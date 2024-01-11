@@ -6,17 +6,18 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/react": "^18.2.21",
-    "@types/react-native": "^0.72.2",
-    "eslint": "^8.21.0",
-    "prettier": "^3.0.3",
-    "prettier-plugin-tailwindcss": "^0.5.4",
-    "turbo": "^1.4.2",
-    "typescript": "^5.2.2"
+    "@types/react": "^18.2.47",
+    "@types/react-native": "^0.73.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "native": "cd apps/expo && yarn start",
-    "web": "cd apps/next && yarn next"
+    "web": "cd apps/next && yarn next",
+    "web:sb": "cd apps/next && yarn storybook"
   },
   "resolutions": {
     "metro": "~0.76.7",
@@ -26,5 +27,5 @@
     "**/expo-router",
     "**/expo-router/**"
   ],
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@4.0.2"
 }
