@@ -16,6 +16,7 @@ const nextConfig = {
     'app',
     'react-native-reanimated',
     'nativewind',
+    'react-native-css-interop',
     'react-native-gesture-handler',
   ],
 }

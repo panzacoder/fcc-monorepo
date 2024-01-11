@@ -1,34 +1,56 @@
+import { clsx } from 'clsx'
 import { ComponentProps, forwardRef } from 'react'
-import { Text as NativeText, Platform, Linking, TextStyle } from 'react-native'
-import { styled, StyledProps } from 'nativewind'
+import { Text as NativeText, Platform, Linking } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
 
-export const Text = styled(NativeText)
-
+export const Text = NativeText
 /**
  * You can use this pattern to create components with default styles
  */
-export const P = styled(NativeText, 'text-base text-black my-4')
+export const P = ({ className, ...props }) => (
+  <Text className={clsx('my-4 text-base text-black', className)} {...props} />
+)
 
 /**
  * Components can have defaultProps and styles
  */
-export const H1 = styled(NativeText, 'text-3xl font-extrabold my-4')
+
+export const H1 = ({ className, ...props }) => (
+  <Text
+    className={clsx('my-4 text-3xl font-extrabold', className)}
+    {...props}
+  />
+)
 H1.defaultProps = {
-  accessibilityLevel: 1,
-  accessibilityRole: 'header',
+  'aria-level': 1,
+  role: 'heading',
 }
 
-export const H2 = styled(NativeText, 'text-2xl font-extrabold my-4')
+export const H2 = ({ className, ...props }) => (
+  <Text
+    className={clsx('my-4 text-2xl font-extrabold', className)}
+    {...props}
+  />
+)
 H2.defaultProps = {
-  accessibilityLevel: 2,
-  accessibilityRole: 'header',
+  'aria-level': 2,
+  role: 'heading',
 }
 
-export const H3 = styled(NativeText, 'text-xl font-bold my-4')
+export const H3 = ({ className, ...props }) => (
+  <Text className={clsx('my-4 text-xl font-bold', className)} {...props} />
+)
 H3.defaultProps = {
-  accessibilityLevel: 3,
-  accessibilityRole: 'header',
+  'aria-level': 3,
+  role: 'heading',
+}
+
+export const H4 = ({ className, ...props }) => (
+  <Text className={clsx('my-4 text-lg font-bold', className)} {...props} />
+)
+H4.defaultProps = {
+  'aria-level': 4,
+  role: 'heading',
 }
 
 /**
@@ -39,7 +61,7 @@ export interface AProps extends ComponentProps<typeof Text> {
   target?: '_blank'
 }
 
-export const A = forwardRef<NativeText, StyledProps<AProps>>(function A(
+export const A = forwardRef<NativeText, AProps>(function A(
   { className = '', href, target, ...props },
   ref,
 ) {
@@ -64,7 +86,7 @@ export const A = forwardRef<NativeText, StyledProps<AProps>>(function A(
 
   return (
     <Text
-      accessibilityRole="link"
+      role="link"
       className={`text-blue-500 hover:underline ${className}`}
       {...props}
       {...nativeAProps}
@@ -73,17 +95,10 @@ export const A = forwardRef<NativeText, StyledProps<AProps>>(function A(
   )
 })
 
-/**
- * Solito's TextLink doesn't work directly with styled() since it has a textProps prop
- * By wrapping it in a function, we can forward style down properly.
- */
-export const TextLink = styled<
-  ComponentProps<typeof SolitoTextLink> & { style?: TextStyle }
->(function TextLink({ style, textProps, ...props }) {
+type TextLinkProps = ComponentProps<typeof SolitoTextLink>
+export const TextLink = ({ className, ...props }: TextLinkProps) => {
+  const defaultClassName = 'text-bae font-bold hover:underline text-blue-500'
   return (
-    <SolitoTextLink
-      textProps={{ ...textProps, style: [style, textProps?.style] }}
-      {...props}
-    />
+    <SolitoTextLink className={clsx(defaultClassName, className)} {...props} />
   )
-}, 'text-base font-bold hover:underline text-blue-500')
+}

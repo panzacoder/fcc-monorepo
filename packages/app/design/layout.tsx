@@ -1,4 +1,6 @@
 import { View } from 'react-native'
-import { styled } from 'nativewind'
+import clsx from 'clsx'
 
-export const Row = styled(View, "flex-row")
+export const Row = ({ className, children }) => (
+  <View className={clsx('flex-row', className)}>{children}</View>
+)
