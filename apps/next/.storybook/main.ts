@@ -1,62 +1,68 @@
 import { join, dirname } from 'path'
-import assert from 'assert'
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+import type { StorybookConfig } from '@storybook/nextjs'
 
 /**
  * This function is used to resolve the absolute path of a package.
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
  */
-function getAbsolutePath(value) {
+function getAbsolutePath(value: string) {
   return dirname(require.resolve(join(value, 'package.json')))
 }
 
-/** @type { import('@storybook/nextjs').StorybookConfig } */
-const config = {
-  stories: [
-    '../stories/**/*.mdx',
-    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-  ],
-  addons: [
-    getAbsolutePath('@storybook/addon-links'),
-    getAbsolutePath('@storybook/addon-essentials'),
-    getAbsolutePath('@storybook/addon-onboarding'),
-    getAbsolutePath('@storybook/addon-interactions'),
-    {
-      name: getAbsolutePath('@storybook/addon-react-native-web'),
-      options: {
-        modulesToTranspile: [
-          'react-native',
-          'react-native-web',
-          'solito',
-          'moti',
-          'app',
-          'react-native-reanimated',
-          'nativewind',
-          'react-native-css-interop',
-          'react-native-gesture-handler',
-        ],
+const projectRoot = join(__dirname, '../../..')
+console.log('storybook config', projectRoot)
 
-        babelPlugins: [
-          // 'react-native-reanimated/plugin', // this breaks...
-        ],
-      },
-    },
-  ],
+const config: StorybookConfig = {
   framework: {
-    name: getAbsolutePath('@storybook/nextjs'),
+    name: '@storybook/nextjs',
     options: {
+      nextConfigPath: '../next.config.js',
       builder: {
         useSWC: true,
       },
     },
   },
+  stories: [
+    '../stories/**/*.mdx',
+    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+  ],
   docs: {
     autodocs: 'tag',
   },
-  webpackFinal: async (config) => {
-    assert(config.resolve)
-    config.resolve.plugins = [new TsconfigPathsPlugin()]
 
+  addons: [
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-essentials'),
+    getAbsolutePath('@storybook/addon-interactions'),
+    {
+      name: getAbsolutePath('@storybook/addon-react-native-web'),
+      options: {
+        projectRoot,
+        modulesToTranspile: [
+          'app', // this is my local monorepo package
+          'react-native',
+          'react-native-web',
+          'solito',
+          'moti',
+          'react-native-reanimated',
+          'react-native-css-interop',
+          'nativewind',
+          'react-native-gesture-handler',
+        ],
+        babelPlugins: [
+          'react-native-reanimated/plugin',
+          [
+            '@babel/plugin-transform-react-jsx',
+            {
+              runtime: 'automatic',
+              importSource: 'nativewind',
+            },
+          ],
+        ],
+      },
+    },
+  ],
+  webpackFinal: async (config: any) => {
     // Remove export-order-loader since it doesn't work properly for CommonJS code
     // It currently appends ES code to CommonJS code resulting in a "exports is not defined" error
     // See https://github.com/storybookjs/storybook/issues/25383
@@ -64,9 +70,9 @@ const config = {
     // although from my testing it doesn't seem to be the case and works fine without it
     // TODO: remove this fix once it is fixed in the library
     config.module.rules = config.module.rules.filter(
-      (rule) =>
-        !rule?.use?.some?.((u) =>
-          String(u?.loader)?.includes?.('export-order-loader'),
+      (rule: any) =>
+        !rule?.use?.some?.(
+          (u: any) => String(u?.loader)?.includes?.('export-order-loader'),
         ),
     )
 

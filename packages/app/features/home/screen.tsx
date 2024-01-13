@@ -1,21 +1,23 @@
-import { A, H1, H2, P, Text, TextLink } from 'app/design/typography'
+import { Typography, A, TextLink } from 'app/design/typography'
 import { Row } from 'app/design/layout'
-import { View } from 'app/design/view'
+import { View } from 'react-native'
 
 import { MotiLink } from 'solito/moti'
 
 export function HomeScreen() {
   return (
     <View className="flex-1 items-center justify-center p-3">
-      <H1>Welcome to Solito.</H1>
-      <H2>It does a good job of translating text types to Native and Web.</H2>
+      <Typography variant="h1">Welcome to Solito.</Typography>
+      <Typography variant="h2">
+        It does a good job of translating text types to Native and Web.
+      </Typography>
       <View className="max-w-xl">
-        <P className="text-center">
+        <Typography className="text-center">
           Here is a basic starter to show you how you can navigate from one
           screen to another. This screen uses the same code on Next.js and React
           Native.
-        </P>
-        <P className="text-center">
+        </Typography>
+        <Typography className="text-center">
           Solito is made by{' '}
           <A
             href="https://twitter.com/fernandotherojo"
@@ -27,8 +29,8 @@ export function HomeScreen() {
             Fernando Rojo
           </A>
           .
-        </P>
-        <P className="text-center">
+        </Typography>
+        <Typography className="text-center">
           NativeWind is made by{' '}
           <A
             href="https://twitter.com/mark__lawlor"
@@ -40,7 +42,7 @@ export function HomeScreen() {
             Mark Lawlor
           </A>
           .
-        </P>
+        </Typography>
       </View>
       <View className="h-[32px]" />
       <Row className="space-x-8">
@@ -60,9 +62,9 @@ export function HomeScreen() {
             duration: 150,
           }}
         >
-          <Text selectable={false} className="text-base font-bold">
+          <Typography selectable={false} className="text-base font-bold">
             Moti Link
-          </Text>
+          </Typography>
         </MotiLink>
       </Row>
     </View>

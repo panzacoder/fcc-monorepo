@@ -2,10 +2,11 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "jsxImportSource": "nativewind",
     "paths": {
       "app/*": ["./packages/app/*"]
     },
-    "jsx": "react-jsx"
+    "jsx": "preserve"
   },
   "extends": "expo/tsconfig.base"
 }

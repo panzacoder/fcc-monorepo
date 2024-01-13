@@ -1,5 +1,10 @@
-/** @type { import('@storybook/nextjs').Preview } */
-const preview = {
+import type { Preview } from '@storybook/react'
+import 'raf/polyfill'
+import 'setimmediate'
+
+import '../global.css'
+
+const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
