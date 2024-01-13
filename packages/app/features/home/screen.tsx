@@ -3,6 +3,7 @@ import { Row } from 'app/design/layout'
 import { View } from 'react-native'
 
 import { MotiLink } from 'solito/moti'
+import Button from 'app/design/button'
 
 export function HomeScreen() {
   return (
@@ -46,6 +47,7 @@ export function HomeScreen() {
       </View>
       <View className="h-[32px]" />
       <Row className="space-x-8">
+        <Button text="Button" />
         <TextLink href="/user/fernando">Regular Link</TextLink>
         <MotiLink
           href="/user/fernando"

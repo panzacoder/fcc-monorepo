@@ -49,17 +49,14 @@ export const Typography = ({
   ...props
 }: TypographyProps) => {
   const defaults = variantDefaultClassNames[variant] as defaultTextProps
-  console.log('props', props)
-  console.log('className', clsx(defaults.className, className))
   return (
     <>
       <Text
         className={clsx(defaults.className, className)}
         aria-level={defaults?.ariaLevel}
         role={defaults?.role}
-      >
-        {props.children}
-      </Text>
+        {...props}
+      />
     </>
   )
 }
