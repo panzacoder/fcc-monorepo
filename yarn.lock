@@ -6507,6 +6507,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
+    "@expo/vector-icons": "npm:^13.0.0"
     class-variance-authority: "npm:^0.7.0"
     clsx: "npm:^2.1.0"
     moti: "npm:^0.27.2"
@@ -9735,6 +9736,7 @@ __metadata:
     expo-router: "npm:^2.0.14"
     expo-splash-screen: "npm:~0.22.0"
     expo-status-bar: "npm:~1.7.1"
+    nativewind: "npm:^4.0.22"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
     react-native: "npm:0.73.2"

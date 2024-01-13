@@ -1,17 +1,12 @@
 // import { vars, useColorScheme } from 'nativewind'
-import { Pressable, Text, View, PressableProps } from 'react-native'
+import { Pressable, PressableProps } from 'react-native'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Typography } from './typography'
-// import { cn } from './utils'
+import { Typography, TypographyProps } from './typography'
+import { cn } from './utils'
 
-const variants = [
-  'flex-row items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+const buttonVariants = cva(
+  'flex-row items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
   {
-    defaultText: 'text-primary-foreground',
-    destructiveText: 'text-destructive-foreground',
-    outlineText: 'text-primary',
-    ghostText: 'text-primary',
-    linkText: 'text-primary',
     variants: {
       variant: {
         default: 'bg-primary hover:bg-primary/90',
@@ -35,20 +30,56 @@ const variants = [
       size: 'default',
     },
   },
-]
+)
 
-const buttonVariants = cva(...variants)
+const buttonTextVariants = cva(
+  'text-sm font-medium transition-colors  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  {
+    variants: {
+      variant: {
+        default: 'text-secondary',
+        destructive: 'text-destructive',
+        outline: 'text-secondary',
+        secondary: 'text-primary',
+        ghost: 'text-secondary',
+        link: 'text-secondary',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+)
 
-interface ButtonProps
-  extends PressableProps,
-  VariantProps<typeof buttonVariants> {
-  text: string
-}
+type ButtonProps = PressableProps &
+  VariantProps<typeof buttonVariants> & {
+    title: string
+    typographyClassName?: string
+  }
 
-const Button: React.FC<ButtonProps> = ({ className, text, ...props }) => {
+const Button = ({
+  title,
+  onPress,
+  className,
+  variant = 'default',
+  size,
+  typographyClassName,
+}: ButtonProps) => {
   return (
-    <Pressable className={className}>
-      <Typography variant="p">{text}</Typography>
+    <Pressable
+      onPress={onPress}
+      className={cn(buttonVariants({ variant, size, className }))}
+    >
+      <Typography
+        className={cn(
+          buttonTextVariants({
+            variant,
+            className: typographyClassName,
+          }),
+        )}
+      >
+        {title}
+      </Typography>
     </Pressable>
   )
 }
