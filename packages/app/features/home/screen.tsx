@@ -4,8 +4,11 @@ import { View } from 'react-native'
 
 import { MotiLink } from 'solito/moti'
 import Button from 'app/design/button'
+import { useRouter } from 'solito/navigation'
 
 export function HomeScreen() {
+  const router = useRouter()
+
   return (
     <View className="flex-1 items-center justify-center p-3">
       <Typography variant="h1">Welcome to Solito.</Typography>
@@ -47,7 +50,7 @@ export function HomeScreen() {
       </View>
       <View className="h-[32px]" />
       <Row className="space-x-8">
-        <Button title="Button" />
+        <Button title="Button" onPress={() => router.push('/user/fernando')} />
         <TextLink href="/user/fernando">Regular Link</TextLink>
         <MotiLink
           href="/user/fernando"
