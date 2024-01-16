@@ -1,6 +1,6 @@
-import '../../../global.css'
 import 'raf/polyfill'
 import 'setimmediate'
+import '../../../global.css'
 
 import { Provider } from 'app/provider'
 import Head from 'next/head'
