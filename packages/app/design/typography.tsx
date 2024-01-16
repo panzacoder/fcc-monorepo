@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { ComponentProps, forwardRef } from 'react'
 import { View, Text, Platform, Linking, Role } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
+import { cn } from './utils'
 
 type defaultTextProps = {
   className: string
@@ -36,7 +37,7 @@ const variantDefaultClassNames = {
   blockquote: {
     className: 'text-base italic border-l-4 border-gray-400 pl-4',
   },
-} as const
+}
 
 export type TypographyProps = ComponentProps<typeof Text> & {
   variant?: keyof typeof variantDefaultClassNames
@@ -52,7 +53,7 @@ export const Typography = ({
   return (
     <>
       <Text
-        className={clsx(defaults.className, className)}
+        className={cn(defaults.className, className)}
         aria-level={defaults?.ariaLevel}
         role={defaults?.role}
         {...props}

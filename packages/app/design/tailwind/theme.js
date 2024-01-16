@@ -1,5 +1,5 @@
 // @ts-check
-const { fontFamily } = require('tailwindcss/defaultTheme')
+// const { fontFamily } = require('tailwindcss/defaultTheme')
 
 /** @type {import('tailwindcss').Config['theme']} */
 const theme = {
@@ -53,9 +53,9 @@ const theme = {
       md: `var(--radius-md)`,
       sm: `var(--radius-sm)`,
     },
-    fontFamily: {
-      sans: ['var(--font-sans)', ...fontFamily.sans],
-    },
+    // fontFamily: {
+    //   sans: ['var(--font-sans)', ...fontFamily.sans],
+    // },
     keyframes: {
       'accordion-down': {
         from: { height: '0' },

@@ -5,7 +5,7 @@ import { Typography, TypographyProps } from './typography'
 import { cn } from './utils'
 
 const buttonVariants = cva(
-  'flex-row items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'flex-row items-center justify-center rounded-md text-sm font-medium  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
   {
     variants: {
       variant: {
@@ -33,7 +33,7 @@ const buttonVariants = cva(
 )
 
 const buttonTextVariants = cva(
-  'text-sm font-medium transition-colors  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'text-sm font-medium disabled:opacity-50 disabled:pointer-events-none ',
   {
     variants: {
       variant: {
