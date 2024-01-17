@@ -11,14 +11,18 @@ const nextConfig = {
   transpilePackages: [
     'react-native',
     'react-native-web',
-    'solito',
-    'moti',
+    'expo',
     'app',
     'react-native-reanimated',
     'nativewind',
     'react-native-css-interop',
     'react-native-gesture-handler',
+    'solito',
+    'moti',
   ],
+  experimental: {
+    forceSwcTransforms: true,
+  },
 }
 
 module.exports = withExpo(nextConfig)

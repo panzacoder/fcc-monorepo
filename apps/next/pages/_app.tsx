@@ -1,11 +1,10 @@
 import 'raf/polyfill'
 import 'setimmediate'
+import '../../../global.css'
 
 import { Provider } from 'app/provider'
 import Head from 'next/head'
-import React from 'react'
 
-import '../global.css'
 import { AppProps } from 'next/app'
 
 function MyApp({ Component, pageProps }: AppProps) {

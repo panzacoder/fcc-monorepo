@@ -13,7 +13,7 @@ const projectRoot = __dirname
 // This can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(projectRoot, '../..')
 
-const config = getDefaultConfig(projectRoot, { isCSSEnabled: true })
+const config = getDefaultConfig(projectRoot)
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot]
@@ -25,4 +25,18 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true
 
-module.exports = withNativeWind(config, { input: '../../global.css' })
+module.exports = withNativeWind(config, {
+  input: '../../global.css',
+  config: './tailwind.config.js',
+  projectRoot,
+  // experiments: {
+  // inlineAnimations: true,
+  // import: true,
+  // native: true,
+  // css: true,
+  // transformCSSImports: true,
+  // asyncImport: true,
+  // asyncImportSearchDirs: [path.resolve(__dirname, '../../')],
+  // },
+})
+console.log(module.exports)

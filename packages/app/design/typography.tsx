@@ -1,56 +1,68 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { ComponentProps, forwardRef } from 'react'
-import { Text as NativeText, Platform, Linking } from 'react-native'
+import { Text, Platform, Linking, Role } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
+import { cn } from './utils'
+import { MotiLink } from 'solito/moti'
 
-export const Text = NativeText
-/**
- * You can use this pattern to create components with default styles
- */
-export const P = ({ className, ...props }) => (
-  <Text className={clsx('my-4 text-base text-black', className)} {...props} />
-)
-
-/**
- * Components can have defaultProps and styles
- */
-
-export const H1 = ({ className, ...props }) => (
-  <Text
-    className={clsx('my-4 text-3xl font-extrabold', className)}
-    {...props}
-  />
-)
-H1.defaultProps = {
-  'aria-level': 1,
-  role: 'heading',
+type defaultTextProps = {
+  className: string
+  ariaLevel?: number
+  role?: Role
+}
+const variantDefaultClassNames = {
+  h1: {
+    className: 'text-3xl font-extrabold',
+    ariaLevel: 1,
+    role: 'heading',
+  },
+  h2: {
+    className: 'text-2xl font-extrabold',
+    ariaLevel: 2,
+    role: 'heading',
+  },
+  h3: { className: 'text-xl font-bold', ariaLevel: 3, role: 'heading' },
+  h4: { className: 'text-lg font-bold', ariaLevel: 4, role: 'heading' },
+  h5: {
+    className: 'text-base font-bold',
+    ariaLevel: 5,
+    role: 'heading',
+  },
+  h6: { className: 'text-sm font-bold', ariaLevel: 6, role: 'heading' },
+  p: { className: 'text-base text-black' },
+  span: { className: 'text-base text-black' },
+  strong: { className: 'text-base font-bold' },
+  em: { className: 'text-base italic' },
+  small: { className: 'text-sm text-black' },
+  a: { className: 'text-blue-500 hover:underline' },
+  blockquote: {
+    className: 'text-base italic border-l-4 border-gray-400 pl-4',
+  },
 }
 
-export const H2 = ({ className, ...props }) => (
-  <Text
-    className={clsx('my-4 text-2xl font-extrabold', className)}
-    {...props}
-  />
-)
-H2.defaultProps = {
-  'aria-level': 2,
-  role: 'heading',
+export type TypographyProps = ComponentProps<typeof Text> & {
+  variant?: keyof typeof variantDefaultClassNames
+  as?: keyof typeof variantDefaultClassNames
 }
-
-export const H3 = ({ className, ...props }) => (
-  <Text className={clsx('my-4 text-xl font-bold', className)} {...props} />
-)
-H3.defaultProps = {
-  'aria-level': 3,
-  role: 'heading',
-}
-
-export const H4 = ({ className, ...props }) => (
-  <Text className={clsx('my-4 text-lg font-bold', className)} {...props} />
-)
-H4.defaultProps = {
-  'aria-level': 4,
-  role: 'heading',
+export const Typography = ({
+  variant = 'p',
+  as = variant,
+  className,
+  ...props
+}: TypographyProps) => {
+  const defaults = variantDefaultClassNames[variant] as defaultTextProps
+  return (
+    <>
+      <Text
+        className={cn(defaults.className, className)}
+        aria-level={defaults?.ariaLevel}
+        role={defaults?.role}
+        {...props}
+      />
+    </>
+  )
 }
 
 /**
@@ -61,7 +73,7 @@ export interface AProps extends ComponentProps<typeof Text> {
   target?: '_blank'
 }
 
-export const A = forwardRef<NativeText, AProps>(function A(
+export const A = forwardRef<Text, AProps>(function A(
   { className = '', href, target, ...props },
   ref,
 ) {
@@ -96,9 +108,48 @@ export const A = forwardRef<NativeText, AProps>(function A(
 })
 
 type TextLinkProps = ComponentProps<typeof SolitoTextLink>
-export const TextLink = ({ className, ...props }: TextLinkProps) => {
-  const defaultClassName = 'text-bae font-bold hover:underline text-blue-500'
+export const TextLink = ({ className, children, ...props }: TextLinkProps) => {
+  const defaultClassName =
+    'text-bae font-bold hover:underline text-blue-500 max-h-full'
   return (
-    <SolitoTextLink className={clsx(defaultClassName, className)} {...props} />
+    <SolitoTextLink {...props}>
+      <Typography className={clsx(defaultClassName, className)}>
+        {children}
+      </Typography>
+    </SolitoTextLink>
+  )
+}
+
+type AnimatedLinkProps = ComponentProps<typeof MotiLink> & {
+  className?: string
+  children: string
+}
+export const AnimatedLink = ({
+  className,
+  children,
+  ...props
+}: AnimatedLinkProps) => {
+  const defaultClassName =
+    'text-bae font-bold hover:underline text-blue-500 max-h-full'
+  return (
+    <MotiLink
+      animate={({ hovered, pressed }) => {
+        'worklet'
+
+        return {
+          scale: pressed ? 0.95 : hovered ? 1.1 : 1,
+          rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg',
+        }
+      }}
+      transition={{
+        type: 'timing',
+        duration: 150,
+      }}
+      {...props}
+    >
+      <Typography className={clsx(defaultClassName, className)}>
+        {children}
+      </Typography>
+    </MotiLink>
   )
 }
