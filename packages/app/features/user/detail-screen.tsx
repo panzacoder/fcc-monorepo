@@ -1,7 +1,8 @@
 import { createParam } from 'solito'
 import { TextLink } from 'solito/link'
 import { View } from 'react-native'
-import { Typography } from 'app/design/typography'
+
+import { Typography } from 'app/ui/typography'
 
 const { useParam } = createParam<{ id: string }>()
 
