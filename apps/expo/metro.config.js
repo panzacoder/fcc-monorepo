@@ -35,4 +35,3 @@ module.exports = withNativeWind(config, {
   configPath: tailwindConfigPath,
   projectRoot,
 })
-console.log(module.exports)
