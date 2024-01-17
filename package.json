@@ -1,5 +1,5 @@
 {
-  "name": "solito-with-tailwind",
+  "name": "fcc-monorepo",
   "private": true,
   "workspaces": [
     "apps/*",
