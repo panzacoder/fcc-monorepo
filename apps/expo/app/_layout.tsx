@@ -1,7 +1,7 @@
+import 'app/design/tailwind/global.css'
 import { Provider } from 'app/provider'
 import { Tabs } from 'expo-router/tabs'
 import Feather from '@expo/vector-icons/Feather'
-import '../../../global.css'
 
 import { LogBox } from 'react-native'
 

@@ -14,6 +14,11 @@ const projectRoot = __dirname
 const workspaceRoot = path.resolve(projectRoot, '../..')
 
 const config = getDefaultConfig(projectRoot)
+const globalCSS = path.resolve(
+  workspaceRoot,
+  'packages/app/design/tailwind/global.css',
+)
+const tailwindConfigPath = path.resolve(projectRoot, 'tailwind.config.js')
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot]
@@ -26,17 +31,8 @@ config.resolver.nodeModulesPaths = [
 config.resolver.disableHierarchicalLookup = true
 
 module.exports = withNativeWind(config, {
-  input: '../../global.css',
-  config: './tailwind.config.js',
+  input: globalCSS,
+  configPath: tailwindConfigPath,
   projectRoot,
-  // experiments: {
-  // inlineAnimations: true,
-  // import: true,
-  // native: true,
-  // css: true,
-  // transformCSSImports: true,
-  // asyncImport: true,
-  // asyncImportSearchDirs: [path.resolve(__dirname, '../../')],
-  // },
 })
 console.log(module.exports)
