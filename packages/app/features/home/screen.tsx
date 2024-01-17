@@ -1,10 +1,10 @@
-import { Typography, A, TextLink } from 'app/design/typography'
-import { Row } from 'app/design/layout'
 import { View } from 'react-native'
-
 import { MotiLink } from 'solito/moti'
-import Button from 'app/design/button'
 import { useRouter } from 'solito/navigation'
+
+import { Typography, A, TextLink } from 'app/ui/typography'
+import Button from 'app/ui/button'
+import { Row } from 'app/ui/layout'
 
 export function HomeScreen() {
   const router = useRouter()

@@ -1,4 +1,4 @@
-import { Typography } from 'app/design/typography'
+import { Typography } from 'app/ui/typography'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const Meta = {

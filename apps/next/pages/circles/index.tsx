@@ -1,4 +1,4 @@
-import { Typography } from 'app/design/typography'
+import { Typography } from 'app/ui/typography'
 
 export default function CirclesTab() {
   return (
