@@ -19,6 +19,9 @@
     "web": "cd apps/next && yarn next",
     "web:sb": "cd apps/next && yarn storybook"
   },
+  "resolutions": {
+    "react-native-reanimated": "3.6.0"
+  },
   "nohoist": [
     "**/expo-router",
     "**/expo-router/**"

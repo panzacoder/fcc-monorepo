@@ -5,14 +5,15 @@ import { Typography, TypographyProps } from './typography'
 import { cn } from './utils'
 
 const buttonVariants = cva(
-  'flex-row items-center justify-center rounded-md text-sm font-medium  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'flex-row items-center justify-center rounded-md text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+
   {
     variants: {
       variant: {
-        default: 'bg-primary hover:bg-primary/90',
-        destructive: 'bg-destructive hover:bg-destructive/90',
+        default: 'bg-primary shadow hover:bg-primary/90',
+        destructive: 'bg-destructive shadow-sm hover:bg-destructive/90',
         outline:
-          'text-primary-foreground border border-input hover:bg-accent hover:text-accent-foreground',
+          'text-primary-foreground border border-input shadow-sm  hover:bg-accent hover:text-accent-foreground',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
@@ -53,12 +54,14 @@ const buttonTextVariants = cva(
 
 type ButtonProps = PressableProps &
   VariantProps<typeof buttonVariants> & {
-    title: string
+    title?: string
+    children?: React.ReactNode
     typographyClassName?: string
   }
 
 const Button = ({
   title,
+  children,
   onPress,
   className,
   variant = 'default',
@@ -70,16 +73,18 @@ const Button = ({
       onPress={onPress}
       className={cn(buttonVariants({ variant, size, className }))}
     >
-      <Typography
-        className={cn(
-          buttonTextVariants({
-            variant,
-            className: typographyClassName,
-          }),
-        )}
-      >
-        {title}
-      </Typography>
+      {children ?? (
+        <Typography
+          className={cn(
+            buttonTextVariants({
+              variant,
+              className: typographyClassName,
+            }),
+          )}
+        >
+          {title}
+        </Typography>
+      )}
     </Pressable>
   )
 }

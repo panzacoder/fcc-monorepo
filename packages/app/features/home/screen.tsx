@@ -49,8 +49,8 @@ export function HomeScreen() {
         </Typography>
       </View>
       <View className="h-[32px]" />
-      <Row className="space-x-8">
-        <Button title="Button" onPress={() => router.push('/user/fernando')} />
+      <Row className="items-center gap-8">
+        <Button title="Home" onPress={() => router.push('/example')} />
         <TextLink href="/user/fernando">Regular Link</TextLink>
         <MotiLink
           href="/user/fernando"

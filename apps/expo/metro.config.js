@@ -29,13 +29,14 @@ module.exports = withNativeWind(config, {
   input: '../../global.css',
   config: './tailwind.config.js',
   projectRoot,
-  experiments: {
-    // import: true,
-    // native: true,
-    css: true,
-    transformCSSImports: true,
-    // asyncImport: true,
-    // asyncImportSearchDirs: [path.resolve(__dirname, '../../')],
-  },
+  // experiments: {
+  // inlineAnimations: true,
+  // import: true,
+  // native: true,
+  // css: true,
+  // transformCSSImports: true,
+  // asyncImport: true,
+  // asyncImportSearchDirs: [path.resolve(__dirname, '../../')],
+  // },
 })
 console.log(module.exports)

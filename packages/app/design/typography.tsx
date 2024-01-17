@@ -1,8 +1,11 @@
+'use client'
+
 import { clsx } from 'clsx'
 import { ComponentProps, forwardRef } from 'react'
-import { View, Text, Platform, Linking, Role } from 'react-native'
+import { Text, Platform, Linking, Role } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
 import { cn } from './utils'
+import { MotiLink } from 'solito/moti'
 
 type defaultTextProps = {
   className: string
@@ -105,7 +108,48 @@ export const A = forwardRef<Text, AProps>(function A(
 })
 
 type TextLinkProps = ComponentProps<typeof SolitoTextLink>
-export const TextLink = ({ className, ...props }: TextLinkProps) => {
-  const defaultClassName = 'text-bae font-bold hover:underline text-blue-500'
-  return <SolitoTextLink className={clsx(className, className)} {...props} />
+export const TextLink = ({ className, children, ...props }: TextLinkProps) => {
+  const defaultClassName =
+    'text-bae font-bold hover:underline text-blue-500 max-h-full'
+  return (
+    <SolitoTextLink {...props}>
+      <Typography className={clsx(defaultClassName, className)}>
+        {children}
+      </Typography>
+    </SolitoTextLink>
+  )
+}
+
+type AnimatedLinkProps = ComponentProps<typeof MotiLink> & {
+  className?: string
+  children: string
+}
+export const AnimatedLink = ({
+  className,
+  children,
+  ...props
+}: AnimatedLinkProps) => {
+  const defaultClassName =
+    'text-bae font-bold hover:underline text-blue-500 max-h-full'
+  return (
+    <MotiLink
+      animate={({ hovered, pressed }) => {
+        'worklet'
+
+        return {
+          scale: pressed ? 0.95 : hovered ? 1.1 : 1,
+          rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg',
+        }
+      }}
+      transition={{
+        type: 'timing',
+        duration: 150,
+      }}
+      {...props}
+    >
+      <Typography className={clsx(defaultClassName, className)}>
+        {children}
+      </Typography>
+    </MotiLink>
+  )
 }
