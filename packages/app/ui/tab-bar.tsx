@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable } from 'react-native'
 import IconButton from './icon-button'
-import Button from './button'
+import { Feather } from '@expo/vector-icons'
 
 const tabIconMap = {
   index: 'home',
@@ -10,7 +10,7 @@ const tabIconMap = {
 export default function MyTabBar({ state, descriptors, navigation }) {
   return (
     <View className="bg-card">
-      <View className="bg-primary mx-12 mb-10 mt-8 flex flex-row flex-nowrap rounded-full p-2">
+      <View className="bg-primary mx-16 mb-10 mt-8 flex flex-row  content-center rounded-full px-2 py-4">
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key]
           const label =
@@ -41,19 +41,21 @@ export default function MyTabBar({ state, descriptors, navigation }) {
             })
           }
 
+          const icon = tabIconMap[route.name]
           return (
-            tabIconMap[route.name] && (
-              <Button
+            icon && (
+              <Pressable
                 key={route.name}
+                className="flex flex-1 flex-row content-center justify-center bg-transparent shadow-none"
                 onPress={onPress}
                 onLongPress={onLongPress}
-                accessibilityRole="button"
-                accessibilityState={isFocused ? { selected: true } : {}}
-                accessibilityLabel={label}
-              // icon={tabIconMap[route.name]}
-              // iconSize={24}
-              // color={isFocused ? 'white' : 'gray'}
-              />
+              >
+                <Feather
+                  name={icon}
+                  size={32}
+                  color={isFocused ? 'white' : 'gray'}
+                />
+              </Pressable>
             )
           )
         })}

@@ -5,7 +5,7 @@ import { Typography, TypographyProps } from './typography'
 import { cn } from './utils'
 
 const buttonVariants = cva(
-  'flex-row items-center justify-center rounded-md text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'flex-row items-center justify-center rounded-md text-sm font-medium web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
 
   {
     variants: {
@@ -63,9 +63,9 @@ const Button = ({
   title,
   children,
   onPress,
-  className,
+  className = '',
   variant = 'default',
-  size,
+  size = 'default',
   typographyClassName,
 }: ButtonProps) => {
   return (

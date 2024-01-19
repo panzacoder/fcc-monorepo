@@ -15,32 +15,32 @@ export default function Root() {
   return (
     <Provider>
       <Tabs
-        // tabBar={MyTabBar}
+        tabBar={MyTabBar}
         screenOptions={{ headerShown: false, tabBarShowLabel: false }}
       >
         <Tabs.Screen
           name="index"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Feather name="home" size={size} color={color} />
-            ),
-          }}
+        // options={{
+        //   tabBarIcon: ({ color, size }) => (
+        //     <Feather name="home" size={size} color={color} />
+        //   ),
+        // }}
         />
         <Tabs.Screen
           name="circles"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Feather name="circle" size={size} color={color} />
-            ),
-          }}
+        // options={{
+        //   tabBarIcon: ({ color, size }) => (
+        //     <Feather name="circle" size={size} color={color} />
+        //   ),
+        // }}
         />
         <Tabs.Screen
           name="planner"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Feather name="calendar" size={size} color={color} />
-            ),
-          }}
+        // options={{
+        //   tabBarIcon: ({ color, size }) => (
+        //     <Feather name="calendar" size={size} color={color} />
+        //   ),
+        // }}
         />
       </Tabs>
     </Provider>
