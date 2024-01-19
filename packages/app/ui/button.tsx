@@ -52,7 +52,7 @@ const buttonTextVariants = cva(
   },
 )
 
-type ButtonProps = PressableProps &
+export type ButtonProps = PressableProps &
   VariantProps<typeof buttonVariants> & {
     title?: string
     children?: React.ReactNode

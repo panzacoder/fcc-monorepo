@@ -10,6 +10,48 @@
 - Expo Router 3
 - Storybook 7 for documentation and testing of components
 
+## 🗂 Folder layout
+
+- `apps` entry points for each app
+
+  - `expo`
+  - `app` you'll be creating files inside of `apps/expo/app` to use file system routing on iOS and Android.
+  - `next`
+
+- `packages` shared packages across apps
+  - `app` you'll be importing most files from `app/`
+    - `design` your app's design system.
+    - `ui` the shared components for web + native. These are the building blocks of the app.
+    - `features` (don't use a `screens` folder. organize by feature.)
+    - `provider` (all the providers that wrap the app, and some no-ops for Web.)
+
+## 🏁 Start the app
+
+- Prerequisites:
+
+  - Node v20
+  - yarn v4 (go to yarn's website to learn more about automatic yarn versioning with npm)
+
+- Install dependencies: `yarn`
+
+- Next.js local dev: `yarn web`
+  - Runs `yarn next`
+
+> Make sure `yarn web` is running first, and then run the mobile app in another shell session.
+
+- Expo local dev:
+  - First, build a dev client onto your device or simulator
+    - `cd apps/expo`
+    - Then, either `expo run:ios`, or `eas build`
+    - NOTE: I have found the above sometimes does not succeed, but the native app will build for me if I install the cocoapods first `npx pod-install`
+  - After building the dev client, from the root of the monorepo...
+    - `yarn native` (This runs `expo start --dev-client`)
+
+### Testing
+
+- Running Storybook
+  - Storybook local server: `yarn web:sb`
+
 ## 👓 How NativeWind works with Solito
 
 ### Fast on every platform
@@ -51,34 +93,6 @@ As a result, using NativeWind with React Native doesn't have significant overhea
 If you're planning on making a website with Tailwind, why not use Solito with NativeWind?
 
 You might accidentally make a great native app when you thought you were just making a website.
-
-## 🗂 Folder layout
-
-- `apps` entry points for each app
-
-  - `expo`
-  - `app` you'll be creating files inside of `apps/expo/app` to use file system routing on iOS and Android.
-  - `next`
-
-- `packages` shared packages across apps
-  - `app` you'll be importing most files from `app/`
-    - `design` your app's design system.
-    - `ui` the shared components for web + native. These are the building blocks of the app.
-    - `features` (don't use a `screens` folder. organize by feature.)
-    - `provider` (all the providers that wrap the app, and some no-ops for Web.)
-
-## 🏁 Start the app
-
-- Install dependencies: `yarn`
-
-- Next.js local dev: `yarn web`
-  - Runs `yarn next`
-- Expo local dev:
-  - First, build a dev client onto your device or simulator
-    - `cd apps/expo`
-    - Then, either `expo run:ios`, or `eas build`
-  - After building the dev client, from the root of the monorepo...
-    - `yarn native` (This runs `expo start --dev-client`)
 
 ## 🆕 Add new dependencies
 
