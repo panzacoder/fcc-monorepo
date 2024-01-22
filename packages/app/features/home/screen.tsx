@@ -11,49 +11,35 @@ export function HomeScreen() {
 
   return (
     <View className="flex-1 items-center justify-center p-3">
-      <Typography variant="h1">Welcome to Solito.</Typography>
-      <Typography variant="h2">
-        It does a good job of translating text types to Native and Web.
-      </Typography>
-      <View className="max-w-xl">
-        <Typography className="text-center">
-          Here is a basic starter to show you how you can navigate from one
-          screen to another. This screen uses the same code on Next.js and React
-          Native.
+      <Typography variant="h1">Family Care Circle</Typography>
+      <Typography variant="h2">A single app across web and mobile.</Typography>
+      <View className="mb-8 max-w-xl">
+        <Typography className="my-1">
+          Much of the code can be written once in the &quot;package/app&quot;
+          folder, and imported into the routes for each platform.
         </Typography>
-        <Typography className="text-center">
-          Solito is made by{' '}
-          <A
-            href="https://twitter.com/fernandotherojo"
-            hrefAttrs={{
-              target: '_blank',
-              rel: 'noreferrer',
-            }}
-          >
-            Fernando Rojo
-          </A>
-          .
+        <Typography className="my-1">
+          These buttons are all currently WIP, showing different ways of
+          building components with interactions on mobile and web. The code is
+          written once and transpiled to different platforms.{' '}
         </Typography>
-        <Typography className="text-center">
-          NativeWind is made by{' '}
-          <A
-            href="https://twitter.com/mark__lawlor"
-            hrefAttrs={{
-              target: '_blank',
-              rel: 'noreferrer',
-            }}
-          >
-            Mark Lawlor
-          </A>
-          .
+
+        <Typography className="my-1">
+          The TextLink component knows to use the proper router (expo or next)
+          for in-app navigation using <A href="https://solito.dev/">Solito</A>
+        </Typography>
+
+        <Typography className="my-1">
+          Similarly, the Button component is using navigation hooks from solito
+          to navigate. These concepts of cross-platform rendering and routing
+          can be powerful for native & web shared components
         </Typography>
       </View>
-      <View className="h-[32px]" />
       <Row className="items-center gap-8">
-        <Button title="Home" onPress={() => router.push('/example')} />
-        <TextLink href="/user/fernando">Regular Link</TextLink>
+        <Button title="Home" onPress={() => router.push('/')} />
+        <TextLink href="/circles">Circles</TextLink>
         <MotiLink
-          href="/user/fernando"
+          href="/planner"
           animate={({ hovered, pressed }) => {
             'worklet'
 
@@ -68,10 +54,22 @@ export function HomeScreen() {
           }}
         >
           <Typography selectable={false} className="text-base font-bold">
-            Moti Link
+            Planner
           </Typography>
         </MotiLink>
       </Row>
+      <Typography variant="h4" className="mb-1 mt-8">
+        Navigation
+      </Typography>
+      <Typography className="my-1">
+        The navigation is only deployed on mobile, using expo router Tabs to
+        switch between screens using native navigation, gestures, and caching.
+      </Typography>
+      <Typography variant="h5" className="my-1">
+        Learn more about Navigation here:
+      </Typography>
+      <A href="https://docs.expo.dev/router/layouts/">Expo Layouts</A>
+      <A href="https://docs.expo.dev/router/advanced/tabs/">Expo Tabs</A>
     </View>
   )
 }
