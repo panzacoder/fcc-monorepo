@@ -43,7 +43,7 @@
   - First, build a dev client onto your device or simulator
     - `cd apps/expo`
     - Then, either `expo run:ios`, or `eas build`
-    - NOTE: I have found the above sometimes does not succeed, but the native app will build for me if I install the cocoapods first `npx pod-install`
+    - This shouldn't be needed. ~NOTE: I have found the above sometimes does not succeed, but the native app will build for me if I install the cocoapods first `npx pod-install`~
   - After building the dev client, from the root of the monorepo...
     - `yarn native` (This runs `expo start --dev-client`)
 
