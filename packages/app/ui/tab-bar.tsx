@@ -16,7 +16,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
 }) => {
   return (
     <View className="bg-muted">
-      <View className="bg-card mx-16 mb-10 mt-8 flex flex-row  content-center rounded-full p-2">
+      <View className="bg-card mx-16 mb-10 mt-8 flex flex-row content-center rounded-full p-2 shadow-md">
         {state.routes.map((route, index: number) => {
           const isFocused = state.index === index
 
@@ -52,7 +52,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
               >
                 <View
                   className={cn(
-                    isFocused ? 'border-primary border-b-2' : 'border-none',
+                    isFocused ? 'border-primary border-b-2' : '',
                     'py-1',
                   )}
                 >
