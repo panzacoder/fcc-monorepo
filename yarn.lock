@@ -9667,7 +9667,7 @@ __metadata:
     app: "npm:*"
     expo: "npm:^50.0.2"
     expo-linking: "npm:~6.2.2"
-    expo-router: "npm:~3.4.3"
+    expo-router: "npm:~3.4.4"
     expo-splash-screen: "npm:~0.26.3"
     expo-status-bar: "npm:~1.11.1"
     nativewind: "npm:^4.0.23"
@@ -9774,9 +9774,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-router@npm:~3.4.3":
-  version: 3.4.3
-  resolution: "expo-router@npm:3.4.3"
+"expo-router@npm:~3.4.4":
+  version: 3.4.4
+  resolution: "expo-router@npm:3.4.4"
   dependencies:
     "@expo/metro-runtime": "npm:3.1.1"
     "@expo/server": "npm:^0.3.0"
@@ -9803,7 +9803,7 @@ __metadata:
       optional: true
     react-native-reanimated:
       optional: true
-  checksum: db2e1f825367acc00c030b38feb9c01c930bd0501762cabbf00352775a6293cae3878ebaa75745609191454b58b82d07e86f8bbf72d5510225d8eead56e2aa8b
+  checksum: 4ac12f00630061aa65da6a5f4a591f7bc74007962317b77dfd062f44bf0482dac71a7f84b3b3648931b154a78f8ca184fd92422959dbe27b0c06bacab6c58f8a
   languageName: node
   linkType: hard
 

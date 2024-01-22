@@ -1,6 +1,6 @@
 import 'app/design/tailwind/global.css'
 import { Tabs } from 'expo-router/tabs'
-import Feather from '@expo/vector-icons/Feather'
+// import Feather from '@expo/vector-icons/Feather'
 import { LogBox } from 'react-native'
 // import { remapProps } from 'nativewind'
 

@@ -1,23 +1,22 @@
 // import { vars, useColorScheme } from 'nativewind'
 import { Pressable, PressableProps } from 'react-native'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Typography, TypographyProps } from './typography'
+import { Typography } from './typography'
 import { cn } from './utils'
 
 const buttonVariants = cva(
-  'flex-row items-center justify-center rounded-md text-sm font-medium web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
+  'flex-row items-center justify-center rounded-full text-sm font-medium active:opacity-90 web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
 
   {
     variants: {
       variant: {
-        default: 'bg-primary shadow hover:bg-primary/90',
+        default: 'bg-primary shadow hover:bg-primary/90 active:opacity-90',
         destructive: 'bg-destructive shadow-sm hover:bg-destructive/90',
         outline:
-          'text-primary-foreground border border-input shadow-sm  hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'underline-offset-4 hover:underline text-primary',
+          'text-primary-foreground border border-input shadow-sm  hover:bg-accent ',
+        secondary: 'bg-secondary  hover:bg-secondary/80',
+        ghost: 'hover:bg-accent',
+        link: 'underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 py-2 px-4',
@@ -38,12 +37,12 @@ const buttonTextVariants = cva(
   {
     variants: {
       variant: {
-        default: 'text-secondary',
-        destructive: 'text-destructive',
-        outline: 'text-secondary',
-        secondary: 'text-primary',
-        ghost: 'text-secondary',
-        link: 'text-secondary',
+        default: 'text-primary-foreground',
+        destructive: 'text-destructive-foreground',
+        outline: 'text-primary hover:text-accent-foreground',
+        secondary: 'text-secondary-foreground',
+        ghost: 'text-secondary hover:text-accent-foreground',
+        link: 'text-primary',
       },
     },
     defaultVariants: {
