@@ -10,10 +10,10 @@ export function HomeScreen() {
   const router = useRouter()
 
   return (
-    <View className="flex-1 items-center justify-center p-3">
+    <View className="flex-1 mt-20 items-center justify-center p-3">
       <Typography variant="h1">Family Care Circle</Typography>
       <Typography variant="h2">A single app across web and mobile.</Typography>
-      <View className="mb-8 max-w-xl">
+      <View className=" max-w-xl">
         <Typography className="my-1">
           Much of the code can be written once in the &quot;package/app&quot;
           folder, and imported into the routes for each platform.

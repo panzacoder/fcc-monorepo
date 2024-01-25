@@ -1,15 +1,15 @@
-import 'app/design/tailwind/global.css'
-import { Tabs } from 'expo-router/tabs'
+import 'app/design/tailwind/global.css';
+import { Tabs } from 'expo-router/tabs';
 // import Feather from '@expo/vector-icons/Feather'
-import { LogBox } from 'react-native'
+import { LogBox } from 'react-native';
 // import { remapProps } from 'nativewind'
 
-import { Provider } from 'app/provider'
-import MyTabBar from 'app/ui/tab-bar'
+import { Provider } from 'app/provider';
+import MyTabBar from 'app/ui/tab-bar';
 
 // TODO: figure out why we get a soft warning about Reanimated. Likely to do with nativewind v4
 // I have double checked that the same Reanimated version is being used in expo sdk v50 and my own code.
-LogBox.ignoreLogs(['[Reanimated]'])
+LogBox.ignoreLogs(['[Reanimated]']);
 
 export default function Root() {
   return (
@@ -42,7 +42,15 @@ export default function Root() {
         //   ),
         // }}
         />
+        <Tabs.Screen
+          name="login"
+        // options={{
+        //   tabBarIcon: ({ color, size }) => (
+        //     <Feather name="calendar" size={size} color={color} />
+        //   ),
+        // }}
+        />
       </Tabs>
     </Provider>
-  )
+  );
 }
