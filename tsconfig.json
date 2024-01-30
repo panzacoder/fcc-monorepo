@@ -5,9 +5,9 @@
     "jsxImportSource": "nativewind",
     "paths": {
       "@native/components/*": ["./apps/expo/components/*"],
-      "app/*": ["./packages/app/*"]
+      "app/*": ["./packages/app/*"],
     },
-    "jsx": "preserve"
+    "jsx": "preserve",
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
 }

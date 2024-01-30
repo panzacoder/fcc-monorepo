@@ -17,7 +17,6 @@ const variantDefaultClassNames = {
     className: 'text-3xl font-extrabold',
     ariaLevel: 1,
     role: 'heading',
-    
   },
   h2: {
     className: 'text-2xl font-extrabold',

@@ -71,8 +71,8 @@ const config: StorybookConfig = {
     // TODO: remove this fix once it is fixed in the library
     config.module.rules = config.module.rules.filter(
       (rule: any) =>
-        !rule?.use?.some?.(
-          (u: any) => String(u?.loader)?.includes?.('export-order-loader'),
+        !rule?.use?.some?.((u: any) =>
+          String(u?.loader)?.includes?.('export-order-loader'),
         ),
     )
 
