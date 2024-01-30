@@ -26,5 +26,8 @@
     "**/expo-router",
     "**/expo-router/**"
   ],
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.0.2",
+  "dependencies": {
+    "react-native-linear-gradient": "^2.8.3"
+  }
 }
