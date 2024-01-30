@@ -6442,6 +6442,7 @@ __metadata:
     clsx: "npm:^2.1.0"
     moti: "npm:^0.27.2"
     nativewind: "npm:^4.0.23"
+    react-native-linear-gradient: "npm:^2.8.3"
     solito: "npm:4.2.0"
     tailwind-merge: "npm:^2.2.1"
     tailwindcss: "npm:^3.4.1"
@@ -10014,7 +10015,6 @@ __metadata:
     eslint: "npm:^8.56.0"
     prettier: "npm:^3.2.4"
     prettier-plugin-tailwindcss: "npm:^0.5.11"
-    react-native-linear-gradient: "npm:^2.8.3"
     turbo: "npm:^1.11.3"
     typescript: "npm:^5.3.3"
   languageName: unknown

@@ -10,7 +10,7 @@ export function HomeScreen() {
   const router = useRouter()
 
   return (
-    <View className="flex-1 mt-20 items-center justify-center p-3">
+    <View className="mt-20 flex-1 items-center justify-center p-3">
       <Typography variant="h1">Family Care Circle</Typography>
       <Typography variant="h2">A single app across web and mobile.</Typography>
       <View className=" max-w-xl">
