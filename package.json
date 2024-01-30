@@ -15,9 +15,9 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "native": "cd apps/expo && yarn start",
-    "web": "cd apps/next && yarn next",
-    "web:sb": "cd apps/next && yarn storybook"
+    "native": "yarn workspace expo-app start",
+    "web": "yarn workspace next-app next",
+    "web:sb": "yarn workspace next-app storybook"
   },
   "resolutions": {
     "react-native-reanimated": "3.6.0"
