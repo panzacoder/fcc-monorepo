@@ -65,6 +65,8 @@ export const Typography = ({
   )
 }
 
+export default Typography
+
 /**
  * This is a more advanced component with custom styles and per-platform functionality
  */
