@@ -1,4 +1,3 @@
-// import { vars, useColorScheme } from 'nativewind'
 import { Pressable, PressableProps } from 'react-native'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Typography } from './typography'
@@ -6,7 +5,6 @@ import { cn } from './utils'
 
 const buttonVariants = cva(
   'flex-row items-center justify-center rounded-full text-sm font-medium active:opacity-90 web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
-
   {
     variants: {
       variant: {
@@ -58,7 +56,7 @@ export type ButtonProps = PressableProps &
     typographyClassName?: string
   }
 
-const Button = ({
+export const Button = ({
   title,
   children,
   onPress,
@@ -87,5 +85,3 @@ const Button = ({
     </Pressable>
   )
 }
-
-export default Button

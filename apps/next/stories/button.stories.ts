@@ -1,18 +1,57 @@
-import Button from 'app/ui/button'
+import { Button } from 'app/ui/button'
+
+import type { Meta, StoryObj } from '@storybook/react'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
-const Meta = {
+const meta: Meta<typeof Button> = {
   title: 'UI/Button',
   component: Button,
   tags: ['autodocs'],
 }
 
-export default Meta
+export default meta
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const Default = {
+export const Default: StoryObj<typeof Button> = {
   args: {
-    variant: 'default',
-    title: 'Click me!',
+    title: 'Click Me',
+    onPress: () => alert('Button Pressed'),
   },
 }
+
+export const Destructive = {
+  args: {
+    ...Default.args,
+    variant: 'destructive',
+    title: 'Delete',
+  },
+}
+
+export const Outline = {
+  args: {
+    ...Default.args,
+    variant: 'outline',
+    title: 'Outline',
+  },
+}
+
+export const SmallSize = {
+  args: {
+    ...Default.args,
+    size: 'sm',
+  },
+}
+
+export const LargeSize = {
+  args: {
+    ...Default.args,
+    size: 'lg',
+  },
+}
+
+// export const IconButton = {
+//   args: {
+//     ...Default.args,
+//     size: 'icon',
+//     children: <Ico />, // Assuming an Icon component is available
+//   },
+// };

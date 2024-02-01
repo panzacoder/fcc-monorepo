@@ -10,7 +10,6 @@ function getAbsolutePath(value: string) {
 }
 
 const projectRoot = join(__dirname, '../../..')
-console.log('storybook config', projectRoot)
 
 const config: StorybookConfig = {
   framework: {
@@ -28,6 +27,9 @@ const config: StorybookConfig = {
   ],
   docs: {
     autodocs: 'tag',
+  },
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
   },
 
   addons: [
@@ -61,6 +63,7 @@ const config: StorybookConfig = {
         ],
       },
     },
+    '@storybook/addon-styling-webpack'
   ],
   webpackFinal: async (config: any) => {
     // Remove export-order-loader since it doesn't work properly for CommonJS code

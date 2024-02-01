@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/react'
 import 'raf/polyfill'
 import 'setimmediate'
 
-import '../global.css'
+import 'app/design/tailwind/global.css'
 
 const preview: Preview = {
   parameters: {
