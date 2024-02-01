@@ -14,17 +14,17 @@ type defaultTextProps = {
 }
 const variantDefaultClassNames = {
   h1: {
-    className: 'text-3xl font-extrabold',
+    className: 'text-5xl font-extrabold',
     ariaLevel: 1,
     role: 'heading',
   },
   h2: {
-    className: 'text-2xl font-extrabold',
+    className: 'text-4xl font-extrabold',
     ariaLevel: 2,
     role: 'heading',
   },
-  h3: { className: 'text-xl font-bold', ariaLevel: 3, role: 'heading' },
-  h4: { className: 'text-lg font-bold', ariaLevel: 4, role: 'heading' },
+  h3: { className: 'text-3xl font-bold', ariaLevel: 3, role: 'heading' },
+  h4: { className: 'text-xl font-bold', ariaLevel: 4, role: 'heading' },
   h5: {
     className: 'text-base font-bold',
     ariaLevel: 5,

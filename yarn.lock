@@ -9637,7 +9637,6 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.23.7"
     "@types/react": "npm:^18.2.48"
-    "@types/react-native": "npm:^0.73.0"
     app: "npm:*"
     expo: "npm:^50.0.2"
     expo-linking: "npm:~6.2.2"
