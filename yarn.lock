@@ -9655,14 +9655,10 @@ __metadata:
     expo-splash-screen: "npm:~0.26.3"
     expo-status-bar: "npm:~1.11.1"
     nativewind: "npm:^4.0.23"
-    react: "npm:18.2.0"
-    react-dom: "npm:18.2.0"
-    react-native: "npm:0.73.2"
     react-native-gesture-handler: "npm:~2.14.1"
     react-native-reanimated: "npm:3.6.0"
     react-native-safe-area-context: "npm:4.8.2"
     react-native-screens: "npm:~3.29.0"
-    react-native-web: "npm:~0.19.10"
     react-native-webview: "npm:^13.6.4"
     tailwindcss: "npm:^3.4.1"
     typescript: "npm:^5.3.3"
@@ -10025,6 +10021,10 @@ __metadata:
     eslint: "npm:^8.56.0"
     prettier: "npm:^3.2.4"
     prettier-plugin-tailwindcss: "npm:^0.5.11"
+    react: "npm:18.2.0"
+    react-dom: "npm:18.2.0"
+    react-native: "npm:0.73.2"
+    react-native-web: "npm:~0.19.10"
     turbo: "npm:^1.11.3"
     typescript: "npm:^5.3.3"
   languageName: unknown
@@ -13659,8 +13659,6 @@ __metadata:
     nativewind: "npm:^4.0.23"
     next: "npm:14.1.0"
     raf: "npm:^3.4.1"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
     setimmediate: "npm:^1.0.5"
     storybook: "npm:^7.6.12"
     tailwindcss: "npm:^3.4.1"
@@ -15399,7 +15397,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:18.2.0, react-dom@npm:^18.2.0":
+"react-dom@npm:18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
   dependencies:
@@ -15730,7 +15728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:18.2.0, react@npm:^18.2.0":
+"react@npm:18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:

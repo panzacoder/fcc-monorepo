@@ -4,6 +4,6 @@
     "nativewind-env.d.ts",
     "rnw-overrides.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-  ],
+    "**/*.tsx"
+  ]
 }

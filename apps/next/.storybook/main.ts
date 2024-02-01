@@ -17,19 +17,19 @@ const config: StorybookConfig = {
     options: {
       nextConfigPath: '../next.config.js',
       builder: {
-        useSWC: true,
-      },
-    },
+        useSWC: true
+      }
+    }
   },
   stories: [
-    '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/app/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   docs: {
-    autodocs: 'tag',
+    autodocs: 'tag'
   },
   typescript: {
-    reactDocgen: 'react-docgen-typescript',
+    reactDocgen: 'react-docgen-typescript'
   },
 
   addons: [
@@ -49,7 +49,7 @@ const config: StorybookConfig = {
           'react-native-reanimated',
           'react-native-css-interop',
           'nativewind',
-          'react-native-gesture-handler',
+          'react-native-gesture-handler'
         ],
         babelPlugins: [
           'react-native-reanimated/plugin',
@@ -57,13 +57,40 @@ const config: StorybookConfig = {
             '@babel/plugin-transform-react-jsx',
             {
               runtime: 'automatic',
-              importSource: 'nativewind',
-            },
-          ],
-        ],
-      },
-    },
-    '@storybook/addon-styling-webpack'
+              importSource: 'nativewind'
+            }
+          ]
+        ]
+      }
+    }
+    // '@storybook/addon-styling-webpack',
+    // {
+    //   name: '@storybook/addon-styling-webpack',
+    //
+    //   options: {
+    //     rules: [
+    //       {
+    //         test: /\.css$/,
+    //         sideEffects: true,
+    //         use: [
+    //           require.resolve('style-loader'),
+    //           {
+    //             loader: require.resolve('css-loader'),
+    //             options: {
+    //               importLoaders: 1,
+    //             },
+    //           },
+    //           {
+    //             loader: require.resolve('postcss-loader'),
+    //             options: {
+    //               implementation: require.resolve('postcss'),
+    //             },
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    // },
   ],
   webpackFinal: async (config: any) => {
     // Remove export-order-loader since it doesn't work properly for CommonJS code
@@ -75,11 +102,11 @@ const config: StorybookConfig = {
     config.module.rules = config.module.rules.filter(
       (rule: any) =>
         !rule?.use?.some?.((u: any) =>
-          String(u?.loader)?.includes?.('export-order-loader'),
-        ),
+          String(u?.loader)?.includes?.('export-order-loader')
+        )
     )
 
     return config
-  },
+  }
 }
 export default config

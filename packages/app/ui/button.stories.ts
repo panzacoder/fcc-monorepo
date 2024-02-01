@@ -1,4 +1,4 @@
-import { Button } from 'app/ui/button'
+import { Button } from './button'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof Button> = {
   title: 'UI/Button',
   component: Button,
-  tags: ['autodocs'],
+  tags: ['autodocs']
 }
 
 export default meta
@@ -14,38 +14,38 @@ export default meta
 export const Default: StoryObj<typeof Button> = {
   args: {
     title: 'Click Me',
-    onPress: () => alert('Button Pressed'),
-  },
+    onPress: () => alert('Button Pressed')
+  }
 }
 
 export const Destructive = {
   args: {
     ...Default.args,
     variant: 'destructive',
-    title: 'Delete',
-  },
+    title: 'Delete'
+  }
 }
 
 export const Outline = {
   args: {
     ...Default.args,
     variant: 'outline',
-    title: 'Outline',
-  },
+    title: 'Outline'
+  }
 }
 
 export const SmallSize = {
   args: {
     ...Default.args,
-    size: 'sm',
-  },
+    size: 'sm'
+  }
 }
 
 export const LargeSize = {
   args: {
     ...Default.args,
-    size: 'lg',
-  },
+    size: 'lg'
+  }
 }
 
 // export const IconButton = {
