@@ -3,7 +3,7 @@ import { MotiLink } from 'solito/moti'
 import { useRouter } from 'solito/navigation'
 
 import { Typography } from 'app/ui/typography'
-import { A, TextLink } from 'app/ui/link'
+import { TextLink } from 'app/ui/link'
 import { Button } from 'app/ui/button'
 import { Row } from 'app/ui/layout'
 
@@ -27,7 +27,8 @@ export function HomeScreen() {
 
         <Typography className="my-1">
           The TextLink component knows to use the proper router (expo or next)
-          for in-app navigation using <A href="https://solito.dev/">Solito</A>
+          for in-app navigation using{' '}
+          <TextLink href="https://solito.dev/">Solito</TextLink>
         </Typography>
 
         <Typography className="my-1">
@@ -69,8 +70,12 @@ export function HomeScreen() {
       <Typography variant="h5" className="my-1">
         Learn more about Navigation here:
       </Typography>
-      <A href="https://docs.expo.dev/router/layouts/">Expo Layouts</A>
-      <A href="https://docs.expo.dev/router/advanced/tabs/">Expo Tabs</A>
+      <TextLink external href="https://docs.expo.dev/router/layouts/">
+        Expo Layouts
+      </TextLink>
+      <TextLink external href="https://docs.expo.dev/router/advanced/tabs/">
+        Expo Tabs
+      </TextLink>
     </View>
   )
 }

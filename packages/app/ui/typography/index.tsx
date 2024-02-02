@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react'
+import { ComponentProps, forwardRef } from 'react'
 import { Text, Role } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
 
@@ -58,19 +58,19 @@ type TypographyVariants = VariantProps<typeof typographyVariants>
 export type TypographyProps = ComponentProps<typeof Text> &
   TypographyVariants & {
     as?: TypographyVariants['variant']
+    target?: string // added for compat with web links
   }
-export const Typography = ({
-  variant = 'p',
-  as = variant,
-  className,
-  ...props
-}: TypographyProps) => {
+export const Typography = forwardRef<Text, TypographyProps>(function Typography(
+  { variant = 'p', as = variant, className, ...props },
+  ref
+) {
   const defaults = variantProps[variant] as defaultTextProps
   return (
     <Text
       className={typographyVariants({ variant, className })}
       {...defaults}
       {...props}
+      ref={ref}
     />
   )
-}
+})

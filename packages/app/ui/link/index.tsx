@@ -1,59 +1,87 @@
 import { Text, Platform, Linking } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
-import { cn } from 'app/ui/utils'
 import { ComponentProps, forwardRef } from 'react'
-import { Typography } from 'app/ui/typography'
+import { Typography, TypographyProps } from 'app/ui/typography'
+import { tv } from 'tailwind-variants'
 
 /**
  * This is a more advanced component with custom styles and per-platform functionality
  */
-export interface AProps extends ComponentProps<typeof Text> {
-  href?: string
-  target?: '_blank'
-}
-export const A = forwardRef<Text, AProps>(function A(
-  { className = '', href, target, ...props },
-  ref
-) {
-  const nativeAProps = Platform.select<Partial<AProps>>({
-    web: {
-      href,
-      target,
-      hrefAttrs: {
-        rel: 'noreferrer',
-        target
-      }
-    },
-    default: {
-      onPress: (event) => {
-        props.onPress && props.onPress(event)
-        if (Platform.OS !== 'web' && href !== undefined) {
-          Linking.openURL(href)
+export type ExternalLinkProps = TypographyProps
+
+export const ExternalLink = forwardRef<Text, ExternalLinkProps>(
+  function ExternalLink({ href, ...props }, ref) {
+    const target = '_blank'
+    console.log('href', href)
+    const nativeAProps = Platform.select<Partial<ExternalLinkProps>>({
+      web: {
+        href,
+        target,
+        hrefAttrs: {
+          rel: 'noreferrer',
+          target
+        }
+      },
+      default: {
+        onPress: (event) => {
+          props.onPress && props.onPress(event)
+          if (Platform.OS !== 'web' && href !== undefined) {
+            Linking.openURL(href)
+          }
         }
       }
-    }
-  })
+    })
 
-  return (
-    <Text
-      role="link"
-      className={`text-blue-500 hover:underline ${className}`}
-      {...props}
-      {...nativeAProps}
-      ref={ref}
-    />
-  )
-})
+    return <Typography role="link" {...props} {...nativeAProps} ref={ref} />
+  }
+)
 
-type TextLinkProps = ComponentProps<typeof SolitoTextLink>
-export const TextLink = ({ className, children, ...props }: TextLinkProps) => {
-  const defaultClassName =
-    'text-bae font-bold hover:underline text-blue-500 max-h-full'
+type InternalLinkProps = ComponentProps<typeof SolitoTextLink>
+
+export const InternalLink = ({
+  className,
+  children,
+  ...props
+}: InternalLinkProps) => {
   return (
     <SolitoTextLink {...props}>
-      <Typography className={cn(defaultClassName, className)}>
-        {children}
-      </Typography>
+      <Typography className={className}>{children}</Typography>
     </SolitoTextLink>
   )
+}
+
+type ConditionalTextLinkProps =
+  | { external?: boolean }
+  | ({ external?: false } & InternalLinkProps)
+  | ({ external: true } & ExternalLinkProps)
+
+const linkStyleVariants = tv({
+  base: 'text-bae max-h-full font-bold text-blue-500 hover:underline',
+  variants: {
+    external: {
+      true: 'underline',
+      false: 'active:underline'
+    }
+  },
+  defaultVariants: {
+    external: false
+  }
+})
+
+export const TextLink = ({
+  className,
+  external = false,
+  ...props
+}: ConditionalTextLinkProps & { className?: string }) => {
+  const classNames = linkStyleVariants({ external, className })
+
+  if (external) {
+    return (
+      <ExternalLink {...(props as ExternalLinkProps)} className={classNames} />
+    )
+  } else {
+    return (
+      <InternalLink {...(props as InternalLinkProps)} className={classNames} />
+    )
+  }
 }
