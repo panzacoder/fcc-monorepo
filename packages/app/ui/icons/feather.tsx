@@ -2,14 +2,21 @@ import { Feather } from '@expo/vector-icons'
 import { cssInterop } from 'nativewind'
 import { ComponentProps } from 'react'
 
-const FeatherWrapper = (props: ComponentProps<typeof Feather>) => {
-  return <Feather {...props} />
+const FeatherWrapper = ({
+  color,
+  ...props
+}: ComponentProps<typeof Feather>) => {
+  console.log('FeatherWrapper', color)
+  return <Feather color={color} {...props} />
 }
 
-cssInterop(FeatherWrapper, {
+const FeatherInterop = cssInterop(FeatherWrapper, {
   className: {
-    target: 'style', // string or boolean
+    target: false, // string or boolean
+    nativeStyleToProp: {
+      backgroundColor: 'color',
+    },
   },
 })
 
-export default FeatherWrapper
+export default FeatherInterop

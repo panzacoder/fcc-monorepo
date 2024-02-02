@@ -15,9 +15,9 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "native": "yarn workspace expo-app start",
-    "web": "yarn workspace next-app next",
-    "web:sb": "yarn workspace next-app storybook"
+    "native": "cd apps/expo && yarn start",
+    "web": "cd apps/next && yarn next",
+    "web:sb": "cd apps/next && yarn storybook"
   },
   "resolutions": {
     "react-native-reanimated": "3.6.0"
@@ -28,6 +28,9 @@
   ],
   "packageManager": "yarn@4.0.2",
   "dependencies": {
+    "expo-device": "^5.9.3",
+    "react-native-element-dropdown": "^2.10.1",
+    "react-native-elements": "^3.4.3",
     "react-native-linear-gradient": "^2.8.3"
   }
 }

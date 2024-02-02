@@ -1,5 +1,9 @@
-import { SplashScreen } from 'app/features/splash/splash'
+import { HomeScreen } from 'app/features/home/screen';
+import { LoginScreen } from 'app/features/auth/login';
+import { SplashScreen } from 'app/features/splash/splash';
 
 export default function Home() {
-  return <SplashScreen />
+  // return <HomeScreen />;
+  // return <LoginScreen />;
+  return <SplashScreen />;
 }
