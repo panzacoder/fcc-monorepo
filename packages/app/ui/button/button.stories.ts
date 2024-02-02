@@ -1,24 +1,24 @@
-import { Button } from './button'
-
+import { Button } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
+type Story = StoryObj<typeof Button>
+type StoryMeta = Meta<typeof Button>
+
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
-const meta: Meta<typeof Button> = {
-  title: 'UI/Button',
-  component: Button,
-  tags: ['autodocs']
+const meta: StoryMeta = {
+  component: Button
 }
 
 export default meta
 
-export const Default: StoryObj<typeof Button> = {
+export const Default: Story = {
   args: {
     title: 'Click Me',
     onPress: () => alert('Button Pressed')
   }
 }
 
-export const Destructive = {
+export const Destructive: Story = {
   args: {
     ...Default.args,
     variant: 'destructive',
@@ -26,7 +26,7 @@ export const Destructive = {
   }
 }
 
-export const Outline = {
+export const Outline: Story = {
   args: {
     ...Default.args,
     variant: 'outline',
@@ -34,24 +34,16 @@ export const Outline = {
   }
 }
 
-export const SmallSize = {
+export const SmallSize: Story = {
   args: {
     ...Default.args,
     size: 'sm'
   }
 }
 
-export const LargeSize = {
+export const LargeSize: Story = {
   args: {
     ...Default.args,
     size: 'lg'
   }
 }
-
-// export const IconButton = {
-//   args: {
-//     ...Default.args,
-//     size: 'icon',
-//     children: <Ico />, // Assuming an Icon component is available
-//   },
-// };

@@ -4,7 +4,7 @@ import { clsx } from 'clsx'
 import { ComponentProps, forwardRef } from 'react'
 import { Text, Platform, Linking, Role } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
-import { cn } from './utils'
+import { cn } from '../utils'
 import { MotiLink } from 'solito/moti'
 
 type defaultTextProps = {
@@ -16,19 +16,19 @@ const variantDefaultClassNames = {
   h1: {
     className: 'text-5xl font-extrabold',
     ariaLevel: 1,
-    role: 'heading',
+    role: 'heading'
   },
   h2: {
     className: 'text-4xl font-extrabold',
     ariaLevel: 2,
-    role: 'heading',
+    role: 'heading'
   },
   h3: { className: 'text-3xl font-bold', ariaLevel: 3, role: 'heading' },
   h4: { className: 'text-xl font-bold', ariaLevel: 4, role: 'heading' },
   h5: {
     className: 'text-base font-bold',
     ariaLevel: 5,
-    role: 'heading',
+    role: 'heading'
   },
   h6: { className: 'text-sm font-bold', ariaLevel: 6, role: 'heading' },
   p: { className: 'text-base text-black' },
@@ -38,8 +38,8 @@ const variantDefaultClassNames = {
   small: { className: 'text-sm text-black' },
   a: { className: 'text-blue-500 hover:underline' },
   blockquote: {
-    className: 'text-base italic border-l-4 border-gray-400 pl-4',
-  },
+    className: 'text-base italic border-l-4 border-gray-400 pl-4'
+  }
 }
 
 export type TypographyProps = ComponentProps<typeof Text> & {
@@ -75,7 +75,7 @@ export interface AProps extends ComponentProps<typeof Text> {
 
 export const A = forwardRef<Text, AProps>(function A(
   { className = '', href, target, ...props },
-  ref,
+  ref
 ) {
   const nativeAProps = Platform.select<Partial<AProps>>({
     web: {
@@ -83,8 +83,8 @@ export const A = forwardRef<Text, AProps>(function A(
       target,
       hrefAttrs: {
         rel: 'noreferrer',
-        target,
-      },
+        target
+      }
     },
     default: {
       onPress: (event) => {
@@ -92,8 +92,8 @@ export const A = forwardRef<Text, AProps>(function A(
         if (Platform.OS !== 'web' && href !== undefined) {
           Linking.openURL(href)
         }
-      },
-    },
+      }
+    }
   })
 
   return (
@@ -138,12 +138,12 @@ export const AnimatedLink = ({
 
         return {
           scale: pressed ? 0.95 : hovered ? 1.1 : 1,
-          rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg',
+          rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg'
         }
       }}
       transition={{
         type: 'timing',
-        duration: 150,
+        duration: 150
       }}
       {...props}
     >

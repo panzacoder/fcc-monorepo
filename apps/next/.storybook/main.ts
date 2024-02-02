@@ -26,7 +26,7 @@ const config: StorybookConfig = {
     '../../../packages/app/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   docs: {
-    autodocs: 'tag'
+    autodocs: true
   },
   typescript: {
     reactDocgen: 'react-docgen-typescript'
@@ -63,34 +63,6 @@ const config: StorybookConfig = {
         ]
       }
     }
-    // '@storybook/addon-styling-webpack',
-    // {
-    //   name: '@storybook/addon-styling-webpack',
-    //
-    //   options: {
-    //     rules: [
-    //       {
-    //         test: /\.css$/,
-    //         sideEffects: true,
-    //         use: [
-    //           require.resolve('style-loader'),
-    //           {
-    //             loader: require.resolve('css-loader'),
-    //             options: {
-    //               importLoaders: 1,
-    //             },
-    //           },
-    //           {
-    //             loader: require.resolve('postcss-loader'),
-    //             options: {
-    //               implementation: require.resolve('postcss'),
-    //             },
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    // },
   ],
   webpackFinal: async (config: any) => {
     // Remove export-order-loader since it doesn't work properly for CommonJS code
