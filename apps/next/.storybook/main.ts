@@ -23,7 +23,8 @@ const config: StorybookConfig = {
   },
   stories: [
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../../../packages/app/**/*.stories.@(js|jsx|ts|tsx)'
+    '../../../packages/app/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/app/**/*.mdx'
   ],
   docs: {
     autodocs: true
