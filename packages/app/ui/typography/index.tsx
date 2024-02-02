@@ -1,61 +1,76 @@
 import { ComponentProps } from 'react'
 import { Text, Role } from 'react-native'
-import { cn } from '../utils'
+import { tv, type VariantProps } from 'tailwind-variants'
 
-type defaultTextProps = {
-  className: string
-  ariaLevel?: number
-  role?: Role
-}
-const variantDefaultClassNames = {
+const typographyVariants = tv({
+  base: 'text-base text-black',
+  variants: {
+    variant: {
+      h1: 'text-5xl font-extrabold',
+      h2: 'text-4xl font-extrabold',
+      h3: 'text-3xl font-bold',
+      h4: 'text-xl font-bold',
+      h5: 'font-bold',
+      h6: 'text-sm font-bold',
+      p: '',
+      span: '',
+      strong: 'font-bold',
+      em: 'italic',
+      small: 'text-sm',
+      a: 'text-blue-500 hover:underline',
+      blockquote: 'border-l-4 border-gray-400 pl-4 italic'
+    }
+  }
+})
+
+const variantProps = {
   h1: {
-    className: 'text-5xl font-extrabold',
-    ariaLevel: 1,
+    'aria-level': 1,
     role: 'heading'
   },
   h2: {
-    className: 'text-4xl font-extrabold',
-    ariaLevel: 2,
+    'aria-level': 2,
     role: 'heading'
   },
-  h3: { className: 'text-3xl font-bold', ariaLevel: 3, role: 'heading' },
-  h4: { className: 'text-xl font-bold', ariaLevel: 4, role: 'heading' },
+  h3: { 'aria-level': 3, role: 'heading' },
+  h4: { 'aria-level': 4, role: 'heading' },
   h5: {
-    className: 'text-base font-bold',
-    ariaLevel: 5,
+    'aria-level': 5,
     role: 'heading'
   },
-  h6: { className: 'text-sm font-bold', ariaLevel: 6, role: 'heading' },
-  p: { className: 'text-base text-black' },
-  span: { className: 'text-base text-black' },
-  strong: { className: 'text-base font-bold' },
-  em: { className: 'text-base italic' },
-  small: { className: 'text-sm text-black' },
-  a: { className: 'text-blue-500 hover:underline' },
-  blockquote: {
-    className: 'text-base italic border-l-4 border-gray-400 pl-4'
-  }
+  h6: { 'aria-level': 6, role: 'heading' },
+  p: {},
+  span: {},
+  strong: {},
+  em: {},
+  small: {},
+  a: {},
+  blockquote: {}
 }
 
-export type TypographyProps = ComponentProps<typeof Text> & {
-  variant?: keyof typeof variantDefaultClassNames
-  as?: keyof typeof variantDefaultClassNames
+type defaultTextProps = {
+  'aria-level'?: number
+  role?: Role
 }
+
+type TypographyVariants = VariantProps<typeof typographyVariants>
+
+export type TypographyProps = ComponentProps<typeof Text> &
+  TypographyVariants & {
+    as?: TypographyVariants['variant']
+  }
 export const Typography = ({
   variant = 'p',
   as = variant,
   className,
   ...props
 }: TypographyProps) => {
-  const defaults = variantDefaultClassNames[variant] as defaultTextProps
+  const defaults = variantProps[variant] as defaultTextProps
   return (
-    <>
-      <Text
-        className={cn(defaults.className, className)}
-        aria-level={defaults?.ariaLevel}
-        role={defaults?.role}
-        {...props}
-      />
-    </>
+    <Text
+      className={typographyVariants({ variant, className })}
+      {...defaults}
+      {...props}
+    />
   )
 }
