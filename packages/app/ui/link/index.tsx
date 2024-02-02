@@ -1,9 +1,8 @@
 import { Text, Platform, Linking } from 'react-native'
 import { TextLink as SolitoTextLink } from 'solito/link'
-import { cn } from './utils'
+import { cn } from 'app/ui/utils'
 import { ComponentProps, forwardRef } from 'react'
-import { MotiLink } from 'solito/moti'
-import Typography from './typography'
+import { Typography } from 'app/ui/typography'
 
 /**
  * This is a more advanced component with custom styles and per-platform functionality
@@ -14,7 +13,7 @@ export interface AProps extends ComponentProps<typeof Text> {
 }
 export const A = forwardRef<Text, AProps>(function A(
   { className = '', href, target, ...props },
-  ref,
+  ref
 ) {
   const nativeAProps = Platform.select<Partial<AProps>>({
     web: {
@@ -22,8 +21,8 @@ export const A = forwardRef<Text, AProps>(function A(
       target,
       hrefAttrs: {
         rel: 'noreferrer',
-        target,
-      },
+        target
+      }
     },
     default: {
       onPress: (event) => {
@@ -31,8 +30,8 @@ export const A = forwardRef<Text, AProps>(function A(
         if (Platform.OS !== 'web' && href !== undefined) {
           Linking.openURL(href)
         }
-      },
-    },
+      }
+    }
   })
 
   return (
@@ -56,39 +55,5 @@ export const TextLink = ({ className, children, ...props }: TextLinkProps) => {
         {children}
       </Typography>
     </SolitoTextLink>
-  )
-}
-
-type AnimatedLinkProps = ComponentProps<typeof MotiLink> & {
-  className?: string
-  children: string
-}
-export const AnimatedLink = ({
-  className,
-  children,
-  ...props
-}: AnimatedLinkProps) => {
-  const defaultClassName =
-    'text-bae font-bold hover:underline text-blue-500 max-h-full'
-  return (
-    <MotiLink
-      animate={({ hovered, pressed }) => {
-        'worklet'
-
-        return {
-          scale: pressed ? 0.95 : hovered ? 1.1 : 1,
-          rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg',
-        }
-      }}
-      transition={{
-        type: 'timing',
-        duration: 150,
-      }}
-      {...props}
-    >
-      <Typography className={cn(defaultClassName, className)}>
-        {children}
-      </Typography>
-    </MotiLink>
   )
 }

@@ -2,7 +2,8 @@ import { View } from 'react-native'
 import { MotiLink } from 'solito/moti'
 import { useRouter } from 'solito/navigation'
 
-import { Typography, A, TextLink } from 'app/ui/typography'
+import { Typography } from 'app/ui/typography'
+import { A, TextLink } from 'app/ui/link'
 import { Button } from 'app/ui/button'
 import { Row } from 'app/ui/layout'
 
