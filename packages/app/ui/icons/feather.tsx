@@ -8,8 +8,8 @@ const FeatherWrapper = (props: ComponentProps<typeof Feather>) => {
 
 cssInterop(FeatherWrapper, {
   className: {
-    target: 'style', // string or boolean
-  },
+    target: 'style' // string or boolean
+  }
 })
 
 export default FeatherWrapper

@@ -18,11 +18,11 @@ const nextConfig = {
     'react-native-css-interop',
     'react-native-gesture-handler',
     'solito',
-    'moti',
+    'moti'
   ],
   experimental: {
-    forceSwcTransforms: true,
-  },
+    forceSwcTransforms: true
+  }
 }
 
 module.exports = withExpo(nextConfig)
