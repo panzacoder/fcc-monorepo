@@ -2,8 +2,9 @@ import { View } from 'react-native'
 import { MotiLink } from 'solito/moti'
 import { useRouter } from 'solito/navigation'
 
-import { Typography, A, TextLink } from 'app/ui/typography'
-import Button from 'app/ui/button'
+import { Typography } from 'app/ui/typography'
+import { TextLink } from 'app/ui/link'
+import { Button } from 'app/ui/button'
 import { Row } from 'app/ui/layout'
 
 export function HomeScreen() {
@@ -26,7 +27,8 @@ export function HomeScreen() {
 
         <Typography className="my-1">
           The TextLink component knows to use the proper router (expo or next)
-          for in-app navigation using <A href="https://solito.dev/">Solito</A>
+          for in-app navigation using{' '}
+          <TextLink href="https://solito.dev/">Solito</TextLink>
         </Typography>
 
         <Typography className="my-1">
@@ -45,12 +47,12 @@ export function HomeScreen() {
 
             return {
               scale: pressed ? 0.95 : hovered ? 1.1 : 1,
-              rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg',
+              rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg'
             }
           }}
           transition={{
             type: 'timing',
-            duration: 150,
+            duration: 150
           }}
         >
           <Typography selectable={false} className="text-base font-bold">
@@ -68,8 +70,12 @@ export function HomeScreen() {
       <Typography variant="h5" className="my-1">
         Learn more about Navigation here:
       </Typography>
-      <A href="https://docs.expo.dev/router/layouts/">Expo Layouts</A>
-      <A href="https://docs.expo.dev/router/advanced/tabs/">Expo Tabs</A>
+      <TextLink external href="https://docs.expo.dev/router/layouts/">
+        Expo Layouts
+      </TextLink>
+      <TextLink external href="https://docs.expo.dev/router/advanced/tabs/">
+        Expo Tabs
+      </TextLink>
     </View>
   )
 }

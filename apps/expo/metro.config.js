@@ -16,7 +16,7 @@ const workspaceRoot = path.resolve(projectRoot, '../..')
 const config = getDefaultConfig(projectRoot)
 const globalCSS = path.resolve(
   workspaceRoot,
-  'packages/app/design/tailwind/global.css',
+  'packages/app/design/tailwind/global.css'
 )
 const tailwindConfigPath = path.resolve(projectRoot, 'tailwind.config.js')
 
@@ -25,7 +25,7 @@ config.watchFolders = [workspaceRoot]
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
-  path.resolve(workspaceRoot, 'node_modules'),
+  path.resolve(workspaceRoot, 'node_modules')
 ]
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true
@@ -33,5 +33,5 @@ config.resolver.disableHierarchicalLookup = true
 module.exports = withNativeWind(config, {
   input: globalCSS,
   configPath: tailwindConfigPath,
-  projectRoot,
+  projectRoot
 })

@@ -1,6 +1,6 @@
 // This is a dummy tailwind config file used to provide intellisense.
 // To configure your global tailwind settings, modify the imported theme object.
-const { theme } = require('app/design/tailwind/theme')
+const { theme } = require('./design/tailwind/theme')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -9,6 +9,6 @@ module.exports = {
   important: 'html',
   darkMode: ['class'],
   theme: {
-    ...theme,
-  },
+    ...theme
+  }
 }

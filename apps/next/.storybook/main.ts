@@ -10,7 +10,6 @@ function getAbsolutePath(value: string) {
 }
 
 const projectRoot = join(__dirname, '../../..')
-console.log('storybook config', projectRoot)
 
 const config: StorybookConfig = {
   framework: {
@@ -18,16 +17,20 @@ const config: StorybookConfig = {
     options: {
       nextConfigPath: '../next.config.js',
       builder: {
-        useSWC: true,
-      },
-    },
+        useSWC: true
+      }
+    }
   },
   stories: [
-    '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/app/**/*.stories.@(js|jsx|ts|tsx)',
+    '../../../packages/app/**/*.mdx'
   ],
   docs: {
-    autodocs: 'tag',
+    autodocs: true
+  },
+  typescript: {
+    reactDocgen: 'react-docgen-typescript'
   },
 
   addons: [
@@ -47,7 +50,7 @@ const config: StorybookConfig = {
           'react-native-reanimated',
           'react-native-css-interop',
           'nativewind',
-          'react-native-gesture-handler',
+          'react-native-gesture-handler'
         ],
         babelPlugins: [
           'react-native-reanimated/plugin',
@@ -55,12 +58,12 @@ const config: StorybookConfig = {
             '@babel/plugin-transform-react-jsx',
             {
               runtime: 'automatic',
-              importSource: 'nativewind',
-            },
-          ],
-        ],
-      },
-    },
+              importSource: 'nativewind'
+            }
+          ]
+        ]
+      }
+    }
   ],
   webpackFinal: async (config: any) => {
     // Remove export-order-loader since it doesn't work properly for CommonJS code
@@ -72,11 +75,11 @@ const config: StorybookConfig = {
     config.module.rules = config.module.rules.filter(
       (rule: any) =>
         !rule?.use?.some?.((u: any) =>
-          String(u?.loader)?.includes?.('export-order-loader'),
-        ),
+          String(u?.loader)?.includes?.('export-order-loader')
+        )
     )
 
     return config
-  },
+  }
 }
 export default config

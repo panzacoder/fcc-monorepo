@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather'
 
-import Button, { ButtonProps } from './button'
+import { Button, ButtonProps } from './button'
 import { ComponentProps } from 'react'
 
 export type IconButtonProps = {

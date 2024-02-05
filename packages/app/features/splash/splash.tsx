@@ -1,4 +1,4 @@
-import { AccentLink } from 'app/ui/accent-button'
+import { AccentButton } from 'app/ui/accent-button'
 import { View, Text } from 'react-native'
 import { Typography } from 'app/ui/typography'
 
@@ -11,8 +11,8 @@ export function SplashScreen() {
       </Typography>
 
       <View className="flex flex-col items-end gap-6">
-        <AccentLink title="Log in" href="/login" />
-        <AccentLink title="Sign up" href="/" />
+        <AccentButton title="Log in" href="/login" />
+        <AccentButton title="Sign up" href="/home" />
       </View>
     </View>
   )

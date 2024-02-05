@@ -13,7 +13,7 @@ const area = {
   bottom: 0,
   left: 0,
   right: 0,
-  top: 0,
+  top: 0
 
   // you could also use CSS env variables like below:
   // but you'll have to be sure to override the types for `useSafeArea`

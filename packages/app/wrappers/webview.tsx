@@ -5,7 +5,7 @@ export default function WebView({ path }) {
   return (
     <RNWebView
       source={{
-        uri: new URL(path || '404', baseURL).toString(),
+        uri: new URL(path || '404', baseURL).toString()
       }}
     />
   )
