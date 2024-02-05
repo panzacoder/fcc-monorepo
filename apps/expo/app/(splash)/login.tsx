@@ -3,24 +3,18 @@ import {
   View,
   Image,
   Text,
-  Dimensions,
   TouchableOpacity,
-  TouchableHighlight,
   Alert,
-  TextInput,
+  TextInput
 } from 'react-native'
-import { MotiLink } from 'solito/moti'
 import { router } from 'expo-router'
 import { CallPostService } from '../provider/fetchServerData'
 import { BASE_URL, USER_LOGIN } from '../constant/urlConstants'
 import { getUserDeviceInformation } from '../utils/utils'
-import { Typography, TextLink } from 'app/ui/typography'
-// import Button from 'app/ui/button';
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
 import PtsHeader from 'app/ui/PtsHeader'
-import { Row } from 'app/ui/layout'
 export default function Login() {
   const [email, onChangeEmail] = useState('')
   const [password, onChangePassword] = useState('')
@@ -28,7 +22,6 @@ export default function Login() {
   const [isShowPassword, onChangeShowPassword] = useState(false)
   async function buttonPressed() {
     console.log('email', email)
-    // console.log('password', password)
     if (!email) {
       Alert.alert('', 'Please Enter Email')
       return
@@ -45,8 +38,8 @@ export default function Login() {
       appuserVo: {
         emailOrPhone: email,
         credential: password,
-        rememberMe: true,
-      },
+        rememberMe: true
+      }
     }
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
@@ -67,9 +60,7 @@ export default function Login() {
   }
 
   return (
-    // <View>
     <View className="flex-1 bg-white">
-      {/* <Typography variant="h1">Login Page</Typography> */}
       <PtsHeader title="Login" />
       <PtsLoader loading={isLoading} />
       <Image
@@ -81,38 +72,7 @@ export default function Login() {
       <Text className="self-center text-center text-[16px] text-black">
         {'Welcome to Family Care Circle'}
       </Text>
-      {/* <Image
-        source={require('../../../assets/shapes.png')}
-        className="absolute right-[0] top-[140] self-center"
-        resizeMode={'contain'}
-        alt="shapes"
-      /> */}
       <View className=" ">
-        {/* <Image
-          source={require('../../../assets/logoWithText.png')}
-          className="ml-[15] mt-[15]"
-          resizeMode={'contain'}
-          alt="logoWithText"
-        /> */}
-        {/* <Text className="absolute right-[10] top-[10] self-center text-center text-[16px] text-black">
-          {'New here?'}
-        </Text>
-        <Text
-          onPress={() => {
-            router.push('/signUp')
-          }}
-          className="absolute right-[10] top-[30] self-center text-center text-[16px] text-[#0C68DC]"
-        >
-          {'Sign Up'}
-        </Text> */}
-
-        {/* <TextInput
-          className="m-5 h-[40] rounded-[5px] border-[1px] border-black px-5"
-          onChangeText={(email) => onChangeEmail(email)}
-          placeholder={'Email Address'}
-          value={email}
-          defaultValue=""
-        /> */}
         <PtsTextInput
           className={`m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5 `}
           onChangeText={onChangeEmail.bind(this)}
@@ -181,8 +141,6 @@ export default function Login() {
           />
         </View>
       </View>
-
-      {/* </View> */}
     </View>
   )
 }
