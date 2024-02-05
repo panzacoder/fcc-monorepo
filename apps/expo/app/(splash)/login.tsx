@@ -6,10 +6,8 @@ import { BASE_URL, USER_LOGIN } from '../../constant/urlConstants'
 import { getUserDeviceInformation } from '../../utils/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
-import PtsButton from 'app/ui/PtsButton'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
-import { TextLink } from 'app/ui/link'
 import headerAction from '../../redux/header/headerAction'
 import { Feather } from 'app/ui/icons'
 import store from '../../redux/store'
@@ -115,25 +113,14 @@ export default function Login() {
               title="Forgot Password?"
               variant="link"
               onPress={() => {
-                // router.push('/forgotPassword')
-                router.push('/verification')
+                router.push('/forgotPassword')
               }}
             />
 
-            {/* 
-            //on button click with this button componet , state was being reset. So did changes in PtsButton.
             <Button
               title="Log in"
               trailingIcon="arrow-right"
-              onPress={buttonPressed.bind(this)}
-            /> */}
-            <PtsButton
-              trailingIcon="arrow-right"
-              onPress={() => {
-                buttonPressed()
-              }}
-              className="w-[30%]"
-              title="Log In"
+              onPress={buttonPressed}
             />
           </View>
         </View>

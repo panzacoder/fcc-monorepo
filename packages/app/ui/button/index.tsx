@@ -54,7 +54,6 @@ const buttonVariants = tv({
 export type ButtonProps = PressableProps &
   VariantProps<typeof buttonVariants> & {
     title?: string
-    children?: React.ReactNode
     typographyClassName?: string
     leadingIcon?: ComponentProps<typeof Feather>['name']
     trailingIcon?: ComponentProps<typeof Feather>['name']
@@ -62,7 +61,6 @@ export type ButtonProps = PressableProps &
 
 export const Button = ({
   title,
-  children,
   onPress,
   className = '',
   variant = 'default',
@@ -77,15 +75,13 @@ export const Button = ({
       {leadingIcon && (
         <Feather name={leadingIcon} size={16} color="white" className="" />
       )}
-      {children ?? (
-        <Typography
-          className={text({
-            className: typographyClassName
-          })}
-        >
-          {title}
-        </Typography>
-      )}
+      <Typography
+        className={text({
+          className: typographyClassName
+        })}
+      >
+        {title}
+      </Typography>
       {trailingIcon && (
         <Feather name={trailingIcon} size={16} color="white" className="" />
       )}
