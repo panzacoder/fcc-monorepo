@@ -3,5 +3,7 @@
   "useTabs": false,
   "tabWidth": 2,
   "singleQuote": true,
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "trailingComma": "none",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindFunctions": ["tv"]
 }

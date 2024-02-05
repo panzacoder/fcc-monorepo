@@ -1,81 +1,19 @@
-import { View, Image, Text, Dimensions, TouchableOpacity } from 'react-native'
-import { useEffect, useState } from 'react'
-import { MotiLink } from 'solito/moti'
-// import { useRouter } from 'solito/navigation'
-
-import { router } from 'expo-router'
-import { Typography, A, TextLink } from 'app/ui/typography'
-import Button from 'app/ui/button'
-import { Row } from 'app/ui/layout'
+import { AccentButton } from 'app/ui/accent-button'
+import { View, Text } from 'react-native'
+import { Typography } from 'app/ui/typography'
 
 export function SplashScreen() {
-  // const router = useRouter()
-  const height = Dimensions.get('window').height
   return (
-    <View className="flex-1 bg-[#6493d9]">
-      <View className="">
-        <Text className="absolute top-[220] z-[1] self-center text-center text-[38px] font-bold text-white">
-          {"Caregiving isn't \neasy.\n\n Let's lighten the load a bit."}
-        </Text>
+    <View className="mx-4 flex h-full flex-col justify-between gap-40 pb-40 pt-80">
+      <Typography variant="h2" className="text-center font-bold text-white">
+        Caregiving can be <Text className="italic">heavy</Text>.
+        {"\n\nLet's lighten the load."}
+      </Typography>
+
+      <View className="flex flex-col items-end gap-6">
+        <AccentButton title="Log in" href="/login" />
+        <AccentButton title="Sign up" href="/home" />
       </View>
-
-      <Image
-        source={require('../../../../assets/logo.png')}
-        className="absolute top-[40] z-[-1] h-[178] w-[223] self-center"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <Image
-        source={require('../../../../assets/shapes.png')}
-        className=" mr-[-20] mt-[140] self-center"
-        resizeMode={'contain'}
-        alt="shapes"
-      />
-
-      <View>
-        <TouchableOpacity
-          className="flex-row"
-          onPress={() => {
-            // console.log('in login ')
-            router.push('/login')
-          }}
-        >
-          <Text className="absolute bottom-[65] right-[65] self-center text-center text-[28px] font-bold text-white">
-            {'Login'}
-          </Text>
-          <Image
-            source={require('../../../../assets/arrow_right.png')}
-            className="absolute bottom-[60] right-[10] "
-            resizeMode={'contain'}
-            alt="arrow_right"
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className="flex-row"
-          onPress={() => {
-            // console.log('in sign up ')
-            router.push('/signUp')
-          }}
-        >
-          <Text className="absolute bottom-[5] right-[65] self-center text-center text-[28px] font-bold text-white ">
-            {'Sign Up'}
-          </Text>
-          <Image
-            source={require('../../../../assets/arrow_right.png')}
-            className="absolute bottom-[0] right-[10] "
-            resizeMode={'contain'}
-            alt="arrow_right"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* <Image
-                source={require('../../../../assets/splash.png')}
-                className=" self-center mt-[140]"
-                resizeMode={'cover'}
-
-            /> */}
     </View>
   )
 }

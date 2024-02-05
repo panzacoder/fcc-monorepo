@@ -38,15 +38,6 @@ export default function Root() {
         //   ),
         // }}
       />
-      <Tabs.Screen
-        name="login"
-        // options={{
-        //   tabBarIcon: ({ color, size }) => (
-        //     <Feather name="calendar" size={size} color={color} />
-        //   ),
-        // }}
-      />
-    
     </Tabs>
   )
 }

@@ -5,6 +5,17 @@
     "apps/*",
     "packages/*"
   ],
+  "dependencies": {
+    "expo-device": "^5.9.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.73.2",
+    "react-native-element-dropdown": "^2.10.1",
+    "react-native-elements": "^3.4.3",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-web": "~0.19.10",
+    "tailwind-variants": "^0.1.20"
+  },
   "devDependencies": {
     "@types/react": "^18.2.48",
     "@types/react-native": "^0.73.0",
@@ -15,9 +26,10 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "native": "cd apps/expo && yarn start",
-    "web": "cd apps/next && yarn next",
-    "web:sb": "cd apps/next && yarn storybook"
+    "native": "yarn workspace expo-app start",
+    "web": "yarn workspace next-app next",
+    "web:sb": "yarn workspace next-app storybook",
+    "format": "prettier --write ."
   },
   "resolutions": {
     "react-native-reanimated": "3.6.0"
@@ -26,11 +38,5 @@
     "**/expo-router",
     "**/expo-router/**"
   ],
-  "packageManager": "yarn@4.0.2",
-  "dependencies": {
-    "expo-device": "^5.9.3",
-    "react-native-element-dropdown": "^2.10.1",
-    "react-native-elements": "^3.4.3",
-    "react-native-linear-gradient": "^2.8.3"
-  }
+  "packageManager": "yarn@4.0.2"
 }

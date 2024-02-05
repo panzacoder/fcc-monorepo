@@ -7,12 +7,12 @@ import { cn } from './utils'
 const tabIconMap = {
   index: 'home',
   circles: 'circle',
-  planner: 'calendar',
+  planner: 'calendar'
 }
 
 const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
   state,
-  navigation,
+  navigation
 }) => {
   return (
     <View className="bg-muted">
@@ -24,7 +24,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
-              canPreventDefault: true,
+              canPreventDefault: true
             })
 
             if (!isFocused && !event.defaultPrevented) {
@@ -35,7 +35,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
           const onLongPress = () => {
             navigation.emit({
               type: 'tabLongPress',
-              target: route.key,
+              target: route.key
             })
           }
 
@@ -53,7 +53,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
                 <View
                   className={cn(
                     isFocused ? 'border-primary border-b-2' : '',
-                    'py-1',
+                    'py-1'
                   )}
                 >
                   <Feather
