@@ -1,18 +1,14 @@
 import { Alert } from 'react-native'
-// import { CommonActions } from '@react-navigation/native';
-// import { SCREENNAMES } from '../constant/screenName';
 
 export const CallPostService = (url: string | URL | Request, data: any) => {
   console.log('Service Call :' + url + ' width data ' + JSON.stringify(data))
-  // hideLoader();
-  // showLoader();
   return new Promise(function (accept, reject) {
     fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     })
       .then((response) => {
         // console.log('..../')
@@ -34,10 +30,8 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
           Alert.alert('Session Expired. Please Login.', '', [
             {
               text: 'Ok',
-              onPress: () => {
-             
-              },
-            },
+              onPress: () => {}
+            }
           ])
           reject('Login Expired')
         }
