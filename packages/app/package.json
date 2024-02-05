@@ -10,7 +10,7 @@
     "nativewind": "^4.0.23",
     "react-native-linear-gradient": "^2.8.3",
     "solito": "4.2.0",
-    "tailwind-merge": "^2.2.0",
+    "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1"
   },
   "sideEffects": false

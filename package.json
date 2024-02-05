@@ -9,7 +9,7 @@
     "expo-device": "^5.9.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.73.2",
+    "react-native": "0.73.3",
     "react-native-element-dropdown": "^2.10.1",
     "react-native-elements": "^3.4.3",
     "react-native-linear-gradient": "^2.8.3",
@@ -17,12 +17,12 @@
     "tailwind-variants": "^0.1.20"
   },
   "devDependencies": {
-    "@types/react": "^18.2.48",
+    "@types/react": "^18.2.52",
     "@types/react-native": "^0.73.0",
     "eslint": "^8.56.0",
-    "prettier": "^3.2.4",
+    "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
-    "turbo": "^1.11.3",
+    "turbo": "^1.12.2",
     "typescript": "^5.3.3"
   },
   "scripts": {
@@ -32,7 +32,7 @@
     "format": "prettier --write ."
   },
   "resolutions": {
-    "react-native-reanimated": "3.6.0"
+    "react-native-reanimated": "3.6.2"
   },
   "nohoist": [
     "**/expo-router",

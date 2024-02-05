@@ -8,9 +8,9 @@ import {
   TextInput
 } from 'react-native'
 import { router } from 'expo-router'
-import { CallPostService } from '../provider/fetchServerData'
-import { BASE_URL, USER_LOGIN } from '../constant/urlConstants'
-import { getUserDeviceInformation } from '../utils/utils'
+import { CallPostService } from '../../provider/fetchServerData'
+import { BASE_URL, USER_LOGIN } from '../../constant/urlConstants'
+import { getUserDeviceInformation } from '../../utils/utils'
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
@@ -64,7 +64,7 @@ export default function Login() {
       <PtsHeader title="Login" />
       <PtsLoader loading={isLoading} />
       <Image
-        source={require('../../../assets/logoNew.png')}
+        source={require('../../../../assets/logoNew.png')}
         className="mt-[40] h-[150] w-[150] self-center"
         resizeMode={'contain'}
         alt="logo"
@@ -98,8 +98,8 @@ export default function Login() {
             <Image
               source={
                 isShowPassword
-                  ? require('../../../assets/view.png')
-                  : require('../../../assets/hide.png')
+                  ? require('../../../../assets/view.png')
+                  : require('../../../../assets/hide.png')
               }
               className="absolute bottom-[0] right-[25] top-[15] h-[20] w-[20]  "
               resizeMode={'contain'}

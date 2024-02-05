@@ -28,7 +28,7 @@
     "@storybook/nextjs": "^7.6.12",
     "@storybook/react": "^7.6.12",
     "@storybook/test": "^7.6.12",
-    "@types/node": "20.11.5",
+    "@types/node": "20.11.16",
     "assert": "^2.1.0",
     "autoprefixer": "^10.4.17",
     "eslint-config-next": "14.1.0",
