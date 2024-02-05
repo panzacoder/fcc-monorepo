@@ -80,7 +80,7 @@ export default function Login() {
         </View>
         <View className="my-5 flex flex-col gap-2">
           <PtsTextInput
-            onChangeText={onChangeEmail.bind(this)}
+            onChangeText={onChangeEmail}
             placeholder={'Email Address'}
             value={email}
             defaultValue=""
