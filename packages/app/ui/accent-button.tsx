@@ -7,7 +7,7 @@ import { TextLink } from 'solito/link'
 export function AccentLink({ title, href, className = '' }) {
   const defaultClassName = 'flex flex-row items-center text-white gap-1'
   return (
-    <TextLink href={href}>
+    <TextLink href={href} variant="h3">
       <View className={cn(defaultClassName, className)}>
         <Typography
           variant="h3"

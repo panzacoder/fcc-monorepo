@@ -1,5 +1,5 @@
 import { Text, Platform, Linking } from 'react-native'
-import { TextLink as SolitoTextLink } from 'solito/link'
+import { TextLink as SolitoTextLink, Link } from 'solito/link'
 import { ComponentProps, forwardRef } from 'react'
 import { Typography, TypographyProps } from 'app/ui/typography'
 import { tv } from 'tailwind-variants'
@@ -44,9 +44,9 @@ export const InternalLink = ({
   ...props
 }: InternalLinkProps) => {
   return (
-    <SolitoTextLink {...props}>
+    <Link {...props}>
       <Typography className={className}>{children}</Typography>
-    </SolitoTextLink>
+    </Link>
   )
 }
 
