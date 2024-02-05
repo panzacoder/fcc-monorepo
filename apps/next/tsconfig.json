@@ -19,7 +19,7 @@
         "name": "next"
       }
     ],
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true
   },
   "include": [
