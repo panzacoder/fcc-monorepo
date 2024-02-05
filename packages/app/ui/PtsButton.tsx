@@ -1,32 +1,42 @@
-import { View, Image, Text, Pressable, PressableProps } from 'react-native'
+import { View, Image, Pressable, PressableProps } from 'react-native'
+import { Typography } from 'app/ui/typography'
+import { cn } from './utils'
+import { Feather } from 'app/ui/icons'
+import { ComponentProps } from 'react'
 export type ButtonProps = PressableProps & {
   title?: string
-  isShowIcon?: boolean
+  leadingIcon?: ComponentProps<typeof Feather>['name']
+  trailingIcon?: ComponentProps<typeof Feather>['name']
+  children?: React.ReactNode
   isDisabled?: boolean
   className?: string
   onPress?: {}
 }
 const PtsButton = ({
   title,
-  isShowIcon,
+  leadingIcon,
+  trailingIcon,
   isDisabled,
   className = '',
-  onPress,
+  onPress
 }: ButtonProps) => {
   return (
-    <Pressable disabled={isDisabled} className={className} onPress={onPress}>
-      <Text className="self-center text-center font-bold text-white">
+    <Pressable
+      disabled={isDisabled}
+      className={cn(
+        'bg-primary flex-row justify-center self-center rounded-[20px] p-[10]',
+        className
+      )}
+      onPress={onPress}
+    >
+      {leadingIcon && (
+        <Feather name={leadingIcon} size={16} color="white" className="" />
+      )}
+      <Typography className="text-primary-foreground mx-[5] text-center font-bold">
         {title}
-      </Text>
-      {isShowIcon ? (
-        <Image
-          source={require('../../../assets/arrow.png')}
-          className="absolute right-[10] self-center"
-          resizeMode={'contain'}
-          alt="arrow"
-        />
-      ) : (
-        <View />
+      </Typography>
+      {trailingIcon && (
+        <Feather name={trailingIcon} size={16} color="white" className="" />
       )}
     </Pressable>
   )

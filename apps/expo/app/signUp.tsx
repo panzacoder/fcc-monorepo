@@ -1,38 +1,27 @@
 import React, { useState, useEffect } from 'react'
-import {
-  View,
-  Image,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  TouchableHighlight,
-  Alert,
-  TextInput,
-  ScrollView
-} from 'react-native'
+import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import { MotiLink } from 'solito/moti'
 import { CallPostService } from '../provider/fetchServerData'
+import { Button } from 'app/ui/button'
 import {
   BASE_URL,
   CREATE_ACCOUNT,
   GET_COUNTRIES,
   GET_STATES_AND_TIMEZONES
 } from '../constant/urlConstants'
-import { Typography, TextLink } from 'app/ui/typography'
+import { Typography } from 'app/ui/typography'
 // import Button from 'app/ui/button';
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
+import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
 import PtsDropdown from 'app/ui/PtsDropdown'
 import { Row } from 'app/ui/layout'
 import { router } from 'expo-router'
 
 export default function SignUp() {
-  // const params = useSearchParams<Params>()
-  // const search = searchParams.get('search')
-  // const router = useRouter()
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [isTcAccepted, setIsTcAccepted] = useState(false)
@@ -54,7 +43,7 @@ export default function SignUp() {
   const [isLoading, setLoading] = useState(false)
   // return <WebView path="/login" />
   const borderClassName =
-    password === confirmPassword ? 'border-black' : 'border-[#C81D1C]'
+    password === confirmPassword ? 'border-gray-400' : 'border-red-400'
 
   useEffect(() => {
     async function getCountries() {
@@ -225,161 +214,112 @@ export default function SignUp() {
     <View className="flex-1 bg-white">
       <PtsHeader title="Registration" />
       <ScrollView>
-        {/* <Typography variant="h1">Login Page</Typography> */}
         <PtsLoader loading={isLoading} />
-
-        {/* <Image
-        source={require('../../../assets/logo.png')}
-        className="absolute top-[40] z-[-1] h-[178] w-[223] self-center"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <Image
-        source={require('../../../assets/shapes.png')}
-        className="absolute right-[0] top-[140] self-center"
-        resizeMode={'contain'}
-        alt="shapes"
-      /> */}
         <Image
           source={require('../../../assets/logoNew.png')}
           className="mt-[10] h-[150] w-[150] self-center"
           resizeMode={'contain'}
           alt="logo"
         />
-        <Text className="self-center text-center text-[16px] text-black">
+        <Typography className="text-center">
           {'Welcome to Family Care Circle'}
-        </Text>
+        </Typography>
 
-        <View style={{ width: '100%' }} className=" self-center bg-[#fff]  ">
-          {/* <Image
-          source={require('../../../assets/logoWithText.png')}
-          className="ml-[15] mt-[15]"
-          resizeMode={'contain'}
-          alt="logoWithText"
-        /> */}
-
-          {/* <TextInput
-          className="m-5 h-[40] rounded-[5px] border-[1px] border-black px-5"
-          setText={(email) => setEmail(email)}
-          placeholder={'Email Address'}
-          value={email}
-          defaultValue=""
-        /> */}
+        <View className="w-[100%] self-center bg-white  ">
           <View className="flex-row">
             <PtsTextInput
-              className="m-5 h-[50] w-[100%] rounded-[5px] border-[1px] border-[#808080] px-5"
+              className="m-5 w-[40%]"
               onChangeText={setFirstName.bind(this)}
               placeholder={'First Name*'}
               value={firstName}
               defaultValue=""
             />
             <PtsTextInput
-              className="m-5 ml-[35] h-[50] w-[100%]  rounded-[5px] border-[1px] border-[#808080] px-5"
+              className="m-5 ml-[15] w-[40%]"
               onChangeText={setLastName.bind(this)}
               placeholder={'Last Name*'}
               value={lastName}
               defaultValue=""
             />
           </View>
-          <PtsTextInput
-            className={`m-5 mt-[-5] h-[50] rounded-[5px] border-[1px] border-[#808080] px-5 `}
-            onChangeText={setEmail.bind(this)}
-            placeholder={'Email Address*'}
-            value={email}
-            defaultValue=""
-          />
-          <PtsTextInput
-            className={`m-5 mt-[-5] h-[50] rounded-[5px] border-[1px] border-[#808080] px-5 `}
-            onChangeText={setPhone.bind(this)}
-            placeholder={'Phone'}
-            keyboard={'numeric'}
-            value={phone}
-            defaultValue=""
-          />
+          <View className="w-[90%]">
+            <PtsTextInput
+              className="m-5 mt-[0]"
+              onChangeText={setEmail.bind(this)}
+              placeholder={'Email Address*'}
+              value={email}
+              defaultValue=""
+            />
+            <PtsTextInput
+              className="m-5 mt-[0]"
+              onChangeText={setPhone.bind(this)}
+              placeholder={'Phone'}
+              keyboard={'numeric'}
+              value={phone}
+              defaultValue=""
+            />
 
-          <View className="flex-row">
-            <TextInput
+            <PtsTextInput
+              className="m-5 mt-[0]"
               onChangeText={(password) => setPassword(password)}
-              className={`mx-5 h-[50] flex-1 rounded-[5px] border-[1px] border-[#808080] px-5`}
               autoCorrect={false}
               secureTextEntry={!isShowPassword}
               placeholder="Password*"
               value={password}
               defaultValue=""
+              trailingSlot={
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowPassword(!isShowPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </TouchableOpacity>
+              }
             />
-            <TouchableOpacity
-              onPress={() => {
-                setShowPassword(!isShowPassword)
-              }}
-            >
-              <Image
-                source={
-                  isShowPassword
-                    ? require('../../../assets/view.png')
-                    : require('../../../assets/hide.png')
-                }
-                className="absolute bottom-[0] right-[25] top-[15] h-[20] w-[20]  "
-                resizeMode={'contain'}
-                alt="logoWithText"
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View className="flex-row">
-            <TextInput
+            <PtsTextInput
+              className={`m-5 mt-[0] ${borderClassName}`}
               onChangeText={(password) => setConfirmPassword(password)}
-              className={`m-5 h-[50] flex-1 rounded-[5px] border-[1px] border-[#808080] border-black px-5 ${borderClassName}`}
               autoCorrect={false}
               secureTextEntry={!isShowConfirmPassword}
               placeholder="Confirm Password*"
               value={confirmPassword}
               defaultValue=""
+              trailingSlot={
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowConfirmPassword(!isShowConfirmPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowConfirmPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </TouchableOpacity>
+              }
             />
-            <TouchableOpacity
-              onPress={() => {
-                setShowConfirmPassword(!isShowConfirmPassword)
-              }}
-            >
-              <Image
-                source={
-                  isShowConfirmPassword
-                    ? require('../../../assets/view.png')
-                    : require('../../../assets/hide.png')
-                }
-                className="absolute bottom-[0] right-[25] top-[30] h-[20] w-[20] "
-                resizeMode={'contain'}
-                alt="logoWithText"
-              />
-            </TouchableOpacity>
+            {password !== confirmPassword ? (
+              <View className=" mb-[5] ml-[15] mt-[-5] flex-row">
+                <Image
+                  source={require('../../../assets/Icon.png')}
+                  className=""
+                  resizeMode={'contain'}
+                  alt="Icon"
+                />
+                <Typography className="ml-[10]  text-[12px] text-black">
+                  {'Passwords must match'}
+                </Typography>
+              </View>
+            ) : (
+              <View />
+            )}
           </View>
-          {password !== confirmPassword ? (
-            <View className=" mb-[5] ml-[15] mt-[-5] flex-row">
-              <Image
-                source={require('../../../assets/Icon.png')}
-                className=""
-                resizeMode={'contain'}
-                alt="Icon"
-              />
-              <Text
-                onPress={() => {
-                  router.push('/login')
-                }}
-                className=" ml-[10]  text-[12px] text-[#1A1A1A]"
-              >
-                {'Passwords must match'}
-              </Text>
-            </View>
-          ) : (
-            <View />
-          )}
-          <Text
-            onPress={() => {
-              router.push('/login')
-            }}
-            className="ml-[20] text-[12px] font-bold text-[#1A1A1A]"
-          >
-            {'Address'}
-          </Text>
+          <Typography className="ml-[20] font-bold">{'Address'}</Typography>
           <PtsDropdown
             onChangeValue={setSelectedCountryChange.bind(this)}
             // onChange={setSelectedCountryChange.bind(this)}
@@ -417,33 +357,30 @@ export default function SignUp() {
               }}
               className="mt-[-10] self-center"
             />
-            <Text className=" ml-[-10] max-w-[90%]">
-              I accept the Terms and Conditions and Privacy Policy
-            </Text>
+            <Typography className="ml-[-10] max-w-[90%]">
+              {'I accept the Terms and Conditions and Privacy Policy'}
+            </Typography>
           </View>
         </View>
         <PtsButton
           isDisabled={!isTcAccepted}
-          isShowIcon={false}
           onPress={() => {
             signUpPressed()
           }}
-          className=" w-[90%] 
-        flex-row justify-center self-center rounded-[20px] bg-[#6493d9] p-[10]"
+          className="w-[90%] "
           title="Sign Up"
         />
         <View className="mb-[10] mt-[10] flex-row">
-          <Text className="ml-[20] text-[16px] text-black">
+          <Typography className="ml-[20] mt-[5] text-[16px] text-black">
             {'Already a member?'}
-          </Text>
-          <Text
+          </Typography>
+          <Button
+            title="Log In"
+            variant="link"
             onPress={() => {
               router.push('/login')
             }}
-            className="ml-[15] text-[16px] text-[#0C68DC]"
-          >
-            {'Log in'}
-          </Text>
+          />
         </View>
       </ScrollView>
     </View>

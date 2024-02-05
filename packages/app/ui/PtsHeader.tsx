@@ -1,16 +1,16 @@
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+import { Typography } from 'app/ui/typography'
 export type Props = {
   title?: string
 }
 const PtsHeader = ({ title }: Props) => {
   return (
     <View
-      style={{ width: '100%' }}
-      className="h-[80] justify-center bg-[#6493d9]"
+      className="bg-primary h-[80] w-[100%] justify-center"
     >
-      <Text className="mt-[20] text-center text-[18px] font-bold text-white">
+      <Typography className="mt-[20] text-center text-[18px] font-bold text-white">
         {title}
-      </Text>
+      </Typography>
     </View>
   )
 }

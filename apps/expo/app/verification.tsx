@@ -1,14 +1,19 @@
 import WebView from 'app/wrappers/webview'
-import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, Alert } from 'react-native'
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
+import { Typography } from 'app/ui/typography'
+import { Button } from 'app/ui/button'
 import { useLocalSearchParams, router } from 'expo-router'
 import PtsHeader from 'app/ui/PtsHeader'
 import { CallPostService } from '../provider/fetchServerData'
+import store from '../redux/store'
 import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from '../constant/urlConstants'
 export default function Verification() {
+  const header = store.getState().headerState.header
+  console.log('header', header)
   const item = useLocalSearchParams()
   // console.log('item', item)
   const [verificationCode, setVerficationCode] = useState('')
@@ -61,65 +66,61 @@ export default function Verification() {
       })
   }
   return (
-    <View className="flex-1 bg-[#fff]">
+    <View className="flex-1 bg-white">
       <PtsHeader title="Account Verification" />
       <PtsLoader loading={isLoading} />
       <View className="flex-1 justify-center">
-        <Text className="mx-[5] mt-[20]  text-center text-[16px] font-bold text-black">
+        <Typography className="mx-[5] mt-[20]  text-center text-[16px] font-bold text-black">
           {
             'Congratulations! you are successfully registered on Family Care Circle.'
           }
-        </Text>
-        <Text className="mx-[5] mt-[20] text-center text-[16px] text-black">
+        </Typography>
+        <Typography className="mx-[5] mt-[20] text-center text-[16px] text-black">
           {
             ' An Authentication Code has been sent to your registered email address. Please check your email for more details.'
           }
-        </Text>
-        <PtsTextInput
-          className="m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
-          placeholder={'Email'}
-          isEditable={false}
-          value={item.email ? item.email : ''}
-          defaultValue=""
-        />
-        <PtsTextInput
-          className="m-5 mt-[0] h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
-          onChangeText={setVerficationCode.bind(this)}
-          placeholder={'Verification Code'}
-          value={verificationCode}
-          defaultValue=""
-          keyboard="numeric"
-        />
+        </Typography>
+        <View className="mt-5 w-[90%]">
+          <PtsTextInput
+            className="m-5 mt-[0]"
+            placeholder={'Email'}
+            isEditable={false}
+            value={item.email ? item.email : ''}
+            defaultValue=""
+          />
+          <PtsTextInput
+            className="m-5 mt-[0]"
+            onChangeText={setVerficationCode.bind(this)}
+            placeholder={'Verification Code'}
+            value={verificationCode}
+            defaultValue=""
+            keyboard="numeric"
+          />
+        </View>
         <View className="flex-row self-center">
           <PtsButton
-            isShowIcon={false}
             onPress={() => {
               verifyPressed()
             }}
-            className=" w-[30%] 
-        flex-row justify-center rounded-[20px] bg-[#6493d9] p-[10]"
+            className="w-[30%] "
             title="Verify"
           />
           <PtsButton
-            isShowIcon={false}
             onPress={() => {
               router.replace('/login')
             }}
-            className="ml-[20] w-[30%] 
-        flex-row justify-center rounded-[20px] bg-[#86939e] p-[10]"
+            className="ml-[20] w-[30%] bg-[#86939e]"
             title="Cancel"
           />
         </View>
-        <TouchableOpacity
+        <Button
+          className="mt-5"
+          title="Resend Authentication Code"
+          variant="link"
           onPress={() => {
             resendPressed()
           }}
-          className="mt-[30] "
-        >
-          <Text className="text-center text-[16px] font-bold text-[#2884F9]">
-            {'Resend Authentication Code'}
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   )

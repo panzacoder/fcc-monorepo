@@ -6,13 +6,16 @@ import { BASE_URL, USER_LOGIN } from '../../constant/urlConstants'
 import { getUserDeviceInformation } from '../../utils/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
+import PtsButton from 'app/ui/PtsButton'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import { TextLink } from 'app/ui/link'
+import headerAction from '../../redux/header/headerAction'
 import { Feather } from 'app/ui/icons'
+import store from '../../redux/store'
 export default function Login() {
-  const [email, onChangeEmail] = useState('')
-  const [password, onChangePassword] = useState('')
+  const [email, onChangeEmail] = useState('sachaudhari0704@gmail.com')
+  const [password, onChangePassword] = useState('Shubh@m27')
   const [isLoading, setLoading] = useState(false)
   const [isShowPassword, onChangeShowPassword] = useState(false)
   async function buttonPressed() {
@@ -40,7 +43,8 @@ export default function Login() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           console.log('login success', data)
-          router.replace('/home')
+          store.dispatch(headerAction.setHeader(data.data.header))
+          router.replace('/verification')
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
         } else {
@@ -84,7 +88,9 @@ export default function Login() {
             defaultValue=""
           />
           <PtsTextInput
-            onChangeText={(password) => onChangePassword(password)}
+            onChangeText={(password) => {
+              onChangePassword(password)
+            }}
             autoCorrect={false}
             secureTextEntry={!isShowPassword}
             placeholder="Password"
@@ -109,14 +115,25 @@ export default function Login() {
               title="Forgot Password?"
               variant="link"
               onPress={() => {
-                router.push('/forgotPassword')
+                // router.push('/forgotPassword')
+                router.push('/verification')
               }}
             />
 
+            {/* 
+            //on button click with this button componet , state was being reset. So did changes in PtsButton.
             <Button
               title="Log in"
               trailingIcon="arrow-right"
-              onPress={buttonPressed}
+              onPress={buttonPressed.bind(this)}
+            /> */}
+            <PtsButton
+              trailingIcon="arrow-right"
+              onPress={() => {
+                buttonPressed()
+              }}
+              className="w-[30%]"
+              title="Log In"
             />
           </View>
         </View>

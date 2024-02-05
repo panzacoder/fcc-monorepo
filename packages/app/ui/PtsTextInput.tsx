@@ -4,11 +4,13 @@ import { cn } from './utils'
 export type PtsTextInputProps = {
   keyboard?: TextInputProps['keyboardType']
   isEditable?: TextInputProps['editable']
+  onChangeText?: TextInputProps['onChangeText']
   trailingSlot?: React.ReactNode
 } & TextInputProps
 
 const PtsTextInput = ({
   className,
+  onChangeText,
   keyboard = 'default',
   keyboardType = keyboard,
   isEditable = true,
@@ -27,6 +29,9 @@ const PtsTextInput = ({
         className="flex-1"
         editable={editable}
         keyboardType={keyboardType}
+        onChangeText={(text) => {
+          onChangeText && onChangeText(text)
+        }}
         {...rest}
       />
       {trailingSlot}

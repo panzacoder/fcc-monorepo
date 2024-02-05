@@ -6,11 +6,14 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
-  TextInput
+  ScrollView
 } from 'react-native'
+import { Typography } from 'app/ui/typography'
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
+import { Button } from 'app/ui/button'
 import PtsTextInput from 'app/ui/PtsTextInput'
+import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
 import { router } from 'expo-router'
 import { CallPostService } from '../provider/fetchServerData'
@@ -103,161 +106,144 @@ export default function ForgotPassword() {
       })
   }
   const borderClassName =
-    password === confirmPassword ? 'border-black' : 'border-[#C81D1C]'
+    password === confirmPassword ? 'border-gray-400' : 'border-red-400'
   return (
-    <SafeAreaView className="flex-1 bg-[#fff]">
-      <PtsHeader title="Forgot Password" />
-      <PtsLoader loading={isLoading} />
-      <Image
-        source={require('../../../assets/logoNew.png')}
-        className="mt-[10] h-[150] w-[150] self-center"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <Text className="self-center text-center text-[16px] text-black">
-        {'Welcome to Family Care Circle'}
-      </Text>
-      <View className="flex-1">
-        <PtsTextInput
-          isEditable={!isReset}
-          className="m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
-          onChangeText={setEmail.bind(this)}
-          placeholder={'Email Address*'}
-          value={email}
-          defaultValue=""
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView>
+        <PtsHeader title="Forgot Password" />
+        <PtsLoader loading={isLoading} />
+        <Image
+          source={require('../../../assets/logoNew.png')}
+          className="mt-[10] h-[150] w-[150] self-center"
+          resizeMode={'contain'}
+          alt="logo"
         />
-        {!isReset ? (
-          <View>
-            <PtsTextInput
-              className="m-5 mt-[0] h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
-              onChangeText={setAuthCode.bind(this)}
-              placeholder={'Authentication Code*'}
-              value={authCode}
-              keyboard={'numeric'}
-              defaultValue=""
-            />
-            <View className="flex-row">
-              <TextInput
+        <Typography className="text-center">
+          {'Welcome to Family Care Circle'}
+        </Typography>
+        <View className="mx-4 rounded-2xl bg-white px-4 pt-5">
+          <PtsTextInput
+            isEditable={!isReset}
+            className=""
+            onChangeText={setEmail.bind(this)}
+            placeholder={'Email Address*'}
+            value={email}
+            defaultValue=""
+          />
+          {!isReset ? (
+            <View>
+              <PtsTextInput
+                className="mt-5"
+                onChangeText={setAuthCode.bind(this)}
+                placeholder={'Authentication Code*'}
+                value={authCode}
+                keyboard={'numeric'}
+                defaultValue=""
+              />
+              <PtsTextInput
+                className="mt-5"
                 onChangeText={(password) => setPassword(password)}
-                className={`mx-5 h-[50]  w-[90%] flex-1 rounded-[5px] border-[1px] border-[#808080] px-5`}
                 autoCorrect={false}
                 secureTextEntry={!isShowPassword}
                 placeholder="Password*"
                 value={password}
                 defaultValue=""
+                trailingSlot={
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowPassword(!isShowPassword)
+                    }}
+                  >
+                    <Feather
+                      name={isShowPassword ? 'eye' : 'eye-off'}
+                      size={20}
+                      color={'black'}
+                    />
+                  </TouchableOpacity>
+                }
               />
-              <TouchableOpacity
-                onPress={() => {
-                  setShowPassword(!isShowPassword)
-                }}
-              >
-                <Image
-                  source={
-                    isShowPassword
-                      ? require('../../../assets/view.png')
-                      : require('../../../assets/hide.png')
-                  }
-                  className="absolute bottom-[0] right-[25] top-[15] h-[20] w-[20]  "
-                  resizeMode={'contain'}
-                  alt="logoWithText"
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View className="flex-row">
-              <TextInput
+              <PtsTextInput
+                className={`mt-5 ${borderClassName}`}
                 onChangeText={(password) => setConfirmPassword(password)}
-                className={`m-5 h-[50] w-[90%]  flex-1 rounded-[5px] border-[1px] border-[#808080] border-black px-5 ${borderClassName}`}
                 autoCorrect={false}
                 secureTextEntry={!isShowConfirmPassword}
                 placeholder="Confirm Password*"
                 value={confirmPassword}
                 defaultValue=""
+                trailingSlot={
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowConfirmPassword(!isShowConfirmPassword)
+                    }}
+                  >
+                    <Feather
+                      name={isShowConfirmPassword ? 'eye' : 'eye-off'}
+                      size={20}
+                      color={'black'}
+                    />
+                  </TouchableOpacity>
+                }
               />
-              <TouchableOpacity
-                onPress={() => {
-                  setShowConfirmPassword(!isShowConfirmPassword)
-                }}
-              >
-                <Image
-                  source={
-                    isShowConfirmPassword
-                      ? require('../../../assets/view.png')
-                      : require('../../../assets/hide.png')
-                  }
-                  className="absolute bottom-[0] right-[25] top-[30] h-[20] w-[20] "
-                  resizeMode={'contain'}
-                  alt="logoWithText"
-                />
-              </TouchableOpacity>
+              {password !== confirmPassword ? (
+                <View className="mt-4 flex-row">
+                  <Image
+                    source={require('../../../assets/Icon.png')}
+                    className=""
+                    resizeMode={'contain'}
+                    alt="Icon"
+                  />
+                  <Text
+                    onPress={() => {
+                      router.push('/login')
+                    }}
+                    className="mb-[10] ml-[10] text-[12px] text-black"
+                  >
+                    {'Passwords must match'}
+                  </Text>
+                </View>
+              ) : (
+                <View />
+              )}
             </View>
-            {password !== confirmPassword ? (
-              <View className="ml-[15] mt-[-10] flex-row">
-                <Image
-                  source={require('../../../assets/Icon.png')}
-                  className=""
-                  resizeMode={'contain'}
-                  alt="Icon"
-                />
-                <Text
-                  onPress={() => {
-                    router.push('/login')
-                  }}
-                  className="mb-[10] ml-[10] text-[12px] text-[#1A1A1A]"
-                >
-                  {'Passwords must match'}
-                </Text>
-              </View>
-            ) : (
-              <View />
-            )}
-          </View>
-        ) : (
-          <View />
-        )}
+          ) : (
+            <View />
+          )}
 
-        <View className="flex-row self-center">
-          <PtsButton
-            isShowIcon={false}
-            onPress={() => {
-              if (!isReset) {
-                resetPressed()
-              } else {
-                resePasswordtPressed()
-              }
-            }}
-            className=" w-[40%] 
-        flex-row justify-center rounded-[20px] bg-[#6493d9] p-[10]"
-            title="Reset"
-          />
+          <View className="mt-5 flex-row self-center">
+            <PtsButton
+              onPress={() => {
+                if (!isReset) {
+                  resetPressed()
+                } else {
+                  resePasswordtPressed()
+                }
+              }}
+              className="w-[50%] "
+              title="Reset"
+            />
+          </View>
+          <View className="mt-[10] flex-row items-center self-center">
+            <Typography className="text-center">{'New here?'}</Typography>
+            <Button
+              title="Sign Up"
+              variant="link"
+              onPress={() => {
+                router.push('/signUp')
+              }}
+            />
+          </View>
+          <View className="flex-row items-center self-center">
+            <Typography className="text-center">{'Back to'}</Typography>
+            <Button
+              title="Log In"
+              variant="link"
+              onPress={() => {
+                router.push('/login')
+              }}
+            />
+          </View>
         </View>
-        <View className="mt-[20] flex-row items-center self-center">
-          <Text className=" text-center text-[16px] text-black">
-            {'New here?'}
-          </Text>
-          <Text
-            onPress={() => {
-              router.push('/signUp')
-            }}
-            className="ml-[20] self-center text-center text-[16px] text-[#0C68DC]"
-          >
-            {'Sign Up'}
-          </Text>
-        </View>
-        <View className="mt-[10] flex-row items-center self-center">
-          <Text className=" text-center text-[16px] text-black">
-            {'Back to'}
-          </Text>
-          <Text
-            onPress={() => {
-              router.push('/login')
-            }}
-            className="ml-[10] self-center text-center text-[16px] text-[#0C68DC]"
-          >
-            {'Log In'}
-          </Text>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
