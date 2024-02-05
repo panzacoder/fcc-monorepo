@@ -66,7 +66,14 @@ export default function Login() {
           />
           <View className="flex flex-col items-end">
             <Typography>{'New here?'}</Typography>
-            <TextLink href="/signUp">{'Sign Up'}</TextLink>
+            <Button
+              title="Sign up"
+              variant="link"
+              onPress={() => {
+                router.push('/signUp')
+              }}
+              className="pt-0"
+            />
           </View>
         </View>
         <View className="my-5 flex flex-col gap-2">
