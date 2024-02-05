@@ -1,27 +1,21 @@
-import React, { useState } from 'react'
-import {
-  View,
-  Image,
-  Text,
-  TouchableOpacity,
-  Alert,
-  TextInput
-} from 'react-native'
+import { useState } from 'react'
+import { View, Image, TouchableOpacity, Alert } from 'react-native'
 import { router } from 'expo-router'
 import { CallPostService } from '../../provider/fetchServerData'
 import { BASE_URL, USER_LOGIN } from '../../constant/urlConstants'
 import { getUserDeviceInformation } from '../../utils/utils'
-import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
-import PtsHeader from 'app/ui/PtsHeader'
+import { Button } from 'app/ui/button'
+import { Typography } from 'app/ui/typography'
+import { TextLink } from 'app/ui/link'
+import { Feather } from 'app/ui/icons'
 export default function Login() {
   const [email, onChangeEmail] = useState('')
   const [password, onChangePassword] = useState('')
   const [isLoading, setLoading] = useState(false)
   const [isShowPassword, onChangeShowPassword] = useState(false)
   async function buttonPressed() {
-    console.log('email', email)
     if (!email) {
       Alert.alert('', 'Please Enter Email')
       return
@@ -60,85 +54,64 @@ export default function Login() {
   }
 
   return (
-    <View className="flex-1 bg-white">
-      <PtsHeader title="Login" />
-      <PtsLoader loading={isLoading} />
-      <Image
-        source={require('../../../../assets/logoNew.png')}
-        className="mt-[40] h-[150] w-[150] self-center"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <Text className="self-center text-center text-[16px] text-black">
-        {'Welcome to Family Care Circle'}
-      </Text>
-      <View className=" ">
-        <PtsTextInput
-          className={`m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5 `}
-          onChangeText={onChangeEmail.bind(this)}
-          placeHolder={'Email Address'}
-          value={email}
-          defaultValue=""
-        />
-        <View className="flex-row">
-          <TextInput
-            onChangeText={(password) => onChangePassword(password)}
-            className={`mx-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5`}
-            autoCorrect={false}
-            secureTextEntry={!isShowPassword}
-            placeholder="Password*"
-            value={password}
+    <View className="m-auto grid h-full">
+      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5">
+        <PtsLoader loading={isLoading} />
+        <View className="flex flex-row justify-between">
+          <Image
+            source={require('../../assets/fcc-logos/textStacked.png')}
+            className="h-[40] w-[200]"
+            resizeMode={'contain'}
+            alt="logo"
+          />
+          <View className="flex flex-col items-end">
+            <Typography>{'New here?'}</Typography>
+            <TextLink href="/signUp">{'Sign Up'}</TextLink>
+          </View>
+        </View>
+        <View className="my-5 flex flex-col gap-2">
+          <PtsTextInput
+            onChangeText={onChangeEmail.bind(this)}
+            placeholder={'Email Address'}
+            value={email}
             defaultValue=""
           />
-          <TouchableOpacity
-            onPress={() => {
-              onChangeShowPassword(!isShowPassword)
-            }}
-          >
-            <Image
-              source={
-                isShowPassword
-                  ? require('../../../../assets/view.png')
-                  : require('../../../../assets/hide.png')
-              }
-              className="absolute bottom-[0] right-[25] top-[15] h-[20] w-[20]  "
-              resizeMode={'contain'}
-              alt="logoWithText"
-            />
-          </TouchableOpacity>
-        </View>
-        <View className="ml-[20] mt-[10] flex-row">
-          <Text className=" self-center text-center text-[16px] text-black">
-            {'New here?'}
-          </Text>
-          <Text
-            onPress={() => {
-              router.replace('/signUp')
-            }}
-            className="ml-[20] self-center text-center text-[16px] text-[#0C68DC]"
-          >
-            {'Sign Up'}
-          </Text>
-        </View>
-        <View className="ml-[20] mt-[20] flex-row">
-          <TouchableOpacity
-            onPress={() => {
-              router.push('/forgotPassword')
-            }}
-            className="  "
-          >
-            <Text className="text-center text-[16px] font-bold text-[#2884F9]">
-              {'Forgot Password?'}
-            </Text>
-          </TouchableOpacity>
-          <PtsButton
-            isShowIcon={true}
-            onPress={() => {
-              buttonPressed()
-            }}
-            className="absolute right-[15] w-[120px] flex-row justify-center self-center rounded-[20px] bg-[#6493d9] p-[10]"
-            title="Log In"
+          <PtsTextInput
+            onChangeText={(password) => onChangePassword(password)}
+            autoCorrect={false}
+            secureTextEntry={!isShowPassword}
+            placeholder="Password"
+            value={password}
+            defaultValue=""
+            trailingSlot={
+              <TouchableOpacity
+                onPress={() => {
+                  onChangeShowPassword(!isShowPassword)
+                }}
+              >
+                <Feather
+                  name={isShowPassword ? 'eye' : 'eye-off'}
+                  size={20}
+                  color={'black'}
+                />
+              </TouchableOpacity>
+            }
           />
+          <View className="mt-[20] flex-row justify-end">
+            <Button
+              title="Forgot Password?"
+              variant="link"
+              onPress={() => {
+                router.push('/forgotPassword')
+              }}
+            />
+
+            <Button
+              title="Log in"
+              trailingIcon="arrow-right"
+              onPress={buttonPressed}
+            />
+          </View>
         </View>
       </View>
     </View>

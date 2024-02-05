@@ -1,35 +1,35 @@
-import { View, TextInput } from 'react-native'
-export type Props = {
-  value?: any
-  className?: string
-  placeHolder?: string
-  defaultValue?: string
-  keyboard?: any
-  onChangeText?: CallableFunction
-  isEditable?: boolean
-}
+import { TextInput, TextInputProps, View } from 'react-native'
+import { cn } from './utils'
+
+export type PtsTextInputProps = {
+  keyboard?: TextInputProps['keyboardType']
+  isEditable?: TextInputProps['editable']
+  trailingSlot?: React.ReactNode
+} & TextInputProps
+
 const PtsTextInput = ({
-  value,
   className,
-  placeHolder,
-  defaultValue,
-  onChangeText,
-  keyboard,
-  isEditable,
-}: Props) => {
+  keyboard = 'default',
+  keyboardType = keyboard,
+  isEditable = true,
+  editable = isEditable,
+  trailingSlot,
+  ...rest
+}: PtsTextInputProps) => {
   return (
-    <View>
+    <View
+      className={cn(
+        'flex w-full flex-row justify-between  rounded-lg border-[1px] border-gray-400 px-4 py-3',
+        className
+      )}
+    >
       <TextInput
-        editable={isEditable !== undefined ? isEditable : true}
-        className={className}
-        onChangeText={(text) => {
-          onChangeText && onChangeText(text)
-        }}
-        placeholder={placeHolder}
-        value={value}
-        defaultValue={defaultValue}
-        keyboardType={keyboard ? keyboard : 'default'}
+        className="flex-1"
+        editable={editable}
+        keyboardType={keyboardType}
+        {...rest}
       />
+      {trailingSlot}
     </View>
   )
 }

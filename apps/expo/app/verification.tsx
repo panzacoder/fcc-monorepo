@@ -24,8 +24,8 @@ export default function Verification() {
     let dataObject = {
       registrationVo: {
         emailOrPhone: item.email,
-        varificationCode: verificationCode,
-      },
+        varificationCode: verificationCode
+      }
     }
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
@@ -47,8 +47,8 @@ export default function Verification() {
     let loginURL = `${BASE_URL}${RESEND_OTP}`
     let dataObject = {
       registration: {
-        email: item.email,
-      },
+        email: item.email
+      }
     }
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
@@ -77,7 +77,7 @@ export default function Verification() {
         </Text>
         <PtsTextInput
           className="m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
-          placeHolder={'Email'}
+          placeholder={'Email'}
           isEditable={false}
           value={item.email ? item.email : ''}
           defaultValue=""
@@ -85,7 +85,7 @@ export default function Verification() {
         <PtsTextInput
           className="m-5 mt-[0] h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
           onChangeText={setVerficationCode.bind(this)}
-          placeHolder={'Verification Code'}
+          placeholder={'Verification Code'}
           value={verificationCode}
           defaultValue=""
           keyboard="numeric"

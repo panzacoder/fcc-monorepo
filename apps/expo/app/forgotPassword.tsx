@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
-  TextInput,
+  TextInput
 } from 'react-native'
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -17,7 +17,7 @@ import { CallPostService } from '../provider/fetchServerData'
 import {
   BASE_URL,
   FORGOT_PASSWORD,
-  RESET_PASSWORD,
+  RESET_PASSWORD
 } from '../constant/urlConstants'
 
 export default function ForgotPassword() {
@@ -39,8 +39,8 @@ export default function ForgotPassword() {
     let loginURL = `${BASE_URL}${FORGOT_PASSWORD}`
     let dataObject = {
       appuserVo: {
-        emailOrPhone: email,
-      },
+        emailOrPhone: email
+      }
     }
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
@@ -84,8 +84,8 @@ export default function ForgotPassword() {
       appuserVo: {
         emailOrPhone: email,
         tempPassword: authCode,
-        credential: password,
-      },
+        credential: password
+      }
     }
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
@@ -122,7 +122,7 @@ export default function ForgotPassword() {
           isEditable={!isReset}
           className="m-5 h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
           onChangeText={setEmail.bind(this)}
-          placeHolder={'Email Address*'}
+          placeholder={'Email Address*'}
           value={email}
           defaultValue=""
         />
@@ -131,7 +131,7 @@ export default function ForgotPassword() {
             <PtsTextInput
               className="m-5 mt-[0] h-[50] w-[90%] rounded-[5px] border-[1px] border-[#808080] px-5"
               onChangeText={setAuthCode.bind(this)}
-              placeHolder={'Authentication Code*'}
+              placeholder={'Authentication Code*'}
               value={authCode}
               keyboard={'numeric'}
               defaultValue=""

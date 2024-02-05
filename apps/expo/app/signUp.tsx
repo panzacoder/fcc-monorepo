@@ -8,7 +8,7 @@ import {
   TouchableHighlight,
   Alert,
   TextInput,
-  ScrollView,
+  ScrollView
 } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import { MotiLink } from 'solito/moti'
@@ -17,7 +17,7 @@ import {
   BASE_URL,
   CREATE_ACCOUNT,
   GET_COUNTRIES,
-  GET_STATES_AND_TIMEZONES,
+  GET_STATES_AND_TIMEZONES
 } from '../constant/urlConstants'
 import { Typography, TextLink } from 'app/ui/typography'
 // import Button from 'app/ui/button';
@@ -72,7 +72,7 @@ export default function SignUp() {
               }
               let object = {
                 label: data.name,
-                value: index,
+                value: index
               }
               countryList.push(object)
             })
@@ -102,8 +102,8 @@ export default function SignUp() {
         id:
           countryList[countryId] && countryList[countryId].id
             ? countryList[countryId].id
-            : 101,
-      },
+            : 101
+      }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -115,14 +115,14 @@ export default function SignUp() {
           data.data.stateList.map((data: any, index: any) => {
             let object = {
               label: data.name,
-              value: index,
+              value: index
             }
             statesList.push(object)
           })
           data.data.timeZoneList.map((data: any, index: any) => {
             let object = {
               label: data.name,
-              value: index,
+              value: index
             }
             timeZones.push(object)
           })
@@ -186,10 +186,10 @@ export default function SignUp() {
         referralCode: '',
         address: {
           state: {
-            id: statesList[selectedStateValue].id,
-          },
-        },
-      },
+            id: statesList[selectedStateValue].id
+          }
+        }
+      }
     }
     // console.log('dataObject', dataObject.registration)
     setLoading(true)
@@ -201,8 +201,8 @@ export default function SignUp() {
           router.push({
             pathname: '/verification',
             params: {
-              email: email,
-            },
+              email: email
+            }
           })
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
@@ -269,14 +269,14 @@ export default function SignUp() {
             <PtsTextInput
               className="m-5 h-[50] w-[100%] rounded-[5px] border-[1px] border-[#808080] px-5"
               onChangeText={setFirstName.bind(this)}
-              placeHolder={'First Name*'}
+              placeholder={'First Name*'}
               value={firstName}
               defaultValue=""
             />
             <PtsTextInput
               className="m-5 ml-[35] h-[50] w-[100%]  rounded-[5px] border-[1px] border-[#808080] px-5"
               onChangeText={setLastName.bind(this)}
-              placeHolder={'Last Name*'}
+              placeholder={'Last Name*'}
               value={lastName}
               defaultValue=""
             />
@@ -284,14 +284,14 @@ export default function SignUp() {
           <PtsTextInput
             className={`m-5 mt-[-5] h-[50] rounded-[5px] border-[1px] border-[#808080] px-5 `}
             onChangeText={setEmail.bind(this)}
-            placeHolder={'Email Address*'}
+            placeholder={'Email Address*'}
             value={email}
             defaultValue=""
           />
           <PtsTextInput
             className={`m-5 mt-[-5] h-[50] rounded-[5px] border-[1px] border-[#808080] px-5 `}
             onChangeText={setPhone.bind(this)}
-            placeHolder={'Phone'}
+            placeholder={'Phone'}
             keyboard={'numeric'}
             value={phone}
             defaultValue=""
