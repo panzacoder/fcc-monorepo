@@ -57,7 +57,6 @@ export function SignUpScreen() {
         .then(async (data: any) => {
           setLoading(false)
           if (data.status === 'SUCCESS') {
-            // console.log('fetchData success', data)
             const statesList = Array()
             const timeZones = Array()
             data.data.stateList.map((data: any, index: any) => {
@@ -74,7 +73,6 @@ export function SignUpScreen() {
               }
               timeZones.push(object)
             })
-            // console.log('countryList success', countryList)
             setStatesListDropdown(statesList)
             setStatesList(data.data.stateList ? data.data.stateList : [])
             settimeZonesListDropdown(timeZones)
