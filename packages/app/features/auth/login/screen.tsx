@@ -16,7 +16,7 @@ import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsororAction from 'app/redux/sponsor/sponsororAction'
-import { Feather } from 'app/ui/icons'
+import { Feather, FeatherButton } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
@@ -27,6 +27,7 @@ export function LoginScreen() {
   const [password, onChangePassword] = useState('Shubh@m27')
   const [isLoading, setLoading] = useState(false)
   const [isShowPassword, onChangeShowPassword] = useState(false)
+
   async function buttonPressed() {
     if (!email) {
       Alert.alert('', 'Please Enter Email')
@@ -140,17 +141,14 @@ export function LoginScreen() {
             value={password}
             defaultValue=""
             trailingSlot={
-              <TouchableOpacity
+              <FeatherButton
                 onPress={() => {
                   onChangeShowPassword(!isShowPassword)
                 }}
-              >
-                <Feather
-                  name={isShowPassword ? 'eye' : 'eye-off'}
-                  size={20}
-                  color={'black'}
-                />
-              </TouchableOpacity>
+                name={isShowPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color={'black'}
+              />
             }
           />
           <View className="mt-[20] flex-row justify-end">
