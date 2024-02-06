@@ -46,7 +46,6 @@ export function LoginScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('login success', data)
           let subscriptionDetailsobject = {
             subscriptionEndDate: data.data.subscriptionEndDate
               ? data.data.subscriptionEndDate
@@ -66,14 +65,14 @@ export function LoginScreen() {
               subscriptionDetailsobject
             )
           )
-          await store.dispatch(
+          store.dispatch(
             sponsororAction.setSponsor({
               sponsorDetails: data.data.sponsorUser,
               sponsorShipDetails: data.data.sponsorship
             })
           )
           if (data.data.commercialsDetails) {
-            await store.dispatch(
+            store.dispatch(
               paidAdAction.setPaidAd({
                 commercialsDetails: data.data.commercialsDetails.commercials,
                 commercialPageMappings:
@@ -81,9 +80,8 @@ export function LoginScreen() {
               })
             )
           }
-          // router.replace('/homeScreen')
           router.replace({
-            pathname: '/homeScreen',
+            pathname: '/home',
             params: { header: data.data.header }
           })
         } else if (data.errorCode === 'RVF_101') {
