@@ -72,7 +72,7 @@ export function LoginScreen() {
               title="Sign up"
               variant="link"
               onPress={() => {
-                router.push('/signUp')
+                router.push('/sign-up')
               }}
               className="pt-0"
             />
@@ -113,7 +113,7 @@ export function LoginScreen() {
               title="Forgot Password?"
               variant="link"
               onPress={() => {
-                router.push('/forgotPassword')
+                router.push('/forgot-password')
               }}
             />
 

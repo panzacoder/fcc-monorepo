@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { CheckBox } from 'react-native-elements'
-import { MotiLink } from 'solito/moti'
-import { CallPostService } from '../provider/fetchServerData'
+import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
 import {
   BASE_URL,
   CREATE_ACCOUNT,
   GET_COUNTRIES,
   GET_STATES_AND_TIMEZONES
-} from '../constant/urlConstants'
+} from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 // import Button from 'app/ui/button';
 import PtsButton from 'app/ui/PtsButton'
@@ -18,10 +17,9 @@ import PtsTextInput from 'app/ui/PtsTextInput'
 import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
 import PtsDropdown from 'app/ui/PtsDropdown'
-import { Row } from 'app/ui/layout'
 import { router } from 'expo-router'
 
-export default function SignUp() {
+export function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [isTcAccepted, setIsTcAccepted] = useState(false)
@@ -41,9 +39,61 @@ export default function SignUp() {
   const [isShowPassword, setShowPassword] = useState(false)
   const [isShowConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  // return <WebView path="/login" />
   const borderClassName =
     password === confirmPassword ? 'border-gray-400' : 'border-red-400'
+
+  const getStates = useCallback(
+    async (countryId: any) => {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
+      let dataObject = {
+        country: {
+          id:
+            countryList[countryId] && countryList[countryId].id
+              ? countryList[countryId].id
+              : 101
+        }
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          setLoading(false)
+          if (data.status === 'SUCCESS') {
+            // console.log('fetchData success', data)
+            const statesList = Array()
+            const timeZones = Array()
+            data.data.stateList.map((data: any, index: any) => {
+              let object = {
+                label: data.name,
+                value: index
+              }
+              statesList.push(object)
+            })
+            data.data.timeZoneList.map((data: any, index: any) => {
+              let object = {
+                label: data.name,
+                value: index
+              }
+              timeZones.push(object)
+            })
+            // console.log('countryList success', countryList)
+            setStatesListDropdown(statesList)
+            setStatesList(data.data.stateList ? data.data.stateList : [])
+            settimeZonesListDropdown(timeZones)
+            setTimeZonesList(
+              data.data.timeZoneList ? data.data.timeZoneList : []
+            )
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log(error)
+        })
+    },
+    [countryList]
+  )
 
   useEffect(() => {
     async function getCountries() {
@@ -51,9 +101,7 @@ export default function SignUp() {
       let url = `${BASE_URL}${GET_COUNTRIES}`
       CallPostService(url, {})
         .then(async (data: any) => {
-          // setLoading(false)
           if (data.status === 'SUCCESS') {
-            // console.log('fetchData success', data)
             const countryList = Array()
             data.data.map((data: any, index: any) => {
               if (data.name === 'India') {
@@ -80,57 +128,7 @@ export default function SignUp() {
         })
     }
     getCountries()
-  }, [])
-  async function getStates(countryId: any) {
-    // console.log('selectedCountryValue getStates', selectedCountryValue)
-
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id:
-          countryList[countryId] && countryList[countryId].id
-            ? countryList[countryId].id
-            : 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('fetchData success', data)
-          const statesList = Array()
-          const timeZones = Array()
-          data.data.stateList.map((data: any, index: any) => {
-            let object = {
-              label: data.name,
-              value: index
-            }
-            statesList.push(object)
-          })
-          data.data.timeZoneList.map((data: any, index: any) => {
-            let object = {
-              label: data.name,
-              value: index
-            }
-            timeZones.push(object)
-          })
-          // console.log('countryList success', countryList)
-          setStatesListDropdown(statesList)
-          setStatesList(data.data.stateList ? data.data.stateList : [])
-          settimeZonesListDropdown(timeZones)
-          setTimeZonesList(data.data.timeZoneList ? data.data.timeZoneList : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
-
+  }, [getStates, selectedCountryValue])
   async function signUpPressed() {
     // console.log('email', email)
     // console.log('password', password)
@@ -209,14 +207,12 @@ export default function SignUp() {
     await getStates(value)
   }
   return (
-    // <View>
-
     <View className="flex-1 bg-white">
       <PtsHeader title="Registration" />
       <ScrollView>
         <PtsLoader loading={isLoading} />
         <Image
-          source={require('../../../assets/logoNew.png')}
+          source={require('app/assets/logoNew.png')}
           className="mt-[10] h-[150] w-[150] self-center"
           resizeMode={'contain'}
           alt="logo"
@@ -229,14 +225,14 @@ export default function SignUp() {
           <View className="flex-row">
             <PtsTextInput
               className="m-5 w-[40%]"
-              onChangeText={setFirstName.bind(this)}
+              onChangeText={setFirstName}
               placeholder={'First Name*'}
               value={firstName}
               defaultValue=""
             />
             <PtsTextInput
               className="m-5 ml-[15] w-[40%]"
-              onChangeText={setLastName.bind(this)}
+              onChangeText={setLastName}
               placeholder={'Last Name*'}
               value={lastName}
               defaultValue=""
@@ -245,14 +241,14 @@ export default function SignUp() {
           <View className="w-[90%]">
             <PtsTextInput
               className="m-5 mt-[0]"
-              onChangeText={setEmail.bind(this)}
+              onChangeText={setEmail}
               placeholder={'Email Address*'}
               value={email}
               defaultValue=""
             />
             <PtsTextInput
               className="m-5 mt-[0]"
-              onChangeText={setPhone.bind(this)}
+              onChangeText={setPhone}
               placeholder={'Phone'}
               keyboard={'numeric'}
               value={phone}
@@ -306,7 +302,7 @@ export default function SignUp() {
             {password !== confirmPassword ? (
               <View className=" mb-[5] ml-[15] mt-[-5] flex-row">
                 <Image
-                  source={require('../../../assets/Icon.png')}
+                  source={require('app/assets/Icon.png')}
                   className=""
                   resizeMode={'contain'}
                   alt="Icon"
@@ -321,8 +317,7 @@ export default function SignUp() {
           </View>
           <Typography className="ml-[20] font-bold">{'Address'}</Typography>
           <PtsDropdown
-            onChangeValue={setSelectedCountryChange.bind(this)}
-            // onChange={setSelectedCountryChange.bind(this)}
+            onChangeValue={setSelectedCountryChange}
             label="Country*"
             maxHeight={300}
             value={selectedCountryValue}
@@ -330,7 +325,7 @@ export default function SignUp() {
           />
           <View className="mt-[-10]">
             <PtsDropdown
-              onChangeValue={setSelectedState.bind(this)}
+              onChangeValue={setSelectedState}
               label="State*"
               maxHeight={300}
               // value={selectedStateValue}
@@ -340,7 +335,7 @@ export default function SignUp() {
         </View>
         <View className="mt-[-10]">
           <PtsDropdown
-            onChangeValue={setSelectedTimeZone.bind(this)}
+            onChangeValue={setSelectedTimeZone}
             label="Time Zone*"
             maxHeight={300}
             value={selectedTimeZoneValue}
