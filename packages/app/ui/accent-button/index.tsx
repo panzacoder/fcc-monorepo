@@ -1,5 +1,5 @@
 import { Pressable } from 'react-native'
-import { Feather } from '@expo/vector-icons'
+import { Feather } from 'app/ui/icons'
 import { useRouter } from 'solito/navigation'
 
 import { Typography } from 'app/ui/typography'

@@ -1,3 +1,5 @@
+'use client'
+
 import { AccentButton } from 'app/ui/accent-button'
 import { View, Text } from 'react-native'
 import { Typography } from 'app/ui/typography'

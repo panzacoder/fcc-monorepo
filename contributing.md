@@ -22,7 +22,7 @@ We use atomic design principles to build reusable components. This means startin
 
 We have some helpful folders set up for organizing the shared components in `packages/app`
 
-- `design/`: The files for shared configuration of our styling systems, notably the `global.css` and the tailwind config are here.
+- `config/`: The files for shared configuration of our styling systems, notably the `global.css` and the tailwind config are here.
 - `features/`: This is where the shared code and larger components for our individual screens and features come together. They are grouped by 'feature' instead of 'screen' to not lock this repo to the routing file structure.
 - `provider/`: React context components that can be pulled into layouts in expo and next.
 - `ui/`: For any UI primitaves that don't feature strict functionality (not sending or fetching data). Buttons, Links, Typography, Animations, Cards, etc.
