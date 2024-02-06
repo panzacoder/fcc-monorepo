@@ -17,7 +17,6 @@ import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
 import PtsDropdown from 'app/ui/PtsDropdown'
 import { router } from 'expo-router'
-
 export function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -26,13 +25,13 @@ export function SignUpScreen() {
   const [lastName, setLastName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedCountryValue, setSelectedCountry] = useState(0)
+  const [selectedCountryValue, setSelectedCountry] = useState(-1)
   const [countryList, setCountryList] = useState<any>([])
   const [countryListDropdown, setCountryListDropdown] = useState<any>([])
   const [selectedStateValue, setSelectedState] = useState(-1)
   const [statesList, setStatesList] = useState<any>([])
   const [statesListDropdown, setStatesListDropdown] = useState<any>([])
-  const [selectedTimeZoneValue, setSelectedTimeZone] = useState(0)
+  const [selectedTimeZoneValue, setSelectedTimeZone] = useState(-1)
   const [timeZonesList, setTimeZonesList] = useState<any>([])
   const [timeZonesListDropdown, settimeZonesListDropdown] = useState<any>([])
   const [isShowPassword, setShowPassword] = useState(false)
@@ -98,22 +97,25 @@ export function SignUpScreen() {
       let url = `${BASE_URL}${GET_COUNTRIES}`
       CallPostService(url, {})
         .then(async (data: any) => {
+          setLoading(false)
           if (data.status === 'SUCCESS') {
             const countryList = Array()
             data.data.map((data: any, index: any) => {
-              if (data.name === 'India') {
-                setSelectedCountry(index)
-              }
+              // if (data.name === 'India') {
+              //   setSelectedCountry(index)
+              // }
               let object = {
                 label: data.name,
                 value: index
               }
               countryList.push(object)
             })
-            console.log('countryList success', countryList)
+            // console.log('countryList success', countryList)
             setCountryListDropdown(countryList)
             setCountryList(data.data ? data.data : [])
-            getStates(selectedCountryValue)
+            if (selectedCountryValue !== -1) {
+              getStates(selectedCountryValue)
+            }
           } else {
             setLoading(false)
             Alert.alert('', data.message)
@@ -151,8 +153,16 @@ export function SignUpScreen() {
       Alert.alert('', 'Password and Confirm Password are not same')
       return
     }
+    if (selectedCountryValue === -1) {
+      Alert.alert('', 'Please Select Country')
+      return
+    }
     if (selectedStateValue === -1) {
       Alert.alert('', 'Please Select State')
+      return
+    }
+    if (selectedTimeZoneValue === -1) {
+      Alert.alert('', 'Please Select Country')
       return
     }
     let loginURL = `${BASE_URL}${CREATE_ACCOUNT}`

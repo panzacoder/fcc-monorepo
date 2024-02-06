@@ -13,9 +13,8 @@ const PtsDropdown = ({
   maxHeight,
   value,
   list,
-  onChangeValue,
+  onChangeValue
 }: Props) => {
-  const [selectedValue, setValue] = useState(0)
   const [isFocus, setIsFocus] = useState(false)
   const renderLabel = () => {
     if (isFocus) {
@@ -37,14 +36,14 @@ const PtsDropdown = ({
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={list ? list : []}
+        data={list}
         search
         maxHeight={maxHeight ? maxHeight : 300}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? 'Select ' + label : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        // value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item: any) => {
@@ -62,25 +61,25 @@ const styles = StyleSheet.create({
     borderColor: '#808080',
     borderWidth: 0.5,
     borderRadius: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 8
   },
   icon: {
-    marginRight: 5,
+    marginRight: 5
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: 16
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: 16
   },
   iconStyle: {
     width: 20,
-    height: 20,
+    height: 20
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
-  },
+    fontSize: 16
+  }
 })
 
 export default PtsDropdown

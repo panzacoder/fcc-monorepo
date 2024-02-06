@@ -9,7 +9,13 @@ import PtsTextInput from 'app/ui/PtsTextInput'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import headerAction from 'app/redux/header/headerAction'
+import userProfileAction from 'app/redux/userProfile/userProfileAction'
+import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
+import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
+import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
+import sponsororAction from 'app/redux/sponsor/sponsororAction'
 import { Feather } from 'app/ui/icons'
+import moment from 'moment-timezone'
 import store from 'app/redux/store'
 export function LoginScreen() {
   const [email, onChangeEmail] = useState('sachaudhari0704@gmail.com')
@@ -40,9 +46,46 @@ export function LoginScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          console.log('login success', data)
+          // console.log('login success', data)
+          let subscriptionDetailsobject = {
+            subscriptionEndDate: data.data.subscriptionEndDate
+              ? data.data.subscriptionEndDate
+              : '',
+            days: data.data.days ? data.data.days : '',
+            expiredSubscription: data.data.expiredSubscription,
+            expiringSubscription: data.data.expiringSubscription
+          }
+          data.data.header.timezone = moment.tz.guess()
           store.dispatch(headerAction.setHeader(data.data.header))
-          router.replace('/verification')
+          store.dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
+          store.dispatch(
+            subscriptionAction.setSubscription(data.data.userSubscription)
+          )
+          store.dispatch(
+            userSubscriptionAction.setSubscriptionDetails(
+              subscriptionDetailsobject
+            )
+          )
+          await store.dispatch(
+            sponsororAction.setSponsor({
+              sponsorDetails: data.data.sponsorUser,
+              sponsorShipDetails: data.data.sponsorship
+            })
+          )
+          if (data.data.commercialsDetails) {
+            await store.dispatch(
+              paidAdAction.setPaidAd({
+                commercialsDetails: data.data.commercialsDetails.commercials,
+                commercialPageMappings:
+                  data.data.commercialsDetails.commercialPageMappings
+              })
+            )
+          }
+          // router.replace('/homeScreen')
+          router.replace({
+            pathname: '/homeScreen',
+            params: { header: data.data.header }
+          })
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
         } else {

@@ -128,7 +128,7 @@ export function ForgotPasswordScreen() {
             value={email}
             defaultValue=""
           />
-          {!isReset ? (
+          {isReset ? (
             <View>
               <PtsTextInput
                 className="mt-5"
