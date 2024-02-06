@@ -10,7 +10,6 @@ import {
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
-// import Button from 'app/ui/button';
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
@@ -128,11 +127,8 @@ export function SignUpScreen() {
         })
     }
     getCountries()
-  }, [getStates, selectedCountryValue])
+  }, [])
   async function signUpPressed() {
-    // console.log('email', email)
-    // console.log('password', password)
-
     if (!firstName) {
       Alert.alert('', 'Please Enter First Name')
       return
@@ -178,12 +174,10 @@ export function SignUpScreen() {
         }
       }
     }
-    // console.log('dataObject', dataObject.registration)
     setLoading(true)
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
-        // console.log('login success', data)
         if (data.status === 'SUCCESS') {
           router.push({
             pathname: '/verification',
