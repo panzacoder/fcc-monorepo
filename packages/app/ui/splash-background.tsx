@@ -5,7 +5,7 @@ export function SplashBackground({ children }) {
     <>
       <View className="flex-1">
         <ImageBackground
-          source={require('../../../assets/splash.png')}
+          source={require('app/assets/splash.png')}
           className="flex-1"
         >
           <View className="absolute h-full w-full bg-black opacity-40"></View>

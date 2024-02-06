@@ -1,81 +1,63 @@
-import { View } from 'react-native'
-import { MotiLink } from 'solito/moti'
-import { useRouter } from 'solito/navigation'
-
+import { useState } from 'react'
+import { View, Image, TouchableOpacity } from 'react-native'
+import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
-import { TextLink } from 'app/ui/link'
-import { Button } from 'app/ui/button'
-import { Row } from 'app/ui/layout'
+import { Feather } from 'app/ui/icons'
+import { useLocalSearchParams, router } from 'expo-router'
+import store from 'app/redux/store'
 
 export function HomeScreen() {
-  const router = useRouter()
+  const header = store.getState().headerState.header
+  const user = store.getState().userProfileState.header
+  console.log('header', header)
+  console.log('user', user)
+  // const item = useLocalSearchParams()
+  const [isLoading, setLoading] = useState(false)
 
   return (
-    <View className="mt-20 flex-1 items-center justify-center p-3">
-      <Typography variant="h1">Family Care Circle</Typography>
-      <Typography variant="h2">A single app across web and mobile.</Typography>
-      <View className=" max-w-xl">
-        <Typography className="my-1">
-          Much of the code can be written once in the &quot;package/app&quot;
-          folder, and imported into the routes for each platform.
+    <View className="flex-1 bg-white">
+      <PtsLoader loading={isLoading} />
+      <Image
+        source={require('app/assets/header.png')}
+        className="absolute top-[0]"
+        resizeMode={'contain'}
+        alt="logo"
+      />
+      <View>
+        <Typography className="font-400 absolute top-[80] ml-[30] text-[16px]">
+          {'Welcome Back,'}
         </Typography>
-        <Typography className="my-1">
-          These buttons are all currently WIP, showing different ways of
-          building components with interactions on mobile and web. The code is
-          written once and transpiled to different platforms.{' '}
+        <Typography className="absolute top-[110] ml-[30] text-[22px] font-bold text-black">
+          {user.memberName ? user.memberName : ''}
         </Typography>
+        <View className="border-primary absolute top-[200] mx-[10] h-[370px] w-[90%] self-center rounded-[15px] border-[2px]">
+          <View className="ml-[20] flex-row items-center">
+            <View>
+              <Typography className="mt-[10] text-[20px] font-bold text-black">
+                {'Your Week'}
+              </Typography>
+              <Typography className="font-400 text-[16px]">
+                {'6 Appointments, 2 Events'}
+              </Typography>
+            </View>
+            <TouchableOpacity
+              className="absolute right-[20]"
+              onPress={() => { }}
+            >
+              <Feather name={'settings'} size={20} color={'black'} />
+            </TouchableOpacity>
+          </View>
 
-        <Typography className="my-1">
-          The TextLink component knows to use the proper router (expo or next)
-          for in-app navigation using{' '}
-          <TextLink href="https://solito.dev/">Solito</TextLink>
-        </Typography>
-
-        <Typography className="my-1">
-          Similarly, the Button component is using navigation hooks from solito
-          to navigate. These concepts of cross-platform rendering and routing
-          can be powerful for native & web shared components
-        </Typography>
+          <View className="ml-[20]">
+            <Image
+              source={require('app/assets/avatar.png')}
+              className="mt-[10]"
+              resizeMode={'cover'}
+              alt="logo"
+            />
+          </View>
+        </View>
       </View>
-      <Row className="items-center gap-8">
-        <Button title="Home" onPress={() => router.push('/')} />
-        <TextLink href="/circles">Circles</TextLink>
-        <MotiLink
-          href="/planner"
-          animate={({ hovered, pressed }) => {
-            'worklet'
-
-            return {
-              scale: pressed ? 0.95 : hovered ? 1.1 : 1,
-              rotateZ: pressed ? '0deg' : hovered ? '-3deg' : '0deg'
-            }
-          }}
-          transition={{
-            type: 'timing',
-            duration: 150
-          }}
-        >
-          <Typography selectable={false} className="text-base font-bold">
-            Planner
-          </Typography>
-        </MotiLink>
-      </Row>
-      <Typography variant="h4" className="mb-1 mt-8">
-        Navigation
-      </Typography>
-      <Typography className="my-1">
-        The navigation is only deployed on mobile, using expo router Tabs to
-        switch between screens using native navigation, gestures, and caching.
-      </Typography>
-      <Typography variant="h5" className="my-1">
-        Learn more about Navigation here:
-      </Typography>
-      <TextLink external href="https://docs.expo.dev/router/layouts/">
-        Expo Layouts
-      </TextLink>
-      <TextLink external href="https://docs.expo.dev/router/advanced/tabs/">
-        Expo Tabs
-      </TextLink>
     </View>
   )
 }

@@ -1,12 +1,14 @@
 import { Pressable, PressableProps } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { Typography } from '../typography'
+import { Typography } from 'app/ui/typography'
+import { Feather } from 'app/ui/icons'
+import { ComponentProps } from 'react'
 
 const buttonVariants = tv({
   slots: {
     button:
-      'web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 ring-offset-background flex-row items-center justify-center rounded-full text-sm font-medium active:opacity-90 disabled:pointer-events-none disabled:opacity-50',
-    text: 'text-sm font-medium disabled:pointer-events-none disabled:opacity-50'
+      'web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 ring-offset-background flex-row items-center justify-center gap-1 rounded-full active:opacity-90 disabled:pointer-events-none disabled:opacity-50',
+    text: 'text-md px-1 font-bold disabled:pointer-events-none disabled:opacity-50'
   },
   variants: {
     variant: {
@@ -33,7 +35,7 @@ const buttonVariants = tv({
       },
       link: {
         button: 'underline-offset-4 hover:underline',
-        text: 'text-primary'
+        text: 'text-primary '
       }
     },
     size: {
@@ -52,30 +54,36 @@ const buttonVariants = tv({
 export type ButtonProps = PressableProps &
   VariantProps<typeof buttonVariants> & {
     title?: string
-    children?: React.ReactNode
     typographyClassName?: string
+    leadingIcon?: ComponentProps<typeof Feather>['name']
+    trailingIcon?: ComponentProps<typeof Feather>['name']
   }
 
 export const Button = ({
   title,
-  children,
   onPress,
   className = '',
   variant = 'default',
   size = 'default',
+  leadingIcon,
+  trailingIcon,
   typographyClassName
 }: ButtonProps) => {
   const { button, text } = buttonVariants({ variant, size })
   return (
     <Pressable onPress={onPress} className={button({ className })}>
-      {children ?? (
-        <Typography
-          className={text({
-            className: typographyClassName
-          })}
-        >
-          {title}
-        </Typography>
+      {leadingIcon && (
+        <Feather name={leadingIcon} size={16} color="white" className="" />
+      )}
+      <Typography
+        className={text({
+          className: typographyClassName
+        })}
+      >
+        {title}
+      </Typography>
+      {trailingIcon && (
+        <Feather name={trailingIcon} size={16} color="white" className="" />
       )}
     </Pressable>
   )

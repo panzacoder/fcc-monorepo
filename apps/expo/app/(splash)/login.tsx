@@ -1,5 +1,5 @@
-import WebView from 'app/wrappers/webview'
+import { LoginScreen } from 'app/features/auth/login/screen'
 
-export default function LoginTab() {
-  return <WebView path="/login" />
+export default function Login() {
+  return <LoginScreen />
 }

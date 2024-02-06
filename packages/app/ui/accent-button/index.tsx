@@ -1,23 +1,31 @@
-import { View } from 'react-native'
+import { Pressable } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import { Link } from 'solito/link'
+import { useRouter } from 'solito/navigation'
 
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 
 export function AccentButton({ title, href, className = '' }) {
   const defaultClassName = 'flex flex-row items-center text-white gap-1 group'
+  const router = useRouter()
   return (
-    <Link href={href}>
-      <View className={cn(defaultClassName, className)}>
-        <Typography
-          variant="h3"
-          className="text-white group-hover:underline group-active:underline"
-        >
-          {title}
-        </Typography>
-        <Feather name="arrow-right-circle" size={44} color="white" />
-      </View>
-    </Link>
+    <Pressable
+      onPress={() => router.push(href)}
+      className={cn(defaultClassName, className)}
+    >
+      <Typography
+        variant="h3"
+        as="span"
+        className="text-white group-hover:underline group-active:underline"
+      >
+        {title}
+      </Typography>
+      <Feather
+        name="arrow-right-circle"
+        size={44}
+        color="white"
+        className="group"
+      />
+    </Pressable>
   )
 }

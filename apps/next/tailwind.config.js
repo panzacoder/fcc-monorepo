@@ -1,4 +1,4 @@
-const { theme } = require('app/design/tailwind/theme')
+const { theme } = require('app/config/tailwind/theme')
 
 const { withTV } = require('tailwind-variants/transformer')
 

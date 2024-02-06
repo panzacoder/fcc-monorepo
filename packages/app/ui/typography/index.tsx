@@ -64,7 +64,7 @@ export const Typography = forwardRef<Text, TypographyProps>(function Typography(
   { variant = 'p', as = variant, className, ...props },
   ref
 ) {
-  const defaults = variantProps[variant] as defaultTextProps
+  const defaults = variantProps[as] as defaultTextProps
   return (
     <Text
       className={typographyVariants({ variant, className })}

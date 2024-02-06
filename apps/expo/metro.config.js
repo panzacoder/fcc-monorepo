@@ -16,7 +16,7 @@ const workspaceRoot = path.resolve(projectRoot, '../..')
 const config = getDefaultConfig(projectRoot)
 const globalCSS = path.resolve(
   workspaceRoot,
-  'packages/app/design/tailwind/global.css'
+  'packages/app/config/tailwind/global.css'
 )
 const tailwindConfigPath = path.resolve(projectRoot, 'tailwind.config.js')
 

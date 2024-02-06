@@ -1,6 +1,6 @@
 import 'raf/polyfill'
 import 'setimmediate'
-import 'app/design/tailwind/global.css'
+import 'app/config/tailwind/global.css'
 
 import { Provider } from 'app/provider'
 import Head from 'next/head'

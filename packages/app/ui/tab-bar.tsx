@@ -1,11 +1,11 @@
 import { View, Pressable } from 'react-native'
 import { Tabs } from 'expo-router/tabs'
-import Feather from './icons/feather'
+import { Feather } from 'app/ui/icons'
 import { ComponentProps } from 'react'
-import { cn } from './utils'
+import { cn } from 'app/ui/utils'
 
 const tabIconMap = {
-  index: 'home',
+  home: 'home',
   circles: 'circle',
   planner: 'calendar'
 }

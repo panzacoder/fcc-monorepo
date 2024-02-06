@@ -1,4 +1,4 @@
-import 'app/design/tailwind/global.css'
+import 'app/config/tailwind/global.css'
 import { Slot } from 'expo-router'
 import { LogBox } from 'react-native'
 
