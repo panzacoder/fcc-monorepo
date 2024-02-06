@@ -18,6 +18,11 @@
     },
     "android": {
       "package": "app.familycarecircle.fcc"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c1498af4-be97-46be-97a2-ed2b81d0b300"
+      }
     }
   }
 }
