@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   View,
   Text,
@@ -16,15 +16,14 @@ import PtsTextInput from 'app/ui/PtsTextInput'
 import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
 import { router } from 'expo-router'
-import { CallPostService } from '../provider/fetchServerData'
+import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   FORGOT_PASSWORD,
   RESET_PASSWORD
-} from '../constant/urlConstants'
+} from 'app/utils/urlConstants'
 
-export default function ForgotPassword() {
-  // return <WebView path="/circles" />
+export function ForgotPasswordScreen() {
   const [email, setEmail] = useState('')
   const [authCode, setAuthCode] = useState('')
   const [password, setPassword] = useState('')
@@ -94,7 +93,6 @@ export default function ForgotPassword() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('resetPressed success', data)
           router.push('/login')
         } else {
           Alert.alert('', data.message)
@@ -113,7 +111,7 @@ export default function ForgotPassword() {
         <PtsHeader title="Forgot Password" />
         <PtsLoader loading={isLoading} />
         <Image
-          source={require('../../../assets/logoNew.png')}
+          source={require('app/assets/logoNew.png')}
           className="mt-[10] h-[150] w-[150] self-center"
           resizeMode={'contain'}
           alt="logo"
@@ -187,7 +185,7 @@ export default function ForgotPassword() {
               {password !== confirmPassword ? (
                 <View className="mt-4 flex-row">
                   <Image
-                    source={require('../../../assets/Icon.png')}
+                    source={require('app/assets/Icon.png')}
                     className=""
                     resizeMode={'contain'}
                     alt="Icon"
@@ -228,7 +226,7 @@ export default function ForgotPassword() {
               title="Sign Up"
               variant="link"
               onPress={() => {
-                router.push('/signUp')
+                router.push('/sign-up')
               }}
             />
           </View>

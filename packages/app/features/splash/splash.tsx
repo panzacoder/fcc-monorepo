@@ -12,7 +12,7 @@ export function SplashScreen() {
 
       <View className="flex flex-col items-end gap-6">
         <AccentButton title="Log in" href="/login" />
-        <AccentButton title="Sign up" href="/signUp" />
+        <AccentButton title="Sign up" href="/sign-up" />
       </View>
     </View>
   )

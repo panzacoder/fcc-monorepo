@@ -1,3 +1,4 @@
+'use client'
 import { SafeArea } from './safe-area'
 
 export function Provider({ children }: { children: React.ReactNode }) {

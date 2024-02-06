@@ -1,5 +1,4 @@
-import WebView from 'app/wrappers/webview'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,14 +7,14 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useLocalSearchParams, router } from 'expo-router'
 import PtsHeader from 'app/ui/PtsHeader'
-import { CallPostService } from '../provider/fetchServerData'
-import store from '../redux/store'
-import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from '../constant/urlConstants'
-export default function Verification() {
+import { CallPostService } from 'app/utils/fetchServerData'
+import store from 'app/redux/store'
+import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from 'app/utils/urlConstants'
+
+export function VerificationScreen() {
   const header = store.getState().headerState.header
   console.log('header', header)
   const item = useLocalSearchParams()
-  // console.log('item', item)
   const [verificationCode, setVerficationCode] = useState('')
   const [isLoading, setLoading] = useState(false)
   async function verifyPressed() {
@@ -36,7 +35,6 @@ export default function Verification() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('login success', data)
           router.replace('/login')
         } else {
           Alert.alert('', data.message)
@@ -90,7 +88,7 @@ export default function Verification() {
           />
           <PtsTextInput
             className="m-5 mt-[0]"
-            onChangeText={setVerficationCode.bind(this)}
+            onChangeText={setVerficationCode}
             placeholder={'Verification Code'}
             value={verificationCode}
             defaultValue=""
