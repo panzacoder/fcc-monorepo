@@ -42,15 +42,16 @@ const config: StorybookConfig = {
       options: {
         projectRoot,
         modulesToTranspile: [
-          'app', // this is my local monorepo package
-          'react-native',
-          'react-native-web',
-          'solito',
+          'app',
+          'expo',
           'moti',
-          'react-native-reanimated',
-          'react-native-css-interop',
           'nativewind',
-          'react-native-gesture-handler'
+          'react-native',
+          'react-native-css-interop',
+          'react-native-gesture-handler',
+          'react-native-reanimated',
+          'react-native-web',
+          'solito'
         ],
         babelPlugins: [
           'react-native-reanimated/plugin',
@@ -78,6 +79,15 @@ const config: StorybookConfig = {
           String(u?.loader)?.includes?.('export-order-loader')
         )
     )
+
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'react-native$': 'react-native-web'
+    }
+    config.module.rules.push({
+      test: /\.ttf$/,
+      type: 'asset/resource'
+    })
 
     return config
   }
