@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { View, Image, TouchableOpacity, Alert } from 'react-native'
 import { router } from 'expo-router'

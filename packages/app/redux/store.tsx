@@ -1,15 +1,15 @@
-import { createStore } from 'redux'
+import { legacy_createStore as createStore } from 'redux'
 import rootReducer from './rootReducer'
 import StateLoader from './stateLoader'
+
+import { composeWithDevTools } from 'redux-devtools-extension'
 
 const stateLoader = new StateLoader()
 
 const store = createStore(
   rootReducer,
   stateLoader.loadState(),
-  window &&
-  window.__REDUX_DEVTOOLS_EXTENSION__ &&
-  window.__REDUX_DEVTOOLS_EXTENSION__()
+  composeWithDevTools()
 )
 store.subscribe(() => {
   stateLoader.saveState(store.getState())

@@ -1,3 +1,5 @@
+/** @jsxImportSource react */
+
 import { Typography } from 'app/ui/typography'
 
 export default function PlannerTab() {

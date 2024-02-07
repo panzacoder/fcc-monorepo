@@ -10160,6 +10160,7 @@ __metadata:
     react-native-web: "npm:~0.19.10"
     react-redux: "npm:^9.1.0"
     redux: "npm:^5.0.1"
+    redux-devtools-extension: "npm:^2.13.9"
     tailwind-variants: "npm:^0.1.20"
     turbo: "npm:^1.12.2"
     typescript: "npm:^5.3.3"
@@ -16129,6 +16130,15 @@ __metadata:
     indent-string: "npm:^4.0.0"
     strip-indent: "npm:^3.0.0"
   checksum: fa1ef20404a2d399235e83cc80bd55a956642e37dd197b4b612ba7327bf87fa32745aeb4a1634b2bab25467164ab4ed9c15be2c307923dd08b0fe7c52431ae6b
+  languageName: node
+  linkType: hard
+
+"redux-devtools-extension@npm:^2.13.9":
+  version: 2.13.9
+  resolution: "redux-devtools-extension@npm:2.13.9"
+  peerDependencies:
+    redux: ^3.1.0 || ^4.0.0
+  checksum: 8d979c95031dee495e62d90cc12cd9923546227a177f6d3fba973a0d022d819854e47eceea7d0c68254cd410632a5eac2eaf84e17644d2fcecf94a1e246fed88
   languageName: node
   linkType: hard
 

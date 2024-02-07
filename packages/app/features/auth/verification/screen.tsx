@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import PtsButton from 'app/ui/PtsButton'

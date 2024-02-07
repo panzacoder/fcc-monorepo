@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { CheckBox } from 'react-native-elements'

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { View, Image, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -42,7 +44,7 @@ export function HomeScreen() {
             </View>
             <TouchableOpacity
               className="absolute right-[20]"
-              onPress={() => { }}
+              onPress={() => {}}
             >
               <Feather name={'settings'} size={20} color={'black'} />
             </TouchableOpacity>
