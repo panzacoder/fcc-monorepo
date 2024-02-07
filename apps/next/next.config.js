@@ -8,17 +8,29 @@ const nextConfig = {
   // https://github.com/nandorojo/moti/issues/224
   // once that gets fixed, set this back to true
   reactStrictMode: false,
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'react-native$': 'react-native-web'
+    }
+    config.module.rules.push({
+      test: /\.ttf$/,
+      type: 'asset/resource'
+    })
+    return config
+  },
   transpilePackages: [
-    'react-native',
-    'react-native-web',
-    'expo',
+    '@expo/vector-icons',
     'app',
-    'react-native-reanimated',
+    'expo',
+    'moti',
     'nativewind',
+    'react-native',
     'react-native-css-interop',
     'react-native-gesture-handler',
-    'solito',
-    'moti'
+    'react-native-reanimated',
+    'react-native-web',
+    'solito'
   ],
   experimental: {
     forceSwcTransforms: true

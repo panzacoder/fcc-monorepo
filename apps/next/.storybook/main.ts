@@ -42,18 +42,22 @@ const config: StorybookConfig = {
       options: {
         projectRoot,
         modulesToTranspile: [
-          'app', // this is my local monorepo package
-          'react-native',
-          'react-native-web',
-          'solito',
+          '@expo/vector-icons',
+          'app',
+          'expo',
           'moti',
-          'react-native-reanimated',
-          'react-native-css-interop',
           'nativewind',
-          'react-native-gesture-handler'
+          'react-native',
+          'react-native-css-interop',
+          'react-native-gesture-handler',
+          'react-native-reanimated',
+          'react-native-vector-icons',
+          'react-native-web',
+          'solito'
         ],
         babelPlugins: [
           'react-native-reanimated/plugin',
+          'babel-plugin-expo-vector-icon-storybook',
           [
             '@babel/plugin-transform-react-jsx',
             {
@@ -78,6 +82,17 @@ const config: StorybookConfig = {
           String(u?.loader)?.includes?.('export-order-loader')
         )
     )
+
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'react-native$': 'react-native-web'
+    }
+    // config.module.rules.push({
+    //   test: /\.ttf$/,
+    //   type: 'asset/resource',
+    //   loader: 'file-loader',
+    //   include: getAbsolutePath('@expo/vector-icons')
+    // })
 
     return config
   }

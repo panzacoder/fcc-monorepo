@@ -8,7 +8,7 @@ const FeatherWrapper = (props: ComponentProps<typeof ExpoFeather>) => {
 
 cssInterop(FeatherWrapper, {
   className: {
-    target: 'style' // string or boolean
+    target: 'style'
   }
 })
 

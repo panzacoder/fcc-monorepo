@@ -1,3 +1,4 @@
+'use client'
 import { ImageBackground, View } from 'react-native'
 
 export function SplashBackground({ children }) {

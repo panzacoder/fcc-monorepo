@@ -1,6 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { View, Image, TouchableOpacity, Alert } from 'react-native'
-import { router } from 'expo-router'
+import { View, TouchableOpacity, Alert } from 'react-native'
+import { Image } from 'app/ui/image'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
@@ -17,7 +19,10 @@ import sponsororAction from 'app/redux/sponsor/sponsororAction'
 import { Feather } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
+import { useRouter } from 'solito/navigation'
+
 export function LoginScreen() {
+  const router = useRouter()
   const [email, onChangeEmail] = useState('sachaudhari0704@gmail.com')
   const [password, onChangePassword] = useState('Shubh@m27')
   const [isLoading, setLoading] = useState(false)
@@ -80,10 +85,7 @@ export function LoginScreen() {
               })
             )
           }
-          router.replace({
-            pathname: '/home',
-            params: { header: data.data.header }
-          })
+          router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
         } else {
@@ -97,14 +99,16 @@ export function LoginScreen() {
   }
 
   return (
-    <View className="m-auto grid h-full">
-      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5">
+    <View className="my-auto flex w-full items-center justify-center ">
+      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5 md:w-full md:max-w-md">
         <PtsLoader loading={isLoading} />
         <View className="flex flex-row justify-between">
           <Image
-            source={require('app/assets/fcc-logos/textStacked.png')}
+            src={require('app/assets/fcc-logos/textStacked.png')}
             className="h-[40] w-[200]"
-            resizeMode={'contain'}
+            width={200}
+            height={40}
+            contentFit={'contain'}
             alt="logo"
           />
           <View className="flex flex-col items-end">

@@ -34,7 +34,7 @@ const buttonVariants = tv({
         text: 'text-secondary hover:text-accent-foreground'
       },
       link: {
-        button: 'underline-offset-4 hover:underline',
+        button: 'hover:underline',
         text: 'text-primary '
       }
     },

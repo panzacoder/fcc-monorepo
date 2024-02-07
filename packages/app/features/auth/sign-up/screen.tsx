@@ -1,6 +1,8 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
-import { CheckBox } from 'react-native-elements'
+// import { CheckBox } from 'react-native-elements'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
 import {
@@ -346,14 +348,14 @@ export function SignUpScreen() {
         </View>
         <View className="mb-[5] flex-row">
           <View className=" flex-row">
-            <CheckBox
-              checked={isTcAccepted}
-              checkedColor={'#6493d9'}
-              onPress={() => {
-                setIsTcAccepted(!isTcAccepted)
-              }}
-              className="mt-[-10] self-center"
-            />
+            {/* <CheckBox */}
+            {/*   checked={isTcAccepted} */}
+            {/*   checkedColor={'#6493d9'} */}
+            {/*   onPress={() => { */}
+            {/*     setIsTcAccepted(!isTcAccepted) */}
+            {/*   }} */}
+            {/*   className="mt-[-10] self-center" */}
+            {/* /> */}
             <Typography className="ml-[-10] max-w-[90%]">
               {'I accept the Terms and Conditions and Privacy Policy'}
             </Typography>

@@ -1,3 +1,5 @@
+'use client'
+
 import { ComponentProps, forwardRef } from 'react'
 import { Text, Role } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
