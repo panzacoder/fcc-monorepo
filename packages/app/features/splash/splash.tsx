@@ -15,8 +15,8 @@ export function SplashScreen() {
       </Typography>
 
       <View className="flex flex-col items-end gap-6">
-        <AccentButton title="Log in" onPress={router.push('/login')} />
-        <AccentButton title="Sign up" onPress={router.push('/sign-up')} />
+        <AccentButton title="Log in" onPress={() => router.push('/login')} />
+        <AccentButton title="Sign up" onPress={() => router.push('/sign-up')} />
       </View>
     </View>
   )
