@@ -20,6 +20,7 @@ const nextConfig = {
     return config
   },
   transpilePackages: [
+    '@expo/vector-icons',
     'app',
     'expo',
     'moti',

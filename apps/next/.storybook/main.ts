@@ -42,6 +42,7 @@ const config: StorybookConfig = {
       options: {
         projectRoot,
         modulesToTranspile: [
+          '@expo/vector-icons',
           'app',
           'expo',
           'moti',
