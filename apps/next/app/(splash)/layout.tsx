@@ -1,5 +1,7 @@
 /** @jsxImportSource react */
 
+import { SplashBackground } from 'app/ui/splash-background'
+
 export default function SplashLayout({ children }) {
-  return <div className="bg-primary">{children}</div>
+  return <SplashBackground>{children}</SplashBackground>
 }

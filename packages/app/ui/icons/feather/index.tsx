@@ -3,13 +3,12 @@ import { cssInterop } from 'nativewind'
 import { ComponentProps } from 'react'
 
 const FeatherWrapper = (props: ComponentProps<typeof ExpoFeather>) => {
-  console.log('FeatherWrapper')
   return <ExpoFeather {...props} />
 }
 
 cssInterop(FeatherWrapper, {
   className: {
-    target: 'style' // string or boolean
+    target: 'style'
   }
 })
 
