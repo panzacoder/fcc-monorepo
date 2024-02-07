@@ -16,6 +16,6 @@ export default meta
 export const Default: Story = {
   args: {
     title: 'Click Me',
-    href: '/docs/ui-accent-button--docs'
+    onPress: () => alert('Button Pressed')
   }
 }

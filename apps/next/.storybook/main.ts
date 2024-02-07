@@ -51,11 +51,13 @@ const config: StorybookConfig = {
           'react-native-css-interop',
           'react-native-gesture-handler',
           'react-native-reanimated',
+          'react-native-vector-icons',
           'react-native-web',
           'solito'
         ],
         babelPlugins: [
           'react-native-reanimated/plugin',
+          'babel-plugin-expo-vector-icon-storybook',
           [
             '@babel/plugin-transform-react-jsx',
             {
@@ -85,10 +87,12 @@ const config: StorybookConfig = {
       ...(config.resolve.alias || {}),
       'react-native$': 'react-native-web'
     }
-    config.module.rules.push({
-      test: /\.ttf$/,
-      type: 'asset/resource'
-    })
+    // config.module.rules.push({
+    //   test: /\.ttf$/,
+    //   type: 'asset/resource',
+    //   loader: 'file-loader',
+    //   include: getAbsolutePath('@expo/vector-icons')
+    // })
 
     return config
   }

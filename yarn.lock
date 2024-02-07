@@ -6884,6 +6884,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-expo-vector-icon-storybook@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "babel-plugin-expo-vector-icon-storybook@npm:0.0.2"
+  checksum: 78235fd82fac7c3b5b897beac7abfe8196670c85635832b5312275ec7e7ea8b474a5f37f47c02faf9f0adc62a4d087ad095be0f55c1cbe247181aa7d88e9a125
+  languageName: node
+  linkType: hard
+
 "babel-plugin-istanbul@npm:^6.1.1":
   version: 6.1.1
   resolution: "babel-plugin-istanbul@npm:6.1.1"
@@ -7602,8 +7609,8 @@ __metadata:
   linkType: hard
 
 "chokidar@npm:^3.5.3":
-  version: 3.5.3
-  resolution: "chokidar@npm:3.5.3"
+  version: 3.6.0
+  resolution: "chokidar@npm:3.6.0"
   dependencies:
     anymatch: "npm:~3.1.2"
     braces: "npm:~3.0.2"
@@ -7616,7 +7623,7 @@ __metadata:
   dependenciesMeta:
     fsevents:
       optional: true
-  checksum: 863e3ff78ee7a4a24513d2a416856e84c8e4f5e60efbe03e8ab791af1a183f569b62fc6f6b8044e2804966cb81277ddbbc1dc374fba3265bd609ea8efd62f5b3
+  checksum: c327fb07704443f8d15f7b4a7ce93b2f0bc0e6cea07ec28a7570aa22cd51fcf0379df589403976ea956c369f25aa82d84561947e227cd925902e1751371658df
   languageName: node
   linkType: hard
 
@@ -8928,9 +8935,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.648":
-  version: 1.4.658
-  resolution: "electron-to-chromium@npm:1.4.658"
-  checksum: 2d499eb7687635ea56c330cb25e0f1c9bfef8d11d61478cf0ec0b7b0f33b57a57acdf88311136bf96405622286825254067b71b9e484767b8c4043d7e1402ec8
+  version: 1.4.659
+  resolution: "electron-to-chromium@npm:1.4.659"
+  checksum: 784ffe2852e2d87b6afc814d62641b4da74264e7c07362675e074e746bd6183b1fa4f40de26b1a9b75afb23561fb48b70904418c4ac45c5b1120b88f4bf0b3cc
   languageName: node
   linkType: hard
 
@@ -9763,7 +9770,7 @@ __metadata:
     "@babel/core": "npm:^7.23.9"
     "@types/react": "npm:^18.2.52"
     app: "npm:*"
-    expo: "npm:^50.0.5"
+    expo: "npm:^50.0.4"
     expo-linking: "npm:~6.2.2"
     expo-router: "npm:~3.4.6"
     expo-splash-screen: "npm:~0.26.4"
@@ -9930,7 +9937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:^50.0.5":
+"expo@npm:^50.0.4":
   version: 50.0.6
   resolution: "expo@npm:50.0.6"
   dependencies:
@@ -13822,6 +13829,7 @@ __metadata:
     app: "npm:*"
     assert: "npm:^2.1.0"
     autoprefixer: "npm:^10.4.17"
+    babel-plugin-expo-vector-icon-storybook: "npm:^0.0.2"
     eslint-config-next: "npm:14.1.0"
     nativewind: "npm:^4.0.23"
     next: "npm:14.1.0"
@@ -18126,58 +18134,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-darwin-64@npm:1.12.2"
+"turbo-darwin-64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-darwin-64@npm:1.12.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-darwin-arm64@npm:1.12.2"
+"turbo-darwin-arm64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-darwin-arm64@npm:1.12.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-linux-64@npm:1.12.2"
+"turbo-linux-64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-linux-64@npm:1.12.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-linux-arm64@npm:1.12.2"
+"turbo-linux-arm64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-linux-arm64@npm:1.12.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-windows-64@npm:1.12.2"
+"turbo-windows-64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-windows-64@npm:1.12.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "turbo-windows-arm64@npm:1.12.2"
+"turbo-windows-arm64@npm:1.12.3":
+  version: 1.12.3
+  resolution: "turbo-windows-arm64@npm:1.12.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
 "turbo@npm:^1.12.2":
-  version: 1.12.2
-  resolution: "turbo@npm:1.12.2"
+  version: 1.12.3
+  resolution: "turbo@npm:1.12.3"
   dependencies:
-    turbo-darwin-64: "npm:1.12.2"
-    turbo-darwin-arm64: "npm:1.12.2"
-    turbo-linux-64: "npm:1.12.2"
-    turbo-linux-arm64: "npm:1.12.2"
-    turbo-windows-64: "npm:1.12.2"
-    turbo-windows-arm64: "npm:1.12.2"
+    turbo-darwin-64: "npm:1.12.3"
+    turbo-darwin-arm64: "npm:1.12.3"
+    turbo-linux-64: "npm:1.12.3"
+    turbo-linux-arm64: "npm:1.12.3"
+    turbo-windows-64: "npm:1.12.3"
+    turbo-windows-arm64: "npm:1.12.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -18193,7 +18201,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 1b662df29b8c459a3c2ab863c7d14b9b7fa738e86e207b936090a5c6f1a96c87f0b1efd34e57c9b84135235481d07cfc5c7fed93d6678b89b38f2286495fe2aa
+  checksum: f768d83ae0bb19b81ec9366cd2dfd4d9a1f5a4d01efb4054e88ebd2a4356bccc015e3bda62f655d124c3e89b1fe1227eed3ebd2ab533dacd0424c3b96bbdf432
   languageName: node
   linkType: hard
 

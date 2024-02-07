@@ -1,4 +1,5 @@
-import Feather from '@expo/vector-icons/Feather'
+// import Feather from '@expo/vector-icons/Feather'
+import { Feather } from 'app/ui/icons'
 
 import { Button, ButtonProps } from './button'
 import { ComponentProps } from 'react'
