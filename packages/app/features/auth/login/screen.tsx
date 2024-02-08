@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { View, Alert } from 'react-native'
 import { Image } from 'app/ui/image'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
@@ -16,10 +16,12 @@ import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsororAction from 'app/redux/sponsor/sponsororAction'
-import { Feather, FeatherButton } from 'app/ui/icons'
+import { FeatherButton } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
+import { CardView } from 'app/ui/layouts/card-vew'
+import { CardHeader } from '../card-header'
 
 export function LoginScreen() {
   const router = useRouter()
@@ -100,18 +102,10 @@ export function LoginScreen() {
   }
 
   return (
-    <View className="my-auto flex w-full items-center justify-center ">
-      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5 md:w-full md:max-w-md">
-        <PtsLoader loading={isLoading} />
-        <View className="flex flex-row justify-between">
-          <Image
-            src={require('app/assets/fcc-logos/textStacked.png')}
-            className="h-[40] w-[200]"
-            width={200}
-            height={40}
-            contentFit={'contain'}
-            alt="logo"
-          />
+    <CardView>
+      <PtsLoader loading={isLoading} />
+      <CardHeader
+        actionSlot={
           <View className="flex flex-col items-end">
             <Typography>{'New here?'}</Typography>
             <Button
@@ -123,51 +117,52 @@ export function LoginScreen() {
               className="pt-0"
             />
           </View>
-        </View>
-        <View className="my-5 flex flex-col gap-2">
-          <PtsTextInput
-            onChangeText={onChangeEmail}
-            placeholder={'Email Address'}
-            value={email}
-            defaultValue=""
-          />
-          <PtsTextInput
-            onChangeText={(password) => {
-              onChangePassword(password)
-            }}
-            autoCorrect={false}
-            secureTextEntry={!isShowPassword}
-            placeholder="Password"
-            value={password}
-            defaultValue=""
-            trailingSlot={
-              <FeatherButton
-                onPress={() => {
-                  onChangeShowPassword(!isShowPassword)
-                }}
-                name={isShowPassword ? 'eye' : 'eye-off'}
-                size={20}
-                color={'black'}
-              />
-            }
-          />
-          <View className="mt-[20] flex-row justify-end">
-            <Button
-              title="Forgot Password?"
-              variant="link"
-              onPress={() => {
-                router.push('/forgot-password')
-              }}
-            />
+        }
+      />
 
-            <Button
-              title="Log in"
-              trailingIcon="arrow-right"
-              onPress={buttonPressed}
+      <View className="my-5 flex flex-col gap-2">
+        <PtsTextInput
+          onChangeText={onChangeEmail}
+          placeholder={'Email Address'}
+          value={email}
+          defaultValue=""
+        />
+        <PtsTextInput
+          onChangeText={(password) => {
+            onChangePassword(password)
+          }}
+          autoCorrect={false}
+          secureTextEntry={!isShowPassword}
+          placeholder="Password"
+          value={password}
+          defaultValue=""
+          trailingSlot={
+            <FeatherButton
+              onPress={() => {
+                onChangeShowPassword(!isShowPassword)
+              }}
+              name={isShowPassword ? 'eye' : 'eye-off'}
+              size={20}
+              color={'black'}
             />
-          </View>
+          }
+        />
+        <View className="mt-[20] flex-row justify-end">
+          <Button
+            title="Forgot Password?"
+            variant="link"
+            onPress={() => {
+              router.push('/forgot-password')
+            }}
+          />
+
+          <Button
+            title="Log in"
+            trailingIcon="arrow-right"
+            onPress={buttonPressed}
+          />
         </View>
       </View>
-    </View>
+    </CardView>
   )
 }
