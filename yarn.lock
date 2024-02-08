@@ -7641,6 +7641,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chromatic@npm:^10.9.0":
+  version: 10.9.0
+  resolution: "chromatic@npm:10.9.0"
+  peerDependencies:
+    "@chromatic-com/cypress": ^0.5.2 || ^1.0.0
+    "@chromatic-com/playwright": ^0.5.2 || ^1.0.0
+  peerDependenciesMeta:
+    "@chromatic-com/cypress":
+      optional: true
+    "@chromatic-com/playwright":
+      optional: true
+  bin:
+    chroma: dist/bin.js
+    chromatic: dist/bin.js
+    chromatic-cli: dist/bin.js
+  checksum: e3b31d99cf70cf2a9290166a27d638eb6fc91d37811f8a4d732adf9ce935ff689e9999fcdc7d2da0323cc28d2f226ba61f85cd58f33f2e87d83b652c0d0e2a55
+  languageName: node
+  linkType: hard
+
 "chrome-launcher@npm:^0.15.2":
   version: 0.15.2
   resolution: "chrome-launcher@npm:0.15.2"
@@ -10163,6 +10182,7 @@ __metadata:
     "@types/react": "npm:^18.2.52"
     "@types/react-native": "npm:^0.73.0"
     "@types/react-native__assets": "npm:^1"
+    chromatic: "npm:^10.9.0"
     eslint: "npm:^8.56.0"
     expo-device: "npm:^5.9.3"
     expo-image: "npm:1.10.6"
