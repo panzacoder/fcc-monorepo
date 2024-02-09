@@ -5,14 +5,14 @@ import { Card, CardProps } from 'app/ui/card'
 export type CardViewProps = {
   children: React.ReactNode
   className?: string
-  cardProps?: CardProps
+  cardProps?: Partial<CardProps>
 }
 
 export function CardView({ children, className = '' }: CardViewProps) {
   return (
     <View
       className={cn(
-        'flex h-screen w-screen items-center justify-center',
+        'flex flex-1 flex-col items-center justify-center',
         className
       )}
     >

@@ -20,7 +20,7 @@ import { FeatherButton } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
-import { CardView } from 'app/ui/layouts/card-vew'
+import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
 
 export function LoginScreen() {
@@ -106,7 +106,7 @@ export function LoginScreen() {
       <PtsLoader loading={isLoading} />
       <CardHeader
         actionSlot={
-          <View className="flex flex-col items-end">
+          <View className="flex flex-col justify-end">
             <Typography>{'New here?'}</Typography>
             <Button
               title="Sign up"

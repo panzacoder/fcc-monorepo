@@ -8,13 +8,13 @@ import { useRouter } from 'solito/navigation'
 export function SplashScreen() {
   const router = useRouter()
   return (
-    <View className="mx-4 flex h-full flex-col justify-between gap-40 pb-40 pt-80">
+    <View className="web:justify-center native:pt-60 flex h-full w-full flex-1 px-4">
       <Typography variant="h2" className="text-center font-bold text-white">
         Caregiving can be <Text className="italic">heavy</Text>.
         {"\n\nLet's lighten the load."}
       </Typography>
 
-      <View className="flex flex-col items-end gap-6">
+      <View className="absolute bottom-20 right-4 flex flex-col items-end gap-4 ">
         <AccentButton title="Log in" onPress={() => router.push('/login')} />
         <AccentButton title="Sign up" onPress={() => router.push('/sign-up')} />
       </View>

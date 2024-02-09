@@ -16,20 +16,14 @@ const PtsDropdown = ({
   onChangeValue
 }: Props) => {
   const [isFocus, setIsFocus] = useState(false)
-  const renderLabel = () => {
-    if (isFocus) {
-      return (
-        <Text className="absolute left-[22] top-[8] z-[999] bg-white px-[8] text-[14px]">
-          {label}
-        </Text>
-      )
-    }
-    return null
-  }
 
   return (
     <View className="bg-white p-[16]">
-      {renderLabel()}
+      {isFocus ? (
+        <Text className="absolute left-[22] top-[8] z-[999] bg-white px-[8] text-[14px]">
+          {label}
+        </Text>
+      ) : null}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
         placeholderStyle={styles.placeholderStyle}

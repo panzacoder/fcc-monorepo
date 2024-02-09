@@ -8,6 +8,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .web-splash-gradient {
+    background: radial-gradient(
+        54.5% 51.08% at 97.24% 100%,
+        #287cfa 20.5%,
+        rgba(40, 124, 250, 0) 100%
+      ),
+      radial-gradient(
+        53.03% 56.15% at 87.36% -8.53%,
+        #287cfa 17.25%,
+        rgba(40, 124, 250, 0) 100%
+      ),
+      radial-gradient(
+        90.95% 42.55% at 0% 48.58%,
+        #287cfa 0%,
+        rgba(40, 124, 250, 0) 100%
+      ),
+      #64d0d0;
+  }
+}
+
 /**
  * Building on the RNWeb reset:
  * https://github.com/necolas/react-native-web/blob/master/packages/react-native-web/src/exports/StyleSheet/initialRules.js
