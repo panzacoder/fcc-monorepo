@@ -6,12 +6,10 @@ export type CardHeaderProps = {
 }
 export function CardHeader({ actionSlot }: CardHeaderProps) {
   return (
-    <View className="flex flex-row justify-between">
+    <View className="flex flex-row justify-between gap-8">
       <Image
         src={require('app/assets/fcc-logos/textStacked.png')}
-        className="h-[40] w-[200]"
-        width={200}
-        height={40}
+        width={175}
         contentFit={'contain'}
         alt="logo"
       />

@@ -8,8 +8,12 @@ import { useRouter } from 'solito/navigation'
 export function SplashScreen() {
   const router = useRouter()
   return (
-    <View className="web:justify-center native:pt-60 flex h-full w-full flex-1 px-4">
-      <Typography variant="h2" className="text-center font-bold text-white">
+    <View className="native:pt-60 web:pt-40 flex h-full w-full flex-1 px-4 md:justify-center md:pt-0">
+      <Typography
+        variant="h3"
+        as="h1"
+        className="text-center font-bold text-white"
+      >
         Caregiving can be <Text className="italic">heavy</Text>.
         {"\n\nLet's lighten the load."}
       </Typography>

@@ -11,14 +11,14 @@ import {
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
-import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsTextInput from 'app/ui/PtsTextInput'
 import { Feather } from 'app/ui/icons'
 import PtsDropdown from 'app/ui/PtsDropdown'
-import { router } from 'expo-router'
-import { CardView } from 'app/ui/layouts/card-view'
+import { useRouter } from 'solito/navigation'
 import { CardHeader } from '../card-header'
+import { CardView } from 'app/ui/layouts/card-view'
+import { CheckBox } from 'react-native-elements'
 export function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -41,6 +41,8 @@ export function SignUpScreen() {
   const [isLoading, setLoading] = useState(false)
   const borderClassName =
     password === confirmPassword ? 'border-gray-400' : 'border-red-400'
+
+  const router = useRouter()
 
   const getStates = useCallback(
     async (countryId: any) => {
@@ -210,168 +212,167 @@ export function SignUpScreen() {
     setSelectedCountry(value)
     await getStates(value)
   }
+
   return (
     <CardView>
-      <CardHeader />
-      <PtsLoader loading={isLoading} />
-      <ScrollView>
-        <View className="my-5 flex flex-col gap-2">
-          <View className="w-[100%] self-center bg-white  ">
-            <View className="flex-row">
-              <PtsTextInput
-                className="m-5 w-[40%]"
-                onChangeText={setFirstName}
-                placeholder={'First Name*'}
-                value={firstName}
-                defaultValue=""
-              />
-              <PtsTextInput
-                className="m-5 ml-[15] w-[40%]"
-                onChangeText={setLastName}
-                placeholder={'Last Name*'}
-                value={lastName}
-                defaultValue=""
-              />
-            </View>
-            <View className="w-[90%]">
-              <PtsTextInput
-                className="m-5 mt-[0]"
-                onChangeText={setEmail}
-                placeholder={'Email Address*'}
-                value={email}
-                defaultValue=""
-              />
-              <PtsTextInput
-                className="m-5 mt-[0]"
-                onChangeText={setPhone}
-                placeholder={'Phone'}
-                keyboard={'numeric'}
-                value={phone}
-                defaultValue=""
-              />
-
-              <PtsTextInput
-                className="m-5 mt-[0]"
-                onChangeText={(password) => setPassword(password)}
-                autoCorrect={false}
-                secureTextEntry={!isShowPassword}
-                placeholder="Password*"
-                value={password}
-                defaultValue=""
-                trailingSlot={
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowPassword(!isShowPassword)
-                    }}
-                  >
-                    <Feather
-                      name={isShowPassword ? 'eye' : 'eye-off'}
-                      size={20}
-                      color={'black'}
-                    />
-                  </TouchableOpacity>
-                }
-              />
-              <PtsTextInput
-                className={`m-5 mt-[0] ${borderClassName}`}
-                onChangeText={(password) => setConfirmPassword(password)}
-                autoCorrect={false}
-                secureTextEntry={!isShowConfirmPassword}
-                placeholder="Confirm Password*"
-                value={confirmPassword}
-                defaultValue=""
-                trailingSlot={
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowConfirmPassword(!isShowConfirmPassword)
-                    }}
-                  >
-                    <Feather
-                      name={isShowConfirmPassword ? 'eye' : 'eye-off'}
-                      size={20}
-                      color={'black'}
-                    />
-                  </TouchableOpacity>
-                }
-              />
-              {password !== confirmPassword ? (
-                <View className=" mb-[5] ml-[15] mt-[-5] flex-row">
-                  <Image
-                    source={require('app/assets/Icon.png')}
-                    className=""
-                    resizeMode={'contain'}
-                    alt="Icon"
-                  />
-                  <Typography className="ml-[10]  text-[12px] text-black">
-                    {'Passwords must match'}
-                  </Typography>
-                </View>
-              ) : (
-                <View />
-              )}
-            </View>
-            <Typography className="ml-[20] font-bold">{'Address'}</Typography>
-            <PtsDropdown
-              onChangeValue={setSelectedCountryChange}
-              label="Country*"
-              maxHeight={300}
-              value={selectedCountryValue}
-              list={countryListDropdown}
-            />
-            <View className="mt-[-10]">
-              <PtsDropdown
-                onChangeValue={setSelectedState}
-                label="State*"
-                maxHeight={300}
-                // value={selectedStateValue}
-                list={statesListDropdown}
-              />
-            </View>
-          </View>
-          <View className="mt-[-10]">
-            <PtsDropdown
-              onChangeValue={setSelectedTimeZone}
-              label="Time Zone*"
-              maxHeight={300}
-              value={selectedTimeZoneValue}
-              list={timeZonesListDropdown}
-            />
-          </View>
-          <View className="mb-[5] flex-row">
-            <View className=" flex-row">
-              {/* <CheckBox */}
-              {/*   checked={isTcAccepted} */}
-              {/*   checkedColor={'#6493d9'} */}
-              {/*   onPress={() => { */}
-              {/*     setIsTcAccepted(!isTcAccepted) */}
-              {/*   }} */}
-              {/*   className="mt-[-10] self-center" */}
-              {/* /> */}
-              <Typography className="ml-[-10] max-w-[90%]">
-                {'I accept the Terms and Conditions and Privacy Policy'}
-              </Typography>
-            </View>
-          </View>
-          <PtsButton
-            isDisabled={!isTcAccepted}
-            onPress={() => {
-              signUpPressed()
-            }}
-            className="w-[90%] "
-            title="Sign Up"
-          />
-          <View className="mb-[10] mt-[10] flex-row">
-            <Typography className="ml-[20] mt-[5] text-[16px] text-black">
+      <CardHeader
+        actionSlot={
+          <View className="flex flex-1 flex-col items-end">
+            <Typography className="text-right">
               {'Already a member?'}
             </Typography>
             <Button
-              title="Log In"
+              title="Log in"
               variant="link"
               onPress={() => {
                 router.push('/login')
               }}
+              className="p-0"
             />
           </View>
+        }
+      />
+
+      <PtsLoader loading={isLoading} />
+      <ScrollView className="flex-1">
+        <View className="my-5 flex w-full flex-1 flex-col flex-wrap gap-4">
+          <View className="flex flex-1 flex-row flex-wrap gap-4 self-center">
+            <PtsTextInput
+              className="basis-1/3"
+              onChangeText={setFirstName}
+              placeholder={'First Name*'}
+              value={firstName}
+            />
+            <PtsTextInput
+              className="basis-1/3"
+              onChangeText={setLastName}
+              placeholder={'Last Name*'}
+              value={lastName}
+            />
+            <PtsTextInput
+              className="basis-full"
+              onChangeText={setEmail}
+              placeholder={'Email Address*'}
+              value={email}
+            />
+            <PtsTextInput
+              className="basis-full"
+              onChangeText={setPhone}
+              placeholder={'Phone'}
+              keyboard={'numeric'}
+              value={phone}
+            />
+
+            <PtsTextInput
+              className="basis-full"
+              onChangeText={(password) => setPassword(password)}
+              autoCorrect={false}
+              secureTextEntry={!isShowPassword}
+              placeholder="Password*"
+              value={password}
+              trailingSlot={
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowPassword(!isShowPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </TouchableOpacity>
+              }
+            />
+            <PtsTextInput
+              className={`basis-full ${borderClassName}`}
+              onChangeText={(password) => setConfirmPassword(password)}
+              autoCorrect={false}
+              secureTextEntry={!isShowConfirmPassword}
+              placeholder="Confirm Password*"
+              value={confirmPassword}
+              defaultValue=""
+              trailingSlot={
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowConfirmPassword(!isShowConfirmPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowConfirmPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </TouchableOpacity>
+              }
+            />
+            {password === confirmPassword ? (
+              <View className="flex basis-full flex-row gap-2">
+                <Image
+                  source={require('app/assets/Icon.png')}
+                  className=""
+                  resizeMode={'contain'}
+                  alt="Icon"
+                />
+                <Typography className="text-[12px] text-black">
+                  {'Passwords must match'}
+                </Typography>
+              </View>
+            ) : (
+              <View />
+            )}
+            <Typography className="basis-full font-bold">
+              {'Address'}
+            </Typography>
+            <View className="basis-full">
+              <PtsDropdown
+                onChangeValue={setSelectedCountryChange}
+                label="Country*"
+                maxHeight={300}
+                value={selectedCountryValue}
+                list={countryListDropdown}
+              />
+            </View>
+            <View className="basis-full">
+              <PtsDropdown
+                onChangeValue={setSelectedState}
+                label="State*"
+                maxHeight={300}
+                value={selectedStateValue}
+                list={statesListDropdown}
+              />
+            </View>
+            <View className="basis-full">
+              <PtsDropdown
+                onChangeValue={setSelectedTimeZone}
+                label="Time Zone*"
+                maxHeight={300}
+                value={selectedTimeZoneValue}
+                list={timeZonesListDropdown}
+              />
+            </View>
+          </View>
+          <View className="flex flex-row">
+            <CheckBox
+              checked={isTcAccepted}
+              checkedColor={'#6493d9'}
+              onPress={() => {
+                setIsTcAccepted(!isTcAccepted)
+              }}
+              className="flex-shrink"
+            />
+            <Typography className="flex-1">
+              {'I accept the Terms and Conditions and Privacy Policy'}
+            </Typography>
+          </View>
+          <Button
+            disabled={!isTcAccepted}
+            onPress={() => {
+              signUpPressed()
+            }}
+            className="w-full"
+            title="Sign Up"
+          />
         </View>
       </ScrollView>
     </CardView>

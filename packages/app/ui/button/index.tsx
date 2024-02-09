@@ -43,6 +43,12 @@ const buttonVariants = tv({
       sm: { button: 'h-9 px-3 py-1' },
       lg: { button: 'h-11 px-8' },
       icon: { button: 'h-10 w-10' }
+    },
+    disabled: {
+      true: {
+        button: 'pointer-events-none bg-gray-300 opacity-50 shadow-none',
+        text: 'text-gray-900'
+      }
     }
   },
   defaultVariants: {
@@ -65,11 +71,12 @@ export const Button = ({
   className = '',
   variant = 'default',
   size = 'default',
+  disabled = false,
   leadingIcon,
   trailingIcon,
   typographyClassName
 }: ButtonProps) => {
-  const { button, text } = buttonVariants({ variant, size })
+  const { button, text } = buttonVariants({ variant, size, disabled })
   return (
     <Pressable onPress={onPress} className={button({ className })}>
       {leadingIcon && (

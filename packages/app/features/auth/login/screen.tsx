@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
-import { Image } from 'app/ui/image'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
@@ -22,6 +21,7 @@ import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
+import { Card } from 'app/ui/card'
 
 export function LoginScreen() {
   const router = useRouter()
@@ -120,14 +120,16 @@ export function LoginScreen() {
         }
       />
 
-      <View className="my-5 flex flex-col gap-2">
+      <View className="my-5 flex flex-row flex-wrap justify-end gap-y-2">
         <PtsTextInput
+          className="basis-full"
           onChangeText={onChangeEmail}
           placeholder={'Email Address'}
           value={email}
           defaultValue=""
         />
         <PtsTextInput
+          className="basis-full"
           onChangeText={(password) => {
             onChangePassword(password)
           }}
@@ -147,21 +149,21 @@ export function LoginScreen() {
             />
           }
         />
-        <View className="mt-[20] flex-row justify-end">
-          <Button
-            title="Forgot Password?"
-            variant="link"
-            onPress={() => {
-              router.push('/forgot-password')
-            }}
-          />
+        <Button
+          className="web:max-w-fit basis-1/2"
+          title="Forgot Password?"
+          variant="link"
+          onPress={() => {
+            router.push('/forgot-password')
+          }}
+        />
 
-          <Button
-            title="Log in"
-            trailingIcon="arrow-right"
-            onPress={buttonPressed}
-          />
-        </View>
+        <Button
+          className="web:max-w-fit basis-1/3"
+          title="Log in"
+          trailingIcon="arrow-right"
+          onPress={buttonPressed}
+        />
       </View>
     </CardView>
   )

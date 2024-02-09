@@ -3,7 +3,7 @@ import { cssInterop } from 'nativewind'
 import { ComponentProps } from 'react'
 
 const ImageWrapper = (
-  props: ComponentProps<typeof SolitoImage> & { className: string }
+  props: ComponentProps<typeof SolitoImage> & { className?: string }
 ) => {
   return <SolitoImage {...props} />
 }

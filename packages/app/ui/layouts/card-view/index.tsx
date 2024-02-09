@@ -12,7 +12,7 @@ export function CardView({ children, className = '' }: CardViewProps) {
   return (
     <View
       className={cn(
-        'flex flex-1 flex-col items-center justify-center',
+        'web:py-8 web:max-h-[90%] web:max-w-screen flex flex-1 flex-col items-center justify-center md:max-w-screen-sm',
         className
       )}
     >
