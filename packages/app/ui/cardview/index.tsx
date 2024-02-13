@@ -2,8 +2,10 @@ import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
+import { useRouter } from 'solito/navigation'
 import { COLORS } from 'app/utils/colors'
 export function CardView(data: any) {
+  const router = useRouter()
   let memberData = data.data
   let textStyle = 'ml-[10px] self-center text-[19px] font-bold text-black'
   let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}]`
@@ -20,10 +22,10 @@ export function CardView(data: any) {
   let eventDateText = ''
   let eventLocationText = ''
   if (memberData.firstname) {
-    fullName += memberData.firstname + ' '
+    fullName += memberData.firstname.trim() + ' '
   }
   if (memberData.lastname) {
-    fullName += memberData.lastname
+    fullName += memberData.lastname.trim()
   }
   if (memberData.upcomingAppointment) {
     if (memberData.upcomingAppointment.date) {
@@ -83,18 +85,21 @@ export function CardView(data: any) {
             <View className="flex-row">
               <View className="bg-primary h-[40px] w-[40px] items-center justify-center rounded-[20px]">
                 <Typography className="self-center text-[19px] text-white">
-                  {getNameInitials(
-                    memberData.firstname !== undefined
-                      ? memberData.firstname
-                      : '',
-                    memberData.lastname !== undefined ? memberData.lastname : ''
-                  )}
+                  {getNameInitials(fullName)}
                 </Typography>
               </View>
               <Typography className={`${textStyle}`}>{fullName}</Typography>
               <TouchableOpacity
                 className="ml-[5px] self-center"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push({
+                    pathname: '/circleDetails',
+                    query: {
+                      fullName: fullName,
+                      memberData: JSON.stringify(memberData)
+                    }
+                  })
+                }}
               >
                 <Feather name={'arrow-right'} size={20} color={'black'} />
               </TouchableOpacity>

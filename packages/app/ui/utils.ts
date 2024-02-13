@@ -12,10 +12,15 @@ export function consoleData(title: string, data: string) {
 export const getFullDateForCalender = (time: any, formatType: any) => {
   return moment(time).format(formatType)
 }
-export const getNameInitials = (firstName: string, lastName: string) => {
-  let initials =
-    '' +
-    firstName.split('')[0]?.toUpperCase() +
-    lastName.split('')[0]?.toUpperCase()
+export const getNameInitials = (fullName: string) => {
+  let fullNameStr = fullName.split(' ')
+  let initials = ''
+  if (fullNameStr[0]?.split('')[0]?.toUpperCase() !== undefined) {
+    initials += fullNameStr[0]?.split('')[0]?.toUpperCase()
+  }
+  if (fullNameStr[1]?.split('')[0]?.toUpperCase() !== undefined) {
+    initials += fullNameStr[1]?.split('')[0]?.toUpperCase()
+  }
+
   return initials
 }
