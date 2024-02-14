@@ -30,7 +30,7 @@ export function CardView(data: any) {
   if (memberData.upcomingAppointment) {
     if (memberData.upcomingAppointment.date) {
       let date = getFullDateForCalender(
-        memberData.upcomingAppointment.date,
+        new Date(memberData.upcomingAppointment.date),
         'MMMM DD '
       )
       dateText += date + ' - '
@@ -46,7 +46,7 @@ export function CardView(data: any) {
   if (memberData.recentIncident) {
     if (memberData.recentIncident.date) {
       let date = getFullDateForCalender(
-        memberData.recentIncident.date,
+        new Date(memberData.recentIncident.date),
         'MMMM DD '
       )
       incidentDateText += date + ' - '
@@ -62,7 +62,7 @@ export function CardView(data: any) {
   if (memberData.upcomingEvent) {
     if (memberData.upcomingEvent.date) {
       let date = getFullDateForCalender(
-        memberData.upcomingEvent.date,
+        new Date(memberData.upcomingEvent.date),
         'MMMM DD '
       )
       eventText += date + ' - '
