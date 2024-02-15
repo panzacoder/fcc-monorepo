@@ -92,8 +92,9 @@ export function CardView(data: any) {
               <TouchableOpacity
                 className="ml-[5px] self-center"
                 onPress={() => {
+                  console.log('circleDetails')
                   router.push({
-                    pathname: '/circleDetails',
+                    pathname: '/(authenticated_no_tabs)/circleDetails',
                     query: {
                       fullName: fullName,
                       memberData: JSON.stringify(memberData)

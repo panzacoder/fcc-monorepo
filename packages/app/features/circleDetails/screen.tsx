@@ -74,7 +74,6 @@ export function CircleDetailsScreen() {
   if (userDetails.lastName) {
     userName += userDetails.lastName.trim()
   }
-  // console.log('userName', userName)
 
   function buttonPressed() {}
   return (
@@ -114,7 +113,7 @@ export function CircleDetailsScreen() {
                 {'Today'}
               </Typography>
               <Typography className="ml-5 text-[12px]">{datestring}</Typography>
-              {todayDate.includes(apptDate) ? (
+              {apptDate && todayDate.includes(apptDate) ? (
                 <View className="my-2 ml-5 flex-row">
                   <View className="mr-2 w-[2px] bg-[#319D9D]" />
                   <Typography className="w-[90%] text-[12px]">
@@ -124,7 +123,7 @@ export function CircleDetailsScreen() {
               ) : (
                 <View />
               )}
-              {todayDate.includes(eventDate) ? (
+              {eventDate && todayDate.includes(eventDate) ? (
                 <View className="ml-5 flex-row">
                   <View className="mr-2 w-[2px] bg-[#319D9D]" />
                   <Typography className="w-[90%] text-[12px]">
@@ -213,10 +212,18 @@ export function CircleDetailsScreen() {
               </Typography>
               {memberData.unreadMessages &&
               memberData.unreadMessages.length > 0 ? (
-                <View>
-                  <Typography className=" ml-5 flex rounded text-[14px] text-black">
-                    {'Show message'}
+                <View className="flex-row">
+                  <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
+                    {'Show latest message'}
                   </Typography>
+                  <TouchableOpacity
+                    className=" ml-2"
+                    onPress={() => {
+                      router.push('/messages')
+                    }}
+                  >
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <View className="flex-row">
