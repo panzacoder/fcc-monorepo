@@ -1,7 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react'
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Platform
+} from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
 import {
@@ -19,6 +26,16 @@ import { useRouter } from 'solito/navigation'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CheckBox } from 'react-native-elements'
+import { Select } from 'app/ui/select'
+
+const VALUES = {
+  apple: 'Apple',
+  banana: 'Banana',
+  blueberry: 'Blueberry',
+  grapes: 'Grapes',
+  pineapple: 'Pineapple'
+}
+
 export function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -324,6 +341,8 @@ export function SignUpScreen() {
             <Typography className="basis-full font-bold">
               {'Address'}
             </Typography>
+
+            <Select placeholder="Country" options={countryListDropdown} />
             <View className="basis-full">
               <PtsDropdown
                 onChangeValue={setSelectedCountryChange}

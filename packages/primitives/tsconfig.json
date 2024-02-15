@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./packages/primatives/*"]
+    }
+  }
+}

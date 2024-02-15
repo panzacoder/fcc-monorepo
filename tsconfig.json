@@ -3,10 +3,7 @@
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
     "jsxImportSource": "nativewind",
-    "paths": {
-      "@native/components/*": ["./apps/expo/components/*"],
-      "app/*": ["./packages/app/*"]
-    },
+    "baseUrl": ".",
     "strict": false,
     "jsx": "preserve"
   },

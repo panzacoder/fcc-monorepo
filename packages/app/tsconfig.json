@@ -5,5 +5,15 @@
     "rnw-overrides.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ]
+  ],
+  "references": [
+    {
+      "path": "../base-ui"
+    }
+  ],
+  "compilerOptions": {
+    "paths": {
+      "app/*": ["./packages/app/*"]
+    }
+  }
 }

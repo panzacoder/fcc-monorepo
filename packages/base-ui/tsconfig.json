@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig",
+  "include": [
+    "nativewind-env.d.ts",
+    "rnw-overrides.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "references": [
+    {
+      "path": "../primitives"
+    }
+  ],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./packages/base-ui/*"]
+    }
+  }
+}

@@ -3,6 +3,8 @@
   "name": "app",
   "main": "index.ts",
   "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
+    "base-ui": "*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "moti": "^0.27.2",
