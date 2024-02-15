@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Pressable
 } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import PtsButton from 'app/ui/PtsButton'
@@ -16,15 +17,18 @@ import { Button } from 'app/ui/button'
 import PtsTextInput from 'app/ui/PtsTextInput'
 import { Feather } from 'app/ui/icons'
 import PtsHeader from 'app/ui/PtsHeader'
-import { router } from 'expo-router'
+import { useRouter } from 'solito/navigation'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   FORGOT_PASSWORD,
   RESET_PASSWORD
 } from 'app/utils/urlConstants'
+import { CardView } from 'app/ui/layouts/card-view'
+import { CardHeader } from '../card-header'
 
 export function ForgotPasswordScreen() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [authCode, setAuthCode] = useState('')
   const [password, setPassword] = useState('')
@@ -33,7 +37,10 @@ export function ForgotPasswordScreen() {
   const [isShowConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setLoading] = useState(false)
   const [isReset, setReset] = useState(false)
-  function resetPressed() {
+  console.log('email', email)
+  const resetPressed = () => {
+    console.log('resetPressed')
+    console.log('email', email)
     if (!email) {
       Alert.alert('', 'Please Enter Email Address')
       return
@@ -60,7 +67,7 @@ export function ForgotPasswordScreen() {
         console.log(error)
       })
   }
-  function resePasswordtPressed() {
+  function resetPasswordPressed() {
     if (!email) {
       Alert.alert('', 'Please Enter Email')
       return
@@ -107,142 +114,133 @@ export function ForgotPasswordScreen() {
   const borderClassName =
     password === confirmPassword ? 'border-gray-400' : 'border-red-400'
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
-        <PtsHeader title="Forgot Password" />
-        <PtsLoader loading={isLoading} />
-        <Image
-          source={require('app/assets/logoNew.png')}
-          className="mt-[10] h-[150] w-[150] self-center"
-          resizeMode={'contain'}
-          alt="logo"
-        />
-        <Typography className="text-center">
-          {'Welcome to Family Care Circle'}
-        </Typography>
-        <View className="mx-4 rounded-2xl bg-white px-4 pt-5">
-          <PtsTextInput
-            isEditable={!isReset}
-            className=""
-            onChangeText={setEmail.bind(this)}
-            placeholder={'Email Address*'}
-            value={email}
-            defaultValue=""
-          />
-          {isReset ? (
-            <View>
-              <PtsTextInput
-                className="mt-5"
-                onChangeText={setAuthCode.bind(this)}
-                placeholder={'Authentication Code*'}
-                value={authCode}
-                keyboard={'numeric'}
-                defaultValue=""
-              />
-              <PtsTextInput
-                className="mt-5"
-                onChangeText={(password) => setPassword(password)}
-                autoCorrect={false}
-                secureTextEntry={!isShowPassword}
-                placeholder="Password*"
-                value={password}
-                defaultValue=""
-                trailingSlot={
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowPassword(!isShowPassword)
-                    }}
-                  >
-                    <Feather
-                      name={isShowPassword ? 'eye' : 'eye-off'}
-                      size={20}
-                      color={'black'}
-                    />
-                  </TouchableOpacity>
-                }
-              />
-              <PtsTextInput
-                className={`mt-5 ${borderClassName}`}
-                onChangeText={(password) => setConfirmPassword(password)}
-                autoCorrect={false}
-                secureTextEntry={!isShowConfirmPassword}
-                placeholder="Confirm Password*"
-                value={confirmPassword}
-                defaultValue=""
-                trailingSlot={
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowConfirmPassword(!isShowConfirmPassword)
-                    }}
-                  >
-                    <Feather
-                      name={isShowConfirmPassword ? 'eye' : 'eye-off'}
-                      size={20}
-                      color={'black'}
-                    />
-                  </TouchableOpacity>
-                }
-              />
-              {password !== confirmPassword ? (
-                <View className="mt-4 flex-row">
-                  <Image
-                    source={require('app/assets/Icon.png')}
-                    className=""
-                    resizeMode={'contain'}
-                    alt="Icon"
-                  />
-                  <Text
-                    onPress={() => {
-                      router.push('/login')
-                    }}
-                    className="mb-[10] ml-[10] text-[12px] text-black"
-                  >
-                    {'Passwords must match'}
-                  </Text>
-                </View>
-              ) : (
-                <View />
-              )}
-            </View>
-          ) : (
-            <View />
-          )}
-
-          <View className="mt-5 flex-row self-center">
-            <PtsButton
-              onPress={() => {
-                if (!isReset) {
-                  resetPressed()
-                } else {
-                  resePasswordtPressed()
-                }
-              }}
-              className="w-[50%] "
-              title="Reset"
-            />
-          </View>
-          <View className="mt-[10] flex-row items-center self-center">
-            <Typography className="text-center">{'New here?'}</Typography>
+    <CardView>
+      <CardHeader
+        actionSlot={
+          <View className="flex flex-col justify-end">
+            <Typography>{'New here?'}</Typography>
             <Button
-              title="Sign Up"
-              variant="link"
-              onPress={() => {
-                router.push('/sign-up')
-              }}
-            />
-          </View>
-          <View className="flex-row items-center self-center">
-            <Typography className="text-center">{'Back to'}</Typography>
-            <Button
-              title="Log In"
+              title="Sign up"
               variant="link"
               onPress={() => {
                 router.push('/login')
               }}
+              className="py-0"
             />
           </View>
+        }
+      />
+      <PtsLoader loading={isLoading} />
+      <View className="my-4 flex flex-row flex-wrap justify-end gap-y-4">
+        <Typography variant="h5" as="h1" className="text-accent basis-full">
+          {'Enter your email to reset your password'}
+        </Typography>
+        <PtsTextInput
+          isEditable={!isReset}
+          className="basis-full"
+          onChangeText={(text) => setEmail(text)}
+          placeholder={'Email Address*'}
+          value={email}
+          defaultValue=""
+        />
+        {isReset ? (
+          <>
+            <PtsTextInput
+              className="mt-5 basis-full"
+              onChangeText={setAuthCode}
+              placeholder={'Authentication Code*'}
+              value={authCode}
+              keyboard={'numeric'}
+              defaultValue=""
+            />
+            <PtsTextInput
+              className="mt-5 basis-full"
+              onChangeText={setPassword}
+              autoCorrect={false}
+              secureTextEntry={!isShowPassword}
+              placeholder="Password*"
+              value={password}
+              defaultValue=""
+              trailingSlot={
+                <Pressable
+                  onPress={() => {
+                    setShowPassword(!isShowPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </Pressable>
+              }
+            />
+            <PtsTextInput
+              className={`mt-5 ${borderClassName}`}
+              onChangeText={(password) => setConfirmPassword(password)}
+              autoCorrect={false}
+              secureTextEntry={!isShowConfirmPassword}
+              placeholder="Confirm Password*"
+              value={confirmPassword}
+              defaultValue=""
+              trailingSlot={
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowConfirmPassword(!isShowConfirmPassword)
+                  }}
+                >
+                  <Feather
+                    name={isShowConfirmPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={'black'}
+                  />
+                </TouchableOpacity>
+              }
+            />
+            {password !== confirmPassword ? (
+              <View className="mt-4 flex-row">
+                <Image
+                  source={require('app/assets/Icon.png')}
+                  className=""
+                  resizeMode={'contain'}
+                  alt="Icon"
+                />
+                <Text
+                  onPress={() => {
+                    router.push('/login')
+                  }}
+                  className="mb-[10] ml-[10] text-[12px] text-black"
+                >
+                  {'Passwords must match'}
+                </Text>
+              </View>
+            ) : null}
+          </>
+        ) : null}
+        <View className="flex basis-full flex-row justify-end gap-4">
+          <Button
+            variant="link"
+            className=""
+            onPress={() => {
+              router.push('/login')
+            }}
+            title="Back to Log in"
+            leadingIcon="arrow-left"
+          />
+
+          <Button
+            className="web:max-w-fit basis-1/3"
+            onPress={() => {
+              if (!isReset) {
+                resetPressed()
+              } else {
+                resetPasswordPressed()
+              }
+            }}
+            title="Reset"
+          />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </CardView>
   )
 }

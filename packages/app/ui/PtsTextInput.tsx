@@ -21,7 +21,7 @@ const PtsTextInput = ({
   return (
     <View
       className={cn(
-        'flex flex-1 flex-row justify-between rounded-lg border-[1px] border-gray-400 px-4 py-3',
+        'flex flex-row justify-between rounded-lg border-[1px] border-gray-400 px-4 py-3',
         className
       )}
     >
@@ -30,6 +30,7 @@ const PtsTextInput = ({
         editable={editable}
         keyboardType={keyboardType}
         onChangeText={(text) => {
+          console.log('text', text)
           onChangeText && onChangeText(text)
         }}
         {...rest}

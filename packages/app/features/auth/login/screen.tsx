@@ -120,7 +120,7 @@ export function LoginScreen() {
         }
       />
 
-      <View className="my-5 flex flex-row flex-wrap justify-end gap-y-2">
+      <View className="my-5 flex flex-row flex-wrap justify-end gap-y-4">
         <PtsTextInput
           className="basis-full"
           onChangeText={onChangeEmail}
