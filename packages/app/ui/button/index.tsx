@@ -40,8 +40,8 @@ const buttonVariants = tv({
         icon: 'color-secondary hover:color-accent-foreground'
       },
       link: {
-        button: 'hover:underline',
-        text: 'text-primary',
+        button: 'group',
+        text: 'text-primary group-hover:underline',
         icon: 'color-primary'
       }
     },

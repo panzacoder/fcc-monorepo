@@ -21,7 +21,6 @@ import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
-import { Card } from 'app/ui/card'
 
 export function LoginScreen() {
   const router = useRouter()
@@ -120,50 +119,54 @@ export function LoginScreen() {
         }
       />
 
-      <View className="my-5 flex flex-row flex-wrap justify-end gap-y-4">
-        <PtsTextInput
-          className="basis-full"
-          onChangeText={onChangeEmail}
-          placeholder={'Email Address'}
-          value={email}
-          defaultValue=""
-        />
-        <PtsTextInput
-          className="basis-full"
-          onChangeText={(password) => {
-            onChangePassword(password)
-          }}
-          autoCorrect={false}
-          secureTextEntry={!isShowPassword}
-          placeholder="Password"
-          value={password}
-          defaultValue=""
-          trailingSlot={
-            <FeatherButton
-              onPress={() => {
-                onChangeShowPassword(!isShowPassword)
-              }}
-              name={isShowPassword ? 'eye' : 'eye-off'}
-              size={20}
-              color={'black'}
-            />
-          }
-        />
-        <Button
-          className="web:max-w-fit basis-1/2"
-          title="Forgot Password?"
-          variant="link"
-          onPress={() => {
-            router.push('/forgot-password')
-          }}
-        />
+      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+        <View className="flex w-full gap-2">
+          <PtsTextInput
+            className="w-full"
+            onChangeText={onChangeEmail}
+            placeholder={'Email Address'}
+            value={email}
+            defaultValue=""
+          />
+          <PtsTextInput
+            className="w-full"
+            onChangeText={(password) => {
+              onChangePassword(password)
+            }}
+            autoCorrect={false}
+            secureTextEntry={!isShowPassword}
+            placeholder="Password"
+            value={password}
+            defaultValue=""
+            trailingSlot={
+              <FeatherButton
+                onPress={() => {
+                  onChangeShowPassword(!isShowPassword)
+                }}
+                name={isShowPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color={'black'}
+              />
+            }
+          />
+        </View>
+        <View className="flex w-full flex-row justify-end gap-4">
+          <Button
+            className=""
+            title="Forgot Password?"
+            variant="link"
+            onPress={() => {
+              router.push('/forgot-password')
+            }}
+          />
 
-        <Button
-          className="web:max-w-fit basis-1/3"
-          title="Log in"
-          trailingIcon="arrow-right"
-          onPress={buttonPressed}
-        />
+          <Button
+            className=""
+            title="Log in"
+            trailingIcon="arrow-right"
+            onPress={buttonPressed}
+          />
+        </View>
       </View>
     </CardView>
   )

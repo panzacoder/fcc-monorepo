@@ -57,9 +57,9 @@ export function EmailForm({
   }
 
   return (
-    <View className="my-4 flex  flex-wrap justify-end gap-y-4">
+    <View className="my-4 flex flex-wrap justify-end gap-y-4">
       <Typography variant="h5" as="h1" className="w-full">
-        {'Enter your email to reset your password'}
+        {'Enter your email to reset your account password'}
       </Typography>
       <ControlledTextField
         name="email"
@@ -77,11 +77,7 @@ export function EmailForm({
           leadingIcon="arrow-left"
         />
 
-        <Button
-          className="web:max-w-fit basis-1/3"
-          onPress={handleSubmit(onSubmit)}
-          title="Reset"
-        />
+        <Button onPress={handleSubmit(onSubmit)} title="Reset" />
       </View>
     </View>
   )
