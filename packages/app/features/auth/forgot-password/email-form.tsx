@@ -23,11 +23,7 @@ export function EmailForm({
     })
     .required()
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors }
-  } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       email: ''
     },
@@ -62,7 +58,7 @@ export function EmailForm({
 
   return (
     <View className="my-4 flex  flex-wrap justify-end gap-y-4">
-      <Typography variant="h5" as="h1" className="text-accent">
+      <Typography variant="h5" as="h1" className="">
         {'Enter your email to reset your password'}
       </Typography>
       <ControlledTextField
@@ -84,13 +80,6 @@ export function EmailForm({
         <Button
           className="web:max-w-fit basis-1/3"
           onPress={handleSubmit(onSubmit)}
-          // onPress={() => {
-          //   if (!isReset) {
-          //     resetPressed(email)
-          //   } else {
-          //     resetPasswordPressed()
-          //   }
-          // }}
           title="Reset"
         />
       </View>
