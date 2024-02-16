@@ -36,6 +36,8 @@ const schema = z.object({
     })
 })
 
+export type Schema = z.infer<typeof schema>
+
 export function SetPasswordForm({
   email,
   onLoadingChange
