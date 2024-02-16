@@ -16,7 +16,9 @@ export function CircleCard(data: any) {
   }
   return (
     <View className="flex-1 bg-white">
-      <View className="border-primary mt-5 w-[95%] self-center rounded-[10px] border-[2px] bg-white py-5">
+      <View
+        className={`border-[${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? '#287CFA' : '#3DC4C4'}] mt-5 w-[95%] self-center rounded-[10px] border-[2px] bg-white py-5`}
+      >
         <View className=" flex-row">
           <View className="w-[80%] flex-row">
             <View className="bg-primary ml-5 h-[40px] w-[40px] items-center justify-center rounded-[20px]">
@@ -40,7 +42,18 @@ export function CircleCard(data: any) {
                 {'2'}
               </Typography>
             </View>
-            <TouchableOpacity className="ml-2 self-center" onPress={() => {}}>
+            <TouchableOpacity
+              className="ml-2 self-center"
+              onPress={() => {
+                router.push({
+                  pathname: '/(authenticated_no_tabs)/circleDetails',
+                  query: {
+                    fullName: fullName,
+                    memberData: JSON.stringify(memberData)
+                  }
+                })
+              }}
+            >
               <Feather name={'chevron-right'} size={25} color={'black'} />
             </TouchableOpacity>
           </View>
