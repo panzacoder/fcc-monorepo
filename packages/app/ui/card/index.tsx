@@ -10,7 +10,7 @@ export function Card({ children, className = '' }: CardProps) {
   return (
     <View
       className={cn(
-        'bg-card flex flex-shrink rounded-2xl px-4 pt-5',
+        'bg-card flex flex-shrink rounded-2xl px-6 pb-2 pt-5',
         className
       )}
     >
