@@ -19,7 +19,7 @@ import { useRouter } from 'solito/navigation'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CheckBox } from 'react-native-elements'
-import { ScrollView } from 'app/ui/scroll-view'
+import { formatUrl } from 'app/utils/format-url'
 export function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -106,16 +106,12 @@ export function SignUpScreen() {
           if (data.status === 'SUCCESS') {
             const countryList = Array()
             data.data.map((data: any, index: any) => {
-              // if (data.name === 'India') {
-              //   setSelectedCountry(index)
-              // }
               let object = {
                 label: data.name,
                 value: index
               }
               countryList.push(object)
             })
-            // console.log('countryList success', countryList)
             setCountryListDropdown(countryList)
             setCountryList(data.data ? data.data : [])
             if (selectedCountryValue !== -1) {
@@ -192,12 +188,7 @@ export function SignUpScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.push({
-            pathname: '/verification',
-            params: {
-              email: email
-            }
-          })
+          router.push(formatUrl('/verification', { email }))
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
         } else {

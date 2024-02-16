@@ -6,7 +6,6 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsTextInput from 'app/ui/PtsTextInput'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import headerAction from 'app/redux/header/headerAction'
@@ -15,37 +14,47 @@ import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsororAction from 'app/redux/sponsor/sponsororAction'
-import { FeatherButton } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
 
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
+import { formatUrl } from 'app/utils/format-url'
+
+const schema = z.object({
+  email: z.string().min(1, { message: 'Email is required' }).email(),
+  password: z.string().min(1, { message: 'Password is required' })
+})
+
+export type Schema = z.infer<typeof schema>
+
 export function LoginScreen() {
   const router = useRouter()
-  const [email, onChangeEmail] = useState('sachaudhari0704@gmail.com')
-  const [password, onChangePassword] = useState('Shubh@m27')
   const [isLoading, setLoading] = useState(false)
-  const [isShowPassword, onChangeShowPassword] = useState(false)
 
-  async function buttonPressed() {
-    if (!email) {
-      Alert.alert('', 'Please Enter Email')
-      return
-    }
-    if (!password) {
-      Alert.alert('', 'Please Enter Password')
-      return
-    }
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      email: '',
+      password: ''
+    },
+    resolver: zodResolver(schema)
+  })
+
+  async function login(formData: Schema) {
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`
     let dataObject = {
       header: deviceInfo,
       appuserVo: {
-        emailOrPhone: email,
-        credential: password,
+        emailOrPhone: formData.email,
+        credential: formData.password,
         rememberMe: true
       }
     }
@@ -54,10 +63,8 @@ export function LoginScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           let subscriptionDetailsobject = {
-            subscriptionEndDate: data.data.subscriptionEndDate
-              ? data.data.subscriptionEndDate
-              : '',
-            days: data.data.days ? data.data.days : '',
+            subscriptionEndDate: data.data.subscriptionEndDate || '',
+            days: data.data.days || '',
             expiredSubscription: data.data.expiredSubscription,
             expiringSubscription: data.data.expiringSubscription
           }
@@ -89,7 +96,7 @@ export function LoginScreen() {
           }
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
-          Alert.alert('', 'Do verification')
+          router.push(formatUrl('/verification', { email: formData.email }))
         } else {
           Alert.alert('', data.message)
         }
@@ -121,40 +128,24 @@ export function LoginScreen() {
 
       <View className="my-5 flex flex-wrap justify-end gap-y-4">
         <View className="flex w-full gap-2">
-          <PtsTextInput
-            className="w-full"
-            onChangeText={onChangeEmail}
+          <ControlledTextField
+            control={control}
+            name="email"
             placeholder={'Email Address'}
-            value={email}
-            defaultValue=""
-          />
-          <PtsTextInput
             className="w-full"
-            onChangeText={(password) => {
-              onChangePassword(password)
-            }}
-            autoCorrect={false}
-            secureTextEntry={!isShowPassword}
+          />
+          <ControlledSecureField
+            control={control}
+            name="password"
             placeholder="Password"
-            value={password}
-            defaultValue=""
-            trailingSlot={
-              <FeatherButton
-                onPress={() => {
-                  onChangeShowPassword(!isShowPassword)
-                }}
-                name={isShowPassword ? 'eye' : 'eye-off'}
-                size={20}
-                color={'black'}
-              />
-            }
+            className="w-full"
           />
         </View>
-        <View className="flex w-full flex-row justify-end gap-4">
+        <View className="flex w-full flex-row justify-end gap-2">
           <Button
             className=""
             title="Forgot Password?"
-            variant="link"
+            variant="link-secondary"
             onPress={() => {
               router.push('/forgot-password')
             }}
@@ -164,7 +155,7 @@ export function LoginScreen() {
             className=""
             title="Log in"
             trailingIcon="arrow-right"
-            onPress={buttonPressed}
+            onPress={handleSubmit(login)}
           />
         </View>
       </View>

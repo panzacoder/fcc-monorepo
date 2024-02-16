@@ -7,7 +7,7 @@ import { ComponentProps } from 'react'
 const buttonVariants = tv({
   slots: {
     button:
-      'web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 ring-offset-background flex-row items-center justify-center gap-1 rounded-full active:opacity-90 disabled:pointer-events-none disabled:opacity-50',
+      'web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 ring-offset-background group flex-row items-center justify-center gap-1 rounded-full active:opacity-90 disabled:pointer-events-none disabled:opacity-50',
     text: 'text-md px-1 font-bold disabled:pointer-events-none disabled:opacity-50',
     icon: 'color-primary'
   },
@@ -26,7 +26,7 @@ const buttonVariants = tv({
       outline: {
         button:
           'text-primary-foreground border-input hover:bg-accent border shadow-sm ',
-        text: 'text-primary hover:text-accent-foreground',
+        text: 'text-primary group-hover:text-accent-foreground',
         icon: 'hover:color-accent-foreground'
       },
       secondary: {
@@ -36,13 +36,18 @@ const buttonVariants = tv({
       },
       ghost: {
         button: 'hover:bg-accent',
-        text: 'text-secondary hover:text-accent-foreground',
-        icon: 'color-secondary hover:color-accent-foreground'
+        text: 'text-secondary group-hover:text-accent-foreground',
+        icon: 'color-secondary group-hover:color-accent-foreground'
       },
       link: {
-        button: 'group',
+        button: '',
         text: 'text-primary group-hover:underline',
         icon: 'color-primary'
+      },
+      'link-secondary': {
+        button: '',
+        text: 'text-secondary group-hover:underline',
+        icon: 'color-secondary'
       }
     },
     size: {

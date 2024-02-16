@@ -1,36 +1,47 @@
 'use client'
 
 import { useState } from 'react'
-import { View, Alert } from 'react-native'
-import PtsButton from 'app/ui/PtsButton'
+import { View, Alert, Text } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsTextInput from 'app/ui/PtsTextInput'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
-import { useLocalSearchParams, router } from 'expo-router'
-import PtsHeader from 'app/ui/PtsHeader'
+import { useRouter, useSearchParams } from 'solito/navigation'
 import { CallPostService } from 'app/utils/fetchServerData'
-import store from 'app/redux/store'
 import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from 'app/utils/urlConstants'
+import { CardView } from 'app/ui/layouts/card-view'
+import { CardHeader } from '../card-header'
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+const schema = z.object({
+  authCode: z.string().length(6, { message: 'Enter 6 digit code from email' })
+})
+
+export type Schema = z.infer<typeof schema>
 
 export function VerificationScreen() {
-  const header = store.getState().headerState.header
-  console.log('header', header)
-  const item = useLocalSearchParams()
-  const [verificationCode, setVerficationCode] = useState('')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams?.get('email') || '\n(email not found)'
   const [isLoading, setLoading] = useState(false)
-  async function verifyPressed() {
-    if (!verificationCode) {
-      Alert.alert('', 'Please Enter Verification Code')
-      return
-    }
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      authCode: ''
+    },
+    resolver: zodResolver(schema)
+  })
+
+  async function verifyAuthCode(formData: Schema) {
     setLoading(true)
 
-    let loginURL = `${BASE_URL}${VERIFY_ACCOUNT}`
-    let dataObject = {
+    const loginURL = `${BASE_URL}${VERIFY_ACCOUNT}`
+    const dataObject = {
       registrationVo: {
-        emailOrPhone: item.email,
-        varificationCode: verificationCode
+        emailOrPhone: email,
+        varificationCode: formData.authCode
       }
     }
     CallPostService(loginURL, dataObject)
@@ -47,12 +58,12 @@ export function VerificationScreen() {
         console.log(error)
       })
   }
-  async function resendPressed() {
+  async function resendAuthCode() {
     setLoading(true)
     let loginURL = `${BASE_URL}${RESEND_OTP}`
     let dataObject = {
       registration: {
-        email: item.email
+        email: email
       }
     }
     CallPostService(loginURL, dataObject)
@@ -66,62 +77,55 @@ export function VerificationScreen() {
       })
   }
   return (
-    <View className="flex-1 bg-white">
-      <PtsHeader title="Account Verification" />
+    <CardView>
       <PtsLoader loading={isLoading} />
-      <View className="flex-1 justify-center">
-        <Typography className="mx-[5] mt-[20]  text-center text-[16px] font-bold text-black">
-          {
-            'Congratulations! you are successfully registered on Family Care Circle.'
-          }
+      <CardHeader />
+      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+        <Typography variant="h3" className="text-center">
+          {'Almost There! 🎉'}
         </Typography>
-        <Typography className="mx-[5] mt-[20] text-center text-[16px] text-black">
-          {
-            ' An Authentication Code has been sent to your registered email address. Please check your email for more details.'
-          }
+        <Typography variant="h5" className="text-center">
+          {'We sent a verification code to '}
+          <Text className="underline">{email}</Text>
         </Typography>
-        <View className="mt-5 w-[90%]">
-          <PtsTextInput
-            className="m-5 mt-[0]"
-            placeholder={'Email'}
-            isEditable={false}
-            value={item.email ? item.email : ''}
-            defaultValue=""
-          />
-          <PtsTextInput
-            className="m-5 mt-[0]"
-            onChangeText={setVerficationCode}
-            placeholder={'Verification Code'}
-            value={verificationCode}
-            defaultValue=""
-            keyboard="numeric"
-          />
-        </View>
-        <View className="flex-row self-center">
-          <PtsButton
-            onPress={() => {
-              verifyPressed()
-            }}
-            className="w-[30%] "
-            title="Verify"
-          />
-          <PtsButton
-            onPress={() => {
-              router.replace('/login')
-            }}
-            className="ml-[20] w-[30%] bg-[#86939e]"
-            title="Cancel"
-          />
-        </View>
-        <Button
-          className="mt-5"
-          title="Resend Authentication Code"
-          variant="link"
-          onPress={() => {
-            resendPressed()
-          }}
+        <Typography className="text-center text-sm">
+          Please check your email to find the code or find an alternative link
+          to verify your account.
+        </Typography>
+
+        <ControlledTextField
+          name="authCode"
+          control={control}
+          placeholder={'Enter Verification Code'}
+          keyboard={'numeric'}
+          trailingSlot={
+            <Button
+              title="Resend"
+              variant="link-secondary"
+              trailingIcon="refresh-cw"
+              onPress={resendAuthCode}
+              size="sm"
+            />
+          }
         />
+
+        <View className="flex flex-row justify-end gap-4">
+          <Button
+            variant="link"
+            onPress={() => {
+              router.push('/login')
+            }}
+            title="Back to Log in"
+            leadingIcon="arrow-left"
+          />
+
+          <Button
+            title="Verify"
+            onPress={handleSubmit(verifyAuthCode)}
+            trailingIcon="arrow-right"
+          />
+        </View>
       </View>
-    </View>
+    </CardView>
   )
 }
