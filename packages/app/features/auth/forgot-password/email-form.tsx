@@ -58,7 +58,7 @@ export function EmailForm({
 
   return (
     <View className="my-4 flex  flex-wrap justify-end gap-y-4">
-      <Typography variant="h5" as="h1" className="">
+      <Typography variant="h5" as="h1" className="w-full">
         {'Enter your email to reset your password'}
       </Typography>
       <ControlledTextField

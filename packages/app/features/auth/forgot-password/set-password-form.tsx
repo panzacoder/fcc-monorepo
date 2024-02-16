@@ -73,7 +73,7 @@ export function SetPasswordForm({
 
   return (
     <View className="my-4 flex flex-wrap justify-end gap-y-4">
-      <Typography variant="h5" as="h1" className="">
+      <Typography variant="h5" as="h1" className="w-full">
         {'Enter the code sent to your email and set a new password'}
       </Typography>
       <View className="flex w-full gap-2">
