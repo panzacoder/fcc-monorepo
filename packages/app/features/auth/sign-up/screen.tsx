@@ -325,7 +325,6 @@ export function SignUpScreen() {
             onChangeValue={setSelectedCountryChange}
             label="Country*"
             maxHeight={300}
-            value={selectedCountryValue}
             list={countryListDropdown}
           />
           <PtsDropdown
