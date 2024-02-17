@@ -7,7 +7,7 @@ import { Button } from 'app/ui/button'
 import { useRouter } from 'solito/navigation'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
-import { EmailForm } from './email-form'
+import { ForgotPasswordForm } from './forgot-password-form'
 import { SetPasswordForm } from './set-password-form'
 
 export function ForgotPasswordScreen() {
@@ -37,7 +37,7 @@ export function ForgotPasswordScreen() {
       {email ? (
         <SetPasswordForm email={email} onLoadingChange={setLoading} />
       ) : (
-        <EmailForm
+        <ForgotPasswordForm
           onLoadingChange={setLoading}
           onEmailVerified={(verifiedEmail) => setEmail(verifiedEmail)}
         />

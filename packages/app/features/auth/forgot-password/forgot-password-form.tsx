@@ -9,14 +9,14 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-export type EmailFormProps = {
+export type ForgotPasswordFormProps = {
   onLoadingChange: (loading: boolean) => void
   onEmailVerified: (email: string) => void
 }
-export function EmailForm({
+export function ForgotPasswordForm({
   onLoadingChange,
   onEmailVerified
-}: EmailFormProps) {
+}: ForgotPasswordFormProps) {
   const schema = z
     .object({
       email: z.string().min(1, { message: 'Email is required' }).email()
