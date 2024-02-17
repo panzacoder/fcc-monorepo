@@ -15,26 +15,31 @@ export type ResetPasswordFormProps = {
   onLoadingChange: (loading: boolean) => void
 }
 
-const schema = z.object({
-  email: z.string().min(1, { message: 'Email is required' }).email(),
-  authCode: z
-    .string()
-    .min(1, { message: 'Please enter code sent to your email provided' }),
-  password: z
-    .string()
-    .min(8, { message: 'Password must be at least 8 characters' })
-    .max(20, { message: 'Password can be max 20 characters' })
-    .regex(/[0-9]/g, { message: 'Password must contain a number' })
-    .regex(/[!,@,#,$,%,^,&,*]/g, {
-      message: 'Password must contain a special character !@#$%^&*'
-    }),
-  confirmPassword: z
-    .string()
-    .min(1, { message: 'Confirm new password' })
-    .refine((val) => val === schema.password, {
-      message: 'Passwords must match'
-    })
-})
+const schema = z
+  .object({
+    email: z.string().min(1, { message: 'Email is required' }).email(),
+    authCode: z
+      .string()
+      .min(1, { message: 'Please enter code sent to your email provided' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters' })
+      .max(20, { message: 'Password can be max 20 characters' })
+      .regex(/[0-9]/g, { message: 'Password must contain a number' })
+      .regex(/[!,@,#,$,%,^,&,*]/g, {
+        message: 'Password must contain a special character !@#$%^&*'
+      }),
+    confirmPassword: z.string().min(1, { message: 'Confirm new password' })
+  })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    if (password !== confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Passwords must match',
+        path: ['confirmPassword']
+      })
+    }
+  })
 
 export type Schema = z.infer<typeof schema>
 
@@ -91,6 +96,7 @@ export function SetPasswordForm({
           name="email"
           control={control}
           placeholder={'Email Address*'}
+          autoCapitalize="none"
         />
         <ControlledTextField
           name="authCode"

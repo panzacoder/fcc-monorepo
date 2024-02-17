@@ -14,6 +14,7 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { formatUrl } from 'app/utils/format-url'
 
 const schema = z.object({
   authCode: z.string().length(6, { message: 'Enter 6 digit code from email' })
@@ -48,7 +49,7 @@ export function VerificationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.replace('/login')
+          router.replace(formatUrl('/login', { email }))
         } else {
           Alert.alert('', data.message)
         }

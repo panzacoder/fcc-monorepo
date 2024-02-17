@@ -1,22 +1,23 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { useState } from 'react'
+import { ComponentProps, useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
 import { cn } from './utils'
-export type Props = {
+export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
   value?: number
   list?: any
   onChangeValue?: CallableFunction
+  error?: boolean
 }
-
 const PtsDropdown = ({
   label,
   maxHeight,
   value,
   list,
-  onChangeValue
-}: Props) => {
+  onChangeValue,
+  error
+}: PtsDropdownProps) => {
   const [isFocus, setIsFocus] = useState(false)
 
   return (
@@ -29,7 +30,9 @@ const PtsDropdown = ({
       <View
         className={cn(
           'rounded-lg border-[1px] border-gray-400 px-4 py-1',
-          isFocus ? 'border-primary' : 'border-gray-400'
+          'border-gray-400',
+          isFocus && 'border-gray-400',
+          error && 'border-destructive'
         )}
       >
         <Dropdown

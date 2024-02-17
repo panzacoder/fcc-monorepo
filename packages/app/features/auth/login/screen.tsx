@@ -133,6 +133,7 @@ export function LoginScreen() {
             name="email"
             placeholder={'Email Address'}
             className="w-full"
+            autoCapitalize="none"
           />
           <ControlledSecureField
             control={control}

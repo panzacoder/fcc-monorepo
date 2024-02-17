@@ -1,27 +1,23 @@
-import PtsTextInput, { PtsTextInputProps } from 'app/ui/PtsTextInput'
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 import { Controller, ControllerProps, FieldValues } from 'react-hook-form'
 import { View } from 'react-native'
+import PtsDropdown, { PtsDropdownProps } from '../PtsDropdown'
 
-export type ControlledTextFieldProps<T extends FieldValues> =
-  PtsTextInputProps &
+export type ControlledDropdownProps<T extends FieldValues> = PtsDropdownProps &
   Omit<ControllerProps<T>, 'render'> & {
-    inputClassName?: string
-    InputComponent?: React.ComponentType<any>
+    className?: string
   }
 
-export function ControlledTextField<T extends FieldValues>({
+export function ControlledDropdown<T extends FieldValues>({
   control,
   name,
   rules,
-  onChangeText,
+  onChangeValue,
   className,
-  inputClassName,
-  InputComponent = PtsTextInput,
 
   ...rest
-}: ControlledTextFieldProps<T>) {
+}: ControlledDropdownProps<T>) {
   return (
     <Controller<T>
       name={name}
@@ -30,19 +26,17 @@ export function ControlledTextField<T extends FieldValues>({
       render={({ field: { onChange, value }, fieldState }) => {
         const handleChange = (text: string) => {
           onChange(text)
-          onChangeText && onChangeText(text)
+          onChangeValue && onChangeValue(text)
         }
         return (
           <View className={cn('flex w-full gap-1', className)}>
-            <InputComponent
-              className={
-                (cn('', fieldState?.invalid && 'border-destructive'),
-                  inputClassName)
-              }
-              onChangeText={handleChange}
+            <PtsDropdown
+              error={fieldState?.invalid}
+              onChangeValue={handleChange}
               value={value}
               {...rest}
             />
+
             {fieldState?.invalid && (
               <Typography className="text-destructive">
                 {fieldState?.error?.message}

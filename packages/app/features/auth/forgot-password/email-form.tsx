@@ -65,6 +65,7 @@ export function EmailForm({
         name="email"
         control={control}
         placeholder={'Email Address*'}
+        autoCapitalize="none"
       />
       <View className="flex flex-row justify-end gap-4">
         <Button
