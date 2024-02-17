@@ -2491,6 +2491,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^3.3.4":
+  version: 3.3.4
+  resolution: "@hookform/resolvers@npm:3.3.4"
+  peerDependencies:
+    react-hook-form: ^7.0.0
+  checksum: 0845e15f53b515ab5dc8d970d4ee7f47bbdfc4f4391bc166361535482d96b6ae3d1812669107fca05bf8687fa5447e3ed65f2eee3e349759b23b229ca978f917
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.13":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -6508,14 +6517,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
+    "@hookform/resolvers": "npm:^3.3.4"
     class-variance-authority: "npm:^0.7.0"
     clsx: "npm:^2.1.0"
     moti: "npm:^0.27.2"
     nativewind: "npm:^4.0.23"
+    react-hook-form: "npm:^7.50.1"
     react-native-linear-gradient: "npm:^2.8.3"
     solito: "npm:4.2.0"
     tailwind-merge: "npm:^2.2.1"
     tailwindcss: "npm:^3.4.1"
+    zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
 
@@ -7638,6 +7650,25 @@ __metadata:
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
   checksum: c57cf9dd0791e2f18a5ee9c1a299ae6e801ff58fee96dc8bfd0dcb4738a6ce58dd252a3605b1c93c6418fe4f9d5093b28ffbf4d66648cb2a9c67eaef9679be2f
+  languageName: node
+  linkType: hard
+
+"chromatic@npm:^10.9.0":
+  version: 10.9.0
+  resolution: "chromatic@npm:10.9.0"
+  peerDependencies:
+    "@chromatic-com/cypress": ^0.5.2 || ^1.0.0
+    "@chromatic-com/playwright": ^0.5.2 || ^1.0.0
+  peerDependenciesMeta:
+    "@chromatic-com/cypress":
+      optional: true
+    "@chromatic-com/playwright":
+      optional: true
+  bin:
+    chroma: dist/bin.js
+    chromatic: dist/bin.js
+    chromatic-cli: dist/bin.js
+  checksum: e3b31d99cf70cf2a9290166a27d638eb6fc91d37811f8a4d732adf9ce935ff689e9999fcdc7d2da0323cc28d2f226ba61f85cd58f33f2e87d83b652c0d0e2a55
   languageName: node
   linkType: hard
 
@@ -10163,6 +10194,7 @@ __metadata:
     "@types/react": "npm:^18.2.52"
     "@types/react-native": "npm:^0.73.0"
     "@types/react-native__assets": "npm:^1"
+    chromatic: "npm:^10.9.0"
     eslint: "npm:^8.56.0"
     expo-device: "npm:^5.9.3"
     expo-image: "npm:1.10.6"
@@ -15659,6 +15691,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hook-form@npm:^7.50.1":
+  version: 7.50.1
+  resolution: "react-hook-form@npm:7.50.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 54a9daa2143c601a9867e96a2159a0bbe98707b5bbeb5953bfdf3342d2f04bfcaa6169907ed167c5c1f3a044630860d4f43685f4ac4e15b9cd892d1b00d54dde
+  languageName: node
+  linkType: hard
+
 "react-is@npm:18.1.0":
   version: 18.1.0
   resolution: "react-is@npm:18.1.0"
@@ -19378,5 +19419,12 @@ __metadata:
   version: 1.0.0
   resolution: "yocto-queue@npm:1.0.0"
   checksum: 2cac84540f65c64ccc1683c267edce396b26b1e931aa429660aefac8fbe0188167b7aee815a3c22fa59a28a58d898d1a2b1825048f834d8d629f4c2a5d443801
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.22.4":
+  version: 3.22.4
+  resolution: "zod@npm:3.22.4"
+  checksum: 73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
   languageName: node
   linkType: hard

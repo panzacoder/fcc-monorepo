@@ -1,11 +1,22 @@
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
+import { cn } from 'app/ui/utils'
 
-export function Card({ children }) {
+export type CardProps = {
+  children: React.ReactNode
+  className?: string
+  scroll?: boolean
+}
+
+export function Card({ children, scroll, className = '' }: CardProps) {
+  const ViewComponent = scroll ? ScrollView : View
   return (
-    <View className="m-auto grid h-full">
-      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5">
-        {children}
-      </View>
-    </View>
+    <ViewComponent
+      className={cn(
+        'bg-card flex flex-shrink rounded-2xl px-6 pb-1 pt-5',
+        className
+      )}
+    >
+      {children}
+    </ViewComponent>
   )
 }

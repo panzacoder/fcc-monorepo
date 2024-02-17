@@ -6,11 +6,15 @@ export type PtsTextInputProps = {
   isEditable?: TextInputProps['editable']
   onChangeText?: TextInputProps['onChangeText']
   trailingSlot?: React.ReactNode
+  valid?: boolean
+  textClassName?: string
 } & TextInputProps
 
 const PtsTextInput = ({
   className,
+  textClassName,
   onChangeText,
+  valid = true,
   keyboard = 'default',
   keyboardType = keyboard,
   isEditable = true,
@@ -21,12 +25,18 @@ const PtsTextInput = ({
   return (
     <View
       className={cn(
-        'flex w-full flex-row justify-between  rounded-lg border-[1px] border-gray-400 px-4 py-3',
+        'flex flex-row justify-between rounded-lg ',
+        valid ? 'border-gray-400' : 'border-destructive',
+        editable ? '' : 'bg-muted',
         className
       )}
     >
       <TextInput
-        className="flex-1"
+        className={cn(
+          'active:border-primary focus:border-primary flex-1 rounded-lg  border-[1px] border-gray-400 px-4 py-3 ',
+          editable ? '' : 'text-muted-foreground',
+          textClassName
+        )}
         editable={editable}
         keyboardType={keyboardType}
         onChangeText={(text) => {
@@ -34,7 +44,9 @@ const PtsTextInput = ({
         }}
         {...rest}
       />
-      {trailingSlot}
+      <View className="absolute bottom-0 right-3 top-0 flex justify-center">
+        {trailingSlot}
+      </View>
     </View>
   )
 }

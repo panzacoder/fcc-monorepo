@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
-// import { CheckBox } from 'react-native-elements'
+import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
 import {
@@ -12,86 +11,118 @@ import {
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
-import PtsButton from 'app/ui/PtsButton'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsTextInput from 'app/ui/PtsTextInput'
-import { Feather } from 'app/ui/icons'
-import PtsHeader from 'app/ui/PtsHeader'
-import PtsDropdown from 'app/ui/PtsDropdown'
-import { router } from 'expo-router'
-export function SignUpScreen() {
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [isTcAccepted, setIsTcAccepted] = useState(false)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedCountryValue, setSelectedCountry] = useState(-1)
-  const [countryList, setCountryList] = useState<any>([])
-  const [countryListDropdown, setCountryListDropdown] = useState<any>([])
-  const [selectedStateValue, setSelectedState] = useState(-1)
-  const [statesList, setStatesList] = useState<any>([])
-  const [statesListDropdown, setStatesListDropdown] = useState<any>([])
-  const [selectedTimeZoneValue, setSelectedTimeZone] = useState(-1)
-  const [timeZonesList, setTimeZonesList] = useState<any>([])
-  const [timeZonesListDropdown, settimeZonesListDropdown] = useState<any>([])
-  const [isShowPassword, setShowPassword] = useState(false)
-  const [isShowConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setLoading] = useState(false)
-  const borderClassName =
-    password === confirmPassword ? 'border-gray-400' : 'border-red-400'
+import { useRouter } from 'solito/navigation'
+import { CardHeader } from '../card-header'
+import { CardView } from 'app/ui/layouts/card-view'
+import { CheckBox } from 'react-native-elements'
+import { formatUrl } from 'app/utils/format-url'
 
-  const getStates = useCallback(
-    async (countryId: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-      let dataObject = {
-        country: {
-          id:
-            countryList[countryId] && countryList[countryId].id
-              ? countryList[countryId].id
-              : 101
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            const statesList = Array()
-            const timeZones = Array()
-            data.data.stateList.map((data: any, index: any) => {
-              let object = {
-                label: data.name,
-                value: index
-              }
-              statesList.push(object)
-            })
-            data.data.timeZoneList.map((data: any, index: any) => {
-              let object = {
-                label: data.name,
-                value: index
-              }
-              timeZones.push(object)
-            })
-            setStatesListDropdown(statesList)
-            setStatesList(data.data.stateList ? data.data.stateList : [])
-            settimeZonesListDropdown(timeZones)
-            setTimeZonesList(
-              data.data.timeZoneList ? data.data.timeZoneList : []
-            )
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log(error)
-        })
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
+import { Controller, useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+
+const schema = z
+  .object({
+    firstName: z.string().min(1, { message: 'First Name is required' }),
+    lastName: z.string().min(1, { message: 'Last Name is required' }),
+    phone: z.string(),
+    email: z.string().min(1, { message: 'Email is required' }).email(),
+    timezone: z.string().min(1, { message: 'Timezone is required' }),
+    state: z.number().min(1, { message: 'State is required' }),
+    country: z.number().min(1, { message: 'Country is required' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters' })
+      .max(20, { message: 'Password can be max 20 characters' })
+      .regex(/[0-9]/g, { message: 'Password must contain a number' })
+      .regex(/[!,@,#,$,%,^,&,*]/g, {
+        message: 'Password must contain a special character !@#$%^&*'
+      }),
+    confirmPassword: z.string().min(1, { message: 'Confirm new password' }),
+    acceptTc: z.boolean()
+  })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    if (password !== confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Passwords must match',
+        path: ['confirmPassword']
+      })
+    }
+  })
+
+export type Schema = z.infer<typeof schema>
+
+export function SignUpScreen() {
+  const [selectedCountryValue, setSelectedCountry] = useState(-1)
+  const [countries, setCountries] = useState<any>([])
+  const [states, setStates] = useState<any>([])
+  const [timezones, setTimezones] = useState<any>([])
+  const [isLoading, setLoading] = useState(false)
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      firstName: 'Jake',
+      lastName: 'Hebert',
+      email: 'jake+1@plfx.studio',
+      phone: '',
+      password: 'Jaketest1!',
+      confirmPassword: 'Jaketest1!',
+      timezone: '',
+      country: -1,
+      state: -1,
+      acceptTc: true
+      // acceptTc: false
     },
-    [countryList]
-  )
+    resolver: zodResolver(schema)
+  })
+
+  const router = useRouter()
+
+  const getStates = useCallback(async (countryId: any) => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
+    let dataObject = {
+      country: {
+        id: countryId || 101
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        console.log('data', data)
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // set available states
+          const statesList = data.data.stateList.map((data: any) => {
+            return {
+              label: data.name,
+              value: data.id
+            }
+          })
+          setStates(statesList)
+
+          // set available timezones
+          const timeZones = data.data.timeZoneList.map((data: any) => {
+            return {
+              label: data.name,
+              value: data.name
+            }
+          })
+          setTimezones(timeZones)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }, [])
 
   useEffect(() => {
     async function getCountries() {
@@ -101,20 +132,13 @@ export function SignUpScreen() {
         .then(async (data: any) => {
           setLoading(false)
           if (data.status === 'SUCCESS') {
-            const countryList = Array()
-            data.data.map((data: any, index: any) => {
-              // if (data.name === 'India') {
-              //   setSelectedCountry(index)
-              // }
-              let object = {
+            const countryList = data.data.map((data: any, index: any) => {
+              return {
                 label: data.name,
-                value: index
+                value: data.id
               }
-              countryList.push(object)
             })
-            // console.log('countryList success', countryList)
-            setCountryListDropdown(countryList)
-            setCountryList(data.data ? data.data : [])
+            setCountries(countryList)
             if (selectedCountryValue !== -1) {
               getStates(selectedCountryValue)
             }
@@ -130,56 +154,22 @@ export function SignUpScreen() {
     }
     getCountries()
   }, [])
-  async function signUpPressed() {
-    if (!firstName) {
-      Alert.alert('', 'Please Enter First Name')
-      return
-    }
-    if (!lastName) {
-      Alert.alert('', 'Please Enter Last Name')
-      return
-    }
-    if (!email) {
-      Alert.alert('', 'Please Enter Email')
-      return
-    }
-    if (!password) {
-      Alert.alert('', 'Please Enter Password')
-      return
-    }
-    if (!confirmPassword) {
-      Alert.alert('', 'Please Confirm Password')
-      return
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('', 'Password and Confirm Password are not same')
-      return
-    }
-    if (selectedCountryValue === -1) {
-      Alert.alert('', 'Please Select Country')
-      return
-    }
-    if (selectedStateValue === -1) {
-      Alert.alert('', 'Please Select State')
-      return
-    }
-    if (selectedTimeZoneValue === -1) {
-      Alert.alert('', 'Please Select Country')
-      return
-    }
-    let loginURL = `${BASE_URL}${CREATE_ACCOUNT}`
-    let dataObject = {
+
+  async function submitRegistration(formData: Schema) {
+    console.log('formData', formData)
+    const loginURL = `${BASE_URL}${CREATE_ACCOUNT}`
+    const dataObject = {
       registration: {
-        firstName: firstName,
-        lastName: lastName,
-        phone: phone,
-        email: email,
-        credential: password,
-        userTimezone: timeZonesList[selectedTimeZoneValue].name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        email: formData.email,
+        credential: formData.password,
+        userTimezone: formData.timezone,
         referralCode: '',
         address: {
           state: {
-            id: statesList[selectedStateValue].id
+            id: formData.state
           }
         }
       }
@@ -189,12 +179,7 @@ export function SignUpScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.push({
-            pathname: '/verification',
-            params: {
-              email: email
-            }
-          })
+          router.push(formatUrl('/verification', { email: formData.email }))
         } else if (data.errorCode === 'RVF_101') {
           Alert.alert('', 'Do verification')
         } else {
@@ -210,178 +195,116 @@ export function SignUpScreen() {
     setSelectedCountry(value)
     await getStates(value)
   }
+
   return (
-    <View className="flex-1 bg-white">
-      <PtsHeader title="Registration" />
-      <ScrollView>
-        <PtsLoader loading={isLoading} />
-        <Image
-          source={require('app/assets/logoNew.png')}
-          className="mt-[10] h-[150] w-[150] self-center"
-          resizeMode={'contain'}
-          alt="logo"
-        />
-        <Typography className="text-center">
-          {'Welcome to Family Care Circle'}
-        </Typography>
+    <CardView scroll>
+      <CardHeader
+        actionSlot={
+          <View className="flex flex-1 flex-col items-end">
+            <Typography className="text-right">
+              {'Already a member?'}
+            </Typography>
+            <Button
+              title="Log in"
+              variant="link"
+              onPress={() => {
+                router.push('/login')
+              }}
+              className="p-0"
+            />
+          </View>
+        }
+      />
 
-        <View className="w-[100%] self-center bg-white  ">
-          <View className="flex-row">
-            <PtsTextInput
-              className="m-5 w-[40%]"
-              onChangeText={setFirstName}
+      <PtsLoader loading={isLoading} />
+      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+        <View className="flex w-full gap-2">
+          <View className="flex w-full flex-row justify-between gap-2">
+            <ControlledTextField
+              control={control}
+              name="firstName"
+              className="flex-1"
               placeholder={'First Name*'}
-              value={firstName}
-              defaultValue=""
             />
-            <PtsTextInput
-              className="m-5 ml-[15] w-[40%]"
-              onChangeText={setLastName}
+            <ControlledTextField
+              control={control}
+              name="lastName"
+              className="flex-1"
               placeholder={'Last Name*'}
-              value={lastName}
-              defaultValue=""
             />
           </View>
-          <View className="w-[90%]">
-            <PtsTextInput
-              className="m-5 mt-[0]"
-              onChangeText={setEmail}
-              placeholder={'Email Address*'}
-              value={email}
-              defaultValue=""
-            />
-            <PtsTextInput
-              className="m-5 mt-[0]"
-              onChangeText={setPhone}
-              placeholder={'Phone'}
-              keyboard={'numeric'}
-              value={phone}
-              defaultValue=""
-            />
+          <ControlledTextField
+            control={control}
+            name="email"
+            placeholder={'Email Address*'}
+            autoCapitalize="none"
+          />
+          <ControlledTextField
+            control={control}
+            name="phone"
+            placeholder={'Phone'}
+            keyboard={'numeric'}
+          />
+          <ControlledSecureField
+            control={control}
+            name="password"
+            placeholder="Password*"
+          />
+          <ControlledSecureField
+            control={control}
+            name="confirmPassword"
+            placeholder="Confirm Password*"
+          />
 
-            <PtsTextInput
-              className="m-5 mt-[0]"
-              onChangeText={(password) => setPassword(password)}
-              autoCorrect={false}
-              secureTextEntry={!isShowPassword}
-              placeholder="Password*"
-              value={password}
-              defaultValue=""
-              trailingSlot={
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowPassword(!isShowPassword)
-                  }}
-                >
-                  <Feather
-                    name={isShowPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color={'black'}
-                  />
-                </TouchableOpacity>
-              }
-            />
-            <PtsTextInput
-              className={`m-5 mt-[0] ${borderClassName}`}
-              onChangeText={(password) => setConfirmPassword(password)}
-              autoCorrect={false}
-              secureTextEntry={!isShowConfirmPassword}
-              placeholder="Confirm Password*"
-              value={confirmPassword}
-              defaultValue=""
-              trailingSlot={
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowConfirmPassword(!isShowConfirmPassword)
-                  }}
-                >
-                  <Feather
-                    name={isShowConfirmPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color={'black'}
-                  />
-                </TouchableOpacity>
-              }
-            />
-            {password !== confirmPassword ? (
-              <View className=" mb-[5] ml-[15] mt-[-5] flex-row">
-                <Image
-                  source={require('app/assets/Icon.png')}
-                  className=""
-                  resizeMode={'contain'}
-                  alt="Icon"
-                />
-                <Typography className="ml-[10]  text-[12px] text-black">
-                  {'Passwords must match'}
-                </Typography>
-              </View>
-            ) : (
-              <View />
-            )}
-          </View>
-          <Typography className="ml-[20] font-bold">{'Address'}</Typography>
-          <PtsDropdown
-            onChangeValue={setSelectedCountryChange}
+          <Typography className=" font-bold">{'Address'}</Typography>
+          <ControlledDropdown
+            control={control}
+            name="country"
             label="Country*"
             maxHeight={300}
-            value={selectedCountryValue}
-            list={countryListDropdown}
+            list={countries}
+            onChangeValue={setSelectedCountryChange}
           />
-          <View className="mt-[-10]">
-            <PtsDropdown
-              onChangeValue={setSelectedState}
-              label="State*"
-              maxHeight={300}
-              // value={selectedStateValue}
-              list={statesListDropdown}
-            />
-          </View>
-        </View>
-        <View className="mt-[-10]">
-          <PtsDropdown
-            onChangeValue={setSelectedTimeZone}
+          <ControlledDropdown
+            control={control}
+            name="state"
+            label="State*"
+            maxHeight={300}
+            list={states}
+          />
+          <ControlledDropdown
+            control={control}
+            name="timezone"
             label="Time Zone*"
             maxHeight={300}
-            value={selectedTimeZoneValue}
-            list={timeZonesListDropdown}
+            list={timezones}
           />
         </View>
-        <View className="mb-[5] flex-row">
-          <View className=" flex-row">
-            {/* <CheckBox */}
-            {/*   checked={isTcAccepted} */}
-            {/*   checkedColor={'#6493d9'} */}
-            {/*   onPress={() => { */}
-            {/*     setIsTcAccepted(!isTcAccepted) */}
-            {/*   }} */}
-            {/*   className="mt-[-10] self-center" */}
-            {/* /> */}
-            <Typography className="ml-[-10] max-w-[90%]">
-              {'I accept the Terms and Conditions and Privacy Policy'}
-            </Typography>
-          </View>
+        <View className="flex flex-row items-center justify-center">
+          <Controller
+            name="acceptTc"
+            control={control}
+            render={({ field: { onChange, value }, fieldState }) => (
+              <CheckBox
+                checked={value}
+                checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
+                onPress={() => {
+                  onChange(!value)
+                }}
+                className="flex-shrink"
+              />
+            )}
+          />
+          <Typography className="flex-1">
+            {'I accept the Terms and Conditions and Privacy Policy'}
+          </Typography>
         </View>
-        <PtsButton
-          isDisabled={!isTcAccepted}
-          onPress={() => {
-            signUpPressed()
-          }}
-          className="w-[90%] "
+        <Button
+          onPress={handleSubmit(submitRegistration)}
+          className="w-full"
           title="Sign Up"
         />
-        <View className="mb-[10] mt-[10] flex-row">
-          <Typography className="ml-[20] mt-[5] text-[16px] text-black">
-            {'Already a member?'}
-          </Typography>
-          <Button
-            title="Log In"
-            variant="link"
-            onPress={() => {
-              router.push('/login')
-            }}
-          />
-        </View>
-      </ScrollView>
-    </View>
+      </View>
+    </CardView>
   )
 }

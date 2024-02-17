@@ -68,6 +68,7 @@ const theme = {
       md: `var(--radius-md)`,
       sm: `var(--radius-sm)`
     },
+
     // fontFamily: {
     //   sans: ['var(--font-sans)', ...fontFamily.sans],
     // },

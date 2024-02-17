@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
-import { Image } from 'app/ui/image'
+import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsTextInput from 'app/ui/PtsTextInput'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import headerAction from 'app/redux/header/headerAction'
@@ -16,34 +14,47 @@ import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsororAction from 'app/redux/sponsor/sponsororAction'
-import { Feather } from 'app/ui/icons'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
+import { CardView } from 'app/ui/layouts/card-view'
+import { CardHeader } from '../card-header'
+
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
+import { formatUrl } from 'app/utils/format-url'
+
+const schema = z.object({
+  email: z.string().min(1, { message: 'Email is required' }).email(),
+  password: z.string().min(1, { message: 'Password is required' })
+})
+
+export type Schema = z.infer<typeof schema>
 
 export function LoginScreen() {
   const router = useRouter()
-  const [email, onChangeEmail] = useState('sachaudhari0704@gmail.com')
-  const [password, onChangePassword] = useState('Shubh@m27')
   const [isLoading, setLoading] = useState(false)
-  const [isShowPassword, onChangeShowPassword] = useState(false)
-  async function buttonPressed() {
-    if (!email) {
-      Alert.alert('', 'Please Enter Email')
-      return
-    }
-    if (!password) {
-      Alert.alert('', 'Please Enter Password')
-      return
-    }
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      email: '',
+      password: ''
+    },
+    resolver: zodResolver(schema)
+  })
+
+  async function login(formData: Schema) {
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`
     let dataObject = {
       header: deviceInfo,
       appuserVo: {
-        emailOrPhone: email,
-        credential: password,
+        emailOrPhone: formData.email,
+        credential: formData.password,
         rememberMe: true
       }
     }
@@ -52,10 +63,8 @@ export function LoginScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           let subscriptionDetailsobject = {
-            subscriptionEndDate: data.data.subscriptionEndDate
-              ? data.data.subscriptionEndDate
-              : '',
-            days: data.data.days ? data.data.days : '',
+            subscriptionEndDate: data.data.subscriptionEndDate || '',
+            days: data.data.days || '',
             expiredSubscription: data.data.expiredSubscription,
             expiringSubscription: data.data.expiringSubscription
           }
@@ -87,7 +96,7 @@ export function LoginScreen() {
           }
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
-          Alert.alert('', 'Do verification')
+          router.push(formatUrl('/verification', { email: formData.email }))
         } else {
           Alert.alert('', data.message)
         }
@@ -99,19 +108,11 @@ export function LoginScreen() {
   }
 
   return (
-    <View className="my-auto flex w-full items-center justify-center ">
-      <View className="mx-4 my-auto rounded-2xl bg-white px-4 pt-5 md:w-full md:max-w-md">
-        <PtsLoader loading={isLoading} />
-        <View className="flex flex-row justify-between">
-          <Image
-            src={require('app/assets/fcc-logos/textStacked.png')}
-            className="h-[40] w-[200]"
-            width={200}
-            height={40}
-            contentFit={'contain'}
-            alt="logo"
-          />
-          <View className="flex flex-col items-end">
+    <CardView>
+      <PtsLoader loading={isLoading} />
+      <CardHeader
+        actionSlot={
+          <View className="flex flex-col justify-end">
             <Typography>{'New here?'}</Typography>
             <Button
               title="Sign up"
@@ -122,54 +123,43 @@ export function LoginScreen() {
               className="pt-0"
             />
           </View>
-        </View>
-        <View className="my-5 flex flex-col gap-2">
-          <PtsTextInput
-            onChangeText={onChangeEmail}
-            placeholder={'Email Address'}
-            value={email}
-            defaultValue=""
-          />
-          <PtsTextInput
-            onChangeText={(password) => {
-              onChangePassword(password)
-            }}
-            autoCorrect={false}
-            secureTextEntry={!isShowPassword}
-            placeholder="Password"
-            value={password}
-            defaultValue=""
-            trailingSlot={
-              <TouchableOpacity
-                onPress={() => {
-                  onChangeShowPassword(!isShowPassword)
-                }}
-              >
-                <Feather
-                  name={isShowPassword ? 'eye' : 'eye-off'}
-                  size={20}
-                  color={'black'}
-                />
-              </TouchableOpacity>
-            }
-          />
-          <View className="mt-[20] flex-row justify-end">
-            <Button
-              title="Forgot Password?"
-              variant="link"
-              onPress={() => {
-                router.push('/forgot-password')
-              }}
-            />
+        }
+      />
 
-            <Button
-              title="Log in"
-              trailingIcon="arrow-right"
-              onPress={buttonPressed}
-            />
-          </View>
+      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+        <View className="flex w-full gap-2">
+          <ControlledTextField
+            control={control}
+            name="email"
+            placeholder={'Email Address'}
+            className="w-full"
+            autoCapitalize="none"
+          />
+          <ControlledSecureField
+            control={control}
+            name="password"
+            placeholder="Password"
+            className="w-full"
+          />
+        </View>
+        <View className="flex w-full flex-row justify-end gap-2">
+          <Button
+            className=""
+            title="Forgot Password?"
+            variant="link-secondary"
+            onPress={() => {
+              router.push('/forgot-password')
+            }}
+          />
+
+          <Button
+            className=""
+            title="Log in"
+            trailingIcon="arrow-right"
+            onPress={handleSubmit(login)}
+          />
         </View>
       </View>
-    </View>
+    </CardView>
   )
 }
