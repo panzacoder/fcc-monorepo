@@ -31,8 +31,7 @@ export function HomeScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-  let viewStyle = `mx-[10px] mt-[50] h-[40%] w-[94%] self-center rounded-[15px] border-[2px] border-[#287CFA]`
-  useEffect(() => {
+  let viewStyle = useEffect(() => {
     async function getMemberDetails() {
       setLoading(true)
       let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
@@ -107,7 +106,9 @@ export function HomeScreen() {
           )}
         </View>
         {isDataReceived ? (
-          <View className={viewStyle}>
+          <View
+            className={`border-primary bg-card mx-[10px] mt-[50] h-[40%] w-[94%] self-center rounded-[15px] border-[2px]`}
+          >
             <View className="ml-[20] flex-row items-center">
               <View>
                 <Typography className="mt-[10] text-[20px] font-bold text-black">
