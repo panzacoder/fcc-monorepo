@@ -6,5 +6,6 @@ export const FORGOT_PASSWORD = 'userms/forgetPassword'
 export const RESET_PASSWORD = 'userms/resetPassword'
 export const VERIFY_ACCOUNT = 'regms/verify'
 export const GET_COUNTRIES = 'countryms/getAll'
-export const RESEND_OTP = 'regms/verificationCodeRequest';
+export const RESEND_OTP = 'regms/verificationCodeRequest'
 export const GET_STATES_AND_TIMEZONES = 'timezonems/getForCountry'
+export const GET_MEMBER_DETAILS = 'homems/getClassicMemberDetails'

@@ -4007,6 +4007,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-navigation/drawer@npm:^6.6.7":
+  version: 6.6.7
+  resolution: "@react-navigation/drawer@npm:6.6.7"
+  dependencies:
+    "@react-navigation/elements": "npm:^1.3.22"
+    color: "npm:^4.2.3"
+    warn-once: "npm:^0.1.0"
+  peerDependencies:
+    "@react-navigation/native": ^6.0.0
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: ">= 1.0.0"
+    react-native-reanimated: ">= 1.0.0"
+    react-native-safe-area-context: ">= 3.0.0"
+    react-native-screens: ">= 3.0.0"
+  checksum: c706999124fe9feec77f45165902118655df4a7cfadbfa318775128ad7fbf3cdc97a6f8902aa129c3bb5d7054e70b0fe3a9b359dac40561269c095a86df0e6ac
+  languageName: node
+  linkType: hard
+
 "@react-navigation/elements@npm:^1.3.21":
   version: 1.3.21
   resolution: "@react-navigation/elements@npm:1.3.21"
@@ -4016,6 +4035,18 @@ __metadata:
     react-native: "*"
     react-native-safe-area-context: ">= 3.0.0"
   checksum: 84a8ecfe9bbaf4a59a310edf99effbe5639a664fcdb1c821caf5382b1b18a206191f084b2975e35fe7c393e0223bb454a16622c688633766928472dd7e216a95
+  languageName: node
+  linkType: hard
+
+"@react-navigation/elements@npm:^1.3.22":
+  version: 1.3.22
+  resolution: "@react-navigation/elements@npm:1.3.22"
+  peerDependencies:
+    "@react-navigation/native": ^6.0.0
+    react: "*"
+    react-native: "*"
+    react-native-safe-area-context: ">= 3.0.0"
+  checksum: 3eaac4285d0d04acd3f7f726d345cfd740d1c7a1c65787dadabaf56298e13a7fd45258d7ede4a83a3729d914742208b153dc3183364487a23b05291db96e7875
   languageName: node
   linkType: hard
 
@@ -10191,6 +10222,7 @@ __metadata:
   resolution: "fcc-monorepo@workspace:."
   dependencies:
     "@expo/vector-icons": "npm:^14.0.0"
+    "@react-navigation/drawer": "npm:^6.6.7"
     "@types/react": "npm:^18.2.52"
     "@types/react-native": "npm:^0.73.0"
     "@types/react-native__assets": "npm:^1"
@@ -10206,7 +10238,9 @@ __metadata:
     react-native: "npm:0.73.3"
     react-native-element-dropdown: "npm:^2.10.1"
     react-native-elements: "npm:^3.4.3"
+    react-native-gesture-handler: "npm:~2.14.0"
     react-native-linear-gradient: "npm:^2.8.3"
+    react-native-reanimated: "npm:~3.6.2"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-web: "npm:~0.19.10"
     react-redux: "npm:^9.1.0"
@@ -15782,7 +15816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:~2.14.1":
+"react-native-gesture-handler@npm:~2.14.0, react-native-gesture-handler@npm:~2.14.1":
   version: 2.14.1
   resolution: "react-native-gesture-handler@npm:2.14.1"
   dependencies:
