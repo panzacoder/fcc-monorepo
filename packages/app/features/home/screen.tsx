@@ -32,7 +32,6 @@ export function HomeScreen() {
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
   let viewStyle = `mx-[10px] mt-[50] h-[40%] w-[94%] self-center rounded-[15px] border-[2px] border-[#287CFA]`
-  // consoleData('viewStyle', viewStyle)
   useEffect(() => {
     async function getMemberDetails() {
       setLoading(true)
@@ -63,11 +62,11 @@ export function HomeScreen() {
       <PtsLoader loading={isLoading} />
       <Image
         source={require('app/assets/header.png')}
-        className="mt-[-40px]"
+        className="absolute top-0"
         resizeMode={'contain'}
         alt="logo"
       />
-      <View className="absolute top-[60] ">
+      <View className="top-[60] ">
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
@@ -81,7 +80,7 @@ export function HomeScreen() {
             <View
               className={`absolute right-[5] w-[110px] flex-row items-center rounded-[50px] bg-[${COLORS.drawer_bg}] p-5`}
             >
-              <View className=" flex-row">
+              <View className="flex-row">
                 <View className="bg-primary  h-[30px] w-[30px] items-center justify-center rounded-[15px]">
                   <Typography className="self-center text-[15px] text-white">
                     {getNameInitials(
