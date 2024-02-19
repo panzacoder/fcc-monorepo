@@ -1,14 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Text
-} from 'react-native'
+import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -18,9 +11,6 @@ import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
 import { COLORS } from 'app/utils/colors'
 import { CardView } from 'app/ui/cardview'
-
-import { useDrawerStatus } from '@react-navigation/drawer'
-import { getNameInitials } from 'app/ui/utils'
 
 export function HomeScreen() {
   const header = store.getState().headerState.header
@@ -77,9 +67,9 @@ export function HomeScreen() {
           </View>
           {isDataReceived ? (
             <View
-              className={`absolute right-[5] w-[110px] flex-row items-center rounded-[50px] bg-[${COLORS.drawer_bg}] p-5`}
+              className={`absolute right-[10] flex-row items-center justify-center rounded-[50px] bg-[#184E4E] p-2`}
             >
-              <View className="flex-row">
+              {/* <View className=" flex-row">
                 <View className="bg-primary  h-[30px] w-[30px] items-center justify-center rounded-[15px]">
                   <Typography className="self-center text-[15px] text-white">
                     {getNameInitials(
@@ -93,11 +83,8 @@ export function HomeScreen() {
                     {'2'}
                   </Text>
                 </View>
-              </View>
-              <TouchableOpacity
-                className="absolute right-[20]"
-                onPress={() => {}}
-              >
+              </View> */}
+              <TouchableOpacity className="" onPress={() => { }}>
                 <Feather name={'menu'} size={25} color={COLORS.green} />
               </TouchableOpacity>
             </View>
@@ -120,7 +107,7 @@ export function HomeScreen() {
               </View>
               <TouchableOpacity
                 className="absolute right-[20]"
-                onPress={() => {}}
+                onPress={() => { }}
               >
                 <Feather name={'settings'} size={20} color={'black'} />
               </TouchableOpacity>
