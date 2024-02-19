@@ -10,6 +10,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
 import { COLORS } from 'app/utils/colors'
+import { CardView } from 'app/ui/cardview'
 
 export function HomeScreen() {
   const header = store.getState().headerState.header
