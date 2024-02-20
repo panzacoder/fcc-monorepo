@@ -63,7 +63,7 @@ export function HomeScreen() {
         </View>
         {isDataReceived ? (
           <View
-            className={`border-primary bg-card mx-[10px] mt-[50] h-[40%] w-[94%] self-center rounded-[15px] border-[2px]`}
+            className={` border-primary bg-card mx-[10px] mt-[50] h-[70%] w-[94%] self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
               <View>
@@ -81,7 +81,7 @@ export function HomeScreen() {
                 <Feather name={'settings'} size={20} color={'black'} />
               </TouchableOpacity>
             </View>
-            <ScrollView persistentScrollbar={true} className="m-2 flex-1">
+            <ScrollView persistentScrollbar={true} className="m-2">
               {memberList.map((data: any, index: number) => {
                 return (
                   <View key={index}>

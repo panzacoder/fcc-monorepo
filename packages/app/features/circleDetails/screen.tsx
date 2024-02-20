@@ -19,6 +19,8 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import store from 'app/redux/store'
 import { BASE_URL } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
+import { COLORS } from 'app/utils/colors'
+import { formatUrl } from 'app/utils/format-url'
 import { LinearGradient } from 'expo-linear-gradient'
 import { cssInterop } from 'nativewind'
 import { CircleSummaryCard } from './circle-summary-card'
@@ -56,8 +58,6 @@ export function CircleDetailsScreen() {
       ' with ' +
       memberData.upcomingAppointment.location
   }
-
-  function buttonPressed() {}
   return (
     <View className="mt-14 flex-1">
       <PtsLoader loading={isLoading} />
@@ -71,7 +71,7 @@ export function CircleDetailsScreen() {
                 {'Messages'}
               </Typography>
               {memberData.unreadMessages &&
-              memberData.unreadMessages.length > 0 ? (
+                memberData.unreadMessages.length > 0 ? (
                 <View className="flex-row">
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'Show latest message'}
