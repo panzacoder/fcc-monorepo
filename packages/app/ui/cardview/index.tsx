@@ -3,6 +3,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
+import { formatUrl } from 'app/utils/format-url'
 import { COLORS } from 'app/utils/colors'
 export function CardView(data: any) {
   const router = useRouter()
@@ -92,13 +93,12 @@ export function CardView(data: any) {
               <TouchableOpacity
                 className="ml-[5px] self-center"
                 onPress={() => {
-                  router.push({
-                    pathname: '/circleDetails',
-                    query: {
+                  router.push(
+                    formatUrl('/(authenticated_no_tabs)/circleDetails', {
                       fullName: fullName,
                       memberData: JSON.stringify(memberData)
-                    }
-                  })
+                    })
+                  )
                 }}
               >
                 <Feather name={'arrow-right'} size={20} color={'black'} />

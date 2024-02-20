@@ -21,7 +21,7 @@ export function HomeScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-  let viewStyle = useEffect(() => {
+  useEffect(() => {
     async function getMemberDetails() {
       setLoading(true)
       let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
@@ -55,7 +55,7 @@ export function HomeScreen() {
         resizeMode={'contain'}
         alt="logo"
       />
-      <View className="top-[60] ">
+      <View className="top-[60] flex-1">
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
@@ -67,7 +67,7 @@ export function HomeScreen() {
           </View>
           {isDataReceived ? (
             <View
-              className={`absolute right-[10] flex-row items-center justify-center rounded-[50px] bg-[#184E4E] p-2`}
+              className={` absolute right-[10] flex-row items-center justify-center rounded-[50px] bg-[#184E4E] p-2`}
             >
               {/* <View className=" flex-row">
                 <View className="bg-primary  h-[30px] w-[30px] items-center justify-center rounded-[15px]">
@@ -84,7 +84,7 @@ export function HomeScreen() {
                   </Text>
                 </View>
               </View> */}
-              <TouchableOpacity className="" onPress={() => { }}>
+              <TouchableOpacity className="" onPress={() => {}}>
                 <Feather name={'menu'} size={25} color={COLORS.green} />
               </TouchableOpacity>
             </View>
@@ -94,7 +94,7 @@ export function HomeScreen() {
         </View>
         {isDataReceived ? (
           <View
-            className={`border-primary bg-card mx-[10px] mt-[50] h-[40%] w-[94%] self-center rounded-[15px] border-[2px]`}
+            className={` border-primary bg-card mx-[10px] mt-[50] h-[70%] w-[94%] self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
               <View>
@@ -107,12 +107,15 @@ export function HomeScreen() {
               </View>
               <TouchableOpacity
                 className="absolute right-[20]"
-                onPress={() => { }}
+                onPress={() => {}}
               >
                 <Feather name={'settings'} size={20} color={'black'} />
               </TouchableOpacity>
             </View>
-            <ScrollView persistentScrollbar={true} className="m-2 flex-1">
+            <ScrollView
+              persistentScrollbar={true}
+              className="m-2"
+            >
               {memberList.map((data: any, index: number) => {
                 return (
                   <View key={index}>

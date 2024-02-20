@@ -14,6 +14,7 @@ import store from 'app/redux/store'
 import { BASE_URL } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { COLORS } from 'app/utils/colors'
+import { formatUrl } from 'app/utils/format-url'
 import { LinearGradient } from 'expo-linear-gradient'
 
 export function CircleDetailsScreen() {
@@ -74,9 +75,7 @@ export function CircleDetailsScreen() {
   if (userDetails.lastName) {
     userName += userDetails.lastName.trim()
   }
-  // console.log('userName', userName)
 
-  function buttonPressed() {}
   return (
     <View className="flex-1  bg-white">
       <PtsBackHeader title={userName} />
@@ -114,7 +113,7 @@ export function CircleDetailsScreen() {
                 {'Today'}
               </Typography>
               <Typography className="ml-5 text-[12px]">{datestring}</Typography>
-              {todayDate.includes(apptDate) ? (
+              {apptDate && todayDate.includes(apptDate) ? (
                 <View className="my-2 ml-5 flex-row">
                   <View className="mr-2 w-[2px] bg-[#319D9D]" />
                   <Typography className="w-[90%] text-[12px]">
@@ -124,7 +123,7 @@ export function CircleDetailsScreen() {
               ) : (
                 <View />
               )}
-              {todayDate.includes(eventDate) ? (
+              {eventDate && todayDate.includes(eventDate) ? (
                 <View className="ml-5 flex-row">
                   <View className="mr-2 w-[2px] bg-[#319D9D]" />
                   <Typography className="w-[90%] text-[12px]">
@@ -168,19 +167,29 @@ export function CircleDetailsScreen() {
                 className="px-3"
                 title="Caregivers"
                 leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                onPress={() => {
+                  router.push(formatUrl('/home', {}))
+                }}
               />
               <Button
                 className="ml-2 px-3"
                 title="Doctors"
                 leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/(authenticated_no_tabs)/doctors', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
               />
               <Button
                 className="ml-2 px-3"
                 title="Facilities"
                 leadingIcon="home"
-                onPress={buttonPressed}
+                onPress={() => {
+                  // router.push(formatUrl('/home', {}))
+                }}
               />
             </View>
 
@@ -189,13 +198,17 @@ export function CircleDetailsScreen() {
                 className="px-3"
                 title="Prescriptions"
                 leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                onPress={() => {
+                  // router.push(formatUrl('/home', {}))
+                }}
               />
               <Button
                 className="ml-2 px-3"
                 title="Medical Devices"
                 leadingIcon="watch"
-                onPress={buttonPressed}
+                onPress={() => {
+                  // router.push(formatUrl('/home', {}))
+                }}
               />
             </View>
           </View>
@@ -213,10 +226,18 @@ export function CircleDetailsScreen() {
               </Typography>
               {memberData.unreadMessages &&
               memberData.unreadMessages.length > 0 ? (
-                <View>
-                  <Typography className=" ml-5 flex rounded text-[14px] text-black">
-                    {'Show message'}
+                <View className="flex-row">
+                  <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
+                    {'Show latest message'}
                   </Typography>
+                  <TouchableOpacity
+                    className=" ml-2"
+                    onPress={() => {
+                      router.push('/messages')
+                    }}
+                  >
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <View className="flex-row">

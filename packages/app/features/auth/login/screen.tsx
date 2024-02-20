@@ -47,6 +47,7 @@ export function LoginScreen() {
   })
 
   async function login(formData: Schema) {
+    console.log('formData',formData.email)
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`

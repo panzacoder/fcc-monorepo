@@ -48,6 +48,10 @@ const buttonVariants = tv({
         button: '',
         text: 'text-secondary group-hover:underline',
         icon: 'color-secondary'
+      },
+      border: {
+        button: 'border-primary border-[2px]',
+        text: 'text-primary '
       }
     },
     size: {
