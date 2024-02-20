@@ -1,7 +1,9 @@
 {
   "version": "0.0.0",
   "name": "base-ui",
-  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@hookform/resolvers": "^3.3.4",
