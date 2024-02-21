@@ -98,7 +98,7 @@ export function DoctorsScreen() {
               onPress={() => {
                 router.push(
                   formatUrl('/(authenticated_no_tabs)/addEditDoctor', {
-
+                    memberData: JSON.stringify(memberData)
                   })
                 )
               }}
@@ -115,7 +115,8 @@ export function DoctorsScreen() {
               onPress={() => {
                 router.push(
                   formatUrl('/(authenticated_no_tabs)/doctorDetails', {
-                    doctorDetails: JSON.stringify(data)
+                    doctorDetails: JSON.stringify(data),
+                    memberData: JSON.stringify(memberData)
                   })
                 )
               }}
@@ -137,7 +138,11 @@ export function DoctorsScreen() {
                 </Typography>
 
                 <Typography
-                  className={`ml-5 mr-5 rounded-[20px] bg-[${data.status.toLowerCase() === 'active' ? '#83D991' : '#ffcccb'}] px-5 text-right`}
+                  className={
+                    data.status.toLowerCase() === 'active'
+                      ? "ml-5 mr-5 rounded-[20px] bg-['#83D991'] px-5 text-right"
+                      : "ml-5 mr-5 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
+                  }
                 >
                   {data.status ? data.status : ''}
                 </Typography>

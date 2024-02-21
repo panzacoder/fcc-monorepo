@@ -10264,6 +10264,7 @@ __metadata:
     redux: "npm:^5.0.1"
     redux-devtools-extension: "npm:^2.13.9"
     tailwind-variants: "npm:^0.1.20"
+    toggle-switch-react-native: "npm:^3.3.0"
     turbo: "npm:^1.12.2"
     typescript: "npm:^5.3.3"
   languageName: unknown
@@ -15395,7 +15396,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.7, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -18117,6 +18118,17 @@ __metadata:
   version: 4.25.0
   resolution: "tocbot@npm:4.25.0"
   checksum: fcbe6299ec26322f51e62d54d1281b31370efab89b7a7e58c90fa431a51548e1a09b8aafd7314ed2500694bee8451713f59ecddafa7242e6bf626134b0e3cce6
+  languageName: node
+  linkType: hard
+
+"toggle-switch-react-native@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "toggle-switch-react-native@npm:3.3.0"
+  dependencies:
+    prop-types: "npm:^15.5.7"
+  peerDependencies:
+    react-native: ">=0.47.1"
+  checksum: d6c02353d862fff74dcd89b26518eb9ae56a98ec6a55e38d7c3c4fc4ac895bcdd10102ff6e7264ba39e01c42a4a76ab46fc8f2a195184bcd13bdbb2e4e8f5750
   languageName: node
   linkType: hard
 

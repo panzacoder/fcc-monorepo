@@ -1,0 +1,2 @@
+export const SET_STATIC_DATA = 'SET_STATIC_DATA';
+export const GET_STATIC_DATA= 'GET_STATIC_DATA';

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -21,11 +21,12 @@ export function DoctorDetailsScreen() {
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
+  let memberData = JSON.parse(item.memberData)
   const router = useRouter()
   let doctorInfo = JSON.parse(item.doctorDetails)
   // console.log('doctorDetails', '' + JSON.stringify(doctorDetails))
   const [isLoading, setLoading] = useState(false)
-  const [doctorDetails, setDoctorDetails] = useState({})
+  const [doctorDetails, setDoctorDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
@@ -52,7 +53,7 @@ export function DoctorDetailsScreen() {
                 ? data.data.doctorAppointmentList
                 : []
             )
-            console.log('appointmentList', JSON.stringify(appointmentList))
+            // console.log('appointmentList', JSON.stringify(appointmentList))
           } else {
             Alert.alert('', data.message)
           }
@@ -65,6 +66,7 @@ export function DoctorDetailsScreen() {
     }
     getDoctorDetails()
   }, [])
+
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
@@ -95,7 +97,14 @@ export function DoctorDetailsScreen() {
                 className=""
                 title="Edit"
                 variant="border"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/(authenticated_no_tabs)/addEditDoctor', {
+                      memberData: JSON.stringify(memberData),
+                      doctorDetails: JSON.stringify(doctorInfo)
+                    })
+                  )
+                }}
               />
             </View>
             <View>
@@ -172,7 +181,17 @@ export function DoctorDetailsScreen() {
                 className=""
                 title="Add Location"
                 variant="border"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push(
+                    formatUrl(
+                      '/(authenticated_no_tabs)/addEditDoctorLocation',
+                      {
+                        memberData: JSON.stringify(memberData),
+                        doctorDetails: JSON.stringify(doctorInfo)
+                      }
+                    )
+                  )
+                }}
               />
             </View>
             <ScrollView className="">
