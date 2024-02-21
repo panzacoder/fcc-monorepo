@@ -48,15 +48,9 @@ export function HomeScreen() {
   }, [])
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <Image
-        source={require('app/assets/header.png')}
-        className="absolute top-0"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <View className="top-[60] ">
+      <View className="">
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
@@ -66,32 +60,6 @@ export function HomeScreen() {
               {user.memberName ? user.memberName : ''}
             </Typography>
           </View>
-          {isDataReceived ? (
-            <View
-              className={`absolute right-[10] flex-row items-center justify-center rounded-[50px] bg-[#184E4E] p-2`}
-            >
-              {/* <View className=" flex-row">
-                <View className="bg-primary  h-[30px] w-[30px] items-center justify-center rounded-[15px]">
-                  <Typography className="self-center text-[15px] text-white">
-                    {getNameInitials(
-                      user.firstName !== undefined ? user.firstName : '',
-                      user.lastName !== undefined ? user.lastName : ''
-                    )}
-                  </Typography>
-                </View>
-                <View className="absolute right-[-10] top-[-15] h-[24px] w-[24px] rounded-[12px] bg-black">
-                  <Text className="self-center text-center font-bold text-white">
-                    {'2'}
-                  </Text>
-                </View>
-              </View> */}
-              <TouchableOpacity className="" onPress={() => { }}>
-                <Feather name={'menu'} size={25} color={COLORS.green} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View />
-          )}
         </View>
         {isDataReceived ? (
           <View

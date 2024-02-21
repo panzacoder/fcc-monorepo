@@ -1,24 +1,27 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import {
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Pressable
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
-// import PtsCard from 'app/ui/PtsCard'
 import { Typography } from 'app/ui/typography'
 import { CircleCard } from 'app/ui/circle-card'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import PtsTextInput from 'app/ui/PtsTextInput'
 import { Button } from 'app/ui/button'
-import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
-import { consoleData } from 'app/ui/utils'
 import { COLORS } from 'app/utils/colors'
+import { Stack } from 'expo-router'
 
 export default function CirclesTab() {
   const header = store.getState().headerState.header
-  const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
   const [isCreateCircle, setCreateCircle] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
@@ -56,44 +59,18 @@ export default function CirclesTab() {
     getMemberDetails()
   }, [])
   return (
-    <View className=" flex-1 bg-white">
+    <View className="flex-1">
+      <Stack.Screen options={{ title: 'Your Circles' }} />
       <PtsLoader loading={isLoading} />
-      <Image
-        source={require('app/assets/header.png')}
-        className="mt-[-40px]"
-        resizeMode={'contain'}
-        alt="logo"
-      />
-      <View className="absolute top-[60] w-[100%]">
-        <View className="flex-row items-center">
-          <Typography className="ml-[20] text-[22px] font-bold">
-            {'Your Circles'}
-          </Typography>
-          <PtsNameInitials
-            className="absolute right-[5]"
-            fullName={user.memberName}
-          />
-        </View>
-        {/* <View className=" ml-[30] mt-5 h-[20%] flex-row">
-          <View className="w-[80%] flex-row">
-            <Typography className="mr-3 font-bold">{'Sort by'}</Typography>
-            <TouchableOpacity className="" onPress={() => {}}>
-              <Feather name={'chevron-down'} size={25} color={'black'} />
-            </TouchableOpacity>
-          </View>
-
-        
-        </View> */}
-        <View className="mr-[30] mt-[30] flex-row justify-end">
-          <TouchableOpacity
-            className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-            onPress={() => {
-              setCreateCircle(!isCreateCircle)
-            }}
-          >
-            <Feather name={'plus'} size={25} color={COLORS.primary} />
-          </TouchableOpacity>
-        </View>
+      <View className="mr-[30] mt-[30] flex-row justify-end">
+        <Pressable
+          className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
+          onPress={() => {
+            setCreateCircle(!isCreateCircle)
+          }}
+        >
+          <Feather name={'plus'} size={25} className="color-primary" />
+        </Pressable>
       </View>
 
       {isCreateCircle ? (
@@ -294,7 +271,7 @@ export default function CirclesTab() {
         <View />
       )}
 
-      <ScrollView persistentScrollbar={true} className="z-[1] m-2 flex-1">
+      <ScrollView>
         {memberList.map((data: any, index: number) => {
           return (
             <View key={index}>
