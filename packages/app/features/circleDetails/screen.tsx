@@ -75,7 +75,7 @@ export function CircleDetailsScreen() {
     userName += userDetails.lastName.trim()
   }
 
-  function buttonPressed() {}
+  function buttonPressed() { }
   return (
     <View className="flex-1  bg-white">
       <PtsBackHeader title={userName} />
@@ -101,7 +101,7 @@ export function CircleDetailsScreen() {
           </Typography>
           <TouchableOpacity
             className="absolute right-[15] self-center"
-            onPress={() => {}}
+            onPress={() => { }}
           >
             <Feather name={'menu'} size={20} color={'#5ACC6C'} />
           </TouchableOpacity>
@@ -211,7 +211,7 @@ export function CircleDetailsScreen() {
                 {'Messages'}
               </Typography>
               {memberData.unreadMessages &&
-              memberData.unreadMessages.length > 0 ? (
+                memberData.unreadMessages.length > 0 ? (
                 <View className="flex-row">
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'Show latest message'}
@@ -219,7 +219,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/messages')
+                      router.push('/circles/messages')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -233,7 +233,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/messages')
+                      router.push('/circles/messages')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -280,7 +280,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/appointments')
+                      router.push('/circles/appointments')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -314,7 +314,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/incidents')
+                      router.push('/circles/incidents')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -329,7 +329,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/incidents')
+                      router.push('/circles/incidents')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -363,7 +363,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/events')
+                      router.push('/circles/events')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -378,7 +378,7 @@ export function CircleDetailsScreen() {
                   <TouchableOpacity
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/events')
+                      router.push('/circles/events')
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />

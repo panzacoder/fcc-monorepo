@@ -21,7 +21,7 @@ export function HomeScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-  let viewStyle = useEffect(() => {
+  useEffect(() => {
     async function getMemberDetails() {
       setLoading(true)
       let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
@@ -46,6 +46,7 @@ export function HomeScreen() {
     }
     getMemberDetails()
   }, [])
+
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
