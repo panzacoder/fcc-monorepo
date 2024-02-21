@@ -1,9 +1,8 @@
-import { View, TouchableOpacity, Pressable } from 'react-native'
+import { View, Pressable } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
-// import { COLORS } from 'app/utils/colors'
 import { formatUrl } from 'app/utils/format-url'
 export function CircleCard(data: any) {
   const router = useRouter()
@@ -45,15 +44,16 @@ export function CircleCard(data: any) {
               </Typography>
             </View>
           </View>
-          <View className="flex-row">
-            <View className="bg-primary h-[24px] w-[24px] self-center rounded-[12px]">
-              <Typography className="font-400 self-center text-[14px] text-white">
-                {'2'}
-              </Typography>
+          <View className="flex-row items-center">
+            <View className="bg-primary flex h-[24px] w-[24px] items-center rounded-full">
+              <Typography className="text-white">{'2'}</Typography>
             </View>
-            <TouchableOpacity className="ml-2 self-center">
-              <Feather name={'chevron-right'} size={25} color={'black'} />
-            </TouchableOpacity>
+            <Feather
+              name={'chevron-right'}
+              size={25}
+              color={'black'}
+              className="ml-2"
+            />
           </View>
         </View>
       </Pressable>
