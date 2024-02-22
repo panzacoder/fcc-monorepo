@@ -18,7 +18,6 @@ import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { COLORS } from 'app/utils/colors'
-import { Stack } from 'expo-router'
 
 export function CirclesListScreen() {
   const header = store.getState().headerState.header
@@ -59,7 +58,6 @@ export function CirclesListScreen() {
   }, [])
   return (
     <View className="flex-1">
-      <Stack.Screen options={{ title: 'Your Circles' }} />
       <PtsLoader loading={isLoading} />
       <View className="mr-[30] mt-[30] flex-row justify-end">
         <Pressable

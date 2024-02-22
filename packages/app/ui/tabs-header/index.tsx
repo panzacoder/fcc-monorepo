@@ -16,9 +16,9 @@ export type TabsHeaderProps = {
 export function TabsHeader() {
   const user = store.getState().userProfileState.header
   return (
-    <View className="absolute top-0 w-full flex-row justify-end gap-2">
+    <View className="absolute right-0 top-0 w-1/4 flex-row justify-end gap-2">
       <PtsNameInitials className="" fullName={user.memberName} />
-      <Pressable className="bg-accent rounded-full p-2" onPress={() => { }}>
+      <Pressable className="bg-accent rounded-full p-2" onPress={() => {}}>
         <Feather name={'menu'} size={25} className="color-accent-foreground" />
       </Pressable>
     </View>

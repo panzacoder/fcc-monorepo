@@ -13,7 +13,6 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import store from 'app/redux/store'
 import { BASE_URL } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
-import { COLORS } from 'app/utils/colors'
 import { LinearGradient } from 'expo-linear-gradient'
 
 export function CircleDetailsScreen() {
@@ -37,7 +36,6 @@ export function CircleDetailsScreen() {
   console.log('userDetails', userDetails)
   const item = useParams<any>()
   let memberData = JSON.parse(item.memberData)
-  // console.log('email', item ? item.memberData : '')
   const [isLoading, setLoading] = useState(false)
   const [isSeeMore, setSeeMore] = useState(false)
 
@@ -75,10 +73,9 @@ export function CircleDetailsScreen() {
     userName += userDetails.lastName.trim()
   }
 
-  function buttonPressed() { }
+  function buttonPressed() {}
   return (
-    <View className="flex-1  bg-white">
-      <PtsBackHeader title={userName} />
+    <View className="mt-14 flex-1">
       <PtsLoader loading={isLoading} />
       <LinearGradient
         colors={['#103264', '#113263', '#319D9D']}
@@ -92,7 +89,7 @@ export function CircleDetailsScreen() {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20
         }}
-        className="mt-5 w-[95%] self-center py-5"
+        className="mt-5 self-center py-5"
       >
         <View className="flex-row">
           <PtsNameInitials fullName={item.fullName} />
@@ -101,7 +98,7 @@ export function CircleDetailsScreen() {
           </Typography>
           <TouchableOpacity
             className="absolute right-[15] self-center"
-            onPress={() => { }}
+            onPress={() => {}}
           >
             <Feather name={'menu'} size={20} color={'#5ACC6C'} />
           </TouchableOpacity>
@@ -211,7 +208,7 @@ export function CircleDetailsScreen() {
                 {'Messages'}
               </Typography>
               {memberData.unreadMessages &&
-                memberData.unreadMessages.length > 0 ? (
+              memberData.unreadMessages.length > 0 ? (
                 <View className="flex-row">
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'Show latest message'}

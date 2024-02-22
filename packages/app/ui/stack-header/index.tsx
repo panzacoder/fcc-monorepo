@@ -8,15 +8,14 @@ export type StackHeaderProps = {
   options: any
   back?: {
     title: string
-    onPress: () => void
   }
 }
 
 export function StackHeader({ navigation, options, back }: StackHeaderProps) {
   return (
-    <View className="flex-row items-end pl-2 pt-2">
+    <View className="w-3/4 flex-row items-center gap-2 pl-2 pt-2">
       {back && (
-        <Pressable className="self-center" onPress={navigation.goBack}>
+        <Pressable className="" onPress={navigation.goBack}>
           <Feather name={'arrow-left'} size={25} color={'black'} />
         </Pressable>
       )}

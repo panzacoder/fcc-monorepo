@@ -7,6 +7,8 @@ export default function Root() {
     <Stack
       screenOptions={{
         header: StackHeader,
+        animation: 'simple_push',
+        presentation: 'card',
         contentStyle: { backgroundColor: 'transparent' }
       }}
     />
