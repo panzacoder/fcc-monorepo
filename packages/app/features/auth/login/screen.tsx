@@ -66,7 +66,6 @@ export function LoginScreen() {
         console.log(error)
       })
   }
-
   async function login(formData: Schema) {
     console.log('formData', formData.email)
     setLoading(true)

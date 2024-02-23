@@ -9,50 +9,56 @@ import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { consoleData, getFullDateForCalender } from 'app/ui/utils'
-import { BASE_URL, GET_DOCTOR_DETAILS } from 'app/utils/urlConstants'
+import { BASE_URL, GET_FACILITY_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getAddressFromObject } from 'app/ui/utils'
 import { Button } from 'app/ui/button'
-let doctorDetails = {}
-export function DoctorDetailsScreen() {
+let facilityDetails = {}
+export function FacilityDetailsScreen() {
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
   let memberData = JSON.parse(item.memberData)
   const router = useRouter()
-  let doctorInfo = JSON.parse(item.doctorDetails)
-  // console.log('doctorDetails', '' + JSON.stringify(doctorDetails))
+  let facilityInfo = JSON.parse(item.facilityDetails)
+  // console.log('facilityDetails', '' + JSON.stringify(facilityDetails))
   const [isLoading, setLoading] = useState(false)
-  // const [doctorDetails, setDoctorDetails] = useState({}) as any
+  // const [facilityDetails, setfacilityDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
-    async function getDoctorDetails() {
+    async function getfacilityDetails() {
       setLoading(true)
-      let url = `${BASE_URL}${GET_DOCTOR_DETAILS}`
+      let url = `${BASE_URL}${GET_FACILITY_DETAILS}`
       let dataObject = {
         header: header,
-        doctor: {
-          id: doctorInfo.id ? doctorInfo.id : ''
+        facility: {
+          id: facilityInfo.id ? facilityInfo.id : ''
         }
       }
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            doctorDetails = data.data.doctor ? data.data.doctor : {}
+            facilityDetails = data.data.facilityWithAppointment.facility
+              ? data.data.facilityWithAppointment.facility
+              : {}
+
             setLocationList(
-              data.data.doctor && data.data.doctor.doctorLocationList
-                ? data.data.doctor.doctorLocationList
+              data.data.facilityWithAppointment &&
+                data.data.facilityWithAppointment.facility.facilityLocationList
+                ? data.data.facilityWithAppointment.facility
+                    .facilityLocationList
                 : []
             )
             setAppointmentList(
-              data.data && data.data.doctorAppointmentList
-                ? data.data.doctorAppointmentList
+              data.data.facilityWithAppointment &&
+                data.data.facilityWithAppointment.facilityAppointmentList
+                ? data.data.facilityWithAppointment.facilityAppointmentList
                 : []
             )
-            // console.log('appointmentList', JSON.stringify(appointmentList))
+            console.log('appointmentList', JSON.stringify(appointmentList))
           } else {
             Alert.alert('', data.message)
           }
@@ -63,30 +69,30 @@ export function DoctorDetailsScreen() {
           console.log('error', error)
         })
     }
-    getDoctorDetails()
+    getfacilityDetails()
   }, [])
 
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
-      {/* <Image
+      <Image
         source={require('app/assets/header.png')}
-        className="abosolute top-[-60]"
+        className="abosolute top-[-50]"
         resizeMode={'contain'}
         alt="logo"
-      /> */}
+      />
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className=" font-400 w-[65%] text-[16px] text-[#86939e]">
-                  {doctorInfo.specialist ? doctorInfo.specialist : ''}
+                <Typography className="font-400 w-[65%] text-[16px] text-[#86939e]">
+                  {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
                 <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
                 <Typography className="font-400 text-primary ml-2 text-[16px]">
-                  {doctorInfo.status ? doctorInfo.status : ''}
+                  {facilityInfo.status ? facilityInfo.status : ''}
                 </Typography>
               </View>
               <Button
@@ -95,9 +101,9 @@ export function DoctorDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated)/circles/addEditDoctor', {
-                      memberData: JSON.stringify(memberData),
-                      doctorDetails: JSON.stringify(doctorDetails)
+                    formatUrl('/(authenticated)/circles/addEditFacility', {
+                      facilityDetails: JSON.stringify(facilityDetails),
+                      memberData: JSON.stringify(memberData)
                     })
                   )
                 }}
@@ -105,63 +111,32 @@ export function DoctorDetailsScreen() {
             </View>
             <View>
               <View className="mt-5 flex-row items-center">
-                <Typography className="font-400 w-[25%] text-[12px] text-[#1A1A1A]">
-                  {'Contact Info'}
-                </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                    {'Phone:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.phone ? doctorDetails.phone : ''}
-                  </Typography>
-                </View>
-                <Feather name={'phone'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                    {'Email:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.email ? doctorDetails.email : ''}
-                  </Typography>
-                </View>
-                <Feather name={'mail'} size={20} color={'black'} />
-              </View>
-            </View>
-
-            <View>
-              <View className="mt-5 flex-row items-center">
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
-                  {'Portal details'}
+                  {'Facility Details'}
                 </Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Username:'}
+              <View className="mt-2 flex-row items-center">
+                <View className="w-[90%] flex-row">
+                  <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
+                    {'Name:'}
                   </Typography>
-                  <Typography className="font-400 ml-2 w-[60%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.websiteuser ? doctorDetails.websiteuser : ''}
+                  <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
+                    {facilityDetails.name ? facilityDetails.name : ''}
                   </Typography>
                 </View>
-                <Feather name={'copy'} size={20} color={'black'} />
+                <Feather name={'info'} size={20} color={'black'} />
               </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Website:'}
+              <View className="mt-2 flex-row items-center">
+                <View className="w-[90%] flex-row">
+                  <Typography className="font-400 w-[60%] text-[16px] text-[#1A1A1A]">
+                    {'Is this Pharmacy ?'}
                   </Typography>
-                  <Typography className="font-400 ml-2 w-[60%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.website ? doctorDetails.website : ''}
+                  <Typography className="font-400 ml-2 w-[30%] text-[16px] font-bold text-[#1A1A1A]">
+                    {facilityDetails.ispharmacy ? 'Yes' : 'No'}
                   </Typography>
                 </View>
-                <Feather name={'external-link'} size={20} color={'black'} />
+                <Feather name={'info'} size={20} color={'black'} />
               </View>
             </View>
           </View>
@@ -183,7 +158,7 @@ export function DoctorDetailsScreen() {
                       '/(authenticated)/circles/addEditDoctorLocation',
                       {
                         memberData: JSON.stringify(memberData),
-                        doctorDetails: JSON.stringify(doctorInfo)
+                        facilityDetails: JSON.stringify(facilityInfo)
                       }
                     )
                   )
@@ -220,10 +195,10 @@ export function DoctorDetailsScreen() {
                     </View>
                     <View className="ml-2 mt-2 w-full flex-row items-center">
                       <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
+                        <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
                           {'Phone:'}
                         </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
+                        <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
                           {data.phone ? data.phone : ''}
                         </Typography>
                       </View>
@@ -284,7 +259,7 @@ export function DoctorDetailsScreen() {
                       //     '/(authenticated)/circles/addEditDoctorLocation',
                       //     {
                       //       memberData: JSON.stringify(memberData),
-                      //       doctorDetails: JSON.stringify(doctorInfo)
+                      //       facilityDetails: JSON.stringify(facilityInfo)
                       //     }
                       //   )
                       // )
@@ -293,9 +268,8 @@ export function DoctorDetailsScreen() {
                     className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
                   >
                     <View className="ml-2 mt-2 flex-row ">
-                      {/* <View className="ml-2 w-[2px] bg-[#184E4E]" /> */}
-                      <View className="w-[95%]">
-                        <Typography className="font-400 ml-2 w-[95%] text-[16px] text-[#103264]">
+                      <View className="w-full">
+                        <Typography className="font-400 ml-2 w-full text-[16px] text-[#103264]">
                           {data.purpose ? data.purpose : ''}
                         </Typography>
                         <View className="w-full flex-row">
@@ -305,7 +279,7 @@ export function DoctorDetailsScreen() {
                               'MMMM DD '
                             ) + ' - '}
                           </Typography>
-                          <Typography className="font-400 w-[70%] text-[12px] text-[#103264]">
+                          <Typography className="font-400 w-[65%] text-[12px] text-[#103264]">
                             {data.appointment ? data.appointment : ''}
                           </Typography>
                         </View>

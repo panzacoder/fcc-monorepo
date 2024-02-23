@@ -3,8 +3,8 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
-import { formatUrl } from 'app/utils/format-url'
 import { COLORS } from 'app/utils/colors'
+import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data

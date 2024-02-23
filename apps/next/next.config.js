@@ -1,5 +1,4 @@
 const { withExpo } = require('@expo/next-adapter')
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // reanimated (and thus, Moti) doesn't work with strict mode currently...
@@ -34,6 +33,24 @@ const nextConfig = {
   ],
   experimental: {
     forceSwcTransforms: true
+  },
+  rewrites() {
+    return [
+      // {
+      //   source: '/fccApi/2.0/countryms/getAll',
+      //   destination: BASE_URL
+      // },
+      // {
+      //   source: '/fccApi/2.0/timezonems/getForCountry',
+      //   destination:
+      //     'http://45.79.147.166:8000/fccApi/2.0/timezonems/getForCountry'
+      // }
+      {
+        source: '/fccApi/2.0/:path*',
+        destination: `${process.env.BASE_URL}/fccApi/2.0/:path*`
+        // 'http://45.79.147.166:8000/fccApi/2.0/:path*'
+      }
+    ]
   }
 }
 

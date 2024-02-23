@@ -1,5 +1,10 @@
 import { IncidentsScreen } from 'app/features/incidents/screen'
-
+import { Stack } from 'expo-router'
 export default function Incidents() {
-  return <IncidentsScreen />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Incidents' }} />
+      <IncidentsScreen />
+    </>
+  )
 }

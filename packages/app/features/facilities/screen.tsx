@@ -9,13 +9,13 @@ import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { consoleData } from 'app/ui/utils'
-import { BASE_URL, GET_MEMBER_DOCTORS } from 'app/utils/urlConstants'
+import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-export function DoctorsScreen() {
+export function FacilitiesScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [doctorList, setDoctorList] = useState([])
+  const [facilityList, setfacilityList] = useState([])
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
@@ -23,12 +23,12 @@ export function DoctorsScreen() {
   let memberData = JSON.parse(item.memberData)
   //   console.log('email', item ? item.memberData : '')
   useEffect(() => {
-    async function getDoctorDetails() {
+    async function getFacilityDetails() {
       setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_DOCTORS}`
+      let url = `${BASE_URL}${GET_MEMBER_FACILITIES}`
       let dataObject = {
         header: header,
-        doctor: {
+        facility: {
           member: {
             id: memberData.member ? memberData.member : ''
           }
@@ -37,7 +37,7 @@ export function DoctorsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            setDoctorList(data.data.list ? data.data.list : [])
+            setfacilityList(data.data.list ? data.data.list : [])
           } else {
             Alert.alert('', data.message)
           }
@@ -48,7 +48,7 @@ export function DoctorsScreen() {
           console.log('error', error)
         })
     }
-    getDoctorDetails()
+    getFacilityDetails()
   }, [])
   return (
     <View className="flex-1  bg-white">
@@ -72,7 +72,7 @@ export function DoctorsScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditDoctor', {
+                  formatUrl('/(authenticated)/circles/addEditFacility', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -83,28 +83,28 @@ export function DoctorsScreen() {
           </View>
         </View>
       </View>
-      <ScrollView className="m-2 mx-5 w-[95%] self-center">
-        {doctorList.map((data: any, index: number) => {
+      <ScrollView className="m-2 w-[95%] self-center">
+        {facilityList.map((data: any, index: number) => {
           return (
             <TouchableOpacity
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/doctorDetails', {
-                    doctorDetails: JSON.stringify(data),
+                  formatUrl('/(authenticated)/circles/facilityDetails', {
+                    facilityDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)
                   })
                 )
               }}
               key={index}
-              className="border-primary my-[5px] w-[95%] flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+              className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
               <View className="my-2 flex-row">
                 <Typography className="text-primary font-400 ml-5 w-[45%]">
-                  {data.doctorName ? data.doctorName : ''}
+                  {data.name ? data.name : ''}
                 </Typography>
 
                 <Typography className="ml-5 mr-5 w-[40%] text-right">
-                  {data.specialist ? data.specialist : ''}
+                  {data.type ? data.type : ''}
                 </Typography>
               </View>
               <View className="flex-row">

@@ -63,7 +63,7 @@ export function HomeScreen() {
         </View>
         {isDataReceived ? (
           <View
-            className={` border-primary bg-card mx-[10px] mt-[50] h-[70%] w-[94%] self-center rounded-[15px] border-[2px]`}
+            className={`border-primary bg-card mx-[10px] mt-[50] h-[80%] w-[94%] self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
               <View>
