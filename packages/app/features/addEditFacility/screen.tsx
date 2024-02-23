@@ -1,34 +1,39 @@
 'use client'
 import _ from 'lodash'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Switch
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
-  CREATE_DOCTOR,
+  CREATE_FACILITY,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'solito/navigation'
 import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
-import { formatUrl } from 'app/utils/format-url'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 const schema = z.object({
-  firstName: z.string(),
-  phone: z.string(),
   website: z.string(),
   username: z.string(),
-  portalWebsite: z.string(),
-  lastName: z.string().min(1, { message: 'Last name is required' }),
-  specialization: z.number().min(0, { message: 'Specialization is required' }),
+  description: z.string(),
+  facilityName: z.string().min(1, { message: 'Facility name is required' }),
+  type: z.number().min(0, { message: 'Type is required' }),
   locationDesc: z
     .string()
     .min(1, { message: 'Location description is required' }),
@@ -41,39 +46,63 @@ const schema = z.object({
   locationPhone: z.string(),
   fax: z.string(),
   state: z.number().min(0, { message: 'State is required' }),
-  // state: z.number(),
   country: z.number().min(0, { message: 'Country is required' })
 })
 export type Schema = z.infer<typeof schema>
 let statesListFull = []
-export function AddEditDoctorScreen() {
+let isThisPharmacy = false
+export function AddEditFacilityScreen() {
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
   let memberData = JSON.parse(item.memberData)
-  let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  // console.log('doctorDetails', JSON.stringify(doctorDetails))
+  let facilityDetails = item.facilityDetails
+    ? JSON.parse(item.facilityDetails)
+    : {}
+  console.log('facilityDetails', JSON.stringify(facilityDetails))
+
+  const [isLoading, setLoading] = useState(false)
+  const [isActive, setIsActive] = useState(true)
+  const [isPharmacy, setIsPharmacy] = useState(false)
+  const [statesList, setStateslist] = useState([])
+  const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
+    return {
+      label: data.type,
+      value: index
+    }
+  })
+  async function getTypeIndex(type: string) {
+    const typeIndex = staticData.facilityTypeList.map(
+      (data: any, index: any) => {
+        if (data.type === type) {
+          return index
+        }
+      }
+    )
+    return typeIndex
+  }
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      firstName:
-        doctorDetails && doctorDetails.firstName ? doctorDetails.firstName : '',
-      lastName:
-        doctorDetails && doctorDetails.lastName ? doctorDetails.lastName : '',
-      specialization:
-        doctorDetails && doctorDetails.specialist
-          ? getSpecialistIndex(doctorDetails.specialist)
+      facilityName:
+        facilityDetails && facilityDetails.name ? facilityDetails.name : '',
+      type:
+        facilityDetails && facilityDetails.type
+          ? getTypeIndex(facilityDetails.type)
           : -1,
-      phone: doctorDetails && doctorDetails.phone ? doctorDetails.phone : '',
       website:
-        doctorDetails && doctorDetails.website ? doctorDetails.website : '',
-      username:
-        doctorDetails && doctorDetails.websiteuser
-          ? doctorDetails.websiteuser
+        facilityDetails && facilityDetails.website
+          ? facilityDetails.website
           : '',
-      portalWebsite:
-        doctorDetails && doctorDetails.website ? doctorDetails.website : '',
+      description:
+        facilityDetails && facilityDetails.description
+          ? facilityDetails.description
+          : '',
+      username:
+        facilityDetails && facilityDetails.websiteuser
+          ? facilityDetails.websiteuser
+          : '',
       locationDesc: '',
       locationShortName: '',
       address: '',
@@ -86,38 +115,7 @@ export function AddEditDoctorScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(true)
-  const [statesList, setStateslist] = useState([])
-  const specializationList = staticData.specializationList.map(
-    (data: any, index: any) => {
-      return {
-        label: data.specialization,
-        value: index
-      }
-    }
-  )
-  async function getSpecialistIndex(specialization: any) {
-    // console.log('getSpecialistIndex', specialization)
-    const specializationCount = staticData.specializationList.map(
-      (data: any, index: any) => {
-        if (data.specialization == specialization) {
-          console.log('index', index)
-          return index
-        }
-      }
-    )
-    return specializationCount
-    // staticData.specializationList.map((data: any, index: any) => {
-    //   // console.log('data', data.specialization)
-    //   if (data.specialization.trim() === specialization.trim()) {
-    //     console.log('index', index)
-    //     return index
-    //   }
-    // })
-    // console.log('specializationCount', specializationCount)
-  }
-  async function createDoctor(formData: Schema) {
+  async function createFacility(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
@@ -127,7 +125,6 @@ export function AddEditDoctorScreen() {
       nickName: formData.locationShortName,
       fax: formData.fax,
       website: formData.website,
-      phone: formData.phone,
       address: {
         id: '',
         line: formData.address,
@@ -138,23 +135,20 @@ export function AddEditDoctorScreen() {
     }
     object.address.state.country = countryObject
     locationList.push(object)
-    let loginURL = `${BASE_URL}${CREATE_DOCTOR}`
+    let loginURL = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
-      doctor: {
+      facility: {
         member: {
           id: memberData.member
         },
-        salutation: 'Dr',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: '',
-        phone: formData.phone,
+        name: formData.facilityName,
+        ispharmacy: isThisPharmacy,
+        description: formData.description,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization].label,
-        isSelf: true,
-        doctorLocationList: locationList
+        type: typesList[formData.type].label,
+        facilityLocationList: locationList
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
@@ -164,9 +158,9 @@ export function AddEditDoctorScreen() {
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
           // router.push(
-          //   formatUrl('/(authenticated)/circles/doctorDetails', {
-          //     doctorDetails: JSON.stringify(
-          //       data.data.doctor ? data.data.doctor : {}
+          //   formatUrl('/(authenticated)/circles/facilityDetails', {
+          //     facilityDetails: JSON.stringify(
+          //       data.data.facility ? data.data.facility : {}
           //     ),
           //     memberData: JSON.stringify(memberData)
           //   })
@@ -192,12 +186,12 @@ export function AddEditDoctorScreen() {
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
     let dataObject = {
       country: {
-        id: countryId
+        id: countryId || 101
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
-        // console.log('data', data)
+        console.log('data', data)
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // set available states
@@ -209,7 +203,7 @@ export function AddEditDoctorScreen() {
           })
           setStateslist(statesList)
           statesListFull = data.data.stateList ? data.data.stateList : []
-          // console.log('setStateslistFull', JSON.stringify(statesListFull))
+          // console.log('statesList', statesList)
         } else {
           Alert.alert('', data.message)
         }
@@ -220,17 +214,12 @@ export function AddEditDoctorScreen() {
         console.log(error)
       })
   }, [])
-
   async function setSelectedCountryChange(value: any) {
     let countryId = staticData.countryList[value].id
       ? staticData.countryList[value].id
       : 101
     await getStates(countryId)
   }
-  // async function setSelectedStateChange(value: any) {
-  //   console.log('setSelectedStateChange value', '' + value)
-  //   console.log('statesListFull', JSON.stringify(statesListFull))
-  // }
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
@@ -269,7 +258,7 @@ export function AddEditDoctorScreen() {
                   className=""
                   title="Save"
                   variant="default"
-                  onPress={handleSubmit(createDoctor)}
+                  onPress={handleSubmit(createFacility)}
                 />
               </View>
             </View>
@@ -277,42 +266,36 @@ export function AddEditDoctorScreen() {
               <View className="w-full flex-row gap-2">
                 <ControlledTextField
                   control={control}
-                  name="firstName"
-                  placeholder={'First Name'}
-                  className="w-[50%]"
-                  autoCapitalize="none"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="lastName"
-                  placeholder="Last Name*"
-                  className="w-[50%]"
+                  name="facilityName"
+                  placeholder="Facility Name*"
+                  className="w-full"
                 />
               </View>
               <View className="mt-5">
                 <ControlledDropdown
                   control={control}
-                  name="specialization"
-                  label="Specialization*"
+                  name="type"
+                  label="Type*"
                   maxHeight={300}
-                  list={specializationList}
+                  list={typesList}
                   // onChangeValue={setSelectedCountryChange}
+                />
+              </View>
+              <View className="mt-5">
+                <ControlledTextField
+                  control={control}
+                  name="description"
+                  placeholder="Description"
+                  className="w-full"
                 />
               </View>
             </View>
             <View>
               <View className="mb-5 flex-row items-center">
-                <Typography className="w-[30%]">{'Contact Info'}</Typography>
+                <Typography className="w-[30%]">{'Portal Details'}</Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
               <View className="flex w-full gap-2">
-                <ControlledTextField
-                  control={control}
-                  name="phone"
-                  placeholder={'Phone'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
                 <ControlledTextField
                   control={control}
                   name="website"
@@ -320,15 +303,6 @@ export function AddEditDoctorScreen() {
                   className="w-full"
                   autoCapitalize="none"
                 />
-              </View>
-            </View>
-
-            <View className="mt-2">
-              <View className="mb-2 flex-row items-center">
-                <Typography className="w-[30%]">{'Portal Details'}</Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
-              </View>
-              <View className="flex w-full gap-2">
                 <ControlledTextField
                   control={control}
                   name="username"
@@ -336,17 +310,25 @@ export function AddEditDoctorScreen() {
                   className="w-full"
                   autoCapitalize="none"
                 />
-                <ControlledTextField
-                  control={control}
-                  name="portalWebsite"
-                  placeholder={'Website'}
-                  className="w-full"
-                  autoCapitalize="none"
+              </View>
+              <View className="mt-5 w-full flex-row">
+                <Typography className=" w-[80%] font-bold">
+                  {'Is this Pharmacy?'}
+                </Typography>
+                <ToggleSwitch
+                  isOn={isPharmacy}
+                  onColor="#2884F9"
+                  offColor="#2884F9"
+                  size="medium"
+                  onToggle={(isOn) => {
+                    isThisPharmacy = !isThisPharmacy
+                    setIsPharmacy(!isPharmacy)
+                  }}
                 />
               </View>
             </View>
           </View>
-          {_.isEmpty(doctorDetails) ? (
+          {_.isEmpty(facilityDetails) ? (
             <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
               <View className="mt-2">
                 <View className="mb-2 flex-row items-center">
@@ -388,19 +370,18 @@ export function AddEditDoctorScreen() {
                       label="State*"
                       maxHeight={300}
                       list={statesList}
-                      // onChangeValue={setSelectedStateChange}
                     />
                     <View className="w-full flex-row gap-2">
                       <ControlledTextField
                         control={control}
-                        name="city"
+                        name="address"
                         placeholder={'City'}
                         className="w-[50%]"
                         autoCapitalize="none"
                       />
                       <ControlledTextField
                         control={control}
-                        name="postalCode"
+                        name="address"
                         placeholder="Postal Code"
                         className="w-[48%]"
                       />
@@ -422,20 +403,6 @@ export function AddEditDoctorScreen() {
                   </View>
                 </View>
               </View>
-            </View>
-          ) : (
-            <View />
-          )}
-          {!_.isEmpty(doctorDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="border"
-                onPress={() => {
-                  router.back()
-                }}
-              />
             </View>
           ) : (
             <View />

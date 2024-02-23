@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
-import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -110,11 +109,6 @@ export function AddEditDoctorLocationScreen() {
         alt="logo"
       />
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
-        <PtsBackHeader
-          title={
-            doctorDetails.doctorName ? doctorDetails.doctorName : 'Add Location'
-          }
-        />
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[90%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">

@@ -3,8 +3,8 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
-import { formatUrl } from 'app/utils/format-url'
 import { COLORS } from 'app/utils/colors'
+import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data
@@ -79,8 +79,8 @@ export function CardView(data: any) {
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||
-      memberData.recentIncident ||
-      memberData.upcomingEvent ? (
+        memberData.recentIncident ||
+        memberData.upcomingEvent ? (
         <View className="m-auto flex-1 ">
           <View className="rounded-2xl bg-white px-2 pt-5">
             <View className="flex-row">
@@ -94,8 +94,8 @@ export function CardView(data: any) {
                 className="ml-[5px] self-center"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated_no_tabs)/circleDetails', {
-                      fullName: fullName,
+                    formatUrl('/circles/circleDetails', {
+                      fullName,
                       memberData: JSON.stringify(memberData)
                     })
                   )

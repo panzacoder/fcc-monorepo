@@ -1,13 +1,12 @@
-import { View, TouchableOpacity } from 'react-native'
+import { View, Pressable } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
+import { getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
-import { COLORS } from 'app/utils/colors'
 import { formatUrl } from 'app/utils/format-url'
 export function CircleCard(data: any) {
   const router = useRouter()
-  let memberData = data.data
+  const memberData = data.data
   let fullName = ''
   if (memberData.firstname) {
     fullName += memberData.firstname.trim() + ' '
@@ -16,12 +15,20 @@ export function CircleCard(data: any) {
     fullName += memberData.lastname.trim()
   }
   return (
-    <View className="flex-1 bg-white">
-      <View
+    <View className="flex-1">
+      <Pressable
         className={`border-[${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? '#287CFA' : '#3DC4C4'}] mt-5 w-[95%] self-center rounded-[10px] border-[2px] bg-white py-5`}
+        onPress={() => {
+          router.push(
+            formatUrl('/circles/circleDetails', {
+              fullName,
+              memberData: JSON.stringify(memberData)
+            })
+          )
+        }}
       >
-        <View className=" flex-row">
-          <View className="w-[80%] flex-row">
+        <View className="flex-row">
+          <View className="flex-1 flex-row">
             <View className="bg-primary ml-5 h-[40px] w-[40px] items-center justify-center rounded-[20px]">
               <Typography className="self-center text-[19px] text-white">
                 {getNameInitials(fullName)}
@@ -37,28 +44,19 @@ export function CircleCard(data: any) {
               </Typography>
             </View>
           </View>
-          <View className="flex-row">
-            <View className="bg-primary h-[24px] w-[24px] self-center rounded-[12px]">
-              <Typography className="font-400 self-center text-[14px] text-white">
-                {'2'}
-              </Typography>
+          <View className="flex-row items-center">
+            <View className="bg-primary flex h-[24px] w-[24px] items-center rounded-full">
+              <Typography className="text-white">{'2'}</Typography>
             </View>
-            <TouchableOpacity
-              className="ml-2 self-center"
-              onPress={() => {
-                router.push(
-                  formatUrl('/(authenticated_no_tabs)/circleDetails', {
-                    fullName: fullName,
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
-              }}
-            >
-              <Feather name={'chevron-right'} size={25} color={'black'} />
-            </TouchableOpacity>
+            <Feather
+              name={'chevron-right'}
+              size={25}
+              color={'black'}
+              className="ml-2"
+            />
           </View>
         </View>
-      </View>
+      </Pressable>
     </View>
   )
 }

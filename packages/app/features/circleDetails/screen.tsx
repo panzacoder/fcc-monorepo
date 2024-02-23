@@ -6,7 +6,6 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'solito/navigation'
-import PtsBackHeader from 'app/ui/PtsBackHeader'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Feather } from 'app/ui/icons'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -78,7 +77,6 @@ export function CircleDetailsScreen() {
 
   return (
     <View className="flex-1  bg-white">
-      <PtsBackHeader title={userName} />
       <PtsLoader loading={isLoading} />
       <LinearGradient
         colors={['#103264', '#113263', '#319D9D']}
@@ -92,21 +90,21 @@ export function CircleDetailsScreen() {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20
         }}
-        className="mt-5 w-[95%] self-center py-5"
+        className="mt-5 w-full self-center py-5"
       >
-        <View className="flex-row">
+        <View className="ml-2 flex-row">
           <PtsNameInitials fullName={item.fullName} />
-          <Typography className="mt-7 text-center text-[18px] font-bold text-white">
+          <Typography className="ml-2 self-center text-center text-[18px] font-bold text-white">
             {item.fullName}
           </Typography>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             className="absolute right-[15] self-center"
             onPress={() => {}}
           >
             <Feather name={'menu'} size={20} color={'#5ACC6C'} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
-        <View className=" flex w-[95%] self-center rounded-[16px] bg-white py-5 ">
+        <View className="mt-2 flex w-[95%] self-center rounded-[16px] bg-white py-5 ">
           <View className="flex-row">
             <View>
               <Typography className="ml-5 text-[16px] font-bold">
@@ -177,7 +175,7 @@ export function CircleDetailsScreen() {
                 leadingIcon="arrow-right"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated_no_tabs)/doctors', {
+                    formatUrl('/(authenticated)/circles/doctors', {
                       memberData: JSON.stringify(memberData)
                     })
                   )
@@ -188,7 +186,11 @@ export function CircleDetailsScreen() {
                 title="Facilities"
                 leadingIcon="home"
                 onPress={() => {
-                  // router.push(formatUrl('/home', {}))
+                  router.push(
+                    formatUrl('/(authenticated)/circles/facilities', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
                 }}
               />
             </View>

@@ -12,7 +12,7 @@ const PtsNameInitials = ({ fullName, className }: Props) => {
   return (
     <View
       className={cn(
-        'bg-primary m-5 h-[40px] w-[40px] items-center justify-center rounded-[20px]',
+        'bg-primary h-[40px] w-[40px] items-center justify-center rounded-full',
         className
       )}
     >
