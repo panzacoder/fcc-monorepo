@@ -1,6 +1,5 @@
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
 import { getNameInitials } from 'app/ui/utils'
 import { cn } from './utils'
 export type Props = {
@@ -8,7 +7,6 @@ export type Props = {
   className?: string
 }
 const PtsNameInitials = ({ fullName, className }: Props) => {
-  const router = useRouter()
   return (
     <View
       className={cn(
