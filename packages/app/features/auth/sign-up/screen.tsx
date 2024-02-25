@@ -66,17 +66,16 @@ export function SignUpScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      firstName: 'Jake',
-      lastName: 'Hebert',
-      email: 'jake+1@plfx.studio',
+      firstName: '',
+      lastName: '',
+      email: '',
       phone: '',
-      password: 'Jaketest1!',
-      confirmPassword: 'Jaketest1!',
+      password: '',
+      confirmPassword: '',
       timezone: '',
       country: -1,
       state: -1,
-      acceptTc: true
-      // acceptTc: false
+      acceptTc: false
     },
     resolver: zodResolver(schema)
   })
