@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { View, Pressable, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -9,15 +9,11 @@ import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
-import { COLORS } from 'app/utils/colors'
 import { CardView } from 'app/ui/cardview'
 
 export function HomeScreen() {
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
-  // const isDrawerOpen = useDrawerStatus() === 'open'
-  // console.log('isDrawerOpen', isDrawerOpen)
-  // console.log('user', user)
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
@@ -74,14 +70,11 @@ export function HomeScreen() {
                   {'6 Appointments, 2 Events'}
                 </Typography>
               </View>
-              <TouchableOpacity
-                className="absolute right-[20]"
-                onPress={() => { }}
-              >
+              <Pressable className="absolute right-[20]" onPress={() => {}}>
                 <Feather name={'settings'} size={20} color={'black'} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
-            <ScrollView persistentScrollbar={true} className="m-2">
+            <ScrollView persistentScrollbar={true} className="m-2 flex-1">
               {memberList.map((data: any, index: number) => {
                 return (
                   <View key={index}>
