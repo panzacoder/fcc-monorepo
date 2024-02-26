@@ -1,31 +1,27 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { consoleData, getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalender } from 'app/ui/utils'
 import { BASE_URL, GET_DOCTOR_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getAddressFromObject } from 'app/ui/utils'
 import { Button } from 'app/ui/button'
-let doctorDetails = {}
 export function DoctorDetailsScreen() {
   const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
-  let memberData = JSON.parse(item.memberData)
+  const memberData = JSON.parse(item.memberData)
   const router = useRouter()
-  let doctorInfo = JSON.parse(item.doctorDetails)
-  // console.log('doctorDetails', '' + JSON.stringify(doctorDetails))
+  const doctorInfo = JSON.parse(item.doctorDetails)
+  const [doctorDetails, setDoctorDetails] = useState({} as any)
   const [isLoading, setLoading] = useState(false)
-  // const [doctorDetails, setDoctorDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
@@ -41,7 +37,7 @@ export function DoctorDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            doctorDetails = data.data.doctor ? data.data.doctor : {}
+            setDoctorDetails(data.data.doctor || {})
             setLocationList(
               data.data.doctor && data.data.doctor.doctorLocationList
                 ? data.data.doctor.doctorLocationList
@@ -67,14 +63,8 @@ export function DoctorDetailsScreen() {
   }, [])
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      {/* <Image
-        source={require('app/assets/header.png')}
-        className="abosolute top-[-60]"
-        resizeMode={'contain'}
-        alt="logo"
-      /> */}
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">

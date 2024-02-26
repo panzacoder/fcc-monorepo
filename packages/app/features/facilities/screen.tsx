@@ -1,27 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { View, Pressable, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { consoleData } from 'app/ui/utils'
 import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
+
 export function FacilitiesScreen() {
   const [isLoading, setLoading] = useState(false)
   const [facilityList, setfacilityList] = useState([])
   const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
-  //   console.log('email', item ? item.memberData : '')
   useEffect(() => {
     async function getFacilityDetails() {
       setLoading(true)
@@ -50,12 +48,13 @@ export function FacilitiesScreen() {
     }
     getFacilityDetails()
   }, [])
+
   return (
     <View className="flex-1  bg-white">
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
-          <TouchableOpacity className="w-[85%] flex-row">
+          <Pressable className="w-[85%] flex-row">
             <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
               {'Filter'}
             </Typography>
@@ -66,9 +65,9 @@ export function FacilitiesScreen() {
               size={25}
               color={'black'}
             />
-          </TouchableOpacity>
+          </Pressable>
           <View className=" mt-[20] self-center">
-            <TouchableOpacity
+            <Pressable
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -79,14 +78,14 @@ export function FacilitiesScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>
       <ScrollView className="m-2 w-[95%] self-center">
         {facilityList.map((data: any, index: number) => {
           return (
-            <TouchableOpacity
+            <Pressable
               onPress={() => {
                 router.push(
                   formatUrl('/(authenticated)/circles/facilityDetails', {
@@ -122,7 +121,7 @@ export function FacilitiesScreen() {
                   {data.status ? data.status : ''}
                 </Typography>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           )
         })}
       </ScrollView>

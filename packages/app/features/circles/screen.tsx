@@ -15,7 +15,6 @@ export function CirclesListScreen() {
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isCreateCircle, setCreateCircle] = useState(false)
-  const [isDataReceived, setDataReceived] = useState(false)
 
   const [isCreateCircleClicked, setCreateCircleClicked] = useState(false)
   const [memberList, setMemberList] = useState([])
@@ -30,7 +29,6 @@ export function CirclesListScreen() {
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
             setMemberList(data.data.memberList ? data.data.memberList : [])
-            setDataReceived(true)
           } else {
             Alert.alert('', data.message)
           }

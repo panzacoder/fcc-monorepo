@@ -1,31 +1,28 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, Image, Pressable, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { consoleData, getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalender } from 'app/ui/utils'
 import { BASE_URL, GET_FACILITY_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getAddressFromObject } from 'app/ui/utils'
 import { Button } from 'app/ui/button'
-let facilityDetails = {}
+
 export function FacilityDetailsScreen() {
+  const [facilityDetails, setFacilityDetails] = useState<any>({})
   const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
   let memberData = JSON.parse(item.memberData)
   const router = useRouter()
   let facilityInfo = JSON.parse(item.facilityDetails)
-  // console.log('facilityDetails', '' + JSON.stringify(facilityDetails))
   const [isLoading, setLoading] = useState(false)
-  // const [facilityDetails, setfacilityDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
@@ -41,9 +38,7 @@ export function FacilityDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            facilityDetails = data.data.facilityWithAppointment.facility
-              ? data.data.facilityWithAppointment.facility
-              : {}
+            setFacilityDetails(data.data.facilityWithAppointment.facility || {})
 
             setLocationList(
               data.data.facilityWithAppointment &&
@@ -252,7 +247,7 @@ export function FacilityDetailsScreen() {
             <ScrollView className="h-[60%] flex-1">
               {appointmentList.map((data: any, index: number) => {
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     onPress={() => {
                       // router.push(
                       //   formatUrl(
@@ -285,7 +280,7 @@ export function FacilityDetailsScreen() {
                         </View>
                       </View>
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 )
               })}
             </ScrollView>
