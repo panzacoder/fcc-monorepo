@@ -6,13 +6,18 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { TodayCard } from './today-card'
+import { cssInterop } from 'nativewind'
+
+cssInterop(LinearGradient, {
+  className: { target: 'style' }
+})
 
 export function CircleSummaryCard({ memberData, userDetails }) {
   const [isSeeMore, setSeeMore] = useState(true)
 
   const fullName = userDetails.firstName + ' ' + userDetails.lastName
 
-  function buttonPressed() {}
+  function buttonPressed() { }
   return (
     <LinearGradient
       colors={['#103264', '#113263', '#319D9D']}
@@ -27,7 +32,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <Pressable className="" onPress={() => {}}>
+        <Pressable className="" onPress={() => { }}>
           <Feather name={'menu'} size={20} color={'#5ACC6C'} />
         </Pressable>
       </View>
