@@ -1,13 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Pressable
-} from 'react-native'
+import { View, Alert, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { CircleCard } from 'app/ui/circle-card'
