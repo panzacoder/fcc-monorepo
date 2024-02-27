@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
+import { BASE_URL, USER_LOGIN, GET_STATIC_DATA } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import headerAction from 'app/redux/header/headerAction'
+import staticAction from 'app/redux/staticData/staticAction'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
 import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
@@ -40,13 +41,33 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: '',
-      password: ''
+      email: 'sachaudhari0704@gmail.com',
+      password: 'Shubh@m27'
     },
     resolver: zodResolver(schema)
   })
-
+  async function getStaticData(header: any) {
+    setLoading(true)
+    let serviceUrl = `${BASE_URL}${GET_STATIC_DATA}`
+    let dataObject = {
+      header: header
+    }
+    CallPostService(serviceUrl, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          store.dispatch(staticAction.setStaticData(data.data))
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
   async function login(formData: Schema) {
+    console.log('formData', formData.email)
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`
@@ -94,6 +115,7 @@ export function LoginScreen() {
               })
             )
           }
+          getStaticData(data.data.header)
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))

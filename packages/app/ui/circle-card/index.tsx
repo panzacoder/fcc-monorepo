@@ -4,6 +4,7 @@ import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
+
 export function CircleCard(data: any) {
   const router = useRouter()
   const memberData = data.data
@@ -36,7 +37,6 @@ export function CircleCard(data: any) {
             </View>
             <View>
               <Typography className="font-400 ml-3  text-[18px] text-black">
-                {/* {fullName + "'s Circle"} */}
                 {fullName}
               </Typography>
               <Typography className="font-400 ml-3 text-[14px] text-[#1A1A1A]">

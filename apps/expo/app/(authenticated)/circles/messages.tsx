@@ -1,5 +1,10 @@
 import { MessagesScreen } from 'app/features/messages/screen'
-
+import { Stack } from 'expo-router'
 export default function Messages() {
-  return <MessagesScreen />
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Messages' }} />
+      <MessagesScreen />
+    </>
+  )
 }
