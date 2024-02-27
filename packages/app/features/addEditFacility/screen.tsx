@@ -1,14 +1,7 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Switch
-} from 'react-native'
+import { useState, useCallback } from 'react'
+import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -19,7 +12,6 @@ import {
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -28,6 +20,7 @@ import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+
 const schema = z.object({
   website: z.string(),
   username: z.string(),
@@ -48,10 +41,12 @@ const schema = z.object({
   state: z.number().min(0, { message: 'State is required' }),
   country: z.number().min(0, { message: 'Country is required' })
 })
+
 export type Schema = z.infer<typeof schema>
-let statesListFull = []
-let isThisPharmacy = false
+
 export function AddEditFacilityScreen() {
+  const [statesListFull, setFullStatesList] = useState([])
+  let isThisPharmacy = false
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
@@ -118,9 +113,9 @@ export function AddEditFacilityScreen() {
   async function createFacility(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state]
+    let stateObject = statesListFull[formData.state] || {}
     let countryObject: object = staticData.countryList[formData.country]
-    let object = {
+    let locationObject = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
       fax: formData.fax,
@@ -130,11 +125,13 @@ export function AddEditFacilityScreen() {
         line: formData.address,
         city: formData.city,
         zipCode: formData.postalCode,
-        state: stateObject
+        state: {
+          ...stateObject,
+          country: countryObject
+        }
       }
     }
-    object.address.state.country = countryObject
-    locationList.push(object)
+    locationList.push(locationObject)
     let loginURL = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
@@ -151,20 +148,10 @@ export function AddEditFacilityScreen() {
         facilityLocationList: locationList
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/facilityDetails', {
-          //     facilityDetails: JSON.stringify(
-          //       data.data.facility ? data.data.facility : {}
-          //     ),
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
           router.back()
         } else {
           Alert.alert('', data.message)
@@ -202,8 +189,9 @@ export function AddEditFacilityScreen() {
             }
           })
           setStateslist(statesList)
-          statesListFull = data.data.stateList ? data.data.stateList : []
-          // console.log('statesList', statesList)
+          if (data.data.statesList) {
+            setFullStatesList(data.data.stateList)
+          }
         } else {
           Alert.alert('', data.message)
         }
@@ -223,12 +211,6 @@ export function AddEditFacilityScreen() {
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
-      {/* <Image
-        source={require('app/assets/header.png')}
-        className="abosolute top-[-40]"
-        resizeMode={'contain'}
-        alt="logo"
-      /> */}
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">

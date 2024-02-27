@@ -1,27 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { consoleData } from 'app/ui/utils'
 import { BASE_URL, GET_MEMBER_DOCTORS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
+
 export function DoctorsScreen() {
   const [isLoading, setLoading] = useState(false)
   const [doctorList, setDoctorList] = useState([])
   const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
-  //   console.log('email', item ? item.memberData : '')
   useEffect(() => {
     async function getDoctorDetails() {
       setLoading(true)
