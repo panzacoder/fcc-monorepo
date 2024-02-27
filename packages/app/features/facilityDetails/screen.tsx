@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Image, Pressable, Alert, ScrollView } from 'react-native'
+import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -12,16 +12,18 @@ import { BASE_URL, GET_FACILITY_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-import { getAddressFromObject } from 'app/ui/utils'
 import { Button } from 'app/ui/button'
+import { Location } from 'app/ui/location'
 
 export function FacilityDetailsScreen() {
   const [facilityDetails, setFacilityDetails] = useState<any>({})
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
-  let facilityInfo = JSON.parse(item.facilityDetails)
+  let facilityInfo = item.facilityDetails
+    ? JSON.parse(item.facilityDetails)
+    : {}
   const [isLoading, setLoading] = useState(false)
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
@@ -70,12 +72,6 @@ export function FacilityDetailsScreen() {
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
-      <Image
-        source={require('app/assets/header.png')}
-        className="abosolute top-[-50]"
-        resizeMode={'contain'}
-        alt="logo"
-      />
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
@@ -149,67 +145,22 @@ export function FacilityDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.push(
-                    formatUrl(
-                      '/(authenticated)/circles/addEditDoctorLocation',
-                      {
-                        memberData: JSON.stringify(memberData),
-                        facilityDetails: JSON.stringify(facilityInfo)
-                      }
-                    )
+                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                      memberData: JSON.stringify(memberData),
+                      details: JSON.stringify(facilityInfo),
+                      component: 'Facility'
+                    })
                   )
                 }}
               />
             </View>
             <ScrollView className="">
               {locationList.map((data: any, index: number) => {
+                data.component = 'Facility'
+                data.doctorFacilityId = facilityInfo.id
                 return (
                   <View key={index}>
-                    <View className="mt-5 flex-row items-center">
-                      <View className=" flex-row">
-                        <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
-                          {data.nickName ? data.nickName : ''}
-                        </Typography>
-                        <Feather
-                          onPress={() => {}}
-                          name={'settings'}
-                          size={15}
-                          color={'black'}
-                        />
-                      </View>
-                      <View className="bg-primary  ml-2 h-[1px] w-full" />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
-                          {getAddressFromObject(
-                            data.address ? data.address : {}
-                          )}
-                        </Typography>
-                      </View>
-                      <Feather name={'navigation'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
-                          {'Phone:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.phone ? data.phone : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'phone'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                          {'Fax:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.fax ? data.fax : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'copy'} size={20} color={'black'} />
-                    </View>
+                    <Location data={data}></Location>
                   </View>
                 )
               })}
@@ -247,11 +198,11 @@ export function FacilityDetailsScreen() {
             <ScrollView className="h-[60%] flex-1">
               {appointmentList.map((data: any, index: number) => {
                 return (
-                  <Pressable
+                  <TouchableOpacity
                     onPress={() => {
                       // router.push(
                       //   formatUrl(
-                      //     '/(authenticated)/circles/addEditDoctorLocation',
+                      //     '/(authenticated)/circles/addEditLocation',
                       //     {
                       //       memberData: JSON.stringify(memberData),
                       //       facilityDetails: JSON.stringify(facilityInfo)
@@ -280,7 +231,7 @@ export function FacilityDetailsScreen() {
                         </View>
                       </View>
                     </View>
-                  </Pressable>
+                  </TouchableOpacity>
                 )
               })}
             </ScrollView>

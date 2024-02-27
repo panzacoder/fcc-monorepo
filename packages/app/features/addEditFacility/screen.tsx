@@ -1,7 +1,14 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback } from 'react'
-import { View, Alert, ScrollView } from 'react-native'
+import { useState, useEffect, useCallback } from 'react'
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Switch
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -9,9 +16,12 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   CREATE_FACILITY,
+  DELETE_FACILITY,
+  UPDATE_FACILITY,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,7 +30,6 @@ import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-
 const schema = z.object({
   website: z.string(),
   username: z.string(),
@@ -41,25 +50,31 @@ const schema = z.object({
   state: z.number().min(0, { message: 'State is required' }),
   country: z.number().min(0, { message: 'Country is required' })
 })
-
 export type Schema = z.infer<typeof schema>
-
+let statesListFull = []
+let isThisPharmacy = false
+let isFacilityActive = true
 export function AddEditFacilityScreen() {
-  const [statesListFull, setFullStatesList] = useState([])
-  let isThisPharmacy = false
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let facilityDetails = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
-  console.log('facilityDetails', JSON.stringify(facilityDetails))
-
+  // console.log('facilityDetails', JSON.stringify(facilityDetails))
+  if (!_.isEmpty(facilityDetails)) {
+    if (
+      facilityDetails.status &&
+      facilityDetails.status.status.toLowerCase() === 'inactive'
+    ) {
+      isFacilityActive = false
+    }
+  }
   const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(true)
+  const [isActive, setIsActive] = useState(isFacilityActive ? true : false)
   const [isPharmacy, setIsPharmacy] = useState(false)
   const [statesList, setStateslist] = useState([])
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
@@ -68,24 +83,23 @@ export function AddEditFacilityScreen() {
       value: index
     }
   })
-  async function getTypeIndex(type: string) {
-    const typeIndex = staticData.facilityTypeList.map(
-      (data: any, index: any) => {
-        if (data.type === type) {
-          return index
-        }
+
+  let facilityTypeIndex: any = -1
+  if (facilityDetails.type) {
+    // facilityTypeIndex = getTypeIndex(facilityDetails.type)
+    staticData.facilityTypeList.map((data: any, index: any) => {
+      if (data.type === facilityDetails.type) {
+        facilityTypeIndex = index
       }
-    )
-    return typeIndex
+    })
   }
+  // console.log('facilityTypeIndex', '' + facilityTypeIndex)
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       facilityName:
         facilityDetails && facilityDetails.name ? facilityDetails.name : '',
-      type:
-        facilityDetails && facilityDetails.type
-          ? getTypeIndex(facilityDetails.type)
-          : -1,
+      type: facilityTypeIndex,
       website:
         facilityDetails && facilityDetails.website
           ? facilityDetails.website
@@ -98,24 +112,109 @@ export function AddEditFacilityScreen() {
         facilityDetails && facilityDetails.websiteuser
           ? facilityDetails.websiteuser
           : '',
-      locationDesc: '',
-      locationShortName: '',
+      locationDesc: _.isEmpty(facilityDetails) ? '' : 'default',
+      locationShortName: _.isEmpty(facilityDetails) ? '' : 'default',
       address: '',
       city: '',
       postalCode: '',
       locationPhone: '',
       fax: '',
-      country: -1,
-      state: -1
+      country: _.isEmpty(facilityDetails) ? -1 : 0,
+      state: _.isEmpty(facilityDetails) ? -1 : 0
     },
     resolver: zodResolver(schema)
   })
+  async function deleteFacility() {
+    setLoading(true)
+    let loginURL = `${BASE_URL}${DELETE_FACILITY}`
+    let dataObject = {
+      header: header,
+      facility: {
+        id: facilityDetails.id ? facilityDetails.id : ''
+      }
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // console.log('createDoctor', JSON.stringify(data))
+          router.push(
+            formatUrl('/(authenticated)/circles/facilities', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+          // router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function updateFacility(formData: Schema) {
+    // console.log('in updateFacility')
+    // console.log('in updateFacility isFacilityActive', '' + isFacilityActive)
+    setLoading(true)
+    let loginURL = `${BASE_URL}${UPDATE_FACILITY}`
+    let dataObject = {
+      header: header,
+      facility: {
+        id: facilityDetails.id ? facilityDetails.id : '',
+        member: {
+          id: memberData.member
+        },
+        name: formData.facilityName,
+        ispharmacy: isThisPharmacy,
+        description: formData.description,
+        website: formData.website,
+        websiteuser: formData.username,
+        type: typesList[formData.type].label,
+        status: {
+          status: isFacilityActive === true ? 'Active' : 'Inactive',
+          id: isFacilityActive === true ? 1 : 2
+        }
+      }
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // console.log('createDoctor', JSON.stringify(data))
+
+          // let details: any = data.data.facility
+          //   ? JSON.stringify(data.data.facility)
+          //   : {}
+          // router.push(
+          //   formatUrl('/(authenticated)/circles/facilityDetails', {
+          //     facilityDetails: details,
+          //     memberData: JSON.stringify(memberData)
+          //   })
+          // )
+          router.push(
+            formatUrl('/(authenticated)/circles/facilities', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+          // router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
   async function createFacility(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state] || {}
+    let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let locationObject = {
+    let object = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
       fax: formData.fax,
@@ -125,13 +224,11 @@ export function AddEditFacilityScreen() {
         line: formData.address,
         city: formData.city,
         zipCode: formData.postalCode,
-        state: {
-          ...stateObject,
-          country: countryObject
-        }
+        state: stateObject
       }
     }
-    locationList.push(locationObject)
+    object.address.state.country = countryObject
+    locationList.push(object)
     let loginURL = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
@@ -148,10 +245,20 @@ export function AddEditFacilityScreen() {
         facilityLocationList: locationList
       }
     }
+    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          // console.log('createDoctor', JSON.stringify(data))
+          // router.push(
+          //   formatUrl('/(authenticated)/circles/facilityDetails', {
+          //     facilityDetails: JSON.stringify(
+          //       data.data.facility ? data.data.facility : {}
+          //     ),
+          //     memberData: JSON.stringify(memberData)
+          //   })
+          // )
           router.back()
         } else {
           Alert.alert('', data.message)
@@ -189,9 +296,8 @@ export function AddEditFacilityScreen() {
             }
           })
           setStateslist(statesList)
-          if (data.data.statesList) {
-            setFullStatesList(data.data.stateList)
-          }
+          statesListFull = data.data.stateList ? data.data.stateList : []
+          // console.log('statesList', statesList)
         } else {
           Alert.alert('', data.message)
         }
@@ -208,6 +314,7 @@ export function AddEditFacilityScreen() {
       : 101
     await getStates(countryId)
   }
+
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
@@ -215,19 +322,27 @@ export function AddEditFacilityScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
-              <View className="w-[50%] flex-row">
+              <View className="w-[45%] flex-row">
                 <ToggleSwitch
                   isOn={isActive}
                   onColor="#2884F9"
                   offColor="#2884F9"
                   size="medium"
-                  onToggle={(isOn) => setIsActive(!isActive)}
+                  onToggle={(isOn) => {
+                    if (isOn) {
+                      setIsActive(true)
+                      isFacilityActive = true
+                    } else {
+                      setIsActive(false)
+                      isFacilityActive = false
+                    }
+                  }}
                 />
                 <Typography className="font-400 ml-2 self-center">
                   {isActive ? 'Active' : 'InActive'}
                 </Typography>
               </View>
-              <View className="flex-row">
+              <View className=" flex-row">
                 <Button
                   className=""
                   title="Cancel"
@@ -238,9 +353,13 @@ export function AddEditFacilityScreen() {
                 />
                 <Button
                   className=""
-                  title="Save"
+                  title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
                   variant="default"
-                  onPress={handleSubmit(createFacility)}
+                  onPress={
+                    _.isEmpty(facilityDetails)
+                      ? handleSubmit(createFacility)
+                      : handleSubmit(updateFacility)
+                  }
                 />
               </View>
             </View>
@@ -385,6 +504,30 @@ export function AddEditFacilityScreen() {
                   </View>
                 </View>
               </View>
+            </View>
+          ) : (
+            <View />
+          )}
+          {!_.isEmpty(facilityDetails) ? (
+            <View className="mx-5 my-5">
+              <Button
+                className=""
+                title="Delete"
+                variant="borderRed"
+                onPress={() => {
+                  Alert.alert(
+                    'Are you sure about deleting Facility?',
+                    'It cannot be recovered once deleted.',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => deleteFacility()
+                      },
+                      { text: 'Cancel', onPress: () => {} }
+                    ]
+                  )
+                }}
+              />
             </View>
           ) : (
             <View />

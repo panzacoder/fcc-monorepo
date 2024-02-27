@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -12,23 +12,24 @@ import { BASE_URL, GET_DOCTOR_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-import { getAddressFromObject } from 'app/ui/utils'
+import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
 export function DoctorDetailsScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  const memberData = JSON.parse(item.memberData)
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
-  const doctorInfo = JSON.parse(item.doctorDetails)
-  const [doctorDetails, setDoctorDetails] = useState({} as any)
+  let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
+  // console.log('doctorDetails', '' + JSON.stringify(doctorInfo))
   const [isLoading, setLoading] = useState(false)
+  const [doctorDetails, setDoctorDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
     async function getDoctorDetails() {
       setLoading(true)
       let url = `${BASE_URL}${GET_DOCTOR_DETAILS}`
-      let dataObject = {
+      let dataObject = { 
         header: header,
         doctor: {
           id: doctorInfo.id ? doctorInfo.id : ''
@@ -87,7 +88,8 @@ export function DoctorDetailsScreen() {
                   router.push(
                     formatUrl('/(authenticated)/circles/addEditDoctor', {
                       memberData: JSON.stringify(memberData),
-                      doctorDetails: JSON.stringify(doctorDetails)
+                      doctorDetails: JSON.stringify(doctorDetails),
+                      component: 'Doctor'
                     })
                   )
                 }}
@@ -169,67 +171,22 @@ export function DoctorDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.push(
-                    formatUrl(
-                      '/(authenticated)/circles/addEditDoctorLocation',
-                      {
-                        memberData: JSON.stringify(memberData),
-                        doctorDetails: JSON.stringify(doctorInfo)
-                      }
-                    )
+                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                      memberData: JSON.stringify(memberData),
+                      details: JSON.stringify(doctorInfo),
+                      component: 'Doctor'
+                    })
                   )
                 }}
               />
             </View>
             <ScrollView className="">
               {locationList.map((data: any, index: number) => {
+                data.component = 'Doctor'
+                data.doctorFacilityId = doctorInfo.id
                 return (
                   <View key={index}>
-                    <View className="mt-5 flex-row items-center">
-                      <View className=" flex-row">
-                        <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
-                          {data.nickName ? data.nickName : ''}
-                        </Typography>
-                        <Feather
-                          onPress={() => {}}
-                          name={'settings'}
-                          size={15}
-                          color={'black'}
-                        />
-                      </View>
-                      <View className="bg-primary  ml-2 h-[1px] w-full" />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
-                          {getAddressFromObject(
-                            data.address ? data.address : {}
-                          )}
-                        </Typography>
-                      </View>
-                      <Feather name={'navigation'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                          {'Phone:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.phone ? data.phone : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'phone'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                          {'Fax:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.fax ? data.fax : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'copy'} size={20} color={'black'} />
-                    </View>
+                    <Location data={data}></Location>
                   </View>
                 )
               })}
@@ -271,7 +228,7 @@ export function DoctorDetailsScreen() {
                     onPress={() => {
                       // router.push(
                       //   formatUrl(
-                      //     '/(authenticated)/circles/addEditDoctorLocation',
+                      //     '/(authenticated)/circles/addEditLocation',
                       //     {
                       //       memberData: JSON.stringify(memberData),
                       //       doctorDetails: JSON.stringify(doctorInfo)

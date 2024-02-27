@@ -9,6 +9,8 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   CREATE_DOCTOR,
+  UPDATE_DOCTOR,
+  DELETE_DOCTOR,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -46,25 +48,40 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 let statesListFull = []
+let isDoctorActive = true
 export function AddEditDoctorScreen() {
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  // console.log('doctorDetails', JSON.stringify(doctorDetails))
+  console.log('doctorDetails', JSON.stringify(doctorDetails))
+  if (!_.isEmpty(doctorDetails)) {
+    if (
+      doctorDetails.status &&
+      doctorDetails.status.status.toLowerCase() === 'inactive'
+    ) {
+      isDoctorActive = false
+    }
+  }
+  let specializationListIndex: any = -1
+  if (doctorDetails.specialist) {
+    // facilityTypeIdex = getTypeIndex(facilityDetails.type)
+    staticData.specializationList.map((data: any, index: any) => {
+      if (data.specialization === doctorDetails.specialist) {
+        specializationListIndex = index
+      }
+    })
+  }
   const { control, handleSubmit } = useForm({
     defaultValues: {
       firstName:
         doctorDetails && doctorDetails.firstName ? doctorDetails.firstName : '',
       lastName:
         doctorDetails && doctorDetails.lastName ? doctorDetails.lastName : '',
-      specialization:
-        doctorDetails && doctorDetails.specialist
-          ? getSpecialistIndex(doctorDetails.specialist)
-          : -1,
+      specialization: specializationListIndex,
       phone: doctorDetails && doctorDetails.phone ? doctorDetails.phone : '',
       website:
         doctorDetails && doctorDetails.website ? doctorDetails.website : '',
@@ -74,20 +91,20 @@ export function AddEditDoctorScreen() {
           : '',
       portalWebsite:
         doctorDetails && doctorDetails.website ? doctorDetails.website : '',
-      locationDesc: '',
-      locationShortName: '',
+      locationDesc: _.isEmpty(doctorDetails) ? '' : 'default',
+      locationShortName: _.isEmpty(doctorDetails) ? '' : 'default',
       address: '',
       city: '',
       postalCode: '',
       locationPhone: '',
       fax: '',
-      country: -1,
-      state: -1
+      country: _.isEmpty(doctorDetails) ? -1 : 0,
+      state: _.isEmpty(doctorDetails) ? -1 : 0
     },
     resolver: zodResolver(schema)
   })
   const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(true)
+  const [isActive, setIsActive] = useState(isDoctorActive ? true : false)
   const [statesList, setStateslist] = useState([])
   const specializationList = staticData.specializationList.map(
     (data: any, index: any) => {
@@ -97,32 +114,97 @@ export function AddEditDoctorScreen() {
       }
     }
   )
-  async function getSpecialistIndex(specialization: any) {
-    // console.log('getSpecialistIndex', specialization)
-    const specializationCount = staticData.specializationList.map(
-      (data: any, index: any) => {
-        if (data.specialization == specialization) {
-          console.log('index', index)
-          return index
+
+  async function deleteDoctor() {
+    setLoading(true)
+    let loginURL = `${BASE_URL}${DELETE_DOCTOR}`
+    let dataObject = {
+      header: header,
+      doctor: {
+        id: doctorDetails.id
+      }
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // console.log('createDoctor', JSON.stringify(data))
+          router.push(
+            formatUrl('/(authenticated)/circles/doctors', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+          // router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function updateDoctor(formData: Schema) {
+    console.log('isDoctorActive updateDoctor', '' + isDoctorActive)
+    setLoading(true)
+    let loginURL = `${BASE_URL}${UPDATE_DOCTOR}`
+    let dataObject = {
+      header: header,
+      doctor: {
+        id: doctorDetails.id ? doctorDetails.id : '',
+        member: {
+          id: memberData.member
+        },
+        salutation: 'Dr',
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        website: formData.website,
+        websiteuser: formData.username,
+        specialist: specializationList[formData.specialization].label,
+        status: {
+          status: isDoctorActive === true ? 'Active' : 'InActive',
+          id: isDoctorActive === true ? 1 : 2
         }
       }
-    )
-    return specializationCount
-    // staticData.specializationList.map((data: any, index: any) => {
-    //   // console.log('data', data.specialization)
-    //   if (data.specialization.trim() === specialization.trim()) {
-    //     console.log('index', index)
-    //     return index
-    //   }
-    // })
-    // console.log('specializationCount', specializationCount)
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // console.log('createDoctor', JSON.stringify(data))
+          // let details: any = data.data.doctor
+          //   ? JSON.stringify(data.data.doctor)
+          //   : {}
+          // router.push(
+          //   formatUrl('/(authenticated)/circles/doctorDetails', {
+          //     doctorDetails: details,
+          //     memberData: JSON.stringify(memberData)
+          //   })
+          // )
+          router.push(
+            formatUrl('/(authenticated)/circles/doctors', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+          // router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
   }
   async function createDoctor(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let object = {
+    let addressObject = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
       fax: formData.fax,
@@ -136,8 +218,8 @@ export function AddEditDoctorScreen() {
         state: stateObject
       }
     }
-    object.address.state.country = countryObject
-    locationList.push(object)
+    addressObject.address.state.country = countryObject
+    locationList.push(addressObject)
     let loginURL = `${BASE_URL}${CREATE_DOCTOR}`
     let dataObject = {
       header: header,
@@ -163,15 +245,21 @@ export function AddEditDoctorScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
+          // let details: any = data.data.doctor
+          //   ? JSON.stringify(data.data.doctor)
+          //   : {}
           // router.push(
           //   formatUrl('/(authenticated)/circles/doctorDetails', {
-          //     doctorDetails: JSON.stringify(
-          //       data.data.doctor ? data.data.doctor : {}
-          //     ),
+          //     doctorDetails: details,
           //     memberData: JSON.stringify(memberData)
           //   })
           // )
-          router.back()
+          router.push(
+            formatUrl('/(authenticated)/circles/doctors', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -234,23 +322,26 @@ export function AddEditDoctorScreen() {
   return (
     <View className="flex-1 bg-white">
       <PtsLoader loading={isLoading} />
-      {/* <Image
-        source={require('app/assets/header.png')}
-        className="abosolute top-[-40]"
-        resizeMode={'contain'}
-        alt="logo"
-      /> */}
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
-              <View className="w-[50%] flex-row">
+              <View className="w-[45%] flex-row">
                 <ToggleSwitch
                   isOn={isActive}
                   onColor="#2884F9"
                   offColor="#2884F9"
                   size="medium"
-                  onToggle={(isOn) => setIsActive(!isActive)}
+                  onToggle={(isOn) => {
+                    if (isOn) {
+                      setIsActive(true)
+                      isDoctorActive = true
+                    } else {
+                      setIsActive(false)
+                      isDoctorActive = false
+                    }
+                    console.log('isDoctorActive', '' + isDoctorActive)
+                  }}
                 />
                 <Typography className="font-400 ml-2 self-center">
                   {isActive ? 'Active' : 'InActive'}
@@ -267,9 +358,13 @@ export function AddEditDoctorScreen() {
                 />
                 <Button
                   className=""
-                  title="Save"
+                  title={_.isEmpty(doctorDetails) ? 'Save' : 'Update'}
                   variant="default"
-                  onPress={handleSubmit(createDoctor)}
+                  onPress={
+                    _.isEmpty(doctorDetails)
+                      ? handleSubmit(createDoctor)
+                      : handleSubmit(updateDoctor)
+                  }
                 />
               </View>
             </View>
@@ -431,9 +526,19 @@ export function AddEditDoctorScreen() {
               <Button
                 className=""
                 title="Delete"
-                variant="border"
+                variant="borderRed"
                 onPress={() => {
-                  router.back()
+                  Alert.alert(
+                    'Are you sure about deleting Doctor?',
+                    'It cannot be recovered once deleted.',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => deleteDoctor()
+                      },
+                      { text: 'Cancel', onPress: () => {} }
+                    ]
+                  )
                 }}
               />
             </View>

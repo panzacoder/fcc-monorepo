@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import moment from 'moment-timezone'
-
+import { Alert, Platform, Linking } from 'react-native'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -15,6 +15,21 @@ export const isNull = (input: any) => {
   }
   return false
 }
+export function googleMapOpenUrl(address: string) {
+  var url =
+    'https://www.google.com/maps/dir/?api=1&travelmode=driving&dir_action=navigate&destination=' +
+    address
+  Linking.canOpenURL(url)
+    .then((supported) => {
+      if (!supported) {
+        console.log("Can't handle url: " + url)
+      } else {
+        return Linking.openURL(url)
+      }
+    })
+    .catch((err) => console.error('An error occurred', err))
+}
+
 export function getAddressFromObject(address: object) {
   if (isNull(address)) {
     return ''

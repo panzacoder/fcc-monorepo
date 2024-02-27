@@ -113,8 +113,8 @@ export function DoctorsScreen() {
                 <Typography
                   className={
                     data.status.toLowerCase() === 'active'
-                      ? "ml-5 mr-5 rounded-[20px] bg-['#83D991'] px-5 text-right"
-                      : "ml-5 mr-5 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
+                      ? "ml-2 rounded-[20px] bg-['#83D991'] px-5 text-right"
+                      : "ml2- rounded-[20px] bg-['#ffcccb'] px-5 text-right"
                   }
                 >
                   {data.status ? data.status : ''}

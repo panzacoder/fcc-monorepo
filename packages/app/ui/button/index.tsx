@@ -52,6 +52,10 @@ const buttonVariants = tv({
       border: {
         button: 'border-primary border-[2px]',
         text: 'text-primary '
+      },
+      borderRed: {
+        button: 'border-[2px] border-[#E43A39]',
+        text: 'text-primary text-[#E43A39]'
       }
     },
     size: {
