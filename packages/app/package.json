@@ -1,7 +1,13 @@
 {
   "version": "0.0.0",
+  "private": true,
   "name": "app",
-  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./config/tailwind/theme": "./config/tailwind/theme.js",
+    "./config/tailwind/global.css": "./config/tailwind/global.css"
+  },
+  "type": "module",
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "class-variance-authority": "^0.7.0",
