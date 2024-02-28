@@ -25,10 +25,9 @@ import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useRouter } from 'solito/navigation'
+import ct from 'countries-and-timezones'
+import moment from 'moment-timezone'
 const schema = z.object({
-  locationDesc: z
-    .string()
-    .min(1, { message: 'Location description is required' }),
   locationShortName: z
     .string()
     .min(1, { message: 'Location short name is required' }),
@@ -62,36 +61,6 @@ export function AddEditLocationScreen() {
   const [isLoading, setLoading] = useState(false)
   const [statesList, setStatesList] = useState([])
   const [statesListFull, setStatesListFull] = useState([])
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      locationDesc: !_.isEmpty(locationDetails)
-        ? locationDetails.shortDescription
-        : '',
-      locationShortName: !_.isEmpty(locationDetails)
-        ? locationDetails.nickName
-        : '',
-      address: !_.isEmpty(locationDetails) ? locationDetails.address.line : '',
-      city: !_.isEmpty(locationDetails) ? locationDetails.address.city : '',
-      postalCode: !_.isEmpty(locationDetails)
-        ? locationDetails.address.zipCode
-        : '',
-      phone:
-        !_.isEmpty(locationDetails) && locationDetails.phone
-          ? locationDetails.phone
-          : '',
-      fax:
-        !_.isEmpty(locationDetails) && locationDetails.fax
-          ? locationDetails.fax
-          : '',
-      website:
-        !_.isEmpty(locationDetails) && locationDetails.website
-          ? locationDetails.website
-          : '',
-      country: countryIndex,
-      state: stateIndex
-    },
-    resolver: zodResolver(schema)
-  })
 
   const countryList = staticData.countryList.map((data: any, index: any) => {
     return {
@@ -117,6 +86,7 @@ export function AddEditLocationScreen() {
               value: index
             }
           })
+          // setCountriesList(countryList)
           setStatesList(list)
           setStatesListFull(data.data.stateList || [])
           if (!_.isEmpty(locationDetails)) {
@@ -142,26 +112,55 @@ export function AddEditLocationScreen() {
 
   useEffect(() => {
     async function setCountryState() {
-      // setLoading(true)
+      let countryName = ''
       if (!_.isEmpty(locationDetails)) {
-        // console.log('setCountryState')
-        let countryName = locationDetails.address.state.country.name
+        countryName = locationDetails.address.state.country.name
           ? locationDetails.address.state.country.name
           : ''
-        staticData.countryList.map((data: any, index: any) => {
-          if (data.name === countryName) {
-            countryIndex = index
-          }
-        })
-        let countryId = staticData.countryList[countryIndex].id
-          ? staticData.countryList[countryIndex].id
-          : -1
-        await getStates(countryId)
-        // console.log('countryIndex', countryIndex)
+      } else {
+        let newTimeZone = moment.tz.guess()
+        const countryObject = ct.getCountriesForTimezone(newTimeZone)
+        countryName = countryObject[0]?.name ? countryObject[0].name : ''
       }
+      staticData.countryList.map(async (data: any, index: any) => {
+        if (data.name === countryName) {
+          countryIndex = index
+        }
+      })
+      let countryId = staticData.countryList[countryIndex].id
+        ? staticData.countryList[countryIndex].id
+        : 101
+      await getStates(countryId)
     }
     setCountryState()
   }, [])
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      locationShortName: !_.isEmpty(locationDetails)
+        ? locationDetails.nickName
+        : '',
+      address: !_.isEmpty(locationDetails) ? locationDetails.address.line : '',
+      city: !_.isEmpty(locationDetails) ? locationDetails.address.city : '',
+      postalCode: !_.isEmpty(locationDetails)
+        ? locationDetails.address.zipCode
+        : '',
+      phone:
+        !_.isEmpty(locationDetails) && locationDetails.phone
+          ? locationDetails.phone
+          : '',
+      fax:
+        !_.isEmpty(locationDetails) && locationDetails.fax
+          ? locationDetails.fax
+          : '',
+      website:
+        !_.isEmpty(locationDetails) && locationDetails.website
+          ? locationDetails.website
+          : '',
+      country: !_.isEmpty(locationDetails) ? countryIndex : 96,
+      state: !_.isEmpty(locationDetails) ? stateIndex : -1
+    },
+    resolver: zodResolver(schema)
+  })
   async function setSelectedCountryChange(value: any) {
     let countryId = staticData.countryList[value].id
       ? staticData.countryList[value].id
@@ -172,7 +171,7 @@ export function AddEditLocationScreen() {
     setLoading(true)
     let url = ''
     let dataObject = {}
-    if (locationDetails.component === 'Doctor') {
+    if (item.component === 'Doctor') {
       url = `${BASE_URL}${DELETE_DOCTOR_LOCATION}`
       dataObject = {
         header: header,
@@ -200,18 +199,34 @@ export function AddEditLocationScreen() {
       }
     }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
-          // router.push(
+          // router.replace(
           //   formatUrl('/(authenticated)/circles/doctors', {
           //     memberData: JSON.stringify(memberData)
           //   })
           // )
-          router.back()
+          // router.back()
+          let details: any = data.data ? JSON.stringify(data.data) : {}
+          if (item.component === 'Doctor') {
+            router.replace(
+              formatUrl('/(authenticated)/circles/doctorDetails', {
+                doctorDetails: details,
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          } else {
+            // router.replace(
+            //   formatUrl('/(authenticated)/circles/facilityDetails', {
+            //     facilityDetails: details,
+            //     memberData: JSON.stringify(memberData)
+            //   })
+            // )
+            router.back()
+          }
         } else {
           Alert.alert('', data.message)
         }
@@ -228,7 +243,7 @@ export function AddEditLocationScreen() {
     let dataObject = {}
     let addressObject = {
       operation: 'add',
-      shortDescription: formData.locationDesc,
+      shortDescription: formData.locationShortName,
       nickName: formData.locationShortName,
       fax: formData.fax,
       website: formData.website,
@@ -241,7 +256,7 @@ export function AddEditLocationScreen() {
         state: stateObject
       }
     }
-    if (locationDetails.component === 'Doctor') {
+    if (item.component === 'Doctor') {
       dataObject = {
         header: header,
         doctorLocation: addressObject
@@ -286,7 +301,7 @@ export function AddEditLocationScreen() {
     }
 
     if (!_.isEmpty(locationDetails)) {
-      if (locationDetails.component === 'Doctor') {
+      if (item.component === 'Doctor') {
         dataObject.doctorLocation.id = locationDetails.id
       } else {
         dataObject.facilityLocation.id = locationDetails.id
@@ -294,7 +309,7 @@ export function AddEditLocationScreen() {
     }
 
     let url = ''
-    if (locationDetails.component === 'Doctor') {
+    if (item.component === 'Doctor') {
       url = _.isEmpty(locationDetails)
         ? `${BASE_URL}${CREATE_DOCTOR_LOCATION}`
         : `${BASE_URL}${UPDATE_DOCTOR_LOCATION}`
@@ -308,13 +323,35 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.back()
+          // router.back()
           // router.push(
           //   formatUrl('/(authenticated)/circles/doctorDetails', {
           //     doctorDetails: JSON.stringify(data.data.doctor),
           //     memberData: JSON.stringify(memberData)
           //   })
           // )
+          if (item.component === 'Doctor') {
+            let details: any = data.data.doctor
+              ? JSON.stringify(data.data.doctor)
+              : {}
+            router.replace(
+              formatUrl('/(authenticated)/circles/doctorDetails', {
+                doctorDetails: details,
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          } else {
+            // let details: any = data.data.facility
+            //   ? JSON.stringify(data.data.facility)
+            //   : {}
+            // router.replace(
+            //   formatUrl('/(authenticated)/circles/facilityDetails', {
+            //     facilityDetails: details,
+            //     memberData: JSON.stringify(memberData)
+            //   })
+            // )
+            router.back()
+          }
         } else {
           Alert.alert('', data.message)
         }
@@ -355,13 +392,6 @@ export function AddEditLocationScreen() {
             </View>
             <View className="my-5 w-full">
               <View className="flex w-full gap-2">
-                <ControlledTextField
-                  control={control}
-                  name="locationDesc"
-                  placeholder={'Location Description'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
                 <ControlledTextField
                   control={control}
                   name="locationShortName"

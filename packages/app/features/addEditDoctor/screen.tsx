@@ -175,20 +175,20 @@ export function AddEditDoctorScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
-          // let details: any = data.data.doctor
-          //   ? JSON.stringify(data.data.doctor)
-          //   : {}
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctorDetails', {
-          //     doctorDetails: details,
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          router.push(
-            formatUrl('/(authenticated)/circles/doctors', {
+          let details: any = data.data.doctor
+            ? JSON.stringify(data.data.doctor)
+            : {}
+          router.replace(
+            formatUrl('/(authenticated)/circles/doctorDetails', {
+              doctorDetails: details,
               memberData: JSON.stringify(memberData)
             })
           )
+          // router.push(
+          //   formatUrl('/(authenticated)/circles/doctors', {
+          //     memberData: JSON.stringify(memberData)
+          //   })
+          // )
           // router.back()
         } else {
           Alert.alert('', data.message)

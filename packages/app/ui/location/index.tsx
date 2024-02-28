@@ -18,9 +18,12 @@ export function Location(data: any, component: any) {
             <Feather
               onPress={() => {
                 // console.log('component', JSON.stringify(locationData))
-                router.push(
+                router.replace(
                   formatUrl('/(authenticated)/circles/addEditLocation', {
-                    locationDetails: JSON.stringify(locationData)
+                    locationDetails: JSON.stringify(locationData),
+                    component: locationData.component
+                      ? locationData.component
+                      : ''
                   })
                 )
               }}

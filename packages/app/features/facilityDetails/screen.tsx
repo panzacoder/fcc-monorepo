@@ -144,7 +144,7 @@ export function FacilityDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.push(
+                  router.replace(
                     formatUrl('/(authenticated)/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(facilityInfo),

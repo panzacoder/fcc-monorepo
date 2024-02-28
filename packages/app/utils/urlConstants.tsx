@@ -26,3 +26,6 @@ export const DELETE_FACILITY_LOCATION = 'facilityms/deleteLocation'
 export const DELETE_FACILITY = 'facilityms/delete'
 export const UPDATE_FACILITY = 'facilityms/update'
 export const UPDATE_FACILITY_LOCATION = 'facilityms/updateLocation'
+export const GET_APPOINTMENTS = 'appointmentms/getFilteredList'
+export const GET_MEMBER_MENUS = 'memberms/getMemberWithMenus';
+export const GET_APPOINTMENT_DETAILS = 'appointmentms/getAppointmentWithPreviousAppointment';

@@ -8,9 +8,11 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/drawer": "^6.6.7",
+    "countries-and-timezones": "^3.6.0",
     "expo-device": "^5.9.3",
     "expo-image": "1.10.6",
     "expo-linear-gradient": "~12.7.1",
+    "expo-localization": "^14.8.3",
     "moment-timezone": "^0.5.45",
     "react": "18.2.0",
     "react-dom": "18.2.0",

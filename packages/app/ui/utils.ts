@@ -2,6 +2,12 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import moment from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
+import store from '../redux/store'
+
+export const DATE_CONSTANT = {
+  FULL_DATE: 'DD MMM YYYY hh:mm A'
+  // FULL_DATE: 'MMM DD, YYYY'
+}
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -104,6 +110,49 @@ export function getAddressFromObject(address: object) {
 }
 export const getFullDateForCalender = (time: any, formatType: any) => {
   return moment(time).format(formatType)
+}
+function getTimezoneName(timezone: any) {
+  let userData = store.getState().userProfileState.header.address
+  // console.log('getTimezoneName', userData);
+  let timeZoneName = null
+  let memberData = store.getState().currentMemberAddress.currentMemberAddress
+  if (timezone) {
+    timeZoneName = timezone
+  } else if (memberData.timezone ? memberData.timezone.name : false) {
+    timeZoneName = memberData.timezone.name
+  } else if (
+    userData !== null
+      ? userData.timezone !== null
+        ? userData.timezone.name
+        : false
+      : false
+  ) {
+    timeZoneName = userData.timezone.name
+  }
+
+  if (timeZoneName) {
+    return timeZoneName
+  } else {
+    return moment.tz.guess()
+  }
+}
+export const getFullDate = (date: any) => {
+  return moment(date).format(DATE_CONSTANT.FULL_DATE)
+}
+export const getDay = (date: any) => {
+  // console.log('date./.', date)
+  var time = moment(date).format('hh:mm A')
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  var formatDate = moment(date).format('MMM DD, YYYY')
+  return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
+}
+export const formatTimeToUserLocalTime = (time: any, timezone: any) => {
+  let timeZoneName = getTimezoneName(timezone)
+  if (timeZoneName) {
+    return `${getDay(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
+  } else {
+    return getFullDate(moment(time).utc(true))
+  }
 }
 export const getNameInitials = (fullName: string) => {
   let fullNameStr = fullName.split(' ')
