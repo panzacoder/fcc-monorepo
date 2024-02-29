@@ -111,14 +111,12 @@ export function getAddressFromObject(address: object) {
 export const getFullDateForCalender = (time: any, formatType: any) => {
   return moment(time).format(formatType)
 }
-function getTimezoneName(timezone: any) {
+function getTimezoneName() {
   let userData = store.getState().userProfileState.header.address
   // console.log('getTimezoneName', userData);
   let timeZoneName = null
   let memberData = store.getState().currentMemberAddress.currentMemberAddress
-  if (timezone) {
-    timeZoneName = timezone
-  } else if (memberData.timezone ? memberData.timezone.name : false) {
+  if (memberData.timezone ? memberData.timezone.name : false) {
     timeZoneName = memberData.timezone.name
   } else if (
     userData !== null
@@ -136,6 +134,7 @@ function getTimezoneName(timezone: any) {
     return moment.tz.guess()
   }
 }
+
 export const getFullDate = (date: any) => {
   return moment(date).format(DATE_CONSTANT.FULL_DATE)
 }
@@ -146,8 +145,16 @@ export const getDay = (date: any) => {
   var formatDate = moment(date).format('MMM DD, YYYY')
   return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
 }
-export const formatTimeToUserLocalTime = (time: any, timezone: any) => {
-  let timeZoneName = getTimezoneName(timezone)
+export const convertTimeToUserLocalTime = (time: any) => {
+  let timeZoneName = getTimezoneName()
+  if (timeZoneName) {
+    return `${getFullDate(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
+  } else {
+    return getFullDate(moment(time).utc(true))
+  }
+}
+export const formatTimeToUserLocalTime = (time: any) => {
+  let timeZoneName = getTimezoneName()
   if (timeZoneName) {
     return `${getDay(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
   } else {

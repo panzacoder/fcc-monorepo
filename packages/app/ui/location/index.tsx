@@ -4,42 +4,51 @@ import { Feather } from 'app/ui/icons'
 import { useRouter } from 'solito/navigation'
 import { getAddressFromObject, googleMapOpenUrl } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
-export function Location(data: any, component: any) {
+export function Location(data: any) {
   const router = useRouter()
-  let locationData = data.data
+  let locationData = data.data ? data.data : {}
+  // console.log('locationData', locationData.component)
+  function getWebsite(url: string) {
+    let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
+    return newUrl
+  }
   return (
     <View>
       {locationData.nickName && locationData.nickName !== '' ? (
-        <View className="mt-5 flex-row items-center">
-          <View className=" flex-row">
+        <View className="mt-2 flex-row items-center">
+          <View className="flex-row">
             <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
               {locationData.nickName ? locationData.nickName : ''}
             </Typography>
-            <Feather
-              onPress={() => {
-                // console.log('component', JSON.stringify(locationData))
-                router.replace(
-                  formatUrl('/(authenticated)/circles/addEditLocation', {
-                    locationDetails: JSON.stringify(locationData),
-                    component: locationData.component
-                      ? locationData.component
-                      : ''
-                  })
-                )
-              }}
-              name={'settings'}
-              size={15}
-              color={'black'}
-            />
+            {locationData.component !== 'Appointment' ? (
+              <Feather
+                onPress={() => {
+                  // console.log('component', JSON.stringify(locationData))
+                  router.replace(
+                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                      locationDetails: JSON.stringify(locationData),
+                      component: locationData.component
+                        ? locationData.component
+                        : ''
+                    })
+                  )
+                }}
+                name={'settings'}
+                size={15}
+                color={'black'}
+              />
+            ) : (
+              <View />
+            )}
           </View>
-          <View className="bg-primary  ml-2 h-[1px] w-full" />
+          <View className="bg-primary h-[1px] w-full" />
         </View>
       ) : (
         <View />
       )}
       {locationData.address && locationData.address !== '' ? (
         <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[90%] flex-row">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>
@@ -64,7 +73,7 @@ export function Location(data: any, component: any) {
           }}
           className="ml-2 mt-2 w-full flex-row items-center"
         >
-          <View className="w-[90%] flex-row">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Phone:'}
             </Typography>
@@ -80,8 +89,8 @@ export function Location(data: any, component: any) {
 
       {locationData.fax && locationData.fax !== '' ? (
         <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[90%] flex-row">
-            <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
+          <View className="w-[95%] flex-row">
+            <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Fax:'}
             </Typography>
             <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
@@ -90,6 +99,26 @@ export function Location(data: any, component: any) {
           </View>
           <Feather name={'copy'} size={20} color={'black'} />
         </View>
+      ) : (
+        <View />
+      )}
+      {locationData.website && locationData.website !== '' ? (
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL(`http://${getWebsite(locationData.website)}`)
+          }}
+          className="ml-2 mt-2 w-full flex-row items-center"
+        >
+          <View className="w-[95%] flex-row">
+            <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
+              {'Website:'}
+            </Typography>
+            <Typography className="font-400 text-primary ml-2 w-[70%] text-[16px] font-bold">
+              {locationData.website ? locationData.website : ''}
+            </Typography>
+          </View>
+          <Feather name={'globe'} size={20} color={'black'} />
+        </TouchableOpacity>
       ) : (
         <View />
       )}

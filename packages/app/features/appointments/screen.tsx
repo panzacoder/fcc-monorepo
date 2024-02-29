@@ -127,7 +127,7 @@ export function AppointmentsScreen() {
               </View>
               <View className="flex-row">
                 <Typography className="font-400 ml-5 w-[74%] text-black">
-                  {data.date ? formatTimeToUserLocalTime(data.date, null) : ''}
+                  {data.date ? formatTimeToUserLocalTime(data.date) : ''}
                 </Typography>
                 <Typography className="font-400 ml-5 text-black">
                   {data.type.toLowerCase() === 'doctor appointment'

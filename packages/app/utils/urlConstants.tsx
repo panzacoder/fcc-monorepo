@@ -29,3 +29,6 @@ export const UPDATE_FACILITY_LOCATION = 'facilityms/updateLocation'
 export const GET_APPOINTMENTS = 'appointmentms/getFilteredList'
 export const GET_MEMBER_MENUS = 'memberms/getMemberWithMenus';
 export const GET_APPOINTMENT_DETAILS = 'appointmentms/getAppointmentWithPreviousAppointment';
+export const DELETE_APPOINTMENT_NOTE = 'appointmentms/deleteNote';
+export const CREATE_APPOINTMENT_NOTE = 'appointmentms/createNote';
+export const UPDATE_APPOINTMENT_NOTE = 'appointmentms/updateNote';

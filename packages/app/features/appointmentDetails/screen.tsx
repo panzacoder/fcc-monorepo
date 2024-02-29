@@ -7,25 +7,30 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { getFullDateForCalender } from 'app/ui/utils'
 import { BASE_URL, GET_APPOINTMENT_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
+import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { Location } from 'app/ui/location'
+import { Note } from 'app/ui/appointmentNote'
+import { AddEditNote } from 'app/ui/addEditNote'
 import { Button } from 'app/ui/button'
 
 export function AppointmentDetailsScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
+  const [isAddNote, setIsAddNote] = useState(false)
+  const [isRender, setIsRender] = useState(false)
+  const [noteData, setNoteData] = useState({})
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [notesList, setNotesList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
   const getAppointmentDetails = useCallback(async () => {
     setLoading(true)
@@ -53,6 +58,14 @@ export function AppointmentDetailsScreen() {
             setAppointmentDetails(
               data.data.appointmentWithPreviousAppointment.appointment
             )
+            if (
+              data.data.appointmentWithPreviousAppointment.appointment.noteList
+            ) {
+              setNotesList(
+                data.data.appointmentWithPreviousAppointment.appointment
+                  .noteList
+              )
+            }
           }
           setIsDataReceived(true)
         } else {
@@ -66,15 +79,38 @@ export function AppointmentDetailsScreen() {
       })
   }, [])
   useEffect(() => {
-    getAppointmentDetails()
+    if (!isAddNote) {
+      getAppointmentDetails()
+    }
   }, [])
-  let doctorName = ''
-  let specialist = ''
-  let phone = ''
-  let email = ''
-  let website = ''
-  let websiteUser = ''
+  let doctorName = '',
+    specialist = '',
+    phone = '',
+    email = '',
+    website = '',
+    websiteUser = '',
+    apptDate = '',
+    status = '',
+    purpose = '',
+    description = ''
+  let doctorAddress = {}
   if (!_.isEmpty(appointmentDetails)) {
+    if (appointmentDetails.date) {
+      apptDate = formatTimeToUserLocalTime(appointmentDetails.date)
+    }
+    if (appointmentDetails.status && appointmentDetails.status.status) {
+      status = appointmentDetails.status.status
+    }
+    if (appointmentDetails.purpose) {
+      purpose = appointmentDetails.purpose
+    }
+    if (appointmentDetails.description) {
+      description = appointmentDetails.description
+    }
+    if (appointmentDetails.doctorLocation) {
+      doctorAddress = appointmentDetails.doctorLocation
+      doctorAddress.component = 'Appointment'
+    }
     if (
       appointmentDetails.doctorLocation &&
       appointmentDetails.doctorLocation.doctor
@@ -102,6 +138,46 @@ export function AppointmentDetailsScreen() {
       }
     }
   }
+  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  const refreshData = (isCancel: boolean) => {
+    // console.log('in refreshData')
+    if (!isCancel) {
+      getAppointmentDetails()
+      setIsRender(!isRender)
+    }
+    setIsAddNote(false)
+  }
+  const editNote = (noteData: any) => {
+    // console.log('noteData', JSON.stringify(noteData))
+    setNoteData(noteData)
+    setIsAddNote(true)
+  }
+  function getDetailsView(
+    title: string,
+    value: string,
+    isIcon: boolean,
+    iconValue: any
+  ) {
+    return (
+      <View className="mt-2 w-full flex-row items-center">
+        <View className="w-full flex-row">
+          <Typography className={titleStyle}>{title}</Typography>
+          <Typography className={valueStyle}>{value}</Typography>
+        </View>
+        {isIcon ? (
+          <Feather
+            className="ml-[-10px]"
+            name={iconValue}
+            size={20}
+            color={'black'}
+          />
+        ) : (
+          <View />
+        )}
+      </View>
+    )
+  }
   return (
     <View className="flex-1 ">
       <PtsLoader loading={isLoading} />
@@ -111,11 +187,11 @@ export function AppointmentDetailsScreen() {
             <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View className=" w-full flex-row items-center">
                 <View className="w-[80%] flex-row">
-                  <Typography className=" font-400 w-[50%] text-[16px] text-[#86939e]">
+                  <Typography className=" font-400 w-[50%] text-[15px] text-[#86939e]">
                     {doctorName}
                   </Typography>
                   <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
-                  <Typography className="font-400 text-primary ml-2 text-[16px]">
+                  <Typography className="font-400 text-primary ml-2 text-[15px]">
                     {specialist}
                   </Typography>
                 </View>
@@ -134,52 +210,74 @@ export function AppointmentDetailsScreen() {
                   }}
                 />
               </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400  w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Phone:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]">
-                    {phone}
-                  </Typography>
-                </View>
-                <Feather name={'phone'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400  w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Email:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]">
-                    {email}
-                  </Typography>
-                </View>
-                <Feather name={'mail'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400  w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Website:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]">
-                    {website}
-                  </Typography>
-                </View>
-                <Feather name={'globe'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Username:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]">
-                    {websiteUser}
-                  </Typography>
-                </View>
-                <Feather name={'copy'} size={20} color={'black'} />
+              {getDetailsView('Phone:', phone, true, 'phone')}
+              {getDetailsView('Email:', email, true, 'mail')}
+              {getDetailsView('Website:', website, true, 'globe')}
+              {getDetailsView('Username:', websiteUser, true, 'copy')}
+              <View className="my-3 h-[1px] w-full self-center bg-[##86939e]" />
+              {getDetailsView('Date:', apptDate, false, '')}
+              {getDetailsView('Purpose:', status, false, '')}
+              {getDetailsView('Status:', purpose, false, '')}
+              {getDetailsView('Description:', description, false, '')}
+            </View>
+            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <Typography className="font-[15px] font-bold text-[#287CFA]">
+                {'Location Details'}
+              </Typography>
+              <View className="w-full">
+                <Location data={doctorAddress}></Location>
               </View>
             </View>
+
+            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <View className=" w-full flex-row items-center">
+                <View className="w-[60%] flex-row">
+                  <Typography className="font-400 text-[16px] font-bold text-black">
+                    {'Notes'}
+                  </Typography>
+                </View>
+                <Button
+                  className=""
+                  title="Add Note"
+                  leadingIcon="plus"
+                  variant="border"
+                  onPress={() => {
+                    setNoteData({})
+                    setIsAddNote(true)
+                  }}
+                />
+              </View>
+
+              {notesList.length > 0 ? (
+                <ScrollView className="">
+                  {notesList.map((data: any, index: number) => {
+                    return (
+                      <View key={index}>
+                        <Note
+                          data={data}
+                          refreshData={refreshData}
+                          editNote={editNote}
+                        ></Note>
+                      </View>
+                    )
+                  })}
+                </ScrollView>
+              ) : (
+                <View />
+              )}
+            </View>
           </ScrollView>
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddNote ? (
+        <View className="h-full w-full justify-center self-center">
+          <AddEditNote
+            noteData={noteData}
+            appointmentId={appointmentDetails.id}
+            refreshData={refreshData}
+          />
         </View>
       ) : (
         <View />
