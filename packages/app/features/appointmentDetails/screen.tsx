@@ -14,7 +14,9 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/appointmentNote'
+import { Reminder } from 'app/ui/appointmentReminder'
 import { AddEditNote } from 'app/ui/addEditNote'
+import { AddEditReminder } from 'app/ui/addEditReminder'
 import { Button } from 'app/ui/button'
 
 export function AppointmentDetailsScreen() {
@@ -27,10 +29,13 @@ export function AppointmentDetailsScreen() {
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
+  const [isAddRemider, setIsAddReminder] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [noteData, setNoteData] = useState({})
+  const [reminderData, setReminderData] = useState({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [notesList, setNotesList] = useState([])
+  const [remindersList, setRemindersList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
   const getAppointmentDetails = useCallback(async () => {
     setLoading(true)
@@ -64,6 +69,15 @@ export function AppointmentDetailsScreen() {
               setNotesList(
                 data.data.appointmentWithPreviousAppointment.appointment
                   .noteList
+              )
+            }
+            if (
+              data.data.appointmentWithPreviousAppointment.appointment
+                .reminderList
+            ) {
+              setRemindersList(
+                data.data.appointmentWithPreviousAppointment.appointment
+                  .reminderList
               )
             }
           }
@@ -147,11 +161,17 @@ export function AppointmentDetailsScreen() {
       setIsRender(!isRender)
     }
     setIsAddNote(false)
+    setIsAddReminder(false)
   }
   const editNote = (noteData: any) => {
     // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
+  }
+  const editReminder = (remiderData: any) => {
+    console.log('remiderData', JSON.stringify(remiderData))
+    setReminderData(remiderData)
+    setIsAddReminder(true)
   }
   function getDetailsView(
     title: string,
@@ -257,7 +277,46 @@ export function AppointmentDetailsScreen() {
                           data={data}
                           refreshData={refreshData}
                           editNote={editNote}
-                        ></Note>
+                        />
+                      </View>
+                    )
+                  })}
+                </ScrollView>
+              ) : (
+                <View />
+              )}
+            </View>
+
+            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <View className=" w-full flex-row items-center">
+                <View className="w-[50%] flex-row">
+                  <Typography className="font-400 text-[16px] font-bold text-black">
+                    {'Reminders'}
+                  </Typography>
+                </View>
+                <Button
+                  className=""
+                  title="Add Reminder"
+                  leadingIcon="plus"
+                  variant="border"
+                  onPress={() => {
+                    setReminderData({})
+                    setIsAddReminder(true)
+                  }}
+                />
+              </View>
+
+              {remindersList.length > 0 ? (
+                <ScrollView className="">
+                  {remindersList.map((data: any, index: number) => {
+                    data.apointmentId = appointmentDetails.id
+                    return (
+                      <View key={index}>
+                        <Reminder
+                          data={data}
+                          refreshData={refreshData}
+                          editReminder={editReminder}
+                        />
                       </View>
                     )
                   })}
@@ -275,6 +334,17 @@ export function AppointmentDetailsScreen() {
         <View className="h-full w-full justify-center self-center">
           <AddEditNote
             noteData={noteData}
+            appointmentId={appointmentDetails.id}
+            refreshData={refreshData}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddRemider ? (
+        <View className="h-full w-full justify-center self-center">
+          <AddEditReminder
+            reminderData={reminderData}
             appointmentId={appointmentDetails.id}
             refreshData={refreshData}
           />

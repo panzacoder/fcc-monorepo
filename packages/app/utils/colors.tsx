@@ -6,6 +6,9 @@ export const COLORS = {
   gray: '#86939e',
   black: '#1A1A1A',
   green: '#5ACC6C',
+  white: '#fff',
   noteColor: '#FCF3CF',
-  drawer_bg: '#184E4E'
+  buttonOrange: '#ef6603',
+  drawer_bg: '#184E4E',
+  transparent: "transparent",
 }

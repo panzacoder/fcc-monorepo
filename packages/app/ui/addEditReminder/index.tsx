@@ -4,78 +4,61 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import PtsLoader from 'app/ui/PtsLoader'
 import {
   BASE_URL,
-  CREATE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_NOTE
+  CREATE_APPOINTMENT_REMINDER,
+  UPDATE_APPOINTMENT_REMINDER
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 const schema = z.object({
-  title: z.string().min(1, { message: 'Note title is required' }),
-  noteDetails: z.string().min(1, { message: 'Note details is required' }),
-  occurrence: z.number().min(0, { message: 'Occurrence is required' })
+  title: z.string().min(1, { message: 'Reminder title is required' })
 })
 export type Schema = z.infer<typeof schema>
-export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
+
+export const AddEditReminder = ({
+  reminderData,
+  appointmentId,
+  refreshData
+}) => {
+  let selectedDate: any = ''
   const [isLoading, setLoading] = useState(false)
   const header = store.getState().headerState.header
-  const staticData = store.getState().staticDataState.staticData
-  // console.log('notesData', noteData.occurance)
-  let occuranceIndex = -1
-  if (noteData.occurance && noteData.occurance.occurance) {
-    // facilityTypeIdex = getTypeIndex(facilityDetails.type)
-    staticData.taskOccuranceList.map(async (data: any, index: any) => {
-      if (data.occurance === noteData.occurance.occurance) {
-        occuranceIndex = index
-      }
-    })
-  }
+  // console.log('notesData', reminderData.occurance)
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      title: !_.isEmpty(noteData) && noteData.shortDescription ? noteData.shortDescription : '',
-      noteDetails:
-        !_.isEmpty(noteData) && noteData.note
-          ? noteData.note
+      title:
+        !_.isEmpty(reminderData) && reminderData.content
+          ? reminderData.content
           : '',
-      occurrence: occuranceIndex
+      dateTime:
+        !_.isEmpty(reminderData) && reminderData.note ? reminderData.note : ''
     },
     resolver: zodResolver(schema)
   })
-  const occuranceList = staticData.taskOccuranceList.map(
-    (data: any, index: any) => {
-      return {
-        label: data.occurance,
-        value: index
-      }
-    }
-  )
+  selectedDate = reminderData.date ? reminderData.date : ''
   async function createUpdateNote(formData: Schema) {
     setLoading(true)
     let url = ''
     let dataObject = {
       header: header,
-      appointmentNote: {
-        id: '',
+      reminder: {
+        content: formData.title,
+        date: selectedDate,
         appointment: {
           id: appointmentId
-        },
-        occurance: {
-          occurance: occuranceList[formData.occurrence].label
-        },
-        note: formData.noteDetails,
-        shortDescription: formData.title
+        }
       }
     }
-    if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_NOTE}`
+    if (_.isEmpty(reminderData)) {
+      url = `${BASE_URL}${CREATE_APPOINTMENT_REMINDER}`
     } else {
-      dataObject.appointmentNote.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_NOTE}`
+      dataObject.reminder.id = reminderData.id ? reminderData.id : ''
+      url = `${BASE_URL}${UPDATE_APPOINTMENT_REMINDER}`
     }
     // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
@@ -99,8 +82,13 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
         console.log(error)
       })
   }
+  const onSelection = (date: any) => {
+    // console.log('onSelection', date)
+    selectedDate = date
+    console.log('onSelection', selectedDate)
+  }
   return (
-    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">
+    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
       <PtsLoader loading={isLoading} />
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
@@ -112,26 +100,11 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
             autoCapitalize="none"
           />
         </View>
-        <View className="my-2 w-full flex-row justify-center">
-          <ControlledDropdown
-            control={control}
-            name="occurrence"
-            label="Occurrence*"
-            className="w-[95%] bg-white"
-            maxHeight={300}
-            list={occuranceList}
-            // onChangeValue={setSelectedCountryChange}
-          />
-        </View>
-        <View className="w-full flex-row justify-center gap-2">
-          <ControlledTextField
-            control={control}
-            name="noteDetails"
-            placeholder={'Enter note details*'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
+        <PtsDateTimePicker
+          currentData={reminderData.date ? reminderData.date : new Date()}
+          onSelection={onSelection}
+        />
+
         <View className="mt-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
@@ -143,7 +116,7 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(noteData) ? 'Save' : 'Update'}
+            title={_.isEmpty(reminderData) ? 'Save' : 'Update'}
             variant="default"
             onPress={handleSubmit(createUpdateNote)}
           />

@@ -3784,6 +3784,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/datetimepicker@npm:^7.6.2":
+  version: 7.6.2
+  resolution: "@react-native-community/datetimepicker@npm:7.6.2"
+  dependencies:
+    invariant: "npm:^2.2.4"
+  checksum: ca72d1abf4f4caa5828e89907674b781880978a06918c4459f6c3a1ae86621312490443aeee68fbd589637f2f04012450ba948b832b6fb52e3905354a461f581
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.73.1":
   version: 0.73.1
   resolution: "@react-native/assets-registry@npm:0.73.1"
@@ -10414,6 +10423,7 @@ __metadata:
   resolution: "fcc-monorepo@workspace:."
   dependencies:
     "@expo/vector-icons": "npm:^14.0.0"
+    "@react-native-community/datetimepicker": "npm:^7.6.2"
     "@react-navigation/drawer": "npm:^6.6.7"
     "@types/react": "npm:^18.2.52"
     "@types/react-native": "npm:^0.73.0"

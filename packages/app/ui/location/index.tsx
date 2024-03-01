@@ -15,9 +15,9 @@ export function Location(data: any) {
   return (
     <View>
       {locationData.nickName && locationData.nickName !== '' ? (
-        <View className="mt-2 flex-row items-center">
+        <View className="mt-2 w-[80%] max-w-[80%] flex-row items-center ">
           <View className="flex-row">
-            <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
+            <Typography className="font-400 text-[12px] text-[#1A1A1A]">
               {locationData.nickName ? locationData.nickName : ''}
             </Typography>
             {locationData.component !== 'Appointment' ? (
@@ -41,7 +41,7 @@ export function Location(data: any) {
               <View />
             )}
           </View>
-          <View className="bg-primary h-[1px] w-full" />
+          <View className="bg-primary mx-2 h-[1px] w-full" />
         </View>
       ) : (
         <View />

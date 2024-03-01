@@ -4,28 +4,36 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { CallPostService } from 'app/utils/fetchServerData'
 import PtsLoader from 'app/ui/PtsLoader'
-import { BASE_URL, DELETE_APPOINTMENT_NOTE } from 'app/utils/urlConstants'
-import { convertTimeToUserLocalTime } from 'app/ui/utils'
+import { BASE_URL, DELETE_APPOINTMENT_REMINDER } from 'app/utils/urlConstants'
+import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import store from 'app/redux/store'
-export const Note = ({ data, refreshData, editNote }) => {
+import { Timer } from 'app/utils/timer'
+
+export const Reminder = ({ data, refreshData, editReminder }) => {
   const [isLoading, setLoading] = useState(false)
   const header = store.getState().headerState.header
-  let noteData = data ? data : {}
-  let creationDate = noteData.createdOn
-    ? convertTimeToUserLocalTime(noteData.createdOn)
+  let reminderData = data ? data : {}
+  let creationDate = reminderData.createdOn
+    ? convertTimeToUserLocalTime(reminderData.createdOn)
     : ''
-  // console.log('noteData', JSON.stringify(data))
-  async function deleteNote() {
+  let reminderDate = reminderData.date
+    ? convertTimeToUserLocalTime(reminderData.date)
+    : ''
+  // console.log('reminderData', JSON.stringify(data))
+  async function deleteReminder() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
+    let url = `${BASE_URL}${DELETE_APPOINTMENT_REMINDER}`
     let dataObject = {
       header: header,
-      appointmentNote: {
-        id: noteData.id
+      reminder: {
+        id: reminderData.id ? reminderData.id : '',
+        appointment: {
+          id: reminderData.apointmentId ? reminderData.apointmentId : ''
+        }
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -47,12 +55,12 @@ export const Note = ({ data, refreshData, editNote }) => {
       })
   }
   return (
-    <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#dbc672] bg-[#FCF3CF] py-2">
+    <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#e09093] bg-[#fbe2e3] py-2">
       <PtsLoader loading={isLoading} />
       <View className="w-full flex-row">
-        <View className="w-[60%]">
-          <Typography className="font-400 ml-2 text-[#1A1A1A]">
-            {noteData.shortDescription ? noteData.shortDescription : ''}
+        <View className="w-[70%] self-center">
+          <Typography className="font-400 ml-5 self-center text-[#1A1A1A]">
+            {reminderData.content ? reminderData.content : ''}
           </Typography>
         </View>
         <View className="flex-row">
@@ -61,12 +69,12 @@ export const Note = ({ data, refreshData, editNote }) => {
               className="self-center"
               onPress={() => {
                 Alert.alert(
-                  'Are you sure about deleting Appointment Note?',
+                  'Are you sure about deleting Reminder?',
                   'It cannot be recovered once deleted.',
                   [
                     {
                       text: 'Ok',
-                      onPress: () => deleteNote()
+                      onPress: () => deleteReminder()
                     },
                     { text: 'Cancel', onPress: () => {} }
                   ]
@@ -81,18 +89,9 @@ export const Note = ({ data, refreshData, editNote }) => {
             <Feather
               className="self-center"
               onPress={() => {
-                editNote(noteData)
+                editReminder(reminderData)
               }}
               name={'edit-2'}
-              size={15}
-              color={'white'}
-            />
-          </Pressable>
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
-            <Feather
-              className="self-center"
-              onPress={() => {}}
-              name={'message-circle'}
               size={15}
               color={'white'}
             />
@@ -100,15 +99,18 @@ export const Note = ({ data, refreshData, editNote }) => {
         </View>
       </View>
       <View>
-        <Typography className=" font-400 ml-2 ml-2 text-[#1A1A1A]">
-          {noteData.note ? noteData.note : ''}
+        <Typography className="font-400 my-2 self-center font-bold text-[#1A1A1A]">
+          {reminderDate}
         </Typography>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Timer startDate={convertUserTimeToUTC(reminderData.date)} />
+        </View>
       </View>
-      <View className="my-2 h-[1px] w-full bg-[#86939e]" />
+      <View className="mt-2 h-[1px] w-full bg-[#86939e]" />
       <View>
         <Typography className=" font-400 ml-2 text-[10px] text-[#1A1A1A]">
-          {noteData.createdByName
-            ? 'Created by ' + noteData.createdByName + ' on ' + creationDate
+          {reminderData.createdByName
+            ? 'Created by ' + reminderData.createdByName + ' on ' + creationDate
             : ''}
         </Typography>
       </View>

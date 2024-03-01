@@ -32,3 +32,6 @@ export const GET_APPOINTMENT_DETAILS = 'appointmentms/getAppointmentWithPrevious
 export const DELETE_APPOINTMENT_NOTE = 'appointmentms/deleteNote';
 export const CREATE_APPOINTMENT_NOTE = 'appointmentms/createNote';
 export const UPDATE_APPOINTMENT_NOTE = 'appointmentms/updateNote';
+export const DELETE_APPOINTMENT_REMINDER = 'appointmentms/deleteReminder';
+export const CREATE_APPOINTMENT_REMINDER = 'appointmentms/createReminder';
+export const UPDATE_APPOINTMENT_REMINDER = 'appointmentms/updateReminder';

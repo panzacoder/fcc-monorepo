@@ -7,6 +7,7 @@
   ],
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@react-native-community/datetimepicker": "^7.6.2",
     "@react-navigation/drawer": "^6.6.7",
     "countries-and-timezones": "^3.6.0",
     "expo-device": "^5.9.3",

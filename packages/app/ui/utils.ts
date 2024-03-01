@@ -145,6 +145,14 @@ export const getDay = (date: any) => {
   var formatDate = moment(date).format('MMM DD, YYYY')
   return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
 }
+export const convertUserTimeToUTC = (time: any) => {
+  let timeZoneName = getTimezoneName()
+  let time1 = moment(time).format(DATE_CONSTANT.FULL_DATE)
+  let utcDateTime = moment
+    .tz(time1, DATE_CONSTANT.FULL_DATE, timeZoneName)
+    .utc()
+  return utcDateTime
+}
 export const convertTimeToUserLocalTime = (time: any) => {
   let timeZoneName = getTimezoneName()
   if (timeZoneName) {
