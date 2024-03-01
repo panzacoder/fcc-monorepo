@@ -1,14 +1,18 @@
-import { GET_STATIC_DATA, SET_STATIC_DATA } from './staticTypes'
+import {
+  StaticData,
+  StaticDataActionProps,
+  StaticDataActionTypes
+} from './staticTypes'
 
-const getStaticData = () => {
+const getStaticData = (): StaticDataActionProps => {
   return {
-    type: GET_STATIC_DATA
+    type: StaticDataActionTypes.GET_STATIC_DATA
   }
 }
 
-const setStaticData = (data: any) => {
+const setStaticData = (data: StaticData): StaticDataActionProps => {
   return {
-    type: SET_STATIC_DATA,
+    type: StaticDataActionTypes.SET_STATIC_DATA,
     payload: data
   }
 }

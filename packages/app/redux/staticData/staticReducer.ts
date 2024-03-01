@@ -1,16 +1,23 @@
-import { GET_STATIC_DATA, SET_STATIC_DATA } from './staticTypes'
+import {
+  StaticDataState,
+  StaticDataActionProps,
+  StaticDataActionTypes
+} from './staticTypes'
 
 const initialState = {
   staticData: {}
 }
 
-const staticReducer = (state = initialState, action: any) => {
+const staticReducer = (
+  state: StaticDataState = initialState,
+  action: StaticDataActionProps
+): StaticDataState => {
   switch (action.type) {
-    case GET_STATIC_DATA:
+    case StaticDataActionTypes.GET_STATIC_DATA:
       return {
         ...state
       }
-    case SET_STATIC_DATA:
+    case StaticDataActionTypes.SET_STATIC_DATA:
       return {
         ...state,
         staticData: action.payload
