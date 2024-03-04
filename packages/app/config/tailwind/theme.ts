@@ -1,10 +1,9 @@
 // @ts-check
 // const { fontFamily } = require('tailwindcss/defaultTheme')
 
-/** @type {import('tailwindcss').Config['theme']} */
-const theme = {
-  // edit your tailwind theme here!
-  // https://tailwindcss.com/docs/adding-custom-styles
+import { Config } from 'tailwindcss'
+
+export const theme: Config['theme'] = {
   container: {
     center: true,
     padding: '2rem',
@@ -19,8 +18,8 @@ const theme = {
     lg: ['1.125rem', { lineHeight: '1.75rem' }],
     xl: ['1.33rem', { lineHeight: '1.5rem' }],
     '2xl': ['1.5rem', { lineHeight: '2rem' }],
-    '3xl': ['1.775rem', { lineHeight: '2rem' }],
-    '4xl': ['2.369rem', { lineHeight: '1.125' }],
+    '3xl': ['2rem', { lineHeight: '2rem' }],
+    '4xl': ['2.4rem', { lineHeight: '1.125' }],
     '5xl': ['3.156rem', { lineHeight: '1.125' }],
     '6xl': ['3.75rem', { lineHeight: '1' }],
     '7xl': ['4.5rem', { lineHeight: '1' }],
@@ -68,6 +67,7 @@ const theme = {
       md: `var(--radius-md)`,
       sm: `var(--radius-sm)`
     },
+
     // fontFamily: {
     //   sans: ['var(--font-sans)', ...fontFamily.sans],
     // },
@@ -86,8 +86,4 @@ const theme = {
       'accordion-up': 'accordion-up 0.2s ease-out'
     }
   }
-}
-
-module.exports = {
-  theme
 }
