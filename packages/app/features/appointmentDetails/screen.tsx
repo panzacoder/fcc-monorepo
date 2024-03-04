@@ -15,8 +15,10 @@ import { useRouter } from 'solito/navigation'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/appointmentNote'
 import { Reminder } from 'app/ui/appointmentReminder'
+import { Transportation } from 'app/ui/transportation'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddEditReminder } from 'app/ui/addEditReminder'
+import { AddEditTransport } from 'app/ui/addEditTransport'
 import { Button } from 'app/ui/button'
 
 export function AppointmentDetailsScreen() {
@@ -30,12 +32,15 @@ export function AppointmentDetailsScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
+  const [isAddTransportation, setIsAddTransportation] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [noteData, setNoteData] = useState({})
   const [reminderData, setReminderData] = useState({})
+  const [transportationData, setTransportationData] = useState({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [notesList, setNotesList] = useState([])
   const [remindersList, setRemindersList] = useState([])
+  const [transportationList, setTransportationList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
   const getAppointmentDetails = useCallback(async () => {
     setLoading(true)
@@ -78,6 +83,15 @@ export function AppointmentDetailsScreen() {
               setRemindersList(
                 data.data.appointmentWithPreviousAppointment.appointment
                   .reminderList
+              )
+            }
+            if (
+              data.data.appointmentWithPreviousAppointment.appointment
+                .transportationList
+            ) {
+              setTransportationList(
+                data.data.appointmentWithPreviousAppointment.appointment
+                  .transportationList
               )
             }
           }
@@ -162,6 +176,7 @@ export function AppointmentDetailsScreen() {
     }
     setIsAddNote(false)
     setIsAddReminder(false)
+    setIsAddTransportation(false)
   }
   const editNote = (noteData: any) => {
     // console.log('noteData', JSON.stringify(noteData))
@@ -172,6 +187,11 @@ export function AppointmentDetailsScreen() {
     console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
+  }
+  const editTransportation = (transportationData: any) => {
+    // console.log('remiderData', JSON.stringify(transportationData))
+    setTransportationData(transportationData)
+    setIsAddTransportation(true)
   }
   function getDetailsView(
     title: string,
@@ -325,6 +345,44 @@ export function AppointmentDetailsScreen() {
                 <View />
               )}
             </View>
+
+            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <View className=" w-full flex-row items-center">
+                <View className="w-[50%] flex-row">
+                  <Typography className="font-400 text-[16px] font-bold text-black">
+                    {'Transportation'}
+                  </Typography>
+                </View>
+                <Button
+                  className=""
+                  title="Transportation"
+                  leadingIcon="plus"
+                  variant="border"
+                  onPress={() => {
+                    setTransportationData({})
+                    setIsAddTransportation(true)
+                  }}
+                />
+              </View>
+              {transportationList.length > 0 ? (
+                <ScrollView className="">
+                  {transportationList.map((data: any, index: number) => {
+                    data.apointmentId = appointmentDetails.id
+                    return (
+                      <View key={index}>
+                        <Transportation
+                          data={data}
+                          refreshData={refreshData}
+                          editTransportation={editTransportation}
+                        />
+                      </View>
+                    )
+                  })}
+                </ScrollView>
+              ) : (
+                <View />
+              )}
+            </View>
           </ScrollView>
         </View>
       ) : (
@@ -345,6 +403,17 @@ export function AppointmentDetailsScreen() {
         <View className="h-full w-full justify-center self-center">
           <AddEditReminder
             reminderData={reminderData}
+            appointmentId={appointmentDetails.id}
+            refreshData={refreshData}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddTransportation ? (
+        <View className="h-full w-full justify-center self-center">
+          <AddEditTransport
+            transportData={transportationData}
             appointmentId={appointmentDetails.id}
             refreshData={refreshData}
           />

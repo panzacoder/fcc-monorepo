@@ -27,11 +27,22 @@ export const DELETE_FACILITY = 'facilityms/delete'
 export const UPDATE_FACILITY = 'facilityms/update'
 export const UPDATE_FACILITY_LOCATION = 'facilityms/updateLocation'
 export const GET_APPOINTMENTS = 'appointmentms/getFilteredList'
-export const GET_MEMBER_MENUS = 'memberms/getMemberWithMenus';
-export const GET_APPOINTMENT_DETAILS = 'appointmentms/getAppointmentWithPreviousAppointment';
-export const DELETE_APPOINTMENT_NOTE = 'appointmentms/deleteNote';
-export const CREATE_APPOINTMENT_NOTE = 'appointmentms/createNote';
-export const UPDATE_APPOINTMENT_NOTE = 'appointmentms/updateNote';
-export const DELETE_APPOINTMENT_REMINDER = 'appointmentms/deleteReminder';
-export const CREATE_APPOINTMENT_REMINDER = 'appointmentms/createReminder';
-export const UPDATE_APPOINTMENT_REMINDER = 'appointmentms/updateReminder';
+export const GET_MEMBER_MENUS = 'memberms/getMemberWithMenus'
+export const GET_APPOINTMENT_DETAILS =
+  'appointmentms/getAppointmentWithPreviousAppointment'
+export const DELETE_APPOINTMENT_NOTE = 'appointmentms/deleteNote'
+export const CREATE_APPOINTMENT_NOTE = 'appointmentms/createNote'
+export const UPDATE_APPOINTMENT_NOTE = 'appointmentms/updateNote'
+export const DELETE_APPOINTMENT_REMINDER = 'appointmentms/deleteReminder'
+export const CREATE_APPOINTMENT_REMINDER = 'appointmentms/createReminder'
+export const UPDATE_APPOINTMENT_REMINDER = 'appointmentms/updateReminder'
+export const UPDATE_APPOINTMENT_TRANSPORTATION = 'apptransportms/delete'
+export const GET_TRANSPORTATION_MEMBER_LIST =
+  'memberms/getTransportationUserList'
+export const CREATE_TRANSPORTATION = 'apptransportms/create'
+export const UPDATE_TRANSPORTATION = 'apptransportms/update'
+export const DELETE_TRANSPORTATION = 'apptransportms/delete'
+export const RESEND_TRANSPORTATION_REQUEST =
+  'apptransportms/resendTransportationRequest'
+export const CANCEL_TRANSPORTATION_REQUEST =
+  'apptransportms/cancelTransportationRequest'

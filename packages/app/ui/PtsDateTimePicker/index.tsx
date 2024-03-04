@@ -13,7 +13,6 @@ import moment from 'moment'
 import store from 'app/redux/store'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'react-native-elements'
-let dateSelected: any = new Date()
 let selectedTime: any = new Date()
 let selectedDate: any = new Date()
 export const PtsDateTimePicker = ({ currentData, onSelection }) => {
@@ -21,7 +20,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
   // console.log('defaultValue', JSON.stringify(defaultValue))
   // console.log('currentData', JSON.stringify(currentData))
   // console.log('onSelection', JSON.stringify(onSelection))
-  let date = new Date(moment(currentData))
+  let date = new Date(currentData)
   // console.log('date', date)
   selectedTime = moment(date).format('hh:mm A')
   selectedDate = moment(date).format('DD MMM YYYY')
@@ -29,23 +28,15 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
   const [isShowDateTimeModal, setDateTimeModal] = useState(false)
   const [isShowDateModal, setDateModal] = useState(false)
   const [isShowTimeModal, setTimeModal] = useState(false)
+  const [dateSelected, setDateSelected] = useState(selectedDate)
+  const [timeSelected, setTimeSelected] = useState(selectedTime)
 
   function getValueForPicker() {
     let date = new Date()
     date = new Date(moment(currentData).utc(true).local(true).unix() * 1000)
-    // console.log('getValueForPicker', date)
-    // console.log('dateSelected', dateSelected)
-    // let selectTime: any = moment(dateSelected).format('hh:mm A')
-    // let selectDate: any = moment(dateSelected).format('DD MMM YYYY')
-    // if (isShowDateModal) {
-    //   selectedDate = selectDate
-    // } else {
-    //   selectedTime = selectTime
-    // }
     return date
   }
   function cancelClicked() {
-    console.log('in cancelClicked')
     setDateTimeModal(false)
     setTimeModal(false)
     setDateModal(false)
@@ -66,7 +57,6 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
           >
             <DateTimePicker
               value={getValueForPicker()}
-              is24Hour={false}
               testID="dateAndTimePicker"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               mode={
@@ -74,23 +64,13 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
               }
               style={{}}
               onChange={(event, date) => {
-                // console.log('event', event)
-                // console.log('date', date)
-                // selectDate = moment(date).format('DD MMM YYYY')
-                // currentData = date
-                // setSelectedDate(selectDate)
-                console.log('in onChange')
                 if (event.type === 'set') {
-                  console.log('in onChange', event)
-                  dateSelected = date
-                  // let selectTime: any = moment(dateSelected).format('hh:mm A')
-                  // let selectDate: any =
-                  //   moment(dateSelected).format('DD MMM YYYY')
-                  // if (isShowDateModal) {
-                  //   selectedDate = selectDate
-                  // } else {
-                  //   selectedTime = selectTime
-                  // }
+                  selectedTime = moment(date).format('hh:mm A')
+                  selectedDate = moment(date).format('DD MMM YYYY')
+                  currentData = date
+                  setDateSelected(selectedDate)
+                  setTimeSelected(selectedTime)
+                  cancelClicked()
                   onSelection(date)
                 }
               }}
@@ -155,7 +135,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
                   title={'Cancel'}
                   containerStyle={{ flex: 1, marginHorizontal: 10 }}
                   buttonStyle={{ padding: 3, backgroundColor: COLORS.gray }}
-                  onPress={() => this.cancelClicked()}
+                  onPress={() => cancelClicked()}
                 />
               </View>
             ) : (
@@ -177,7 +157,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
             setIsRender(!isRender)
           }}
         >
-          <Typography className="ml-2">{'' + selectedDate}</Typography>
+          <Typography className="ml-2">{dateSelected}</Typography>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -187,7 +167,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
             setIsRender(!isRender)
           }}
         >
-          <Typography className="ml-2">{'' + selectedTime}</Typography>
+          <Typography className="ml-2">{timeSelected}</Typography>
         </TouchableOpacity>
       </View>
       {isShowDateTimeModal ? (

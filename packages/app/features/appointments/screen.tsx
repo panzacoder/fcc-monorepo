@@ -76,11 +76,11 @@ export function AppointmentsScreen() {
           <TouchableOpacity
             className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
             onPress={() => {
-              // router.push(
-              //   formatUrl('/(authenticated)/circles/addEditDoctor', {
-              //     memberData: JSON.stringify(memberData)
-              //   })
-              // )
+              router.push(
+                formatUrl('/(authenticated)/circles/addEditAppointment', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
             }}
           >
             <Feather name={'plus'} size={25} color={COLORS.primary} />

@@ -41,7 +41,7 @@ export const AddEditReminder = ({
     resolver: zodResolver(schema)
   })
   selectedDate = reminderData.date ? reminderData.date : ''
-  async function createUpdateNote(formData: Schema) {
+  async function createUpdateReminder(formData: Schema) {
     setLoading(true)
     let url = ''
     let dataObject = {
@@ -83,9 +83,7 @@ export const AddEditReminder = ({
       })
   }
   const onSelection = (date: any) => {
-    // console.log('onSelection', date)
     selectedDate = date
-    console.log('onSelection', selectedDate)
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
@@ -118,7 +116,7 @@ export const AddEditReminder = ({
             className="ml-5"
             title={_.isEmpty(reminderData) ? 'Save' : 'Update'}
             variant="default"
-            onPress={handleSubmit(createUpdateNote)}
+            onPress={handleSubmit(createUpdateReminder)}
           />
         </View>
       </View>
