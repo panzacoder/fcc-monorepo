@@ -24,6 +24,7 @@ import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import { CountryStateTimezone } from 'app/ui/form-fields/country-state-tz'
 
 const schema = z
   .object({
@@ -255,6 +256,7 @@ export function SignUpScreen() {
             placeholder="Confirm Password*"
           />
 
+          <CountryStateTimezone control={control} />
           <Typography className=" font-bold">{'Address'}</Typography>
           <ControlledDropdown
             control={control}
