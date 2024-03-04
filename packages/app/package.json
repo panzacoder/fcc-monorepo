@@ -4,12 +4,15 @@
   "name": "app",
   "exports": {
     ".": "./index.ts",
+    "./ui/*": "./ui/*",
+    "./features": "./features",
     "./config/tailwind/theme": "./config/tailwind/theme.ts",
     "./config/tailwind/global.css": "./config/tailwind/global.css"
   },
   "type": "module",
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
+    "@radix-ui/react-select": "^2.0.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
@@ -21,8 +24,8 @@
     "react-native-svg": "^15.0.0",
     "solito": "4.2.1",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss": "^3.4.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zustand": "^4.5.2"
   },
   "sideEffects": false
 }

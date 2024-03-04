@@ -7,8 +7,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "app/*": ["./*"],
-      "@rnr/*": ["./@rnr/*"]
+      "app/*": ["./*"]
+      // "@rnr/*": ["./@rnr/*"]
     }
   },
   "extends": "../../tsconfig",

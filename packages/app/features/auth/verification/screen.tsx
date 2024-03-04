@@ -20,7 +20,7 @@ const schema = z.object({
   authCode: z.string().length(6, { message: 'Enter 6 digit code from email' })
 })
 
-export type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>
 
 export function VerificationScreen() {
   const router = useRouter()

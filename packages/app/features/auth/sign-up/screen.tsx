@@ -56,7 +56,7 @@ const schema = z
     }
   })
 
-export type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
   const [selectedCountryValue, setSelectedCountry] = useState(-1)

@@ -32,7 +32,7 @@ const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
 
-export type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>
 
 export function LoginScreen() {
   const router = useRouter()
