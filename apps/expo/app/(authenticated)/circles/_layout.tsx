@@ -11,6 +11,17 @@ export default function Root() {
         presentation: 'card',
         contentStyle: { backgroundColor: 'transparent' }
       }}
-    />
+    >
+      <Stack.Screen name="index" options={{ title: 'Your Circles' }} />
+      <Stack.Screen
+        name="create"
+        options={{
+          headerShown: false,
+          title: 'Create Circle',
+          presentation: 'modal',
+          contentStyle: { backgroundColor: 'white' }
+        }}
+      />
+    </Stack>
   )
 }

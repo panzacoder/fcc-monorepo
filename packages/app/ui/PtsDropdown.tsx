@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { ComponentProps, useState } from 'react'
+import { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
 import { cn } from './utils'
 export type PtsDropdownProps = {
@@ -36,6 +36,7 @@ const PtsDropdown = ({
         )}
       >
         <Dropdown
+          disable={list?.length === 0}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           inputSearchStyle={styles.inputSearchStyle}

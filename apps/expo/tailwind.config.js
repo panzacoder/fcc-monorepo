@@ -11,6 +11,7 @@ module.exports = {
     '../../packages/**/*.{js,jsx,ts,tsx}'
   ],
   presets: [require('nativewind/preset')],
+  plugins: [require('tailwindcss-animate')],
   darkMode: ['class'],
   theme: {
     ...theme

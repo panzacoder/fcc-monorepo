@@ -6688,7 +6688,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"app@npm:*, app@workspace:packages/app":
+"app@npm:*, app@workspace:*, app@workspace:packages/app":
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
@@ -10087,16 +10087,16 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.23.9"
     "@types/react": "npm:^18.2.60"
-    app: "npm:*"
+    app: "workspace:*"
     expo: "npm:^50.0.8"
     expo-linking: "npm:~6.2.2"
     expo-router: "npm:~3.4.7"
     expo-splash-screen: "npm:~0.26.4"
     expo-status-bar: "npm:~1.11.1"
     nativewind: "npm:^4.0.36"
-    react-native-gesture-handler: "npm:~2.15.0"
-    react-native-reanimated: "npm:3.7.1"
-    react-native-safe-area-context: "npm:4.9.0"
+    react-native-gesture-handler: "npm:~2.14.0"
+    react-native-reanimated: "npm:3.6.2"
+    react-native-safe-area-context: "npm:4.8.2"
     react-native-screens: "npm:~3.29.0"
     react-native-webview: "npm:13.8.1"
     tailwindcss: "npm:^3.4.1"
@@ -16119,9 +16119,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:~2.15.0":
-  version: 2.15.0
-  resolution: "react-native-gesture-handler@npm:2.15.0"
+"react-native-gesture-handler@npm:~2.14.0":
+  version: 2.14.1
+  resolution: "react-native-gesture-handler@npm:2.14.1"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -16131,7 +16131,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 7feafdcfad1d4e066e5f238340b2f615d5abaa2b39c4d224e2eb0ed6563ce0afabcd1dd927f0aa5a0f3a9464f08909eb8d648a46dec3f25d08875ebc90258e14
+  checksum: 0a86209d515febf6da489c210f8983ded4a8d6e87dc94bca55f8afab657ec096797b21954b7599f6e05e1238634d770b5462266f3f4018363e4eb73496f2147a
   languageName: node
   linkType: hard
 
@@ -16178,13 +16178,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:4.9.0":
-  version: 4.9.0
-  resolution: "react-native-safe-area-context@npm:4.9.0"
+"react-native-safe-area-context@npm:4.8.2":
+  version: 4.8.2
+  resolution: "react-native-safe-area-context@npm:4.8.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: ea95a915fac03bf116edfba24978f3722ed2bcf159c4425d3f52176a0eef84523d442aca9b203f34544c89a30c7d442c01fea25c5ea5f848614186c9a358d37f
+  checksum: ea01a7e3bceec23273a7b2807816b917fae48030431c1d966ee912c5ef12b131620c10b909f2604a2f296fc84ab1a3bdd9e536701401bdca6452441e2a825b60
   languageName: node
   linkType: hard
 
