@@ -1,8 +1,9 @@
+import { StaticData } from 'app/data/static'
+
 export enum StaticDataActionTypes {
   GET_STATIC_DATA = 'GET_STATIC_DATA',
   SET_STATIC_DATA = 'SET_STATIC_DATA'
 }
-import { StaticData } from 'app/data/static.d'
 
 export interface StaticDataState {
   staticData: StaticData | {}

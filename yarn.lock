@@ -6842,6 +6842,7 @@ __metadata:
     react-hook-form: "npm:^7.51.0"
     react-native-linear-gradient: "npm:^2.8.3"
     react-native-svg: "npm:^15.0.0"
+    react-redux: "npm:^9.1.0"
     solito: "npm:4.2.1"
     tailwind-merge: "npm:^2.2.1"
     zod: "npm:^3.22.4"

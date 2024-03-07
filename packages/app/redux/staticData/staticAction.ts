@@ -1,8 +1,5 @@
-import {
-  StaticData,
-  StaticDataActionProps,
-  StaticDataActionTypes
-} from './staticTypes'
+import { StaticData } from 'app/data/static'
+import { StaticDataActionProps, StaticDataActionTypes } from './staticTypes'
 
 const getStaticData = (): StaticDataActionProps => {
   return {
