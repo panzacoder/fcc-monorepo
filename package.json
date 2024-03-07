@@ -33,10 +33,10 @@
     "chromatic": "^11.0.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
+    "prettier-plugin-tailwindcss": "^0.5.12",
     "redux-devtools-extension": "^2.13.9",
-    "turbo": "^1.12.4",
-    "typescript": "^5.3.3"
+    "turbo": "^1.12.5",
+    "typescript": "^5.4.2"
   },
   "scripts": {
     "native": "yarn workspace expo-app start",
