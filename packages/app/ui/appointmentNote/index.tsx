@@ -29,13 +29,7 @@ export const Note = ({ data, refreshData, editNote }) => {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctors', {
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          // router.back()
+
           refreshData()
         } else {
           Alert.alert('', data.message)

@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
-import { CallPostService } from 'app/utils/fetchServerData'
 import PtsLoader from 'app/ui/PtsLoader'
-import {
-  BASE_URL,
-  CREATE_APPOINTMENT_REMINDER,
-  UPDATE_APPOINTMENT_REMINDER
-} from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -22,13 +16,14 @@ export type Schema = z.infer<typeof schema>
 
 export const AddEditReminder = ({
   reminderData,
-  appointmentId,
-  refreshData
+  // appointmentId,
+  refreshData,
+  createUpdateReminder
 }) => {
   let selectedDate: any = ''
   const [isLoading, setLoading] = useState(false)
   const header = store.getState().headerState.header
-  // console.log('notesData', reminderData.occurance)
+  console.log('reminderData', JSON.stringify(reminderData))
   const { control, handleSubmit } = useForm({
     defaultValues: {
       title:
@@ -40,50 +35,13 @@ export const AddEditReminder = ({
     },
     resolver: zodResolver(schema)
   })
-  selectedDate = reminderData.date ? reminderData.date : ''
-  async function createUpdateReminder(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      reminder: {
-        content: formData.title,
-        date: selectedDate,
-        appointment: {
-          id: appointmentId
-        }
-      }
-    }
-    if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_REMINDER}`
-    } else {
-      dataObject.reminder.id = reminderData.id ? reminderData.id : ''
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_REMINDER}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctors', {
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          // router.back()
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
+  selectedDate = reminderData.date ? reminderData.date : new Date()
+
   const onSelection = (date: any) => {
     selectedDate = date
+  }
+  function createUpdateReminderCall(formData: Schema) {
+    createUpdateReminder(formData.title, selectedDate, reminderData)
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
@@ -116,7 +74,7 @@ export const AddEditReminder = ({
             className="ml-5"
             title={_.isEmpty(reminderData) ? 'Save' : 'Update'}
             variant="default"
-            onPress={handleSubmit(createUpdateReminder)}
+            onPress={handleSubmit(createUpdateReminderCall)}
           />
         </View>
       </View>

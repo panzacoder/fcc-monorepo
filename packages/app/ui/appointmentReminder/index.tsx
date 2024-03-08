@@ -2,14 +2,17 @@ import { useState } from 'react'
 import { View, Alert, Pressable } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { CallPostService } from 'app/utils/fetchServerData'
 import PtsLoader from 'app/ui/PtsLoader'
-import { BASE_URL, DELETE_APPOINTMENT_REMINDER } from 'app/utils/urlConstants'
 import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { Timer } from 'app/utils/timer'
 
-export const Reminder = ({ data, refreshData, editReminder }) => {
+export const Reminder = ({
+  data,
+  refreshData,
+  editReminder,
+  deleteReminder
+}) => {
   const [isLoading, setLoading] = useState(false)
   const header = store.getState().headerState.header
   let reminderData = data ? data : {}
@@ -19,41 +22,6 @@ export const Reminder = ({ data, refreshData, editReminder }) => {
   let reminderDate = reminderData.date
     ? convertTimeToUserLocalTime(reminderData.date)
     : ''
-  // console.log('reminderData', JSON.stringify(data))
-  async function deleteReminder() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT_REMINDER}`
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        appointment: {
-          id: reminderData.apointmentId ? reminderData.apointmentId : ''
-        }
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctors', {
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          // router.back()
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
   return (
     <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#e09093] bg-[#fbe2e3] py-2">
       <PtsLoader loading={isLoading} />
@@ -74,7 +42,7 @@ export const Reminder = ({ data, refreshData, editReminder }) => {
                   [
                     {
                       text: 'Ok',
-                      onPress: () => deleteReminder()
+                      onPress: () => deleteReminder(reminderData)
                     },
                     { text: 'Cancel', onPress: () => {} }
                   ]

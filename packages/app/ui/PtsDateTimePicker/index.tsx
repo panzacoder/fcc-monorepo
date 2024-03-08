@@ -10,13 +10,11 @@ import {
 import { Typography } from 'app/ui/typography'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
-import store from 'app/redux/store'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'react-native-elements'
 let selectedTime: any = new Date()
 let selectedDate: any = new Date()
 export const PtsDateTimePicker = ({ currentData, onSelection }) => {
-  const header = store.getState().headerState.header
   // console.log('defaultValue', JSON.stringify(defaultValue))
   // console.log('currentData', JSON.stringify(currentData))
   // console.log('onSelection', JSON.stringify(onSelection))
@@ -46,7 +44,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
       <View style={{ flex: 1 }}>
         <TouchableHighlight
           onPress={() => {}}
-          style={{ height: '100%', width: '100%' }}
+          style={{ width: '100%' }}
           underlayColor={COLORS.transparent}
         >
           <View
@@ -71,6 +69,9 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
                   setDateSelected(selectedDate)
                   setTimeSelected(selectedTime)
                   cancelClicked()
+                  // console.log('date', date)
+                  // console.log('selectedTime', selectedTime)
+                  // console.log('selectedDate', selectedDate)
                   onSelection(date)
                 }
               }}
@@ -103,7 +104,6 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
           >
             <DateTimePicker
               value={selectedDate}
-              is24Hour={false}
               testID="dateAndTimePicker"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               mode={
