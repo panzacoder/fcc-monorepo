@@ -25,7 +25,7 @@ const PtsTextInput = ({
   return (
     <View
       className={cn(
-        'flex flex-row justify-between rounded-lg ',
+        'flex flex-row justify-between rounded-lg',
         valid ? 'border-gray-400' : 'border-destructive',
         editable ? '' : 'bg-muted',
         className
@@ -33,7 +33,7 @@ const PtsTextInput = ({
     >
       <TextInput
         className={cn(
-          'active:border-primary focus:border-primary flex-1 rounded-lg  border-[1px] border-gray-400 px-4 py-3 ',
+          'active:border-primary focus:border-primary h-11 flex-1 flex-row  rounded-lg border-[1px] border-gray-400 px-4',
           editable ? '' : 'text-muted-foreground',
           textClassName
         )}

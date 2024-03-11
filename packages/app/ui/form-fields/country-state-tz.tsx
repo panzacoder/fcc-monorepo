@@ -1,50 +1,51 @@
 import { View } from 'react-native'
 import { ControlledDropdown } from './controlled-dropdown'
-import store from '../../redux/store'
-import { useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { fetchStateAndTimezoneData } from 'app/data/states'
-import { useWatch } from 'react-hook-form'
 import { Country, State, Timezone } from 'app/data/types'
+import { useCountries } from 'app/redux/staticData/hooks'
+import { cn } from '../utils'
 
-export function CountryStateTimezone({ control }) {
-  const staticData = store.getState().staticDataState.staticData
-  const countries = staticData?.countries
-
-  // const [country, setCountry] = useState<Country>()
+export function CountryStateTimezone({ control, className }) {
+  const countries = useCountries()
   const [states, setStates] = useState<State[]>([])
   const [timezones, setTimezones] = useState<Timezone[]>([])
 
-  const updateCountry = (country: Country) => {
-    fetchStateAndTimezoneData(country).then((statesAndTimezoneForCountry) => {
-      if (statesAndTimezoneForCountry) {
-        setStates(statesAndTimezoneForCountry.stateList)
-        setTimezones(statesAndTimezoneForCountry.timeZoneList)
-      }
-    })
-  }
+  const updateCountry = useCallback(
+    (country: Country) => {
+      console.log('updateCountry', country)
+      fetchStateAndTimezoneData(country).then((statesAndTimezoneForCountry) => {
+        if (statesAndTimezoneForCountry) {
+          setStates(statesAndTimezoneForCountry.stateList)
+          setTimezones(statesAndTimezoneForCountry.timeZoneList)
+        }
+      })
+    },
+    [setStates, setTimezones]
+  )
 
   return (
-    <View>
+    <View className={cn('flex flex-row flex-wrap gap-2', className)}>
       <ControlledDropdown
+        className="basis-full"
         control={control}
         name="country"
         label="Country*"
-        maxHeight={300}
         list={countries}
         onChangeValue={updateCountry}
       />
       <ControlledDropdown
+        className="flex-1"
         control={control}
         name="state"
         label="State*"
-        maxHeight={300}
         list={states}
       />
       <ControlledDropdown
+        className="flex-1"
         control={control}
         name="timezone"
         label="Time Zone*"
-        maxHeight={300}
         list={timezones}
       />
     </View>

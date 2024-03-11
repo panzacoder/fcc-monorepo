@@ -1,82 +1,91 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { useState } from 'react'
-import { Dropdown } from 'react-native-element-dropdown'
+import { View, Text, TextInput } from 'react-native'
+import React, { useMemo, useState } from 'react'
 import { cn } from './utils'
+import {
+  AutocompleteDropdown,
+  AutocompleteDropdownProps
+} from 'react-native-autocomplete-dropdown'
 export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
-  value?: number
-  list?: any
+  value?: string
+  list: any[]
   onChangeValue?: CallableFunction
   error?: boolean
 }
+
 const PtsDropdown = ({
   label,
-  maxHeight,
-  value,
+  // value, // unused right now, is hooked into to sync with form state but is not "controlled"
   list,
   onChangeValue,
   error
 }: PtsDropdownProps) => {
   const [isFocus, setIsFocus] = useState(false)
 
+  const DropdownInput = React.forwardRef<TextInput>(
+    React.useCallback(
+      function DropdownInput(props, ref) {
+        return (
+          <TextInput
+            ref={ref}
+            {...props}
+            style={{}}
+            className="flex h-9 shrink grow items-center overflow-hidden focus:outline-none"
+            editable={list?.length > 0}
+            placeholder={isFocus ? '' : label}
+            placeholderClassName="text-blue-500"
+          />
+        )
+      },
+      [label, list, isFocus]
+    )
+  )
+
+  const dataSet = useMemo(() => {
+    return list.map((item) => {
+      return {
+        title: item.title || item.name || item.label,
+        id: item.id || item.value
+      }
+    })
+  }, [list])
+
   return (
     <View className="">
       {isFocus ? (
-        <Text className="absolute left-[22] top-[8] z-[999] bg-white px-[8] text-[14px]">
+        <Text className="absolute -top-[9px] left-2 z-[999] bg-white px-1 text-sm">
           {label}
         </Text>
       ) : null}
       <View
         className={cn(
-          'rounded-lg border-[1px] border-gray-400 px-4 py-1',
-          'border-gray-400',
-          isFocus && 'border-gray-400',
+          'web:pr-3 native:pr-0 h-11 rounded-lg border-[1px] border-gray-400 pl-4',
+
+          isFocus && 'border-primary',
           error && 'border-destructive'
         )}
       >
-        <Dropdown
-          disable={list?.length === 0}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={list}
-          search
-          maxHeight={maxHeight ? maxHeight : 300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select ' + label : '...'}
-          searchPlaceholder="Search..."
-          value={value}
+        <AutocompleteDropdown
+          inputContainerStyle={{
+            backgroundColor: 'transparent',
+            height: '100%',
+            alignItems: 'center',
+            margin: 0
+          }}
+          clearOnFocus={false}
+          closeOnSubmit={true}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={(item: any) => {
-            onChangeValue && onChangeValue(item.value)
-          }}
+          onSelectItem={
+            onChangeValue as AutocompleteDropdownProps['onSelectItem']
+          }
+          dataSet={dataSet}
+          InputComponent={DropdownInput}
         />
       </View>
     </View>
   )
 }
-const styles = StyleSheet.create({
-  icon: {
-    marginRight: 5
-  },
-  placeholderStyle: {
-    fontSize: 14
-  },
-  selectedTextStyle: {
-    fontSize: 14
-  },
-  iconStyle: {
-    width: 20,
-    height: 20
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 14
-  }
-})
 
 export default PtsDropdown
