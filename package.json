@@ -41,6 +41,7 @@
   "scripts": {
     "native": "yarn workspace expo-app start",
     "web": "yarn workspace next-app next",
+    "web:build": "yarn workspace next-app build",
     "web:sb": "yarn workspace next-app storybook",
     "web:sb:build": "yarn workspace next-app build-storybook",
     "format": "prettier --write .",

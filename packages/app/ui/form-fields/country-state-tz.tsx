@@ -6,7 +6,14 @@ import { Country, State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
 
-export function CountryStateTimezone({ control, className }) {
+export type CountryStateTimezoneProps = {
+  control: any
+  className?: string
+}
+export function CountryStateTimezone({
+  control,
+  className
+}: CountryStateTimezoneProps) {
   const countries = useCountries()
   const [states, setStates] = useState<State[]>([])
   const [timezones, setTimezones] = useState<Timezone[]>([])
