@@ -16,6 +16,10 @@ export async function fetchStateAndTimezoneData(
   const serviceUrl = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
   const deviceInfo = await getUserDeviceInformation()
 
+  if (!country?.id) {
+    console.log('Country id is missing')
+    return
+  }
   const requestBody = {
     header: { deviceInfo },
     country: {
@@ -23,7 +27,7 @@ export async function fetchStateAndTimezoneData(
     }
   }
 
-  CallPostService<StateAndTimezoneData>(serviceUrl, requestBody)
+  return CallPostService<StateAndTimezoneData>(serviceUrl, requestBody)
     .then(async (res) => {
       if (res.status === 'SUCCESS') {
         return res.data

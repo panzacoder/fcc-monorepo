@@ -4,12 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
-import {
-  BASE_URL,
-  CREATE_ACCOUNT,
-  GET_COUNTRIES,
-  GET_STATES_AND_TIMEZONES
-} from 'app/utils/urlConstants'
+import { BASE_URL, CREATE_ACCOUNT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'solito/navigation'
@@ -23,7 +18,6 @@ import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-fiel
 import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { CountryStateTimezone } from 'app/ui/form-fields/country-state-tz'
 
 const schema = z
@@ -59,10 +53,6 @@ const schema = z
 type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
-  const [selectedCountryValue, setSelectedCountry] = useState(-1)
-  const [countries, setCountries] = useState<any>([])
-  const [states, setStates] = useState<any>([])
-  const [timezones, setTimezones] = useState<any>([])
   const [isLoading, setLoading] = useState(false)
 
   const { control, handleSubmit } = useForm({
@@ -82,78 +72,6 @@ export function SignUpScreen() {
   })
 
   const router = useRouter()
-
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId || 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        console.log('data', data)
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // set available states
-          const statesList = data.data.stateList.map((data: any) => {
-            return {
-              label: data.name,
-              value: data.id
-            }
-          })
-          setStates(statesList)
-
-          // set available timezones
-          const timeZones = data.data.timeZoneList.map((data: any) => {
-            return {
-              label: data.name,
-              value: data.name
-            }
-          })
-          setTimezones(timeZones)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }, [])
-
-  useEffect(() => {
-    async function getCountries() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_COUNTRIES}`
-      CallPostService(url, {})
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            const countryList = data.data.map((data: any, index: any) => {
-              return {
-                label: data.name,
-                value: data.id
-              }
-            })
-            setCountries(countryList)
-            if (selectedCountryValue !== -1) {
-              getStates(selectedCountryValue)
-            }
-          } else {
-            setLoading(false)
-            Alert.alert('', data.message)
-          }
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log(error)
-        })
-    }
-    getCountries()
-  }, [])
 
   async function submitRegistration(formData: Schema) {
     console.log('formData', formData)
@@ -191,13 +109,9 @@ export function SignUpScreen() {
         console.log(error)
       })
   }
-  async function setSelectedCountryChange(value: any) {
-    setSelectedCountry(value)
-    await getStates(value)
-  }
 
   return (
-    <CardView scroll>
+    <CardView>
       <CardHeader
         actionSlot={
           <View className="flex flex-1 flex-col items-end">
@@ -257,29 +171,6 @@ export function SignUpScreen() {
           />
 
           <CountryStateTimezone control={control} />
-          <Typography className=" font-bold">{'Address'}</Typography>
-          <ControlledDropdown
-            control={control}
-            name="country"
-            label="Country*"
-            maxHeight={300}
-            list={countries}
-            onChangeValue={setSelectedCountryChange}
-          />
-          <ControlledDropdown
-            control={control}
-            name="state"
-            label="State*"
-            maxHeight={300}
-            list={states}
-          />
-          <ControlledDropdown
-            control={control}
-            name="timezone"
-            label="Time Zone*"
-            maxHeight={300}
-            list={timezones}
-          />
         </View>
         <View className="flex flex-row items-center justify-center">
           <Controller

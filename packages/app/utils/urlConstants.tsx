@@ -15,4 +15,7 @@ export const GET_DOCTOR_DETAILS = 'doctorms/getDoctorWithAppointments'
 export const CREATE_DOCTOR = 'doctorms/create'
 export const GET_MEMBER_FACILITIES = 'facilityms/getMemberFacilities'
 export const GET_FACILITY_DETAILS = 'facilityms/getFacilityWithAppointments'
+export const CREATE_CIRCLE = 'memberms/createMemberForAuthorisedCaregiver'
+export const CREATE_CIRCLE_NO_EMAIL =
+  'memberms/createMemberWithoutEmailForAuthorisedCaregiver'
 export const CREATE_FACILITY = 'facilityms/create'

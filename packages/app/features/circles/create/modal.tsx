@@ -1,22 +1,28 @@
 import { Button } from 'app/ui/button'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { Alert, Pressable, View } from 'react-native'
 
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ScrollView } from 'app/ui/scroll-view'
-import store from 'app/redux/store'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_STATES_AND_TIMEZONES } from 'app/utils/urlConstants'
-import { Image } from 'app/ui/image'
 import { Divider } from 'app/ui/divider'
 import { Card } from '../../../ui/card'
 import { AddressFields } from './address-fields'
+import { useRouter } from 'solito/navigation'
+import {
+  BASE_URL,
+  CREATE_CIRCLE,
+  CREATE_CIRCLE_NO_EMAIL
+} from 'app/utils/urlConstants'
+import { CallPostService } from 'app/utils/fetchServerData'
+import store from 'app/redux/store'
+import { cn } from 'app/ui/utils'
+import { ManagedSwitch } from 'app/ui/managed-switch'
+import Checkbox from 'expo-checkbox'
 
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
@@ -29,17 +35,39 @@ const schema = z.object({
 
 export type Schema = z.infer<typeof schema>
 
-export type CreateCircleProps = {
-  onCancel: () => void
-  formData?: Schema
-}
-export function CreateCircle({ onCancel, formData }: CreateCircleProps) {
+export function CreateCircle() {
+  const router = useRouter()
+  const header = store.getState().headerState.header
   const [formStep, setFormStep] = useState(0)
-  const [isManageCircle, setManageCircle] = useState(-1)
+  const [withEmail, setWithEmail] = useState(true)
+  const [isAuthorizedCaregiver, setIsAuthorizedCaregiver] = useState(false)
 
-  const [isCreateCircleClicked, setCreateCircleClicked] = useState(false)
+  async function createCircle() {
+    let url = `${BASE_URL}${withEmail ? CREATE_CIRCLE_NO_EMAIL : CREATE_CIRCLE}`
+    let dataObject = {
+      header: header
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          router.push('/circles/')
+        } else {
+          Alert.alert('', data.message)
+        }
+        // setLoading(false)
+      })
+      .catch((error) => {
+        // setLoading(false)
+        console.log(error)
+      })
+  }
 
-  const { control, handleSubmit, watch } = useForm({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { isValid }
+  } = useForm({
     defaultValues: {
       email: '',
       firstName: '',
@@ -55,109 +83,143 @@ export function CreateCircle({ onCancel, formData }: CreateCircleProps) {
   })
 
   const firstName = watch('firstName')
+  const lastName = watch('lastName')
+  const email = watch('email')
+
+  const previousFormStep = () => {
+    if (formStep === 1) {
+      setFormStep(0)
+    } else if (formStep === 2) {
+      setFormStep(1)
+    }
+  }
+  const nextFormStep = () => {
+    if (formStep === 0) {
+      setFormStep(1)
+    } else if (formStep === 1) {
+      setFormStep(2)
+    } else {
+      // handleSubmit()
+    }
+  }
 
   return (
     <View className="flex h-full items-center">
       <Typography
         variant="h1"
-        className="bg-muted text-secondary w-full py-4 text-center"
+        className="bg-accent text-accent-foreground w-full py-4 text-center"
       >
         Create a Circle
       </Typography>
-      <Divider className="bg-primary" />
-      <ScrollView className="w-full bg-white p-4">
-        <View className="flex items-center gap-4">
-          <Typography variant="h3">Who is this Circle for?</Typography>
-          <View className="my-5 flex w-full gap-2">
-            <ControlledTextField
-              control={control}
-              name="firstName"
-              placeholder={'First Name'}
-              className="w-full"
+      <Divider className="bg-accent-foreground" />
+      <View className="bg-muted flex w-full flex-row justify-evenly py-4">
+        {[0, 1, 2].map((step) => {
+          let variant: 'outline' | 'default' | 'accent' = 'outline'
+          if (formStep === step) {
+            variant = 'default'
+          } else if (formStep > step) {
+            variant = 'accent'
+          }
+          return (
+            <Button
+              key={step}
+              title={`${step + 1}`}
+              size="icon"
+              variant={variant}
+              onPress={() => {
+                setFormStep(step)
+              }}
             />
-            <ControlledTextField
-              control={control}
-              name="lastName"
-              placeholder="Last Name"
-              className="w-full"
-            />
+          )
+        })}
+      </View>
+
+      <ScrollView
+        automaticallyAdjustKeyboardInsets={true}
+        contentInsetAdjustmentBehavior="automatic"
+        className="w-full bg-white p-4"
+      >
+        <View className="flex items-center gap-6">
+          <>
             <View className="flex-row items-center gap-2">
               <Feather name={'info'} size={20} className="color-primary" />
               <Typography className="">
                 {'Circles organize caregiving details for an individual.'}
               </Typography>
             </View>
-          </View>
 
-          <Divider />
-
-          <Typography variant="h3">{`Do you want to invite ${firstName} to manage their Circle?`}</Typography>
-          <View className="bg-muted rounded-[25px] px-2 py-2 ">
-            <View className="flex-row">
-              <Pressable
-                onPress={() => {
-                  setManageCircle(0)
+            <Typography variant="h3">Who is this Circle for?</Typography>
+            <View className="flex w-full gap-2">
+              <ControlledTextField
+                control={control}
+                name="firstName"
+                placeholder={'First Name'}
+                className="w-full"
+              />
+              <ControlledTextField
+                control={control}
+                name="lastName"
+                placeholder="Last Name"
+                className="w-full"
+                onBlur={() => {
+                  nextFormStep()
                 }}
-                className={`bg-[${isManageCircle === 0 ? 'primary' : 'transparent'}] rounded-[25px] px-10 py-2`}
-              >
-                <Typography
-                  className={`text- black items-center self-center font-bold`}
-                >
-                  {'Yes'}
-                </Typography>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setManageCircle(1)
-                }}
-                className={`bg-[${isManageCircle === 1 ? 'primary' : 'transparent'}] rounded-[25px] px-10 py-2`}
-              >
-                <Typography
-                  className={`items-center self-center font-bold text-black`}
-                >
-                  {'No'}
-                </Typography>
-              </Pressable>
+              />
             </View>
-          </View>
+          </>
+          {firstName && lastName && (
+            <>
+              <Typography variant="h3">{`Do you want to invite ${firstName} to manage their circle?`}</Typography>
+              <ManagedSwitch
+                value={withEmail}
+                onValueChange={setWithEmail}
+                onText="Yes"
+                offText="No"
+              />
+              {withEmail ? (
+                <ControlledTextField
+                  control={control}
+                  name="email"
+                  placeholder={'Email Address'}
+                  className="w-full"
+                  autoCapitalize="none"
+                />
+              ) : (
+                <Card className="bg-secondary flex w-full flex-col gap-5 py-5">
+                  <Typography className="text-secondary-foreground text-lg">
+                    {`You will be the sole manager of ${firstName + "'s"} Circle.\n`}
+                    {`If at any point ${firstName} wants to manage their Circle, you can add their email address in Circle settings.`}
+                  </Typography>
+                  <Divider className="bg-secondary-foreground/50" />
+                  <View className="flex flex-row items-center gap-4">
+                    <Checkbox
+                      value={isAuthorizedCaregiver}
+                      onValueChange={setIsAuthorizedCaregiver}
+                    />
+                    <Typography className="text-secondary-foreground text-lg">
+                      {`I am an authorized caregiver for ${firstName}`}
+                    </Typography>
+                  </View>
+                </Card>
+              )}
+            </>
+          )}
+          {(email || isAuthorizedCaregiver) && (
+            <>
+              <Typography variant="h4">
+                {`What is ${firstName}'s primary address?`}
+              </Typography>
+              <AddressFields control={control} className="w-full" />
+            </>
+          )}
 
-          <Divider />
-
-          <ControlledTextField
-            control={control}
-            name="email"
-            placeholder={'Email Address'}
-            className="w-full"
-            autoCapitalize="none"
-          />
-          <Card className="bg-secondary w-full py-5">
-            <Typography className="text-secondary-foreground text-lg">
-              {`You will be the sole manager of ${firstName + "'s"} Circle.\n`}
-              {`If at any point ${firstName} wants to manage their Circle, you can add their email address in Circle settings.`}
-            </Typography>
-          </Card>
-          <Typography variant="h4">
-            {`What is ${firstName}'s default timezone?`}
-          </Typography>
-          <AddressFields control={control} className="w-full" />
-          <View className="flex flex-row gap-2">
+          {isValid && (
             <Button
-              className="mr-2"
-              title={'Back to Circle View'}
-              variant="border"
-              leadingIcon="arrow-left"
-              onPress={() => {
-                setCreateCircleClicked(!isCreateCircleClicked)
-                setFormStep(0)
-              }}
+              className="w-full"
+              title={'Create Circle'}
+              onPress={nextFormStep}
             />
-            <Button
-              className=""
-              title={'Go To Circle'}
-              trailingIcon="arrow-right"
-              onPress={() => { }}
-            />
-          </View>
+          )}
         </View>
       </ScrollView>
     </View>

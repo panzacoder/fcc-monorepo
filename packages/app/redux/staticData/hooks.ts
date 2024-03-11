@@ -6,5 +6,5 @@ export function useStaticData() {
 }
 
 export function useCountries(): Country[] {
-  return useStaticData()['countries'] || []
+  return useStaticData()['countryList'] || []
 }
