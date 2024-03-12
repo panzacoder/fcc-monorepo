@@ -127,10 +127,8 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
       </View>
     )
   }
-  function refreshDataReminder(isCancel: boolean) {
-    if (isCancel) {
-      setIsAddReminder(false)
-    }
+  function cancelClicked() {
+    setIsAddReminder(false)
   }
   async function deleteReminder(reminderData: any) {
     setLoading(true)
@@ -275,7 +273,7 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
         <View className="">
           <AddEditReminder
             reminderData={remindersData}
-            refreshData={refreshDataReminder}
+            cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}
           />
         </View>
@@ -289,7 +287,6 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
               <View key={index} className="ml-4">
                 <Reminder
                   data={data}
-                  refreshData={refreshData}
                   editReminder={editReminder}
                   deleteReminder={deleteReminder}
                 />

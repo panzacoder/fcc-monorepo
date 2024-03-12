@@ -1,12 +1,4 @@
-import { useState } from 'react'
-import { View, Alert } from 'react-native'
-import { CallPostService } from 'app/utils/fetchServerData'
-import PtsLoader from 'app/ui/PtsLoader'
-import {
-  BASE_URL,
-  CREATE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_NOTE
-} from 'app/utils/urlConstants'
+import { View } from 'react-native'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -21,9 +13,7 @@ const schema = z.object({
   occurrence: z.number().min(0, { message: 'Occurrence is required' })
 })
 export type Schema = z.infer<typeof schema>
-export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
-  const [isLoading, setLoading] = useState(false)
-  const header = store.getState().headerState.header
+export const AddEditNote = ({ noteData, cancelClicked, createUpdateNote }) => {
   const staticData = store.getState().staticDataState.staticData
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
@@ -37,11 +27,11 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
   }
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      title: !_.isEmpty(noteData) && noteData.shortDescription ? noteData.shortDescription : '',
-      noteDetails:
-        !_.isEmpty(noteData) && noteData.note
-          ? noteData.note
+      title:
+        !_.isEmpty(noteData) && noteData.shortDescription
+          ? noteData.shortDescription
           : '',
+      noteDetails: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
       occurrence: occuranceIndex
     },
     resolver: zodResolver(schema)
@@ -54,47 +44,16 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
       }
     }
   )
-  async function createUpdateNote(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: '',
-        appointment: {
-          id: appointmentId
-        },
-        occurance: {
-          occurance: occuranceList[formData.occurrence].label
-        },
-        note: formData.noteDetails,
-        shortDescription: formData.title
-      }
-    }
-    if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_NOTE}`
-    } else {
-      dataObject.appointmentNote.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_NOTE}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
+  async function callCreateUpdateNote(formData: Schema) {
+    createUpdateNote(
+      occuranceList[formData.occurrence].label,
+      formData.noteDetails,
+      formData.title,
+      noteData
+    )
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">
-      <PtsLoader loading={isLoading} />
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField
@@ -131,14 +90,14 @@ export const AddEditNote = ({ noteData, appointmentId, refreshData }) => {
             title="Cancel"
             variant="default"
             onPress={() => {
-              refreshData(true)
+              cancelClicked()
             }}
           />
           <Button
             className="ml-5"
             title={_.isEmpty(noteData) ? 'Save' : 'Update'}
             variant="default"
-            onPress={handleSubmit(createUpdateNote)}
+            onPress={handleSubmit(callCreateUpdateNote)}
           />
         </View>
       </View>

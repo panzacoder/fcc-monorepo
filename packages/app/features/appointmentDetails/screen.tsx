@@ -14,8 +14,13 @@ import {
   DELETE_APPOINTMENT_REMINDER,
   CREATE_APPOINTMENT_REMINDER,
   UPDATE_APPOINTMENT_REMINDER,
+  CREATE_APPOINTMENT_NOTE,
+  DELETE_APPOINTMENT_NOTE,
+  UPDATE_APPOINTMENT_NOTE,
   UPDATE_APPOINTMENT_STATUS,
-  DELETE_APPOINTMENT
+  DELETE_APPOINTMENT,
+  GET_THREAD_PARTICIPANTS,
+  CREATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
@@ -28,6 +33,7 @@ import { Transportation } from 'app/ui/transportation'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddEditReminder } from 'app/ui/addEditReminder'
 import { AddEditTransport } from 'app/ui/addEditTransport'
+import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let appointmentPrivileges = {}
@@ -44,6 +50,7 @@ export function AppointmentDetailsScreen() {
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
+  const [isMessageThread, setIsMessageThread] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isAddTransportation, setIsAddTransportation] = useState(false)
   const [isRender, setIsRender] = useState(false)
@@ -55,10 +62,11 @@ export function AppointmentDetailsScreen() {
   const [transportationData, setTransportationData] = useState({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [notesList, setNotesList] = useState([])
+  const [participantsList, setParticipantsList] = useState([])
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
-  const getAppointmentDetails = useCallback(async () => {
+  const getAppointmentDetails = useCallback(async (isFromCreateThread: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_APPOINTMENT_DETAILS}`
     let dataObject = {
@@ -118,6 +126,14 @@ export function AppointmentDetailsScreen() {
             }
           }
           setIsDataReceived(true)
+          if (isFromCreateThread) {
+            router.push(
+              formatUrl('/(authenticated)/circles/noteMessage', {
+                memberData: JSON.stringify(memberData),
+                noteData: JSON.stringify(noteData)
+              })
+            )
+          }
         } else {
           Alert.alert('', data.message)
         }
@@ -130,7 +146,7 @@ export function AppointmentDetailsScreen() {
   }, [])
   useEffect(() => {
     if (!isAddNote) {
-      getAppointmentDetails()
+      getAppointmentDetails(false)
     }
   }, [])
   let doctorFacilityName = '',
@@ -216,21 +232,97 @@ export function AppointmentDetailsScreen() {
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
-  const refreshData = (isCancel: boolean) => {
-    // console.log('in refreshData')
-    if (!isCancel) {
-      getAppointmentDetails()
-      setIsRender(!isRender)
-    }
-
+  const cancelClicked = () => {
     setIsAddNote(false)
     setIsAddReminder(false)
     setIsAddTransportation(false)
+    setIsMessageThread(false)
   }
-  function refreshDataReminder(isCancel: boolean) {
-    if (isCancel) {
-      setIsAddReminder(false)
+
+  function createMessageThread(subject: any, noteData: any) {
+    setLoading(true)
+    let loginURL = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
+    let list: object[] = []
+    participantsList.map((data: any, index: any) => {
+      if (data.isSelected === true) {
+        let object = {
+          user: {
+            id: data.id
+          }
+        }
+        list.push(object)
+      }
+    })
+    let dataObject = {
+      header: header,
+      messageThread: {
+        subject: subject,
+        member: memberData.member ? memberData.member : '',
+        noteId: noteData.id ? noteData.id : '',
+        type: {
+          type: 'Appointment'
+        },
+        participantList: list,
+        appointmentNote: {
+          id: noteData.id ? noteData.id : ''
+        },
+        messageList: []
+      }
     }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          setIsMessageThread(false)
+          getAppointmentDetails(true)
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  function isParticipantSelected(index: any) {
+    participantsList[index].isSelected = !participantsList[index].isSelected
+    setIsRender(!isRender)
+    setParticipantsList(participantsList)
+  }
+  async function getThreadParticipants() {
+    setLoading(true)
+    let loginURL = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
+    let dataObject = {
+      header: header,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      messageThreadType: {
+        type: 'Appointment'
+      }
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          // console.log('in getThreadParticipants')
+          const list = data.data.map((data: any, index: any) => {
+            let object = data
+            object.isSelected = false
+            return object
+          })
+          setParticipantsList(list)
+          setIsMessageThread(true)
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
   }
   async function deleteAppointment() {
     setLoading(true)
@@ -253,6 +345,91 @@ export function AppointmentDetailsScreen() {
             })
           )
           // router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function deleteNote(noteId: any) {
+    setLoading(true)
+    let loginURL = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
+    let dataObject = {
+      header: header,
+      appointmentNote: {
+        id: noteId
+      }
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(loginURL, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          getAppointmentDetails(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function createUpdateNote(
+    occurance: any,
+    noteDetails: any,
+    title: any,
+    noteData: any
+  ) {
+    setLoading(true)
+    let url = ''
+    let dataObject = {
+      header: header,
+      appointmentNote: {
+        id: '',
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : ''
+        },
+        occurance: {
+          occurance: occurance
+        },
+        note: noteDetails,
+        shortDescription: title
+      }
+    }
+    if (_.isEmpty(noteData)) {
+      url = `${BASE_URL}${CREATE_APPOINTMENT_NOTE}`
+    } else {
+      dataObject.appointmentNote.id = noteData.id ? noteData.id : ''
+      url = `${BASE_URL}${UPDATE_APPOINTMENT_NOTE}`
+    }
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          setIsAddNote(false)
+          getAppointmentDetails(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function createUpdateTransportation(url: any, dataObject: any) {
+    setLoading(true)
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          cancelClicked()
+          getAppointmentDetails(false)
         } else {
           Alert.alert('', data.message)
         }
@@ -323,7 +500,7 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          refreshData(false)
+          refreshData()
         } else {
           Alert.alert('', data.message)
         }
@@ -366,6 +543,21 @@ export function AppointmentDetailsScreen() {
     setNoteData(noteData)
     setIsAddNote(true)
   }
+  const messageThreadClicked = (noteData: any) => {
+    // console.log('messageThreadClicked', JSON.stringify(noteData))
+    setNoteData(noteData)
+    if (noteData.hasMsgThread) {
+      // console.log('noteData', noteData)
+      router.push(
+        formatUrl('/(authenticated)/circles/noteMessage', {
+          memberData: JSON.stringify(memberData),
+          noteData: JSON.stringify(noteData)
+        })
+      )
+    } else {
+      getThreadParticipants()
+    }
+  }
   const editReminder = (remiderData: any) => {
     // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
@@ -375,6 +567,9 @@ export function AppointmentDetailsScreen() {
     // console.log('remiderData', JSON.stringify(transportationData))
     setTransportationData(transportationData)
     setIsAddTransportation(true)
+  }
+  async function refreshData() {
+    getAppointmentDetails(false)
   }
   function getDetailsView(
     title: string,
@@ -449,7 +644,54 @@ export function AppointmentDetailsScreen() {
               {getDetailsView('Purpose:', status, false, '')}
               {getDetailsView('Status:', purpose, false, '')}
               {getDetailsView('Description:', description, false, '')}
+              {(status === 'Scheduled' || status === 'ReScheduled') &&
+              (getUserPermission(appointmentPrivileges).createPermission ||
+                getUserPermission(appointmentPrivileges).updatePermission ||
+                getUserPermission(appointmentPrivileges).deletePermission) ? (
+                <View className="mt-5 w-full flex-row justify-center">
+                  {moment(
+                    appointmentDetails.date ? appointmentDetails.date : ''
+                  )
+                    .utc()
+                    .isBefore(moment().utc()) ? (
+                    <Button
+                      className="w-[50%] bg-[#ef6603]"
+                      title="Mark Completed"
+                      variant="default"
+                      onPress={() => {
+                        updateStatus('Completed')
+                      }}
+                    />
+                  ) : (
+                    <View />
+                  )}
+
+                  <Button
+                    className="ml-3 w-[50%] bg-[#ef6603]"
+                    title="Mark Cancelled"
+                    variant="default"
+                    onPress={() => {
+                      Alert.alert(
+                        'Do you really want to cancel appointment?',
+                        'It cannot be recovered once cancelled.',
+                        [
+                          {
+                            text: 'Ok',
+                            onPress: () => {
+                              updateStatus('Cancelled')
+                            }
+                          },
+                          { text: 'Cancel', onPress: () => {} }
+                        ]
+                      )
+                    }}
+                  />
+                </View>
+              ) : (
+                <View />
+              )}
             </View>
+
             <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <Typography className="font-[15px] font-bold text-[#287CFA]">
                 {'Location Details'}
@@ -503,8 +745,11 @@ export function AppointmentDetailsScreen() {
                       <View key={index}>
                         <Note
                           data={data}
-                          refreshData={refreshData}
+                          cancelClicked={cancelClicked}
                           editNote={editNote}
+                          deleteNote={deleteNote}
+                          messageThreadClicked={messageThreadClicked}
+                          notePrivileges={notePrivileges}
                         />
                       </View>
                     )
@@ -558,7 +803,6 @@ export function AppointmentDetailsScreen() {
                       <View key={index}>
                         <Reminder
                           data={data}
-                          refreshData={refreshData}
                           editReminder={editReminder}
                           deleteReminder={deleteReminder}
                         />
@@ -631,50 +875,7 @@ export function AppointmentDetailsScreen() {
                 <View />
               )}
             </View>
-            {(status === 'Scheduled' || status === 'ReScheduled') &&
-            (getUserPermission(appointmentPrivileges).createPermission ||
-              getUserPermission(appointmentPrivileges).updatePermission ||
-              getUserPermission(appointmentPrivileges).deletePermission) ? (
-              <View className="mt-5 w-full flex-row justify-center">
-                {moment(appointmentDetails.date ? appointmentDetails.date : '')
-                  .utc()
-                  .isBefore(moment().utc()) ? (
-                  <Button
-                    className="w-[45%] bg-[#ef6603]"
-                    title="Mark Completed"
-                    variant="default"
-                    onPress={() => {
-                      updateStatus('Completed')
-                    }}
-                  />
-                ) : (
-                  <View />
-                )}
 
-                <Button
-                  className="ml-3 w-[45%] bg-[#ef6603]"
-                  title="Mark Cancelled"
-                  variant="default"
-                  onPress={() => {
-                    Alert.alert(
-                      'Do you really want to cancel appointment?',
-                      'It cannot be recovered once cancelled.',
-                      [
-                        {
-                          text: 'Ok',
-                          onPress: () => {
-                            updateStatus('Cancelled')
-                          }
-                        },
-                        { text: 'Cancel', onPress: () => {} }
-                      ]
-                    )
-                  }}
-                />
-              </View>
-            ) : (
-              <View />
-            )}
             {getUserPermission(appointmentPrivileges).deletePermission ? (
               <View className="mx-5 my-5">
                 <Button
@@ -708,8 +909,8 @@ export function AppointmentDetailsScreen() {
         <View className="h-full w-full justify-center self-center">
           <AddEditNote
             noteData={noteData}
-            appointmentId={appointmentDetails.id}
-            refreshData={refreshData}
+            cancelClicked={cancelClicked}
+            createUpdateNote={createUpdateNote}
           />
         </View>
       ) : (
@@ -719,7 +920,7 @@ export function AppointmentDetailsScreen() {
         <View className="h-full w-full justify-center self-center">
           <AddEditReminder
             reminderData={reminderData}
-            refreshData={refreshDataReminder}
+            cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}
           />
         </View>
@@ -731,7 +932,22 @@ export function AppointmentDetailsScreen() {
           <AddEditTransport
             transportData={transportationData}
             appointmentId={appointmentDetails.id}
-            refreshData={refreshData}
+            cancelClicked={cancelClicked}
+            createUpdateTransportation={createUpdateTransportation}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isMessageThread ? (
+        <View className="h-full w-full justify-center self-center">
+          <AddMessageThread
+            participantsList={participantsList}
+            noteData={noteData}
+            cancelClicked={cancelClicked}
+            isParticipantSelected={isParticipantSelected}
+            createMessageThread={createMessageThread}
+            isUpdateParticipants={false}
           />
         </View>
       ) : (

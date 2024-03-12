@@ -17,7 +17,7 @@ export type Schema = z.infer<typeof schema>
 export const AddEditReminder = ({
   reminderData,
   // appointmentId,
-  refreshData,
+  cancelClicked,
   createUpdateReminder
 }) => {
   let selectedDate: any = ''
@@ -67,7 +67,7 @@ export const AddEditReminder = ({
             title="Cancel"
             variant="default"
             onPress={() => {
-              refreshData(true)
+              cancelClicked()
             }}
           />
           <Button

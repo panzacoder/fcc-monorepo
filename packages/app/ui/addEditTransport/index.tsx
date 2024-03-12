@@ -35,7 +35,8 @@ let selectedDate: any = new Date()
 export const AddEditTransport = ({
   transportData,
   appointmentId,
-  refreshData
+  cancelClicked,
+  createUpdateTransportation
 }) => {
   let countryIndex = 96
   let stateIndex = -1
@@ -144,7 +145,7 @@ export const AddEditTransport = ({
   }, [])
 
   async function createUpdateTransport(formData: Schema) {
-    setLoading(true)
+    
     let dataObject = {}
     let url = ''
     if (_.isEmpty(transportData)) {
@@ -204,20 +205,8 @@ export const AddEditTransport = ({
       url = `${BASE_URL}${UPDATE_TRANSPORTATION}`
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
+    createUpdateTransportation(url, dataObject)
+    
   }
   const onSelection = (date: any) => {
     selectedDate = date
@@ -380,7 +369,7 @@ export const AddEditTransport = ({
             title="Cancel"
             variant="default"
             onPress={() => {
-              refreshData(true)
+              cancelClicked()
             }}
           />
           <Button

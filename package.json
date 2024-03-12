@@ -10,6 +10,7 @@
     "@react-native-community/datetimepicker": "^7.6.2",
     "@react-navigation/drawer": "^6.6.7",
     "countries-and-timezones": "^3.6.0",
+    "expo": "^50.0.11",
     "expo-device": "^5.9.3",
     "expo-image": "1.10.6",
     "expo-linear-gradient": "~12.7.1",
@@ -58,6 +59,6 @@
     "**/expo-router",
     "**/expo-router/**"
   ],
-  "packageManager": "yarn@4.0.2",
+  "packageManager": "yarn@4.1.1",
   "version": ""
 }

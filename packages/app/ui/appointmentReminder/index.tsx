@@ -7,12 +7,7 @@ import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { Timer } from 'app/utils/timer'
 
-export const Reminder = ({
-  data,
-  refreshData,
-  editReminder,
-  deleteReminder
-}) => {
+export const Reminder = ({ data, editReminder, deleteReminder }) => {
   const [isLoading, setLoading] = useState(false)
   const header = store.getState().headerState.header
   let reminderData = data ? data : {}

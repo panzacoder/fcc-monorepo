@@ -56,7 +56,7 @@ export function AppointmentsScreen() {
             }
             setAppointmentsListFull(data.data.list ? data.data.list : [])
             getFilteredList(data.data.list ? data.data.list : [], currentFilter)
-            console.log('setAppointments', data.data)
+            // console.log('setAppointments', data.data)
           } else {
             Alert.alert('', data.message)
           }
