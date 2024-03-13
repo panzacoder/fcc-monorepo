@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/:path*",
-      "destination": "https://e.customeriomail.com/:path*"
+      "destination": "https://track.customer.io/:path*"
     }
   ]
 }
