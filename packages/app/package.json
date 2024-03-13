@@ -21,6 +21,7 @@
     "react-native-autocomplete-dropdown": "^3.1.4",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-svg": "^15.0.0",
+    "react-native-virtualized-view": "^1.0.0",
     "react-redux": "^9.1.0",
     "solito": "4.2.1",
     "tailwind-merge": "^2.2.1",

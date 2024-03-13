@@ -24,22 +24,17 @@ const PtsDropdown = ({
   const [isFocus, setIsFocus] = useState(false)
 
   const DropdownInput = React.forwardRef<TextInput>(
-    React.useCallback(
-      function DropdownInput(props, ref) {
-        return (
-          <TextInput
-            ref={ref}
-            {...props}
-            style={{}}
-            className="flex h-9 shrink grow items-center overflow-hidden focus:outline-none"
-            editable={list?.length > 0}
-            placeholder={isFocus ? '' : label}
-            placeholderClassName="text-blue-500"
-          />
-        )
-      },
-      [label, list, isFocus]
-    )
+    React.useCallback(function DropdownInput(props, ref) {
+      return (
+        <TextInput
+          ref={ref}
+          {...props}
+          style={{}}
+          className="flex h-9 shrink grow items-center overflow-hidden focus:outline-none"
+          placeholderClassName="text-blue-500"
+        />
+      )
+    }, [])
   )
 
   const dataSet = useMemo(() => {
@@ -74,13 +69,20 @@ const PtsDropdown = ({
             margin: 0
           }}
           clearOnFocus={false}
-          closeOnSubmit={true}
-          onFocus={() => setIsFocus(true)}
+          closeOnSubmit
+          onFocus={(e) => {
+            setIsFocus(true)
+            // e.currentTarget.focus()
+          }}
           onBlur={() => setIsFocus(false)}
           onSelectItem={
             onChangeValue as AutocompleteDropdownProps['onSelectItem']
           }
           dataSet={dataSet}
+          textInputProps={{
+            editable: list?.length > 0,
+            placeholder: isFocus ? '' : label
+          }}
           InputComponent={DropdownInput}
         />
       </View>

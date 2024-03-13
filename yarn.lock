@@ -6706,6 +6706,7 @@ __metadata:
     react-native-autocomplete-dropdown: "npm:^3.1.4"
     react-native-linear-gradient: "npm:^2.8.3"
     react-native-svg: "npm:^15.0.0"
+    react-native-virtualized-view: "npm:^1.0.0"
     react-redux: "npm:^9.1.0"
     solito: "npm:4.2.1"
     tailwind-merge: "npm:^2.2.1"
@@ -16333,6 +16334,16 @@ __metadata:
     fa6-upgrade: bin/fa6-upgrade.sh
     generate-icon: bin/generate-icon.js
   checksum: 44f33eeb58fac685a301ea191ef4424dda3f30a20c826bf26f7eee93bb58d90f5075ba7577f3ed09841a0abfe25578735a4778960cba5734eb35e96a5eb969e6
+  languageName: node
+  linkType: hard
+
+"react-native-virtualized-view@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "react-native-virtualized-view@npm:1.0.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: e647ca3556ceb85f0f6a3ae0359c1e628bd3603b178089ae2f122b71398536abb13a02a27755caa8ccbb8358bbda0a57425809a604eed2c076f0be54b0299718
   languageName: node
   linkType: hard
 
