@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// const originDomain = 'https://track.customer.io'
-const originDomain = 'https://e.customeriomail.com'
+const originDomain = 'https://track.customer.io'
+// const originDomain = 'https://e.customeriomail.com'
 export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   console.log('existing host', requestHeaders.get('Host'))
