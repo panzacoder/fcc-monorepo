@@ -6,23 +6,28 @@ import {
   AutocompleteDropdownProps
 } from 'react-native-autocomplete-dropdown'
 
+export type DropdownItem = {
+  id: string | number
+  title: string | null
+}
+
 export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
   value?: string
   list: any[]
-  onChangeValue?: (value: string) => void
+  onChangeValue?: (item?: DropdownItem) => void
   error?: boolean
   emptyResultText?: string
-  textInputProps?: AutocompleteDropdownProps['textInputProps']
   onSubmitEditing?: (e?: any) => void
-}
+} & Omit<AutocompleteDropdownProps, 'ref'>
 
 const DropdownInput = React.forwardRef<TextInput>(
   function DropdownInput(props, ref) {
     return (
       <TextInput
         ref={ref}
+        blurOnSubmit={false}
         {...props}
         style={{}}
         className="placeholder:text-muted-foreground flex h-9 shrink grow items-center overflow-hidden focus:outline-none"
@@ -84,11 +89,10 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           closeOnSubmit
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onSelectItem={(item) => {
-            onChangeValue?.(
-              item as unknown as string
-            ) as AutocompleteDropdownProps['onSelectItem']
-            onSubmitEditing?.()
+          onSelectItem={(item: DropdownItem) => {
+            console.log('onSelectItem', item)
+            onChangeValue?.(item)
+            item && onSubmitEditing?.()
           }}
           dataSet={dataSet}
           textInputProps={{

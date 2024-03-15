@@ -24,15 +24,15 @@ export function ControlledDropdown<T extends FieldValues>({
       control={control}
       rules={rules}
       render={({ field: { onChange, ...fieldProps }, fieldState }) => {
-        const handleChange = (text: string) => {
-          onChange(text)
-          onChangeValue && onChangeValue(text)
+        const handleChangeValue: PtsDropdownProps['onChangeValue'] = (item) => {
+          onChange(item)
+          onChangeValue && onChangeValue(item)
         }
         return (
           <View className={cn('flex w-full gap-1', className)}>
             <PtsDropdown
               error={fieldState?.invalid}
-              onChangeValue={handleChange}
+              onChangeValue={handleChangeValue}
               {...fieldProps}
               {...rest}
             />

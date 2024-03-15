@@ -6,6 +6,7 @@ import { Country, State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
 import { useFormContext } from 'react-hook-form'
+import { DropdownItem } from '../PtsDropdown'
 
 export type CountryStateTimezoneProps = {
   control?: any
@@ -22,9 +23,15 @@ export function CountryStateTimezone({
   const [timezones, setTimezones] = useState<Timezone[]>([])
 
   const updateCountry = useCallback(
-    (country: Country) => {
-      console.log('updateCountry', country)
-      fetchStateAndTimezoneData(country).then((statesAndTimezoneForCountry) => {
+    (item?: DropdownItem) => {
+      if (!item) return
+      var itemId = item.id
+      if (typeof itemId === 'string') {
+        itemId = parseInt(itemId)
+      }
+
+      console.log('updateCountry', item)
+      fetchStateAndTimezoneData(itemId).then((statesAndTimezoneForCountry) => {
         if (statesAndTimezoneForCountry) {
           setStates(statesAndTimezoneForCountry.stateList)
           setTimezones(statesAndTimezoneForCountry.timeZoneList)

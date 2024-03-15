@@ -11,19 +11,19 @@ export type StateAndTimezoneData = {
 }
 
 export async function fetchStateAndTimezoneData(
-  country: Country
+  id: Country['id']
 ): Promise<StateAndTimezoneData | void> {
   const serviceUrl = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
   const deviceInfo = await getUserDeviceInformation()
 
-  if (!country?.id) {
+  if (!id) {
     console.log('Country id is missing')
     return
   }
   const requestBody = {
     header: { deviceInfo },
     country: {
-      id: country.id
+      id
     }
   }
 
