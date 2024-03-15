@@ -5,14 +5,17 @@ import { fetchStateAndTimezoneData } from 'app/data/states'
 import { Country, State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
+import { useFormContext } from 'react-hook-form'
 
 export type CountryStateTimezoneProps = {
-  control: any
+  control?: any
   className?: string
+  onSubmitEditing?: () => void
 }
 export function CountryStateTimezone({
   control,
-  className
+  className,
+  onSubmitEditing
 }: CountryStateTimezoneProps) {
   const countries = useCountries()
   const [states, setStates] = useState<State[]>([])
@@ -31,6 +34,8 @@ export function CountryStateTimezone({
     [setStates, setTimezones]
   )
 
+  const { setFocus } = useFormContext()
+
   return (
     <View className={cn('flex flex-row flex-wrap gap-2', className)}>
       <ControlledDropdown
@@ -41,6 +46,9 @@ export function CountryStateTimezone({
         label="Country*"
         list={countries}
         onChangeValue={updateCountry}
+        onSubmitEditing={() => {
+          setFocus('state')
+        }}
       />
       <ControlledDropdown
         emptyResultText="Please select a country first."
@@ -49,6 +57,9 @@ export function CountryStateTimezone({
         name="state"
         label="State*"
         list={states}
+        onSubmitEditing={() => {
+          setFocus('timezone')
+        }}
       />
       <ControlledDropdown
         emptyResultText="Please select a country first."
@@ -57,6 +68,7 @@ export function CountryStateTimezone({
         name="timezone"
         label="Time Zone*"
         list={timezones}
+        onSubmitEditing={onSubmitEditing}
       />
     </View>
   )

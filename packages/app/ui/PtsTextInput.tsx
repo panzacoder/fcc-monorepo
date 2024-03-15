@@ -1,5 +1,6 @@
 import { TextInput, TextInputProps, View } from 'react-native'
 import { cn } from './utils'
+import React from 'react'
 
 export type PtsTextInputProps = {
   keyboard?: TextInputProps['keyboardType']
@@ -10,18 +11,21 @@ export type PtsTextInputProps = {
   textClassName?: string
 } & TextInputProps
 
-const PtsTextInput = ({
-  className,
-  textClassName,
-  onChangeText,
-  valid = true,
-  keyboard = 'default',
-  keyboardType = keyboard,
-  isEditable = true,
-  editable = isEditable,
-  trailingSlot,
-  ...rest
-}: PtsTextInputProps) => {
+const PtsTextInput = React.forwardRef(function PtsTextInput(
+  {
+    className,
+    textClassName,
+    onChangeText,
+    valid = true,
+    keyboard = 'default',
+    keyboardType = keyboard,
+    isEditable = true,
+    editable = isEditable,
+    trailingSlot,
+    ...rest
+  }: PtsTextInputProps,
+  ref: React.Ref<TextInput>
+) {
   return (
     <View
       className={cn(
@@ -32,6 +36,7 @@ const PtsTextInput = ({
       )}
     >
       <TextInput
+        ref={ref}
         className={cn(
           'placeholder:text-muted-foreground active:border-primary focus:border-primary h-11 flex-1 flex-row  rounded-lg border-[1px] border-gray-400 px-4',
           editable ? '' : 'text-muted-foreground',
@@ -40,6 +45,7 @@ const PtsTextInput = ({
         editable={editable}
         keyboardType={keyboardType}
         returnKeyType="next"
+        blurOnSubmit={false}
         onChangeText={(text) => {
           onChangeText && onChangeText(text)
         }}
@@ -50,5 +56,6 @@ const PtsTextInput = ({
       </View>
     </View>
   )
-}
+})
+
 export default PtsTextInput

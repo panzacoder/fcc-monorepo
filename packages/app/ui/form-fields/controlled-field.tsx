@@ -1,15 +1,16 @@
 import PtsTextInput, { PtsTextInputProps } from 'app/ui/PtsTextInput'
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
+import React from 'react'
 import { Controller, ControllerProps, FieldValues } from 'react-hook-form'
-import { View } from 'react-native'
+import { TextInput, View } from 'react-native'
 
 export type ControlledTextFieldProps<T extends FieldValues> =
   PtsTextInputProps &
-  Omit<ControllerProps<T>, 'render'> & {
-    inputClassName?: string
-    InputComponent?: React.ComponentType<any>
-  }
+    Omit<ControllerProps<T>, 'render'> & {
+      inputClassName?: string
+      InputComponent?: React.ComponentType<any>
+    }
 
 export function ControlledTextField<T extends FieldValues>({
   control,
@@ -19,7 +20,6 @@ export function ControlledTextField<T extends FieldValues>({
   className,
   inputClassName,
   InputComponent = PtsTextInput,
-
   ...rest
 }: ControlledTextFieldProps<T>) {
   return (
@@ -27,7 +27,7 @@ export function ControlledTextField<T extends FieldValues>({
       name={name}
       control={control}
       rules={rules}
-      render={({ field: { onChange, value }, fieldState }) => {
+      render={({ field: { onChange, ...fieldProps }, fieldState }) => {
         const handleChange = (text: string) => {
           onChange(text)
           onChangeText && onChangeText(text)
@@ -37,10 +37,10 @@ export function ControlledTextField<T extends FieldValues>({
             <InputComponent
               className={
                 (cn('', fieldState?.invalid && 'border-destructive'),
-                  inputClassName)
+                inputClassName)
               }
               onChangeText={handleChange}
-              value={value}
+              {...fieldProps}
               {...rest}
             />
             {fieldState?.invalid && (

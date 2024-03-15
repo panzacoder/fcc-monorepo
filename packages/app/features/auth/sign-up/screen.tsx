@@ -15,7 +15,7 @@ import { formatUrl } from 'app/utils/format-url'
 
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CountryStateTimezone } from 'app/ui/form-fields/country-state-tz'
@@ -55,7 +55,7 @@ type Schema = z.infer<typeof schema>
 export function SignUpScreen() {
   const [isLoading, setLoading] = useState(false)
 
-  const { control, handleSubmit } = useForm({
+  const formMethods = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -131,72 +131,89 @@ export function SignUpScreen() {
       />
 
       <PtsLoader loading={isLoading} />
-      <View className="my-5 flex flex-wrap justify-end gap-y-4">
-        <View className="flex w-full gap-2">
-          <View className="flex w-full flex-row justify-between gap-2">
+      <FormProvider {...formMethods}>
+        <View className="my-5 flex flex-wrap justify-end gap-y-4">
+          <View className="flex w-full gap-2">
+            <View className="flex w-full flex-row justify-between gap-2">
+              <ControlledTextField
+                name="firstName"
+                className="flex-1"
+                placeholder={'First Name*'}
+                onSubmitEditing={() => {
+                  formMethods.setFocus('lastName')
+                }}
+              />
+              <ControlledTextField
+                name="lastName"
+                className="flex-1"
+                placeholder={'Last Name*'}
+                onSubmitEditing={() => {
+                  formMethods.setFocus('email')
+                }}
+              />
+            </View>
             <ControlledTextField
-              control={control}
-              name="firstName"
-              className="flex-1"
-              placeholder={'First Name*'}
+              name="email"
+              placeholder={'Email Address*'}
+              autoCapitalize="none"
+              onSubmitEditing={() => {
+                formMethods.setFocus('phone')
+              }}
             />
             <ControlledTextField
-              control={control}
-              name="lastName"
-              className="flex-1"
-              placeholder={'Last Name*'}
+              name="phone"
+              placeholder={'Phone'}
+              keyboard={'numeric'}
+              onSubmitEditing={() => {
+                formMethods.setFocus('password')
+              }}
+            />
+            <ControlledSecureField
+              name="password"
+              placeholder="Password*"
+              onSubmitEditing={() => {
+                formMethods.setFocus('confirmPassword')
+              }}
+            />
+            <ControlledSecureField
+              name="confirmPassword"
+              placeholder="Confirm Password*"
+              onSubmitEditing={() => {
+                formMethods.setFocus('country')
+              }}
+            />
+
+            <CountryStateTimezone
+              onSubmitEditing={() => {
+                formMethods.setFocus('acceptTc')
+              }}
             />
           </View>
-          <ControlledTextField
-            control={control}
-            name="email"
-            placeholder={'Email Address*'}
-            autoCapitalize="none"
+          <View className="flex flex-row items-center justify-center">
+            <Controller
+              name="acceptTc"
+              render={({ field: { onChange, value }, fieldState }) => (
+                <CheckBox
+                  checked={value}
+                  checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
+                  onPress={() => {
+                    onChange(!value)
+                  }}
+                  className="flex-shrink"
+                />
+              )}
+            />
+            <Typography className="flex-1">
+              {'I accept the Terms and Conditions and Privacy Policy'}
+            </Typography>
+          </View>
+          <Button
+            onPress={formMethods.handleSubmit(submitRegistration)}
+            className="w-full"
+            title="Sign Up"
           />
-          <ControlledTextField
-            control={control}
-            name="phone"
-            placeholder={'Phone'}
-            keyboard={'numeric'}
-          />
-          <ControlledSecureField
-            control={control}
-            name="password"
-            placeholder="Password*"
-          />
-          <ControlledSecureField
-            control={control}
-            name="confirmPassword"
-            placeholder="Confirm Password*"
-          />
-
-          <CountryStateTimezone control={control} />
         </View>
-        <View className="flex flex-row items-center justify-center">
-          <Controller
-            name="acceptTc"
-            control={control}
-            render={({ field: { onChange, value }, fieldState }) => (
-              <CheckBox
-                checked={value}
-                checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
-                onPress={() => {
-                  onChange(!value)
-                }}
-                className="flex-shrink"
-              />
-            )}
-          />
-          <Typography className="flex-1">
-            {'I accept the Terms and Conditions and Privacy Policy'}
-          </Typography>
-        </View>
-        <Button
-          onPress={handleSubmit(submitRegistration)}
-          className="w-full"
-          title="Sign Up"
-        />
-      </View>
+      </FormProvider>
     </CardView>
   )
 }

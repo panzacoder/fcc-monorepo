@@ -23,7 +23,7 @@ export function ControlledDropdown<T extends FieldValues>({
       name={name}
       control={control}
       rules={rules}
-      render={({ field: { onChange, value }, fieldState }) => {
+      render={({ field: { onChange, ...fieldProps }, fieldState }) => {
         const handleChange = (text: string) => {
           onChange(text)
           onChangeValue && onChangeValue(text)
@@ -33,7 +33,7 @@ export function ControlledDropdown<T extends FieldValues>({
             <PtsDropdown
               error={fieldState?.invalid}
               onChangeValue={handleChange}
-              value={value}
+              {...fieldProps}
               {...rest}
             />
 

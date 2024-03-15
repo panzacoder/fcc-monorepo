@@ -5,14 +5,17 @@ import {
   AutocompleteDropdown,
   AutocompleteDropdownProps
 } from 'react-native-autocomplete-dropdown'
+
 export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
   value?: string
   list: any[]
-  onChangeValue?: CallableFunction
+  onChangeValue?: (value: string) => void
   error?: boolean
   emptyResultText?: string
+  textInputProps?: AutocompleteDropdownProps['textInputProps']
+  onSubmitEditing?: (e?: any) => void
 }
 
 const DropdownInput = React.forwardRef<TextInput>(
@@ -28,14 +31,19 @@ const DropdownInput = React.forwardRef<TextInput>(
   }
 )
 
-const PtsDropdown = ({
-  label,
-  // value, // unused right now, is hooked into to sync with form state but is not "controlled"
-  list,
-  onChangeValue,
-  error,
-  emptyResultText = 'No options'
-}: PtsDropdownProps) => {
+const PtsDropdown = React.forwardRef(function PtsDropdown(
+  {
+    label,
+    // value, // unused right now, is hooked into to sync with form state but is not "controlled"
+    list,
+    onChangeValue,
+    error,
+    emptyResultText = 'No options',
+    onSubmitEditing,
+    textInputProps
+  }: PtsDropdownProps,
+  ref: React.Ref<TextInput>
+) {
   const [isFocus, setIsFocus] = useState(false)
 
   const dataSet = useMemo(() => {
@@ -63,6 +71,7 @@ const PtsDropdown = ({
         )}
       >
         <AutocompleteDropdown
+          ref={ref}
           emptyResultText={emptyResultText}
           key={`dropdown-${label}`}
           inputContainerStyle={{
@@ -75,18 +84,22 @@ const PtsDropdown = ({
           closeOnSubmit
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onSelectItem={
-            onChangeValue as AutocompleteDropdownProps['onSelectItem']
-          }
+          onSelectItem={(item) => {
+            onChangeValue?.(
+              item as unknown as string
+            ) as AutocompleteDropdownProps['onSelectItem']
+            onSubmitEditing?.()
+          }}
           dataSet={dataSet}
           textInputProps={{
-            placeholder: isFocus ? '' : label
+            placeholder: isFocus ? '' : label,
+            ...textInputProps
           }}
           InputComponent={DropdownInput}
         />
       </Pressable>
     </View>
   )
-}
+})
 
 export default PtsDropdown
