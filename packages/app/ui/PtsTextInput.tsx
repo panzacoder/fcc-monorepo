@@ -33,12 +33,13 @@ const PtsTextInput = ({
     >
       <TextInput
         className={cn(
-          'active:border-primary focus:border-primary h-11 flex-1 flex-row  rounded-lg border-[1px] border-gray-400 px-4',
+          'placeholder:text-muted-foreground active:border-primary focus:border-primary h-11 flex-1 flex-row  rounded-lg border-[1px] border-gray-400 px-4',
           editable ? '' : 'text-muted-foreground',
           textClassName
         )}
         editable={editable}
         keyboardType={keyboardType}
+        returnKeyType="next"
         onChangeText={(text) => {
           onChangeText && onChangeText(text)
         }}

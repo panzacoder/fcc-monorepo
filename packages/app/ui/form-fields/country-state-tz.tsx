@@ -34,6 +34,7 @@ export function CountryStateTimezone({
   return (
     <View className={cn('flex flex-row flex-wrap gap-2', className)}>
       <ControlledDropdown
+        emptyResultText="No countries found, something went wrong."
         className="basis-full"
         control={control}
         name="country"
@@ -42,6 +43,7 @@ export function CountryStateTimezone({
         onChangeValue={updateCountry}
       />
       <ControlledDropdown
+        emptyResultText="Please select a country first."
         className="flex-1"
         control={control}
         name="state"
@@ -49,6 +51,7 @@ export function CountryStateTimezone({
         list={states}
       />
       <ControlledDropdown
+        emptyResultText="Please select a country first."
         className="flex-1"
         control={control}
         name="timezone"
