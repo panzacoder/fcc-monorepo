@@ -27,6 +27,12 @@ const nextConfig = {
     'react-native',
     'react-native-css-interop',
     'react-native-gesture-handler',
+    'react-native-autocomplete-dropdown',
+    'react-native-animatable',
+    'react-native-elements',
+    'react-native-feather',
+    'react-native-ratings',
+    'react-native-vector-icons',
     'react-native-reanimated',
     'react-native-web',
     'solito'

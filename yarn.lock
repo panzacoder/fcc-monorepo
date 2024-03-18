@@ -6824,7 +6824,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"app@npm:*, app@workspace:packages/app":
+"app@npm:*, app@workspace:*, app@workspace:packages/app":
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
@@ -14343,7 +14343,7 @@ __metadata:
     "@storybook/react": "npm:^7.6.17"
     "@storybook/test": "npm:^7.6.17"
     "@types/node": "npm:20.11.20"
-    app: "npm:*"
+    app: "workspace:*"
     assert: "npm:^2.1.0"
     autoprefixer: "npm:^10.4.17"
     babel-plugin-expo-vector-icon-storybook: "npm:^0.0.2"
