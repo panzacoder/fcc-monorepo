@@ -15,7 +15,7 @@ export const isNull = (input: any) => {
   }
   return false
 }
-export function getAddressFromObject(address: object) {
+export function getAddressFromObject(address: any) {
   if (isNull(address)) {
     return ''
   }

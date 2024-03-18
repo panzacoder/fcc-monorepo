@@ -1,5 +1,8 @@
 // export const BASE_URL = 'https://www.familycarecircle.com/fccApi/2.0/';
-export const BASE_URL = 'http://45.79.147.166:8000/fccApi/2.0/'
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  process.env.EXPO_PUBLIC_BACKEND_URL ||
+  'http://45.79.147.166:8000/fccApi/2.0/'
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
 export const CREATE_ACCOUNT = 'regms/create'
