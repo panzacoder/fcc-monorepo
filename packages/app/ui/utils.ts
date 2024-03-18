@@ -36,7 +36,7 @@ export function googleMapOpenUrl(address: string) {
     .catch((err) => console.error('An error occurred', err))
 }
 
-export function getAddressFromObject(address: object) {
+export function getAddressFromObject(address: any) {
   if (isNull(address)) {
     return ''
   }
