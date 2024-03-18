@@ -10311,14 +10311,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:1.11.0":
-  version: 1.11.0
-  resolution: "expo-image@npm:1.11.0"
+"expo-image@npm:~1.10.6":
+  version: 1.10.6
+  resolution: "expo-image@npm:1.10.6"
   dependencies:
     "@react-native/assets-registry": "npm:~0.73.1"
   peerDependencies:
     expo: "*"
-  checksum: 130a9c8c47a1ee3a18231e8ee525007026ac86d62b571deed836651d2d4ce23a47ae6f3199ae83780a2c28de485ffe2de0d90dd6a46e0c1b0013c93467de772e
+  checksum: 6eefcb9c9fba711fd7ad1cb87ef0b97c8b6edab7c2af708fd67db3dc5a7588c18bbecddc98e5e1c9738d571b834cd86aacd7c7283c71e332551029cb1cd758d4
   languageName: node
   linkType: hard
 
@@ -10645,7 +10645,7 @@ __metadata:
     chromatic: "npm:^11.0.0"
     eslint: "npm:^8.57.0"
     expo-device: "npm:^5.9.3"
-    expo-image: "npm:1.11.0"
+    expo-image: "npm:~1.10.6"
     expo-linear-gradient: "npm:~12.7.2"
     moment-timezone: "npm:^0.5.45"
     prettier: "npm:^3.2.5"
