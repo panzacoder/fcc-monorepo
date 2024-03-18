@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
@@ -18,17 +18,14 @@ import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-fiel
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CountryStateTimezone } from 'app/ui/form-fields/country-state-tz'
+import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
 
-const schema = z
-  .object({
+const schema = addressSchema
+  .extend({
     firstName: z.string().min(1, { message: 'First Name is required' }),
     lastName: z.string().min(1, { message: 'Last Name is required' }),
     phone: z.string(),
     email: z.string().min(1, { message: 'Email is required' }).email(),
-    timezone: z.string().min(1, { message: 'Timezone is required' }),
-    state: z.number().min(1, { message: 'State is required' }),
-    country: z.number().min(1, { message: 'Country is required' }),
     password: z
       .string()
       .min(8, { message: 'Password must be at least 8 characters' })
@@ -63,9 +60,12 @@ export function SignUpScreen() {
       phone: '',
       password: '',
       confirmPassword: '',
-      timezone: '',
+      address: '',
+      city: '',
       country: -1,
       state: -1,
+      timezone: '',
+      postalCode: '',
       acceptTc: false
     },
     resolver: zodResolver(schema)
@@ -179,11 +179,11 @@ export function SignUpScreen() {
               name="confirmPassword"
               placeholder="Confirm Password*"
               onSubmitEditing={() => {
-                formMethods.setFocus('country')
+                formMethods.setFocus('address')
               }}
             />
 
-            <CountryStateTimezone
+            <AddressFields
               onSubmitEditing={() => {
                 formMethods.setFocus('acceptTc')
               }}

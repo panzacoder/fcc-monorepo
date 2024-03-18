@@ -5,13 +5,12 @@ import { useState } from 'react'
 import { Alert, View } from 'react-native'
 
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Divider } from 'app/ui/divider'
 import { Card } from '../../../ui/card'
-import { AddressFields } from './address-fields'
 import { useRouter } from 'solito/navigation'
 import {
   BASE_URL,
@@ -24,14 +23,12 @@ import { ManagedSwitch } from 'app/ui/managed-switch'
 import Checkbox from 'expo-checkbox'
 import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
 
-const schema = z.object({
+const schema = addressSchema.extend({
   email: z.string().email(),
   firstName: z.string().min(1, { message: 'First name is required' }),
-  lastName: z.string().min(1, { message: 'Last name is required' }),
-  country: z.number().min(1, { message: 'Country is required' }),
-  state: z.number().min(1, { message: 'State is required' }),
-  timezone: z.string().min(1, { message: 'Timezone is required' })
+  lastName: z.string().min(1, { message: 'Last name is required' })
 })
 
 export type Schema = z.infer<typeof schema>
@@ -64,25 +61,28 @@ export function CreateCircle() {
       })
   }
 
+  const formMethods = useForm({
+    mode: 'onBlur',
+    defaultValues: {
+      email: '',
+      firstName: '',
+      lastName: '',
+      address: '',
+      city: '',
+      country: -1,
+      state: -1,
+      timezone: '',
+      postalCode: ''
+    },
+    resolver: zodResolver(schema)
+  })
+
   const {
     control,
     handleSubmit,
     watch,
     formState: { isValid }
-  } = useForm({
-    defaultValues: {
-      email: '',
-      firstName: '',
-      lastName: '',
-      timezone: '',
-      country: -1,
-      state: -1,
-      address: '',
-      city: '',
-      postalCode: ''
-    },
-    resolver: zodResolver(schema)
-  })
+  } = formMethods
 
   const firstName = watch('firstName')
   const lastName = watch('lastName')
@@ -110,110 +110,119 @@ export function CreateCircle() {
 
   return (
     <AutocompleteDropdownContextProvider headerOffset={insets.top}>
-      <View className="flex h-full items-center">
-        <Typography
-          variant="h1"
-          className="bg-accent text-accent-foreground w-full py-4 text-center"
-        >
-          Create a Circle
-        </Typography>
-        <Divider className="bg-accent-foreground" />
+      <FormProvider {...formMethods}>
+        <View className="flex h-full items-center">
+          <Typography
+            variant="h1"
+            className="bg-accent text-accent-foreground w-full py-4 text-center"
+          >
+            Create a Circle
+          </Typography>
+          <Divider className="bg-accent-foreground" />
 
-        <ScrollView
-          automaticallyAdjustKeyboardInsets={true}
-          contentInsetAdjustmentBehavior="automatic"
-          className="w-full bg-white p-4"
-        >
-          <View className="flex items-start gap-4">
-            <View className="flex items-start gap-2">
-              <View className="flex-row items-center gap-2 pb-2">
-                <Feather name={'info'} size={20} className="color-primary" />
-                <Typography className="">
-                  {'Circles organize caregiving details for an individual.'}
-                </Typography>
-              </View>
-
-              <Typography variant="h5">Who is this Circle for?</Typography>
-              <View className="flex w-full flex-row gap-2">
-                <ControlledTextField
-                  control={control}
-                  name="firstName"
-                  placeholder={'First Name'}
-                  className="flex-1"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="lastName"
-                  placeholder="Last Name"
-                  className="flex-1"
-                  onBlur={() => {
-                    nextFormStep()
-                  }}
-                />
-              </View>
-            </View>
-            {firstName && lastName && (
-              <>
-                <Divider className="bg-muted mt-6" />
-                <View className="flex flex-row items-center gap-2">
-                  <Typography variant="h5" className="basis-1/2">
-                    {`Do you want ${firstName} to manage their circle?`}
+          <ScrollView
+            automaticallyAdjustKeyboardInsets={true}
+            contentInsetAdjustmentBehavior="automatic"
+            className="w-full bg-white p-4"
+          >
+            <View className="flex items-start gap-4">
+              <View className="flex items-start gap-2">
+                <View className="flex-row items-center gap-2 pb-2">
+                  <Feather name={'info'} size={20} className="color-primary" />
+                  <Typography className="">
+                    {'Circles organize caregiving details for an individual.'}
                   </Typography>
-                  <ManagedSwitch
-                    value={withEmail}
-                    onValueChange={setWithEmail}
-                    onText="Yes"
-                    offText="No"
-                  />
                 </View>
-                {withEmail ? (
+
+                <Typography variant="h5">Who is this Circle for?</Typography>
+                <View className="flex w-full flex-row gap-2">
                   <ControlledTextField
                     control={control}
-                    name="email"
-                    placeholder={'Email Address'}
-                    className="w-full"
-                    autoCapitalize="none"
+                    name="firstName"
+                    placeholder={'First Name'}
+                    className="flex-1"
+                    onSubmitEditing={() => {
+                      formMethods.setFocus('lastName')
+                    }}
                   />
-                ) : (
-                  <Card className="bg-secondary flex w-full flex-col gap-5 py-5">
-                    <Typography className="text-secondary-foreground text-lg">
-                      {`You will be the sole manager of ${firstName + "'s"} Circle.\n`}
-                      {`If at any point ${firstName} wants to manage their Circle, you can add their email address in Circle settings.`}
+                  <ControlledTextField
+                    control={control}
+                    name="lastName"
+                    placeholder="Last Name"
+                    className="flex-1"
+                    onSubmitEditing={() => {
+                      formMethods.setFocus('email')
+                    }}
+                  />
+                </View>
+              </View>
+              {firstName && lastName && (
+                <>
+                  <Divider className="bg-muted mt-6" />
+                  <View className="flex flex-row items-center gap-2">
+                    <Typography variant="h5" className="basis-1/2">
+                      {`Do you want ${firstName} to manage their circle?`}
                     </Typography>
-                    <Divider className="bg-secondary-foreground/50" />
-                    <View className="flex flex-row items-center gap-4">
-                      <Checkbox
-                        value={isAuthorizedCaregiver}
-                        onValueChange={setIsAuthorizedCaregiver}
-                      />
-                      <Typography className="text-secondary-foreground text-lg">
-                        {`I am an authorized caregiver for ${firstName}.`}
-                      </Typography>
+                    <ManagedSwitch
+                      value={withEmail}
+                      onValueChange={setWithEmail}
+                      onText="Yes"
+                      offText="No"
+                    />
+                  </View>
+                  {withEmail ? (
+                    <ControlledTextField
+                      control={control}
+                      name="email"
+                      placeholder={'Email Address'}
+                      className="w-full"
+                      autoCapitalize="none"
+                      onSubmitEditing={() => {
+                        formMethods.setFocus('address')
+                      }}
+                    />
+                  ) : (
+                    <View className="flex w-full flex-col ">
+                      <Card className="bg-secondary flex w-full flex-col gap-5 py-5">
+                        <Typography className="text-secondary-foreground text-lg">
+                          {`You will be the sole manager of ${firstName + "'s"} Circle.\n`}
+                          {`If at any point ${firstName} wants to manage their Circle, you can add their email address in Circle settings.`}
+                        </Typography>
+                        <Divider className="bg-secondary-foreground/50" />
+                        <View className="flex flex-row items-center gap-4">
+                          <Checkbox
+                            value={isAuthorizedCaregiver}
+                            onValueChange={setIsAuthorizedCaregiver}
+                          />
+                          <Typography className="text-secondary-foreground text-lg">
+                            {`I am an authorized caregiver for ${firstName}.`}
+                          </Typography>
+                        </View>
+                      </Card>
                     </View>
-                  </Card>
-                )}
-              </>
-            )}
-            {(email || isAuthorizedCaregiver) && (
-              <>
-                <Divider className="bg-muted" />
-                <Typography variant="h4">
-                  {`What is ${firstName}'s primary address?`}
-                </Typography>
-                <AddressFields control={control} className="w-full" />
-              </>
-            )}
+                  )}
+                </>
+              )}
+              {(email || isAuthorizedCaregiver) && (
+                <>
+                  <Divider className="bg-muted" />
+                  <Typography variant="h4">
+                    {`What is ${firstName}'s primary address?`}
+                  </Typography>
+                  <AddressFields className="w-full" />
+                </>
+              )}
 
-            {isValid && (
               <Button
+                disabled={!isValid}
                 className="w-full"
                 title={'Create Circle'}
                 onPress={nextFormStep}
               />
-            )}
-          </View>
-        </ScrollView>
-      </View>
+            </View>
+          </ScrollView>
+        </View>
+      </FormProvider>
     </AutocompleteDropdownContextProvider>
   )
 }

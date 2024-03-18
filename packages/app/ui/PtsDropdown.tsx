@@ -30,7 +30,7 @@ const DropdownInput = React.forwardRef<TextInput>(
         blurOnSubmit={false}
         {...props}
         style={{}}
-        className="placeholder:text-muted-foreground flex h-9 shrink grow items-center overflow-hidden focus:outline-none"
+        className="flex h-9 shrink grow items-center overflow-hidden placeholder:text-gray-400 focus:outline-none"
       />
     )
   }
@@ -90,13 +90,14 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onSelectItem={(item: DropdownItem) => {
-            console.log('onSelectItem', item)
             onChangeValue?.(item)
             item && onSubmitEditing?.()
           }}
           dataSet={dataSet}
           textInputProps={{
             placeholder: isFocus ? '' : label,
+            onSubmitEditing,
+            blurOnSubmit: !!onSubmitEditing,
             ...textInputProps
           }}
           InputComponent={DropdownInput}

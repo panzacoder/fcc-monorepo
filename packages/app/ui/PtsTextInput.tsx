@@ -22,6 +22,8 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
     isEditable = true,
     editable = isEditable,
     trailingSlot,
+    onSubmitEditing,
+    returnKeyType = 'next',
     ...rest
   }: PtsTextInputProps,
   ref: React.Ref<TextInput>
@@ -38,14 +40,15 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
       <TextInput
         ref={ref}
         className={cn(
-          'placeholder:text-muted-foreground active:border-primary focus:border-primary h-11 flex-1 flex-row  rounded-lg border-[1px] border-gray-400 px-4',
+          'active:border-primary focus:border-primary h-11 flex-1 flex-row rounded-lg  border-[1px] border-gray-400 px-4 placeholder:text-gray-400',
           editable ? '' : 'text-muted-foreground',
           textClassName
         )}
         editable={editable}
         keyboardType={keyboardType}
-        returnKeyType="next"
-        blurOnSubmit={false}
+        returnKeyType={returnKeyType}
+        blurOnSubmit={!onSubmitEditing}
+        onSubmitEditing={onSubmitEditing}
         onChangeText={(text) => {
           onChangeText && onChangeText(text)
         }}
