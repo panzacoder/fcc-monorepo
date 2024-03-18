@@ -2,7 +2,7 @@
   "expo": {
     "name": "fcc",
     "slug": "fcc-native",
-    "owner": "panzacoder",
+    "owner": "family-care-circle",
     "version": "1.0.0",
     "scheme": "fcc",
     "userInterfaceStyle": "light",
@@ -12,7 +12,10 @@
       "resizeMode": "cover",
       "backgroundColor": "#287CFA"
     },
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "bundleIdentifier": "app.familycarecircle.fcc"
     },
@@ -23,6 +26,9 @@
       "eas": {
         "projectId": "c1498af4-be97-46be-97a2-ed2b81d0b300"
       }
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

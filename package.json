@@ -46,7 +46,7 @@
     "chromatic": "npx chromatic --project-token=chpt_0d90c7462008c0a --build-script-name=web:sb:build"
   },
   "resolutions": {
-    "react-native-reanimated": "3.7.1",
+    "react-native-reanimated": "3.6.1",
     "@react-native/assets-registry@npm:0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch",
     "@react-native/assets-registry@npm:~0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch"
   },
