@@ -10114,6 +10114,7 @@ __metadata:
     react-native-safe-area-context: "npm:4.9.0"
     react-native-screens: "npm:~3.29.0"
     react-native-web: "npm:~0.19.10"
+    react-native-webview: "npm:13.8.1"
     tailwindcss: "npm:^3.4.1"
     typescript: "npm:^5.4.2"
   languageName: unknown
