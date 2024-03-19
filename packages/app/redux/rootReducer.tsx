@@ -6,6 +6,7 @@ import paidAdReducer from './paidAdvertiser/paidAdReducer'
 import userProfileReducer from './userProfile/userProfileReducer'
 import subscriptionReducer from './userSubscription/subscriptionReducer'
 import subscriptionDetailsReducer from './userSubscriptionDetails/userSubscriptionReducer'
+import currentMemberAddressReducer from './curenMemberAddress/currentMemberAddressReducer';
 
 const appReducer = combineReducers({
   headerState: headerReducer,
@@ -14,7 +15,8 @@ const appReducer = combineReducers({
   sponsor: sponsororReducer,
   paidAdvertiser: paidAdReducer,
   subscriptionState: subscriptionReducer,
-  subscriptionDetailsState: subscriptionDetailsReducer
+  subscriptionDetailsState: subscriptionDetailsReducer,
+  currentMemberAddress: currentMemberAddressReducer,
 })
 
 const rootReducer = (state: any, action: any) => {
