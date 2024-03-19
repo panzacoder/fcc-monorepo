@@ -11,6 +11,9 @@ export const theme: Config['theme'] = {
       '2xl': '1400px'
     }
   },
+  gridTemplateRows: {
+    layout: '10rem 1fr'
+  },
   fontSize: {
     xs: ['0.75rem', { lineHeight: '1rem' }],
     sm: ['0.875rem', { lineHeight: '1.25rem' }],

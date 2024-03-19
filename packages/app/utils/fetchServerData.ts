@@ -11,7 +11,7 @@ export function CallPostService<T>(
   data: any
 ): Promise<CallPostServiceResponse<T>> {
   console.log('Service Call :' + url + ' width data ' + JSON.stringify(data))
-  return new Promise(function (accept, reject) {
+  return new Promise(function(accept, reject) {
     fetch(url, {
       method: 'POST',
       headers: {
@@ -33,7 +33,7 @@ export function CallPostService<T>(
           Alert.alert('Session Expired. Please Login.', '', [
             {
               text: 'Ok',
-              onPress: () => {}
+              onPress: () => { }
             }
           ])
           reject('Login Expired')

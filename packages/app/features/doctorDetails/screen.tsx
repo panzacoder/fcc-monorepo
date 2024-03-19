@@ -12,53 +12,56 @@ import { BASE_URL, GET_DOCTOR_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-import { getAddressFromObject } from 'app/ui/utils'
+import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
 export function DoctorDetailsScreen() {
+  // console.log('in DoctorDetailsScreen')
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  const memberData = JSON.parse(item.memberData)
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
-  const doctorInfo = JSON.parse(item.doctorDetails)
-  const [doctorDetails, setDoctorDetails] = useState({} as any)
+  let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
+  console.log('doctorDetails', '' + JSON.stringify(doctorInfo))
   const [isLoading, setLoading] = useState(false)
+  const [doctorDetails, setDoctorDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
-  useEffect(() => {
-    async function getDoctorDetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_DOCTOR_DETAILS}`
-      let dataObject = {
-        header: header,
-        doctor: {
-          id: doctorInfo.id ? doctorInfo.id : ''
-        }
+
+  const getDoctorDetails = useCallback(async () => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_DOCTOR_DETAILS}`
+    let dataObject = {
+      header: header,
+      doctor: {
+        id: doctorInfo.id ? doctorInfo.id : ''
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            setDoctorDetails(data.data.doctor || {})
-            setLocationList(
-              data.data.doctor && data.data.doctor.doctorLocationList
-                ? data.data.doctor.doctorLocationList
-                : []
-            )
-            setAppointmentList(
-              data.data && data.data.doctorAppointmentList
-                ? data.data.doctorAppointmentList
-                : []
-            )
-            // console.log('appointmentList', JSON.stringify(appointmentList))
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log('error', error)
-        })
     }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          setDoctorDetails(data.data.doctor || {})
+          setLocationList(
+            data.data.doctor && data.data.doctor.doctorLocationList
+              ? data.data.doctor.doctorLocationList
+              : []
+          )
+          setAppointmentList(
+            data.data && data.data.doctorAppointmentList
+              ? data.data.doctorAppointmentList
+              : []
+          )
+          // console.log('appointmentList', JSON.stringify(appointmentList))
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }, [])
+  useEffect(() => {
     getDoctorDetails()
   }, [])
 
@@ -75,9 +78,9 @@ export function DoctorDetailsScreen() {
                   {doctorInfo.specialist ? doctorInfo.specialist : ''}
                 </Typography>
                 <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
-                <Typography className="font-400 text-primary ml-2 text-[16px]">
+                {/* <Typography className="font-400 text-primary ml-2 text-[16px]">
                   {doctorInfo.status ? doctorInfo.status : ''}
-                </Typography>
+                </Typography> */}
               </View>
               <Button
                 className=""
@@ -87,7 +90,8 @@ export function DoctorDetailsScreen() {
                   router.push(
                     formatUrl('/(authenticated)/circles/addEditDoctor', {
                       memberData: JSON.stringify(memberData),
-                      doctorDetails: JSON.stringify(doctorDetails)
+                      doctorDetails: JSON.stringify(doctorDetails),
+                      component: 'Doctor'
                     })
                   )
                 }}
@@ -168,72 +172,31 @@ export function DoctorDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.push(
-                    formatUrl(
-                      '/(authenticated)/circles/addEditDoctorLocation',
-                      {
-                        memberData: JSON.stringify(memberData),
-                        doctorDetails: JSON.stringify(doctorInfo)
-                      }
-                    )
+                  router.replace(
+                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                      memberData: JSON.stringify(memberData),
+                      details: JSON.stringify(doctorInfo),
+                      component: 'Doctor'
+                    })
                   )
                 }}
               />
             </View>
-            <ScrollView className="">
-              {locationList.map((data: any, index: number) => {
-                return (
-                  <View key={index}>
-                    <View className="mt-5 flex-row items-center">
-                      <View className=" flex-row">
-                        <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
-                          {data.nickName ? data.nickName : ''}
-                        </Typography>
-                        <Feather
-                          onPress={() => {}}
-                          name={'settings'}
-                          size={15}
-                          color={'black'}
-                        />
-                      </View>
-                      <View className="bg-primary  ml-2 h-[1px] w-full" />
+            {locationList.length > 0 ? (
+              <ScrollView className="">
+                {locationList.map((data: any, index: number) => {
+                  data.component = 'Doctor'
+                  data.doctorFacilityId = doctorInfo.id
+                  return (
+                    <View key={index}>
+                      <Location data={data}></Location>
                     </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
-                          {getAddressFromObject(
-                            data.address ? data.address : {}
-                          )}
-                        </Typography>
-                      </View>
-                      <Feather name={'navigation'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                          {'Phone:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.phone ? data.phone : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'phone'} size={20} color={'black'} />
-                    </View>
-                    <View className="ml-2 mt-2 w-full flex-row items-center">
-                      <View className="w-[90%] flex-row">
-                        <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                          {'Fax:'}
-                        </Typography>
-                        <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                          {data.fax ? data.fax : ''}
-                        </Typography>
-                      </View>
-                      <Feather name={'copy'} size={20} color={'black'} />
-                    </View>
-                  </View>
-                )
-              })}
-            </ScrollView>
+                  )
+                })}
+              </ScrollView>
+            ) : (
+              <View />
+            )}
           </View>
 
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
@@ -264,47 +227,52 @@ export function DoctorDetailsScreen() {
               </View>
               <View className="bg-primary h-[1px] w-[80%]" />
             </View>
-            <ScrollView className="h-[60%] flex-1">
-              {appointmentList.map((data: any, index: number) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      // router.push(
-                      //   formatUrl(
-                      //     '/(authenticated)/circles/addEditDoctorLocation',
-                      //     {
-                      //       memberData: JSON.stringify(memberData),
-                      //       doctorDetails: JSON.stringify(doctorInfo)
-                      //     }
-                      //   )
-                      // )
-                    }}
-                    key={index}
-                    className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
-                  >
-                    <View className="ml-2 mt-2 flex-row ">
-                      {/* <View className="ml-2 w-[2px] bg-[#184E4E]" /> */}
-                      <View className="w-[95%]">
-                        <Typography className="font-400 ml-2 w-[95%] text-[16px] text-[#103264]">
-                          {data.purpose ? data.purpose : ''}
-                        </Typography>
-                        <View className="w-full flex-row">
-                          <Typography className="font-400 ml-2 w-[35%] text-[12px] text-[#103264]">
-                            {getFullDateForCalender(
-                              new Date(data.date),
-                              'MMMM DD '
-                            ) + ' - '}
-                          </Typography>
-                          <Typography className="font-400 w-[70%] text-[12px] text-[#103264]">
-                            {data.appointment ? data.appointment : ''}
-                          </Typography>
+            {appointmentList.length > 0 ? (
+              <ScrollView className="h-[60%] flex-1">
+                {appointmentList.map((data: any, index: number) => {
+                  return (
+                    <View key={index}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          // router.push(
+                          //   formatUrl(
+                          //     '/(authenticated)/circles/addEditLocation',
+                          //     {
+                          //       memberData: JSON.stringify(memberData),
+                          //       doctorDetails: JSON.stringify(doctorInfo)
+                          //     }
+                          //   )
+                          // )
+                        }}
+                        className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+                      >
+                        <View className="ml-2 mt-2 flex-row ">
+                          {/* <View className="ml-2 w-[2px] bg-[#184E4E]" /> */}
+                          <View className="w-[95%]">
+                            <Typography className="font-400 ml-2 w-[95%] text-[16px] text-[#103264]">
+                              {data.purpose ? data.purpose : ''}
+                            </Typography>
+                            <View className="w-full flex-row">
+                              <Typography className="font-400 ml-2 w-[35%] text-[12px] text-[#103264]">
+                                {getFullDateForCalender(
+                                  new Date(data.date),
+                                  'MMMM DD '
+                                ) + ' - '}
+                              </Typography>
+                              <Typography className="font-400 w-[70%] text-[12px] text-[#103264]">
+                                {data.appointment ? data.appointment : ''}
+                              </Typography>
+                            </View>
+                          </View>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                )
-              })}
-            </ScrollView>
+                  )
+                })}
+              </ScrollView>
+            ) : (
+              <View />
+            )}
           </View>
         </ScrollView>
       </View>

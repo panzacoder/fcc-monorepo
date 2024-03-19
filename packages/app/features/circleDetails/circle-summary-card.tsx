@@ -7,17 +7,21 @@ import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
+import { formatUrl } from 'app/utils/format-url'
+import { useRouter } from 'solito/navigation'
 
 cssInterop(LinearGradient, {
   className: { target: 'style' }
 })
-
 export function CircleSummaryCard({ memberData, userDetails }) {
+  const router = useRouter()
   const [isSeeMore, setSeeMore] = useState(true)
 
   const fullName = userDetails.firstName + ' ' + userDetails.lastName
 
-  function buttonPressed() { }
+  function buttonPressed() {
+
+  }
   return (
     <LinearGradient
       colors={['#103264', '#113263', '#319D9D']}
@@ -32,7 +36,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <Pressable className="" onPress={() => { }}>
+        <Pressable className="" onPress={() => {}}>
           <Feather name={'menu'} size={20} color={'#5ACC6C'} />
         </Pressable>
       </View>
@@ -63,19 +67,37 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 className="px-3"
                 title="Caregivers"
                 leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                onPress={() => {
+                  // router.push(
+                  //   formatUrl('/(authenticated)/circles/doctors', {
+                  //     memberData: JSON.stringify(memberData)
+                  //   })
+                  // )
+                }}
               />
               <Button
                 className="ml-2 px-3"
                 title="Doctors"
                 leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/(authenticated)/circles/doctors', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
               />
               <Button
                 className="ml-2 px-3"
                 title="Facilities"
                 leadingIcon="home"
-                onPress={buttonPressed}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/(authenticated)/circles/facilities', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
               />
             </View>
 

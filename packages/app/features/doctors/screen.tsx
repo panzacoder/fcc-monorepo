@@ -86,7 +86,7 @@ export function DoctorsScreen() {
           return (
             <TouchableOpacity
               onPress={() => {
-                router.push(
+                router.replace(
                   formatUrl('/(authenticated)/circles/doctorDetails', {
                     doctorDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)
@@ -106,19 +106,22 @@ export function DoctorsScreen() {
                 </Typography>
               </View>
               <View className="flex-row">
-                <Typography className="ml-5 w-[60%]">
-                  {data.locations ? data.locations : ''}
-                </Typography>
-
-                <Typography
-                  className={
-                    data.status.toLowerCase() === 'active'
-                      ? "ml-5 mr-5 rounded-[20px] bg-['#83D991'] px-5 text-right"
-                      : "ml-5 mr-5 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
-                  }
-                >
-                  {data.status ? data.status : ''}
-                </Typography>
+                <View className="w-[65%]">
+                  <Typography className="ml-5 ">
+                    {data.locations ? data.locations : ''}
+                  </Typography>
+                </View>
+                <View className="self-center">
+                  <Typography
+                    className={
+                      data.status.toLowerCase() === 'active'
+                        ? "ml-2 rounded-[20px] bg-['#83D991'] px-5 text-right"
+                        : "ml-2 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
+                    }
+                  >
+                    {data.status ? data.status : ''}
+                  </Typography>
+                </View>
               </View>
             </TouchableOpacity>
           )

@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { View, ScrollView, Pressable } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, View, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'solito/navigation'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { useParams } from 'solito/navigation'
+import { formatUrl } from 'app/utils/format-url'
 import { CircleSummaryCard } from './circle-summary-card'
-
+import { CallPostService } from 'app/utils/fetchServerData'
+import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
+import {
+  BASE_URL,
+  GET_APPOINTMENTS,
+  GET_MEMBER_MENUS
+} from 'app/utils/urlConstants'
 export function CircleDetailsScreen() {
+  const header = store.getState().headerState.header
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
@@ -24,6 +32,37 @@ export function CircleDetailsScreen() {
       ' with ' +
       memberData.upcomingAppointment.location
   }
+  useEffect(() => {
+    async function getMemberMenus() {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_MEMBER_MENUS}`
+      let dataObject = {
+        header: header,
+        member: {
+          id: memberData.member ? memberData.member : ''
+        }
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            // console.log('getMemberMenus', JSON.stringify(data.data))
+            if (data.member && data.member.address) {
+              store.dispatch(
+                currentMemberAddressAction.setMemberAddress(data.member.address)
+              )
+            }
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    }
+    getMemberMenus()
+  }, [])
   return (
     <View className="mt-14 flex-1">
       <PtsLoader loading={isLoading} />
@@ -37,7 +76,7 @@ export function CircleDetailsScreen() {
                 {'Messages'}
               </Typography>
               {memberData.unreadMessages &&
-                memberData.unreadMessages.length > 0 ? (
+              memberData.unreadMessages.length > 0 ? (
                 <View className="flex-row">
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'Show latest message'}
@@ -45,7 +84,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/messages')
+                      router.push(
+                        formatUrl('/(authenticated)/circles/messages', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -59,7 +102,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/messages')
+                      router.push(
+                        formatUrl('/(authenticated)/circles/messages', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -92,7 +139,11 @@ export function CircleDetailsScreen() {
                 <Pressable
                   className=" ml-2"
                   onPress={() => {
-                    router.push('/circles/appointments')
+                    router.push(
+                      formatUrl('/(authenticated)/circles/appointments', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
                   }}
                 >
                   <Feather name={'chevron-right'} size={20} color={'black'} />
