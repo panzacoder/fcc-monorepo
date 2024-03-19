@@ -6752,7 +6752,6 @@ __metadata:
     react-native-linear-gradient: "npm:^2.8.3"
     react-native-reanimated: "npm:3.6.1"
     react-native-safe-area-context: "npm:4.9.0"
-    react-native-svg: "npm:^15.0.0"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-virtualized-view: "npm:^1.0.0"
     react-native-webview: "npm:13.8.1"
@@ -6762,6 +6761,7 @@ __metadata:
     tailwind-merge: "npm:^2.2.2"
     tailwind-variants: "npm:^0.2.1"
     tailwindcss: "npm:^3.4.1"
+    tailwindcss-animate: "npm:^1.0.7"
     toggle-switch-react-native: "npm:^3.3.0"
     zod: "npm:^3.22.4"
   languageName: unknown
@@ -10217,6 +10217,7 @@ __metadata:
     expo-dev-client: "npm:~3.3.10"
     expo-device: "npm:^5.9.3"
     expo-image: "npm:~1.10.6"
+    expo-linear-gradient: "npm:~12.7.2"
     expo-linking: "npm:~6.2.2"
     expo-localization: "npm:^14.8.3"
     expo-router: "npm:~3.4.8"
@@ -10226,9 +10227,13 @@ __metadata:
     react: "npm:18.2.0"
     react-native: "npm:0.73.5"
     react-native-gesture-handler: "npm:~2.15.0"
+    react-native-linear-gradient: "npm:^2.8.3"
     react-native-reanimated: "npm:3.6.2"
     react-native-safe-area-context: "npm:4.9.0"
     react-native-screens: "npm:~3.29.0"
+    react-native-svg: "npm:^15.0.0"
+    react-native-vector-icons: "npm:^10.0.3"
+    react-native-virtualized-view: "npm:^1.0.0"
     react-native-web: "npm:~0.19.10"
     react-native-webview: "npm:13.8.1"
     tailwindcss: "npm:^3.4.1"
@@ -18393,6 +18398,15 @@ __metadata:
   peerDependencies:
     tailwindcss: "*"
   checksum: 10/061b9fdb56bca0d49da24d67131014e61602ea2a6e9fe098550fd8d06a799a1196ba441e72a9d44c4424a5339397685332962d20e789a82061192ae026be9a8b
+  languageName: node
+  linkType: hard
+
+"tailwindcss-animate@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "tailwindcss-animate@npm:1.0.7"
+  peerDependencies:
+    tailwindcss: "*"
+  checksum: 10/ef176fbb0bf9dca84178b35b6a9615cd756358ea80be9c575456d12ecd7f3c431e9e571915c7df72959dc798a730959e9a4739d59eab55d8cc6db390870ff0d2
   languageName: node
   linkType: hard
 

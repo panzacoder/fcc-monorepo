@@ -10,7 +10,8 @@ export function CallPostService<T>(
   url: string | URL | Request,
   data: any
 ): Promise<CallPostServiceResponse<T>> {
-  console.log('Service Call :' + url + ' width data ' + JSON.stringify(data))
+  console.log(`Service Call: url( ${url} ) with data object (next line):`)
+  console.dir(data)
   return new Promise(function(accept, reject) {
     fetch(url, {
       method: 'POST',
