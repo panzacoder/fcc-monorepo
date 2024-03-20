@@ -1,9 +1,11 @@
 import { Alert } from 'react-native'
 
 export type CallPostServiceResponse<T> = {
-  status: 'SUCCESS' | 'FAIL'
-  message: string
+  status: 'SUCCESS'
   data: T
+} | {
+  status: 'FAILURE'
+  message: string
 }
 
 export function CallPostService<T>(

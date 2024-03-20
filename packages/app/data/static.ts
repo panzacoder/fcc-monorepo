@@ -1,9 +1,7 @@
-import { BASE_URL, GET_STATIC_DATA } from 'app/utils/urlConstants'
-import { Alert } from 'react-native'
-import { CallPostService } from 'app/utils/fetchServerData'
-import staticDataAction from 'app/redux/staticData/staticAction'
+import { fetchData } from './base'
+import { GET_STATIC_DATA } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
-import { getUserDeviceInformation } from 'app/utils/device'
+import staticDataAction from 'app/redux/staticData/staticAction'
 import {
   AccompanyType,
   AppointmentPurpose,
@@ -55,25 +53,12 @@ export interface StaticData {
   purchaseOccuranceList: PurchaseOccurance[]
   countryList: Country[]
 }
-export async function fetchStaticData(callback?: () => void) {
-  callback ||= () => null
+export async function fetchStaticData() {
 
-  const serviceUrl = `${BASE_URL}${GET_STATIC_DATA}`
-  const deviceInfo = await getUserDeviceInformation()
-  const dataObject = {
-    header: { deviceInfo }
+  const staticData = await fetchData<StaticData>({ route: GET_STATIC_DATA })
+  if (staticData) {
+    store.dispatch(staticDataAction.setStaticData(staticData))
   }
 
-  CallPostService(serviceUrl, dataObject)
-    .then(async (res: any) => {
-      if (res.status === 'SUCCESS') {
-        store.dispatch(staticDataAction.setStaticData(res.data as StaticData))
-      } else {
-        Alert.alert('', res.message)
-      }
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-    .finally(callback)
+  return staticData
 }

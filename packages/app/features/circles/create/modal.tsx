@@ -41,6 +41,11 @@ export function CreateCircle() {
   const [isAuthorizedCaregiver, setIsAuthorizedCaregiver] = useState(false)
   const insets = useSafeAreaInsets()
 
+  async function lookupEmail(email: string) {
+
+
+
+  }
   async function createCircle() {
     let url = `${BASE_URL}${withEmail ? CREATE_CIRCLE_NO_EMAIL : CREATE_CIRCLE}`
     let dataObject = {

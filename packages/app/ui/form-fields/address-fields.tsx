@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { ControlledDropdown } from './controlled-dropdown'
 import { useCallback, useState } from 'react'
-import { fetchStateAndTimezoneData } from 'app/data/states'
+import { getStateAndTimezoneData } from 'app/data/states'
 import { State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
@@ -42,7 +42,7 @@ export function AddressFields({
       }
 
       console.log('updateCountry', item)
-      fetchStateAndTimezoneData(itemId).then((statesAndTimezoneForCountry) => {
+      getStateAndTimezoneData({ id: itemId }).then((statesAndTimezoneForCountry) => {
         if (statesAndTimezoneForCountry) {
           setStates(statesAndTimezoneForCountry.stateList)
           setTimezones(statesAndTimezoneForCountry.timeZoneList)

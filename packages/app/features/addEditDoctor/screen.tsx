@@ -1,7 +1,7 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { useState, useCallback } from 'react'
+import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -23,7 +23,6 @@ import ToggleSwitch from 'toggle-switch-react-native'
 import { formatUrl } from 'app/utils/format-url'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { fetchStateAndTimezoneData } from 'app/data/states'
 const schema = z.object({
   firstName: z.string(),
   phone: z.string(),
