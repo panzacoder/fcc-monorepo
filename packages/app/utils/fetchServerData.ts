@@ -1,17 +1,24 @@
 import { Alert } from 'react-native'
 
-export type CallPostServiceResponse<T> = {
-  status: 'SUCCESS' | 'FAIL'
-  message: string
-  data: T
-}
+export type CallPostServiceResponse<T> =
+  | {
+      status: 'SUCCESS'
+      data: T
+    }
+  | {
+      status: 'FAILURE'
+      message: string
+    }
 
 export function CallPostService<T>(
   url: string | URL | Request,
   data: any
 ): Promise<CallPostServiceResponse<T>> {
-  console.log('Service Call :' + url + ' width data ' + JSON.stringify(data))
-  return new Promise(function(accept, reject) {
+  console.log(
+    `Service Call: url( ${url} ) with data object: ${JSON.stringify(data)}`
+  )
+  console.dir(data)
+  return new Promise(function (accept, reject) {
     fetch(url, {
       method: 'POST',
       headers: {
@@ -33,7 +40,7 @@ export function CallPostService<T>(
           Alert.alert('Session Expired. Please Login.', '', [
             {
               text: 'Ok',
-              onPress: () => { }
+              onPress: () => {}
             }
           ])
           reject('Login Expired')

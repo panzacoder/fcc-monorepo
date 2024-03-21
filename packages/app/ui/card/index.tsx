@@ -10,13 +10,15 @@ export type CardProps = {
 export function Card({ children, scroll, className = '' }: CardProps) {
   const ViewComponent = scroll ? ScrollView : View
   return (
-    <ViewComponent
-      className={cn(
-        'bg-card flex flex-shrink rounded-2xl px-6 pb-1 pt-5',
-        className
-      )}
-    >
-      {children}
-    </ViewComponent>
+    <ScrollView automaticallyAdjustKeyboardInsets={true}>
+      <ViewComponent
+        className={cn(
+          'bg-card flex flex-shrink rounded-2xl px-6 pb-1 pt-5',
+          className
+        )}
+      >
+        {children}
+      </ViewComponent>
+    </ScrollView>
   )
 }

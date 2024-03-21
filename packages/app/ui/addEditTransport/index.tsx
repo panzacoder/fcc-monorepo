@@ -145,7 +145,6 @@ export const AddEditTransport = ({
   }, [])
 
   async function createUpdateTransport(formData: Schema) {
-    
     let dataObject = {}
     let url = ''
     if (_.isEmpty(transportData)) {
@@ -206,7 +205,6 @@ export const AddEditTransport = ({
     }
     // console.log('dataObject', JSON.stringify(dataObject))
     createUpdateTransportation(url, dataObject)
-    
   }
   const onSelection = (date: any) => {
     selectedDate = date
@@ -246,7 +244,7 @@ export const AddEditTransport = ({
     )
   }
   return (
-    <View className="my-2 my-5 w-[90%] self-center rounded-[15px] bg-[#f4ecf7] py-5">
+    <View className="my-5 w-[90%] self-center rounded-[15px] bg-[#f4ecf7] py-5">
       <PtsLoader loading={isLoading} />
       <ScrollView className="my-2 w-full">
         {_.isEmpty(transportData) ? (

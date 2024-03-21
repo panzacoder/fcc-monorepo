@@ -25,7 +25,7 @@ const buttonVariants = tv({
       },
       outline: {
         button:
-          'text-primary-foreground border-input hover:bg-accent border shadow-sm ',
+          'text-primary-foreground border-primary hover:bg-accent border  ',
         text: 'text-primary group-hover:text-accent-foreground',
         icon: 'hover:color-accent-foreground'
       },
@@ -39,6 +39,12 @@ const buttonVariants = tv({
         text: 'text-secondary group-hover:text-accent-foreground',
         icon: 'color-secondary group-hover:color-accent-foreground'
       },
+      accent: {
+        button: 'bg-accent hover:bg-accent/90',
+        text: 'text-accent-foreground',
+        icon: 'color-accent-foreground'
+      },
+
       link: {
         button: '',
         text: 'text-primary group-hover:underline',
@@ -56,6 +62,12 @@ const buttonVariants = tv({
       borderRed: {
         button: 'border-[2px] border-[#E43A39]',
         text: 'text-primary text-[#E43A39]'
+      }
+    },
+    iconOnly: {
+      true: {
+        button: 'p-2',
+        text: 'hidden'
       }
     },
     size: {
@@ -94,9 +106,15 @@ export const Button = ({
   disabled = false,
   leadingIcon,
   trailingIcon,
-  typographyClassName
+  typographyClassName,
+  iconOnly
 }: ButtonProps) => {
-  const { button, text, icon } = buttonVariants({ variant, size, disabled })
+  const { button, text, icon } = buttonVariants({
+    variant,
+    size: iconOnly ? 'icon' : size,
+    disabled,
+    iconOnly
+  })
   return (
     <Pressable onPress={onPress} className={button({ className })}>
       {leadingIcon && (
