@@ -7,7 +7,7 @@ import {
 } from 'react-native-autocomplete-dropdown'
 
 export type DropdownItem = {
-  id: string | number
+  id: number
   title: string | null
 }
 
@@ -16,7 +16,7 @@ export type PtsDropdownProps = {
   maxHeight?: number
   value?: string
   list: any[]
-  onChangeValue?: (item?: DropdownItem) => void
+  onChangeValue?: (item: DropdownItem) => void
   error?: boolean
   emptyResultText?: string
   onSubmitEditing?: (e?: any) => void

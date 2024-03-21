@@ -70,6 +70,7 @@ export function LoginScreen() {
             expiringSubscription: data.data.expiringSubscription
           }
           data.data.header.timezone = moment.tz.guess()
+          console.log('data.data.header', data.data.header)
           store.dispatch(headerAction.setHeader(data.data.header))
           store.dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
           store.dispatch(

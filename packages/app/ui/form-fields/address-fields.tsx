@@ -15,7 +15,7 @@ export const addressSchema = z.object({
   city: z.string().min(1, { message: 'City is required' }),
   country: z.number().min(1, { message: 'Country is required' }),
   state: z.number().min(1, { message: 'State is required' }),
-  timezone: z.string().min(1, { message: 'Timezone is required' }),
+  timezone: z.number().min(1, { message: 'Timezone is required' }),
   postalCode: z.string().min(1, { message: 'Postal Code is required' })
 })
 
@@ -41,13 +41,14 @@ export function AddressFields({
         itemId = parseInt(itemId)
       }
 
-      console.log('updateCountry', item)
-      getStateAndTimezoneData({ id: itemId }).then((statesAndTimezoneForCountry) => {
-        if (statesAndTimezoneForCountry) {
-          setStates(statesAndTimezoneForCountry.stateList)
-          setTimezones(statesAndTimezoneForCountry.timeZoneList)
+      getStateAndTimezoneData({ id: itemId }).then(
+        (statesAndTimezoneForCountry) => {
+          if (statesAndTimezoneForCountry) {
+            setStates(statesAndTimezoneForCountry.stateList)
+            setTimezones(statesAndTimezoneForCountry.timeZoneList)
+          }
         }
-      })
+      )
     },
     [setStates, setTimezones]
   )

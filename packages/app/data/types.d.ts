@@ -186,7 +186,7 @@ export type State = {
   name: string
   namecode: string
   snum: string
-  country: string | null
+  country: Partial<Country>
 }
 
 export type Timezone = {
@@ -199,14 +199,14 @@ export type Timezone = {
 }
 
 export type Address = {
-  line: string
-  city: string
+  city?: string
+  line?: string
+  state: Partial<State>
+  timezone: Partial<Timezone>
   zipCode: string
-  version: number
-  id: number
-  state: State
-  geolocation: string | null
-  timezone: Timezone
+  version?: number
+  id?: number
+  geolocation?: string | null
 }
 
 export type Member = {

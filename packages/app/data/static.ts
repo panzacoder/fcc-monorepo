@@ -54,7 +54,6 @@ export interface StaticData {
   countryList: Country[]
 }
 export async function fetchStaticData() {
-
   const staticData = await fetchData<StaticData>({ route: GET_STATIC_DATA })
   if (staticData) {
     store.dispatch(staticDataAction.setStaticData(staticData))

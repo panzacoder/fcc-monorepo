@@ -1,30 +1,32 @@
 import { JOIN_CIRCLE } from 'app/utils/urlConstants'
-import { Address } from '../types'
 import { fetchData } from '../base'
-
 
 export type JoinCircleReturnType = {
   version: number
-  id: string
-  email: string
-  phone: string | null
+  id: number
+  memberEmail: string
   caregiverEmail: string
+  phone: string | null
   requestRaisedBy: string
   caregiverFname: string
   caregiverLname: string
   memberFname: string
   memberLname: string
-  constentFormVersionDate: null
+  consentFormVersionDate: null
   familyMember: number
   member: number
   isActive: boolean
 }
 
-export type JoinCircleProps = {
-  id: number
-}
+export type JoinCircleProps =
+  | {
+      id: number
+    }
+  | {
+      email: string
+    }
 
-export async function createCircle(props: JoinCircleProps) {
+export async function joinCircle(props: JoinCircleProps) {
   return await fetchData<JoinCircleReturnType>({
     route: JOIN_CIRCLE,
     data: { memberVo: { props } }

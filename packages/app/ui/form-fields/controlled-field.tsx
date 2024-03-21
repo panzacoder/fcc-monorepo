@@ -2,7 +2,7 @@ import PtsTextInput, { PtsTextInputProps } from 'app/ui/PtsTextInput'
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 import React from 'react'
-import { Controller, ControllerProps, FieldValues } from 'react-hook-form'
+import { Controller, ControllerProps, FieldValues, useFormContext, useFormState } from 'react-hook-form'
 import { View } from 'react-native'
 
 export type ControlledTextFieldProps<T extends FieldValues> =
@@ -20,8 +20,10 @@ export function ControlledTextField<T extends FieldValues>({
   className,
   inputClassName,
   InputComponent = PtsTextInput,
+  disabled,
   ...rest
 }: ControlledTextFieldProps<T>) {
+  const { isSubmitting } = useFormState({ control })
   return (
     <Controller<T>
       name={name}
@@ -42,6 +44,7 @@ export function ControlledTextField<T extends FieldValues>({
               onChangeText={handleChange}
               {...fieldProps}
               {...rest}
+              disabled={disabled || isSubmitting}
             />
             {fieldState?.invalid && (
               <Typography className="text-destructive">
@@ -50,7 +53,8 @@ export function ControlledTextField<T extends FieldValues>({
             )}
           </View>
         )
-      }}
+      }
+      }
     />
   )
 }
