@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@react-native-community/datetimepicker": "^7.6.2",
     "@react-navigation/drawer": "^6.6.15",
     "app": "workspace:*",
     "expo": "^50.0.13",
@@ -38,7 +39,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
-  "main": "expo-router/entry",
+  "main": "index.ts",
   "version": "1.0.0",
   "private": true,
   "name": "expo-app"

@@ -10210,6 +10210,7 @@ __metadata:
   resolution: "expo-app@workspace:apps/expo"
   dependencies:
     "@babel/core": "npm:^7.23.9"
+    "@react-native-community/datetimepicker": "npm:^7.6.2"
     "@react-navigation/drawer": "npm:^6.6.15"
     "@types/react": "npm:^18.2.67"
     app: "workspace:*"
