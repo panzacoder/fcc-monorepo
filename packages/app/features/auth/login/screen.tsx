@@ -47,7 +47,6 @@ export function LoginScreen() {
   })
 
   async function login(formData: Schema) {
-    console.log('formData', formData.email)
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`
@@ -70,7 +69,6 @@ export function LoginScreen() {
             expiringSubscription: data.data.expiringSubscription
           }
           data.data.header.timezone = moment.tz.guess()
-          console.log('data.data.header', data.data.header)
           store.dispatch(headerAction.setHeader(data.data.header))
           store.dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
           store.dispatch(
