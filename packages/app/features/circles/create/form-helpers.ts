@@ -10,6 +10,7 @@ const schema = addressSchema.extend({
   authorizedCaregiver: z.boolean().optional(),
   circleExists: z.boolean().optional()
 })
+
 export const resolver = zodResolver(schema)
 
 export type CreateCircleSchema = z.infer<typeof schema>
