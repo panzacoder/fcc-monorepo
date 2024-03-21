@@ -7,8 +7,8 @@ import {
 } from 'react-native-autocomplete-dropdown'
 
 export type DropdownItem = {
-  id: number
-  title: string | null
+  id: string
+  title: string
 }
 
 export type PtsDropdownProps = {

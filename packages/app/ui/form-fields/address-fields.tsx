@@ -36,10 +36,7 @@ export function AddressFields({
   const updateCountry = useCallback(
     (item?: DropdownItem) => {
       if (!item) return
-      var itemId = item.id
-      if (typeof itemId === 'string') {
-        itemId = parseInt(itemId)
-      }
+      const itemId = parseInt(`${item.id}`)
 
       getStateAndTimezoneData({ id: itemId }).then(
         (statesAndTimezoneForCountry) => {
