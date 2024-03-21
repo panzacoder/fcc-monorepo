@@ -52,22 +52,7 @@ type Schema = z.infer<typeof schema>
 export function SignUpScreen() {
   const [isLoading, setLoading] = useState(false)
 
-  const formMethods = useForm({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-      address: '',
-      city: '',
-      country: -1,
-      state: -1,
-      timezone: '',
-      postalCode: '',
-      acceptTc: false
-    },
+  const formMethods = useForm<Schema>({
     resolver: zodResolver(schema)
   })
 
