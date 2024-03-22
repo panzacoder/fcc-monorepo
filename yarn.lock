@@ -16478,9 +16478,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.6.2":
-  version: 3.6.2
-  resolution: "react-native-reanimated@npm:3.6.2"
+"react-native-reanimated@npm:3.6.1":
+  version: 3.6.1
+  resolution: "react-native-reanimated@npm:3.6.1"
   dependencies:
     "@babel/plugin-transform-object-assign": "npm:^7.16.7"
     "@babel/preset-typescript": "npm:^7.16.7"
@@ -16495,7 +16495,7 @@ __metadata:
     "@babel/plugin-transform-template-literals": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10/06c44d4dde054e48e1d030369e93e7590b8c56b6bc80f90e03f2deb9766dad8b96bf60b2c1406abf5bb424a78bc3a89d6274d5aba7d2ff89781357a23381a0a6
+  checksum: 10/594a4ace054fdafa02ea2f126aeeda474f32306698b1d7c15ec8495b606b80e9e10a69eef2653d4b7f9cb743d0007ada1ab27e5f3064af1bfcc95291d70bb824
   languageName: node
   linkType: hard
 
