@@ -37,16 +37,21 @@ export const AddMessageThread = ({
         {'New Communication Thread'}
       </Typography>
       <View className="w-full">
-        <View className="w-full flex-row justify-center gap-2">
-          <ControlledTextField
-            control={control}
-            name="subject"
-            placeholder={'Subject*'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <Typography className="font-bold ml-3 mt-2">
+        {!isUpdateParticipants ? (
+          <View className="w-full flex-row justify-center gap-2">
+            <ControlledTextField
+              control={control}
+              name="subject"
+              placeholder={'Subject*'}
+              className="w-[95%] bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+        ) : (
+          <View />
+        )}
+
+        <Typography className="ml-3 mt-2 font-bold">
           {"Caregivers' List"}
         </Typography>
         <View className="mt-1 h-[1px] w-full bg-gray-400" />

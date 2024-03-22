@@ -13,7 +13,12 @@ const schema = z.object({
   occurrence: z.number().min(0, { message: 'Occurrence is required' })
 })
 export type Schema = z.infer<typeof schema>
-export const AddEditNote = ({ noteData, cancelClicked, createUpdateNote }) => {
+export const AddEditNote = ({
+  component,
+  noteData,
+  cancelClicked,
+  createUpdateNote
+}) => {
   const staticData = store.getState().staticDataState.staticData
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
@@ -32,7 +37,7 @@ export const AddEditNote = ({ noteData, cancelClicked, createUpdateNote }) => {
           ? noteData.shortDescription
           : '',
       noteDetails: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
-      occurrence: occuranceIndex
+      occurrence: component === 'Appointment' ? occuranceIndex : 0
     },
     resolver: zodResolver(schema)
   })
@@ -64,18 +69,23 @@ export const AddEditNote = ({ noteData, cancelClicked, createUpdateNote }) => {
             autoCapitalize="none"
           />
         </View>
+        {component === 'Appointment' ? (
+          <View className="mt-2 w-full flex-row justify-center">
+            <ControlledDropdown
+              control={control}
+              name="occurrence"
+              label="Occurrence*"
+              className="w-[95%] bg-white"
+              maxHeight={300}
+              list={occuranceList}
+              // onChangeValue={setSelectedCountryChange}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
+
         <View className="my-2 w-full flex-row justify-center">
-          <ControlledDropdown
-            control={control}
-            name="occurrence"
-            label="Occurrence*"
-            className="w-[95%] bg-white"
-            maxHeight={300}
-            list={occuranceList}
-            // onChangeValue={setSelectedCountryChange}
-          />
-        </View>
-        <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField
             control={control}
             name="noteDetails"

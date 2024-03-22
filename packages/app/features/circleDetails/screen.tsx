@@ -226,7 +226,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/events')
+                      router.push(
+                        formatUrl('/(authenticated)/circles/events', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -241,7 +245,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/events')
+                      router.push(
+                        formatUrl('/(authenticated)/circles/events', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />

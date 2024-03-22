@@ -39,7 +39,7 @@ export function CallPostService<T>(
           Alert.alert('Session Expired. Please Login.', '', [
             {
               text: 'Ok',
-              onPress: () => {}
+              onPress: () => { }
             }
           ])
           reject('Login Expired')
