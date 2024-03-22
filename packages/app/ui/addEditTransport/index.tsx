@@ -8,7 +8,9 @@ import {
   GET_TRANSPORTATION_MEMBER_LIST,
   GET_STATES_AND_TIMEZONES,
   CREATE_TRANSPORTATION,
-  UPDATE_TRANSPORTATION
+  CREATE_TRANSPORTATION_EVENT,
+  UPDATE_TRANSPORTATION,
+  UPDATE_TRANSPORTATION_EVENT
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
@@ -33,6 +35,7 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 let selectedDate: any = new Date()
 export const AddEditTransport = ({
+  component,
   transportData,
   appointmentId,
   cancelClicked,
@@ -145,8 +148,7 @@ export const AddEditTransport = ({
   }, [])
 
   async function createUpdateTransport(formData: Schema) {
-    
-    let dataObject = {}
+    let dataObject = {} as any
     let url = ''
     if (_.isEmpty(transportData)) {
       let stateObject = statesListFull[formData.state]
@@ -169,15 +171,20 @@ export const AddEditTransport = ({
           accompanyType: {
             type: 'Family Member'
           },
-          appointment: {
-            id: appointmentId
-          },
           reminderList: []
         }
       }
       dataObject.transportation.address = address
       dataObject.transportation.address.state.country = countryObject
-      url = `${BASE_URL}${CREATE_TRANSPORTATION}`
+      if (component === 'Appointment') {
+        url = `${BASE_URL}${CREATE_TRANSPORTATION}`
+        dataObject.transportation.appointment = { id: appointmentId }
+      } else {
+        url = `${BASE_URL}${CREATE_TRANSPORTATION_EVENT}`
+        dataObject.transportation.event = {
+          id: appointmentId
+        }
+      }
     } else {
       dataObject = {
         header: header,
@@ -194,19 +201,21 @@ export const AddEditTransport = ({
                 ? transportData.accompanyType.type
                 : ''
           },
-          appointment: {
-            id: appointmentId
-          },
           reminderList: transportData.reminderList
             ? transportData.reminderList
             : []
         }
       }
-      url = `${BASE_URL}${UPDATE_TRANSPORTATION}`
+      if (component === 'Appointment') {
+        url = `${BASE_URL}${UPDATE_TRANSPORTATION}`
+        dataObject.transportation.appointment = { id: appointmentId }
+      } else {
+        url = `${BASE_URL}${UPDATE_TRANSPORTATION_EVENT}`
+        dataObject.transportation.event = { id: appointmentId }
+      }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
     createUpdateTransportation(url, dataObject)
-    
   }
   const onSelection = (date: any) => {
     selectedDate = date

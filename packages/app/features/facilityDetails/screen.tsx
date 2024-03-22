@@ -198,11 +198,11 @@ export function FacilityDetailsScreen() {
             <ScrollView className="h-[60%] flex-1">
               {appointmentList.map((data: any, index: number) => {
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     onPress={() => {
                       // router.push(
                       //   formatUrl(
-                      //     '/(authenticated)/circles/addEditLocation',
+                      //     '/(authenticated)/circles/addEditDoctorLocation',
                       //     {
                       //       memberData: JSON.stringify(memberData),
                       //       facilityDetails: JSON.stringify(facilityInfo)
@@ -231,7 +231,7 @@ export function FacilityDetailsScreen() {
                         </View>
                       </View>
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 )
               })}
             </ScrollView>

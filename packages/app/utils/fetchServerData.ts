@@ -1,8 +1,17 @@
 import { Alert } from 'react-native'
 
-export const CallPostService = (url: string | URL | Request, data: any) => {
+export type CallPostServiceResponse<T> = {
+  status: 'SUCCESS' | 'FAIL'
+  message: string
+  data: T
+}
+
+export function CallPostService<T>(
+  url: string | URL | Request,
+  data: any
+): Promise<CallPostServiceResponse<T>> {
   console.log('Service Call :' + url + ' width data ' + JSON.stringify(data))
-  return new Promise(function (accept, reject) {
+  return new Promise(function(accept, reject) {
     fetch(url, {
       method: 'POST',
       headers: {
@@ -11,8 +20,6 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
       body: JSON.stringify(data)
     })
       .then((response) => {
-        // console.log('..../')
-        // console.log(response)
         if (response.status != 200) {
           Alert.alert('', `Error with code ${response.status}`)
           reject(`Error with code ${response.status}`)
@@ -22,15 +29,11 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
       })
       .then((response) => response && response.json())
       .then((response) => {
-        //   hideLoader();
-        // console.log(response)
-        // console.log('..../')
-        // console.log(response)
         if (response.errorCode === 'SEP_101') {
           Alert.alert('Session Expired. Please Login.', '', [
             {
               text: 'Ok',
-              onPress: () => {}
+              onPress: () => { }
             }
           ])
           reject('Login Expired')
@@ -38,11 +41,9 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
         accept(response)
       })
       .catch((error) => {
-        // hideLoader();
         console.log('Error Static Data Response: ' + JSON.stringify(error))
         if (error.name !== null && error.name === 'TimeoutError') {
-          // PtsAlert.error("Can't reach to server,please try again later.");
-          reject("Can't reach to server,please try again later.")
+          reject("Can't reach to server, please try again later.")
         } else if (error.status) {
           let errorMessage =
             undefined !== error.message && null !== error.message
@@ -64,7 +65,7 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
                 'You are not authorized to perform this operation or the resource is unavailable for some reason'
               break
             /* 
-                        internal server error
+                        Internal server error
              */
             case 500:
               errorMessage =
@@ -74,15 +75,12 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
                         Request Timeout 
             */
             case 408:
-              /*
-                          gatewat timeout
-             */
               errorMessage =
                 'Internal Server Error occurred , please try again later'
               break
             case 504:
               /*  
-                         Network connect timeout error
+                        Network connect timeout error
              */
               errorMessage =
                 'Internal Server Error occurred , please try again later'
@@ -101,8 +99,7 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
               errorMessage = 'You are not authenticate to call this service'
               break
           }
-          console.log('erroMessage:' + errorMessage)
-          // PtsAlert.error(errorMessage);
+          console.log('errorMessage:' + errorMessage)
           reject(errorMessage)
         } else {
           if (
@@ -111,14 +108,15 @@ export const CallPostService = (url: string | URL | Request, data: any) => {
           ) {
             Alert.alert('', error.message !== undefined ? error.message : error)
           }
-          let errorMessage =
-            undefined !== error.message && null !== error.message
-              ? error.message
-              : 'Unknown Error occurred'
-          // PtsAlert.error(errorMessage);
+
+          // TODO: Need to handle unknown errors, this variable was unused
+          //
+          // let errorMessage =
+          //   undefined !== error.message && null !== error.message
+          //     ? error.message
+          //     : 'Unknown Error occurred'
           reject(error)
         }
       })
   })
-  // hideLoader();
 }

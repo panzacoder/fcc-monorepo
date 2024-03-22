@@ -9,6 +9,7 @@ import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import store from 'app/redux/store'
 export const Note = ({
+  component,
   data,
   cancelClicked,
   editNote,
@@ -43,7 +44,7 @@ export const Note = ({
                 className="self-center"
                 onPress={() => {
                   Alert.alert(
-                    'Are you sure about deleting Appointment Note?',
+                    `Are you sure about deleting ${component} Note?`,
                     'It cannot be recovered once deleted.',
                     [
                       {

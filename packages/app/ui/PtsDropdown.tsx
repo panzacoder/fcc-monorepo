@@ -45,7 +45,7 @@ const PtsDropdown = ({
           maxHeight={maxHeight ? maxHeight : 300}
           labelField="label"
           valueField="value"
-          placeholder={!isFocus ? 'Select ' + label : '...'}
+          placeholder={!isFocus ? label : '...'}
           searchPlaceholder="Search..."
           value={value}
           onFocus={() => setIsFocus(true)}

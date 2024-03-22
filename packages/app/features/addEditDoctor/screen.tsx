@@ -391,7 +391,7 @@ export function AddEditDoctorScreen() {
                   label="Specialization*"
                   maxHeight={300}
                   list={specializationList}
-                  // onChangeValue={setSelectedCountryChange}
+                // onChangeValue={setSelectedCountryChange}
                 />
               </View>
             </View>
@@ -483,7 +483,7 @@ export function AddEditDoctorScreen() {
                       label="State*"
                       maxHeight={300}
                       list={statesList}
-                      // onChangeValue={setSelectedStateChange}
+                    // onChangeValue={setSelectedStateChange}
                     />
                     <View className="w-full flex-row gap-2">
                       <ControlledTextField
@@ -536,7 +536,7 @@ export function AddEditDoctorScreen() {
                         text: 'Ok',
                         onPress: () => deleteDoctor()
                       },
-                      { text: 'Cancel', onPress: () => {} }
+                      { text: 'Cancel', onPress: () => { } }
                     ]
                   )
                 }}
