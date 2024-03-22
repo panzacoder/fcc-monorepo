@@ -28,7 +28,15 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [ 
+        "expo-build-properties",
+        {
+          "android": {
+            "useCleartextTraffic": true,
+          }
+        }
+      ]
     ]
   }
 }
