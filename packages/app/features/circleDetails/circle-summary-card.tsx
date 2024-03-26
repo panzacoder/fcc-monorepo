@@ -19,9 +19,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
 
   const fullName = userDetails.firstName + ' ' + userDetails.lastName
 
-  function buttonPressed() {
-
-  }
+  function buttonPressed() {}
   return (
     <LinearGradient
       colors={['#103264', '#113263', '#319D9D']}
@@ -69,7 +67,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 leadingIcon="arrow-right"
                 onPress={() => {
                   // router.push(
-                  //   formatUrl('/(authenticated)/circles/doctors', {
+                  //   formatUrl('/circles/caregivers', {
                   //     memberData: JSON.stringify(memberData)
                   //   })
                   // )
@@ -81,7 +79,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 leadingIcon="arrow-right"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated)/circles/doctors', {
+                    formatUrl('/circles/doctors', {
                       memberData: JSON.stringify(memberData)
                     })
                   )
@@ -93,7 +91,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 leadingIcon="home"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated)/circles/facilities', {
+                    formatUrl('/circles/facilities', {
                       memberData: JSON.stringify(memberData)
                     })
                   )

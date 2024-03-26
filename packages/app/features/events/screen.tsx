@@ -169,7 +169,7 @@ export function EventsScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditEvent', {
+                  formatUrl('/circles/addEditEvent', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -296,7 +296,7 @@ export function EventsScreen() {
               <Pressable
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/eventDetails', {
+                    formatUrl('/circles/eventDetails', {
                       eventDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
                     })

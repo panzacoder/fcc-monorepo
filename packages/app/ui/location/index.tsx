@@ -23,9 +23,8 @@ export function Location(data: any) {
             {locationData.component !== 'Appointment' ? (
               <Feather
                 onPress={() => {
-                  // console.log('component', JSON.stringify(locationData))
                   router.replace(
-                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                    formatUrl('/circles/addEditLocation', {
                       locationDetails: JSON.stringify(locationData),
                       component: locationData.component
                         ? locationData.component

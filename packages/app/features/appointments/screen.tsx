@@ -244,7 +244,7 @@ export function AppointmentsScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditAppointment', {
+                  formatUrl('/circles/addEditAppointment', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -393,7 +393,7 @@ export function AppointmentsScreen() {
               <Pressable
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/appointmentDetails', {
+                    formatUrl('/circles/appointmentDetails', {
                       appointmentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
                     })

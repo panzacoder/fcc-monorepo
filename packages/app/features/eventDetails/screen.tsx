@@ -121,7 +121,7 @@ export function EventDetailsScreen() {
           setIsRender(!isRender)
           if (isFromCreateThread) {
             router.push(
-              formatUrl('/(authenticated)/circles/noteMessage', {
+              formatUrl('/circles/noteMessage', {
                 component: 'Event',
                 memberData: JSON.stringify(memberData),
                 noteData: JSON.stringify(noteData)
@@ -237,7 +237,6 @@ export function EventDetailsScreen() {
         id: noteId
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -253,12 +252,10 @@ export function EventDetailsScreen() {
       })
   }
   const messageThreadClicked = (noteData: any) => {
-    // console.log('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
-      // console.log('noteData', noteData)
       router.push(
-        formatUrl('/(authenticated)/circles/noteMessage', {
+        formatUrl('/circles/noteMessage', {
           component: 'Event',
           memberData: JSON.stringify(memberData),
           noteData: JSON.stringify(noteData)
@@ -449,7 +446,6 @@ export function EventDetailsScreen() {
       })
   }
   const editTransportation = (transportationData: any) => {
-    // console.log('remiderData', JSON.stringify(transportationData))
     setTransportationData(transportationData)
     setIsAddTransportation(true)
   }
@@ -462,18 +458,15 @@ export function EventDetailsScreen() {
         id: eventDetails.id ? eventDetails.id : ''
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/(authenticated)/circles/events', {
+            formatUrl('/circles/events', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -549,7 +542,6 @@ export function EventDetailsScreen() {
         }
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -582,7 +574,7 @@ export function EventDetailsScreen() {
                     variant="border"
                     onPress={() => {
                       router.push(
-                        formatUrl('/(authenticated)/circles/addEditEvent', {
+                        formatUrl('/circles/addEditEvent', {
                           memberData: JSON.stringify(memberData),
                           eventDetails: JSON.stringify(eventDetails)
                         })
