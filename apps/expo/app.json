@@ -5,6 +5,7 @@
     "owner": "family-care-circle",
     "version": "1.0.0",
     "scheme": "fcc",
+    "jsEngine": "hermes",
     "userInterfaceStyle": "light",
     "githubUrl": "https://github.com/panzacoder/fcc-monorepo",
     "splash": {
@@ -33,7 +34,7 @@
         "expo-build-properties",
         {
           "android": {
-            "useCleartextTraffic": true,
+            "useCleartextTraffic": true
           }
         }
       ]
