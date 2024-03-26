@@ -7,7 +7,7 @@ import { formatUrl } from 'app/utils/format-url'
 export function Location(data: any) {
   const router = useRouter()
   let locationData = data.data ? data.data : {}
-  // console.log('locationData', locationData.component)
+  // console.log('locationData', locationData)
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
@@ -23,9 +23,8 @@ export function Location(data: any) {
             {locationData.component !== 'Appointment' ? (
               <Feather
                 onPress={() => {
-                  // console.log('component', JSON.stringify(locationData))
                   router.replace(
-                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                    formatUrl('/circles/addEditLocation', {
                       locationDetails: JSON.stringify(locationData),
                       component: locationData.component
                         ? locationData.component
@@ -44,7 +43,12 @@ export function Location(data: any) {
           <View className="bg-primary mx-2 h-[1px] w-full" />
         </View>
       ) : (
-        <View />
+        <View className="mt-2 w-[80%] max-w-[80%] flex-row items-center ">
+          <Typography className="font-400 text-[12px] text-[#1A1A1A]">
+            {'Home'}
+          </Typography>
+          <View className="bg-primary mx-2 h-[1px] w-full" />
+        </View>
       )}
       {locationData.address && locationData.address !== '' ? (
         <View className="ml-2 mt-2 w-full flex-row items-center">
@@ -66,7 +70,7 @@ export function Location(data: any) {
       ) : (
         <View />
       )}
-      {locationData.phone && locationData.phone !== '' ? (
+      {locationData.phone !== undefined && locationData.phone !== '' ? (
         <TouchableOpacity
           onPress={() => {
             Linking.openURL(`tel:${locationData.phone}`)
@@ -78,7 +82,7 @@ export function Location(data: any) {
               {'Phone:'}
             </Typography>
             <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
-              {locationData.phone ? locationData.phone : ''}
+              {locationData.phone}
             </Typography>
           </View>
           <Feather name={'phone'} size={20} color={'black'} />
@@ -94,7 +98,7 @@ export function Location(data: any) {
               {'Fax:'}
             </Typography>
             <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-              {locationData.fax ? locationData.fax : ''}
+              {locationData.fax}
             </Typography>
           </View>
           <Feather name={'copy'} size={20} color={'black'} />
@@ -114,7 +118,7 @@ export function Location(data: any) {
               {'Website:'}
             </Typography>
             <Typography className="font-400 text-primary ml-2 w-[70%] text-[16px] font-bold">
-              {locationData.website ? locationData.website : ''}
+              {locationData.website}
             </Typography>
           </View>
           <Feather name={'globe'} size={20} color={'black'} />

@@ -15,8 +15,6 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
-import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 
@@ -36,13 +34,10 @@ const schema = z.object({
   country: z.number().min(1, { message: 'Country is required' })
 })
 export type Schema = z.infer<typeof schema>
+
+let statesList = []
 export function AddEditDoctorLocationScreen() {
   const staticData = store.getState().staticDataState.staticData
-  // console.log('header', JSON.stringify(header))
-  const header = store.getState().headerState.header
-  const item = useParams<any>()
-  let memberData = JSON.parse(item.memberData)
-  let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
   const [isLoading, setLoading] = useState(false)
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -58,7 +53,6 @@ export function AddEditDoctorLocationScreen() {
     },
     resolver: zodResolver(schema)
   })
-  let statesList = []
   const countryList = staticData.countryList.map((data: any, index: any) => {
     return {
       label: data.name,

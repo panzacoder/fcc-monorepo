@@ -6,20 +6,25 @@ import _ from 'lodash'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
-  RESEND_TRANSPORTATION_REQUEST,
-  DELETE_TRANSPORTATION,
-  CANCEL_TRANSPORTATION_REQUEST,
   CREATE_TRANSPORTATION_REMINDER,
   UPDATE_TRANSPORTATION_REMINDER,
-  DELETE_TRANSPORTATION_REMINDER
+  DELETE_TRANSPORTATION_REMINDER,
+  CREATE_TRANSPORTATION_REMINDER_EVENT,
+  UPDATE_TRANSPORTATION_REMINDER_EVENT,
+  DELETE_TRANSPORTATION_REMINDER_EVENT
 } from 'app/utils/urlConstants'
 import { convertTimeToUserLocalTime, getAddressFromObject } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import { AddEditReminder } from 'app/ui/addEditReminder'
-import { Reminder } from 'app/ui/appointmentReminder'
-export const Transportation = ({ data, refreshData, editTransportation }) => {
+import { Reminder } from 'app/ui/reminder'
+export const Transportation = ({
+  component,
+  data,
+  editTransportation,
+  deleteResendCancelTransportation
+}) => {
   const [isAddReminder, setIsAddReminder] = useState(false)
 
   const [remindersData, setReminderData] = useState({})
@@ -53,51 +58,8 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
   let address = transportationData.address
     ? getAddressFromObject(transportationData.address)
     : ''
-  async function deleteResendCancelTransportation(count: any) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
-    if (count === 0) {
-      url = `${BASE_URL}${DELETE_TRANSPORTATION}`
-    } else if (count === 1) {
-      url = `${BASE_URL}${RESEND_TRANSPORTATION_REQUEST}`
-    } else {
-      url = `${BASE_URL}${CANCEL_TRANSPORTATION_REQUEST}`
-    }
-    if (count === 0 || count === 1) {
-      dataObject = {
-        header: header,
-        transportation: {
-          id: transportationData.id ? transportationData.id : ''
-        }
-      }
-    } else {
-      dataObject = {
-        header: header,
-        transportationVo: {
-          id: transportationData.id ? transportationData.id : ''
-        }
-      }
-    }
-
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-          if (count !== 0) {
-            Alert.alert('', data.message)
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
+  async function callDeleteResendCancelTransportation(count: any) {
+    deleteResendCancelTransportation(count, transportationData)
   }
 
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
@@ -132,14 +94,26 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
   }
   async function deleteReminder(reminderData: any) {
     setLoading(true)
-    let url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER}`
+    let url = ''
+    if (component === 'Appointment') {
+      url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER}`
+    } else {
+      url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER_EVENT}`
+    }
+
     let dataObject = {
       header: header,
       reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        appointmentTransportation: {
-          id: transportationData.id ? transportationData.id : ''
-        }
+        id: reminderData.id ? reminderData.id : ''
+      }
+    }
+    if (component === 'Appointment') {
+      dataObject.reminder.appointmentTransportation = {
+        id: transportationData.id ? transportationData.id : ''
+      }
+    } else {
+      dataObject.reminder.eventTransportation = {
+        id: transportationData.id ? transportationData.id : ''
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
@@ -170,19 +144,32 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
       header: header,
       reminder: {
         content: title,
-        date: date,
-        appointmentTransportation: {
-          id: transportationData.id ? transportationData.id : ''
-        }
+        date: date
       }
     }
     if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_TRANSPORTATION_REMINDER}`
+      if (component === 'Appointment') {
+        url = `${BASE_URL}${CREATE_TRANSPORTATION_REMINDER}`
+      } else {
+        url = `${BASE_URL}${CREATE_TRANSPORTATION_REMINDER_EVENT}`
+      }
     } else {
-      url = `${BASE_URL}${UPDATE_TRANSPORTATION_REMINDER}`
+      if (component === 'Appointment') {
+        url = `${BASE_URL}${UPDATE_TRANSPORTATION_REMINDER}`
+      } else {
+        url = `${BASE_URL}${UPDATE_TRANSPORTATION_REMINDER_EVENT}`
+      }
       dataObject.reminder.id = reminderData.id
     }
-
+    if (component === 'Appointment') {
+      dataObject.reminder.appointmentTransportation = {
+        id: transportationData.id ? transportationData.id : ''
+      }
+    } else {
+      dataObject.reminder.eventTransportation = {
+        id: transportationData.id ? transportationData.id : ''
+      }
+    }
     // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -225,7 +212,7 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
                   [
                     {
                       text: 'Ok',
-                      onPress: () => deleteResendCancelTransportation(0)
+                      onPress: () => callDeleteResendCancelTransportation(0)
                     },
                     { text: 'Cancel', onPress: () => {} }
                   ]
@@ -306,7 +293,7 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
               title="Resend Request"
               variant="default"
               onPress={() => {
-                deleteResendCancelTransportation(1)
+                callDeleteResendCancelTransportation(1)
               }}
             />
           ) : (
@@ -318,7 +305,7 @@ export const Transportation = ({ data, refreshData, editTransportation }) => {
               title={'Cancel Request'}
               variant="default"
               onPress={() => {
-                deleteResendCancelTransportation(2)
+                callDeleteResendCancelTransportation(2)
               }}
             />
           ) : (

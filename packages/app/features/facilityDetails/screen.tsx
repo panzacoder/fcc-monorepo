@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import {
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Pressable
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -92,7 +98,7 @@ export function FacilityDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated)/circles/addEditFacility', {
+                    formatUrl('/circles/addEditFacility', {
                       facilityDetails: JSON.stringify(facilityDetails),
                       memberData: JSON.stringify(memberData)
                     })
@@ -145,7 +151,7 @@ export function FacilityDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                    formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(facilityInfo),
                       component: 'Facility'
@@ -202,7 +208,7 @@ export function FacilityDetailsScreen() {
                     onPress={() => {
                       // router.push(
                       //   formatUrl(
-                      //     '/(authenticated)/circles/addEditDoctorLocation',
+                      //     '/circles/addEditDoctorLocation',
                       //     {
                       //       memberData: JSON.stringify(memberData),
                       //       facilityDetails: JSON.stringify(facilityInfo)

@@ -20,15 +20,18 @@ import {
   UPDATE_APPOINTMENT_STATUS,
   DELETE_APPOINTMENT,
   GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD
+  CREATE_MESSAGE_THREAD,
+  RESEND_TRANSPORTATION_REQUEST,
+  DELETE_TRANSPORTATION,
+  CANCEL_TRANSPORTATION_REQUEST
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { Location } from 'app/ui/location'
-import { Note } from 'app/ui/appointmentNote'
-import { Reminder } from 'app/ui/appointmentReminder'
+import { Note } from 'app/ui/note'
+import { Reminder } from 'app/ui/reminder'
 import { Transportation } from 'app/ui/transportation'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddEditReminder } from 'app/ui/addEditReminder'
@@ -62,7 +65,7 @@ export function AppointmentDetailsScreen() {
   const [transportationData, setTransportationData] = useState({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [notesList, setNotesList] = useState([])
-  const [participantsList, setParticipantsList] = useState([])
+  const [participantsList, setParticipantsList] = useState([]) as any
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
@@ -128,7 +131,8 @@ export function AppointmentDetailsScreen() {
           setIsDataReceived(true)
           if (isFromCreateThread) {
             router.push(
-              formatUrl('/(authenticated)/circles/noteMessage', {
+              formatUrl('/circles/noteMessage', {
+                component: 'Appointment',
                 memberData: JSON.stringify(memberData),
                 noteData: JSON.stringify(noteData)
               })
@@ -159,7 +163,7 @@ export function AppointmentDetailsScreen() {
     status = '',
     purpose = '',
     description = ''
-  let doctorFacilityAddress = {}
+  let doctorFacilityAddress = {} as any
   if (!_.isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
       apptDate = formatTimeToUserLocalTime(appointmentDetails.date)
@@ -275,6 +279,7 @@ export function AppointmentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
+          setNoteData(noteData)
           getAppointmentDetails(true)
         } else {
           Alert.alert('', data.message)
@@ -307,7 +312,6 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants')
           const list = data.data.map((data: any, index: any) => {
             let object = data
             object.isSelected = false
@@ -333,18 +337,15 @@ export function AppointmentDetailsScreen() {
         id: appointmentDetails.id ? appointmentDetails.id : ''
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/(authenticated)/circles/appointments', {
+            formatUrl('/circles/appointments', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -363,7 +364,6 @@ export function AppointmentDetailsScreen() {
         id: noteId
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -449,6 +449,7 @@ export function AppointmentDetailsScreen() {
     let dataObject = {
       header: header,
       reminder: {
+        id: '',
         content: title,
         date: date,
         appointment: {
@@ -522,12 +523,10 @@ export function AppointmentDetailsScreen() {
         }
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // refreshData(false)
           setRemindersList(data.data.reminderList ? data.data.reminderList : [])
         } else {
           Alert.alert('', data.message)
@@ -539,17 +538,15 @@ export function AppointmentDetailsScreen() {
       })
   }
   const editNote = (noteData: any) => {
-    // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
   }
   const messageThreadClicked = (noteData: any) => {
-    // console.log('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
-      // console.log('noteData', noteData)
       router.push(
-        formatUrl('/(authenticated)/circles/noteMessage', {
+        formatUrl('/circles/noteMessage', {
+          component: 'Appointment',
           memberData: JSON.stringify(memberData),
           noteData: JSON.stringify(noteData)
         })
@@ -559,9 +556,58 @@ export function AppointmentDetailsScreen() {
     }
   }
   const editReminder = (remiderData: any) => {
-    // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
+  }
+  async function deleteResendCancelTransportation(
+    count: any,
+    transportData: any
+  ) {
+    setLoading(true)
+    let url = ''
+    let dataObject = {}
+    if (count === 0) {
+      url = `${BASE_URL}${DELETE_TRANSPORTATION}`
+    } else if (count === 1) {
+      url = `${BASE_URL}${RESEND_TRANSPORTATION_REQUEST}`
+    } else {
+      setTransportationList([])
+      url = `${BASE_URL}${CANCEL_TRANSPORTATION_REQUEST}`
+    }
+    if (count === 0 || count === 1) {
+      dataObject = {
+        header: header,
+        transportation: {
+          id: transportData.id ? transportData.id : ''
+        }
+      }
+    } else {
+      dataObject = {
+        header: header,
+        transportationVo: {
+          id: transportData.id ? transportData.id : ''
+        }
+      }
+    }
+
+    // console.log('dataObject', JSON.stringify(dataObject))
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          refreshData()
+          if (count !== 0) {
+            Alert.alert('', data.message)
+          }
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
   }
   const editTransportation = (transportationData: any) => {
     // console.log('remiderData', JSON.stringify(transportationData))
@@ -620,14 +666,10 @@ export function AppointmentDetailsScreen() {
                     variant="border"
                     onPress={() => {
                       router.push(
-                        formatUrl(
-                          '/(authenticated)/circles/addEditAppointment',
-                          {
-                            memberData: JSON.stringify(memberData),
-                            appointmentDetails:
-                              JSON.stringify(appointmentDetails)
-                          }
-                        )
+                        formatUrl('/circles/addEditAppointment', {
+                          memberData: JSON.stringify(memberData),
+                          appointmentDetails: JSON.stringify(appointmentDetails)
+                        })
                       )
                     }}
                   />
@@ -744,6 +786,7 @@ export function AppointmentDetailsScreen() {
                     return (
                       <View key={index}>
                         <Note
+                          component={'Appointment'}
                           data={data}
                           cancelClicked={cancelClicked}
                           editNote={editNote}
@@ -863,9 +906,12 @@ export function AppointmentDetailsScreen() {
                     return (
                       <View key={index}>
                         <Transportation
+                          component={'Appointment'}
                           data={data}
-                          refreshData={refreshData}
                           editTransportation={editTransportation}
+                          deleteResendCancelTransportation={
+                            deleteResendCancelTransportation
+                          }
                         />
                       </View>
                     )
@@ -908,6 +954,7 @@ export function AppointmentDetailsScreen() {
       {isAddNote ? (
         <View className="h-full w-full justify-center self-center">
           <AddEditNote
+            component={'Appointment'}
             noteData={noteData}
             cancelClicked={cancelClicked}
             createUpdateNote={createUpdateNote}
@@ -930,6 +977,7 @@ export function AppointmentDetailsScreen() {
       {isAddTransportation ? (
         <View className="h-full w-full justify-center self-center">
           <AddEditTransport
+            component={'Appointment'}
             transportData={transportationData}
             appointmentId={appointmentDetails.id}
             cancelClicked={cancelClicked}

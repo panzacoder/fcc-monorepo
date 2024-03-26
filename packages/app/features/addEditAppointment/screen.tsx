@@ -176,7 +176,7 @@ export function AddEditAppointmentScreen() {
           }
 
           router.push(
-            formatUrl('/(authenticated)/circles/appointmentDetails', {
+            formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
               memberData: JSON.stringify(memberData)
             })

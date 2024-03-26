@@ -21,6 +21,7 @@ import { Feather } from 'app/ui/icons'
 import {
   BASE_URL,
   GET_APPOINTMENT_NOTE,
+  GET_EVENT_NOTE,
   GET_THREAD_PARTICIPANTS,
   UPDATE_THREAD_PARTICIPANTS,
   UPDATE_MESSAGE_THREAD
@@ -46,13 +47,27 @@ export function NoteMessageScreen() {
 
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
-    let url = `${BASE_URL}${GET_APPOINTMENT_NOTE}`
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: noteData.id ? noteData.id : ''
+
+    let url = ''
+    let dataObject = {}
+    if (item.component === 'Appointment') {
+      url = `${BASE_URL}${GET_APPOINTMENT_NOTE}`
+      dataObject = {
+        header: header,
+        appointmentNote: {
+          id: noteData.id ? noteData.id : ''
+        }
+      }
+    } else {
+      url = `${BASE_URL}${GET_EVENT_NOTE}`
+      dataObject = {
+        header: header,
+        note: {
+          id: noteData.id ? noteData.id : ''
+        }
       }
     }
+
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -93,7 +108,7 @@ export function NoteMessageScreen() {
         id: memberData.member ? memberData.member : ''
       },
       messageThreadType: {
-        type: 'Appointment'
+        type: item.component ? item.component : ''
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
@@ -104,11 +119,17 @@ export function NoteMessageScreen() {
           // console.log('in getThreadParticipants', JSON.stringify(data.data))
           const list = data.data.map((data: any, index: any) => {
             let object = data
-            object.isSelected = data.status === 'Active' ? true : false
+            let isParticipant = false
+            participantsList.map((participant, index) => {
+              if (participant.participantName === data.name) {
+                isParticipant = true
+              }
+            })
+            object.isSelected = isParticipant
             return object
           })
           setThreadParticipantsList(list)
-          // console.log('setThreadParticipantsList', threadParticipantsList)
+          console.log('setThreadParticipantsList', list)
         } else {
           Alert.alert('', data.message)
         }
@@ -221,7 +242,7 @@ export function NoteMessageScreen() {
         }}
         className="w-full flex-row items-center py-2"
       >
-        <ScrollView horizontal={true} className="w-[85%] max-w-[8%] flex-row">
+        <ScrollView horizontal={true} className="w-[85%] max-w-[85%] flex-row">
           {participantsList.map((data: any, index: number) => {
             return (
               <View key={index} className="ml-2">

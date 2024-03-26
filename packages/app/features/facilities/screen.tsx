@@ -71,7 +71,7 @@ export function FacilitiesScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditFacility', {
+                  formatUrl('/circles/addEditFacility', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -88,7 +88,7 @@ export function FacilitiesScreen() {
             <Pressable
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/facilityDetails', {
+                  formatUrl('/circles/facilityDetails', {
                     facilityDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)
                   })

@@ -1,15 +1,10 @@
-import { useState } from 'react'
 import { View, Alert, Pressable } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import PtsLoader from 'app/ui/PtsLoader'
 import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
-import store from 'app/redux/store'
 import { Timer } from 'app/utils/timer'
 
 export const Reminder = ({ data, editReminder, deleteReminder }) => {
-  const [isLoading, setLoading] = useState(false)
-  const header = store.getState().headerState.header
   let reminderData = data ? data : {}
   let creationDate = reminderData.createdOn
     ? convertTimeToUserLocalTime(reminderData.createdOn)
@@ -19,7 +14,6 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
     : ''
   return (
     <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#e09093] bg-[#fbe2e3] py-2">
-      <PtsLoader loading={isLoading} />
       <View className="w-full flex-row">
         <View className="w-[70%] self-center">
           <Typography className="font-400 ml-5 self-center text-[#1A1A1A]">
