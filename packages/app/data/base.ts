@@ -19,6 +19,7 @@ export async function fetchData<DataType>({
   onFailure
 }: fetchDataProps<DataType>): Promise<DataType | void> {
   const url = new URL(route, BASE_URL)
+  console.log(`Fetching data from ${url}`)
   const deviceInfo = await getUserDeviceInformation()
   const header = store.getState().headerState.header
 
@@ -27,8 +28,8 @@ export async function fetchData<DataType>({
     ...data
   }
 
-  return CallPostService<DataType>(url, payload)
-    .then(async (res) => {
+  const res = CallPostService<DataType>(url, payload)
+    .then((res) => {
       if (res.status === 'SUCCESS') {
         return res.data
       } else {
@@ -38,4 +39,5 @@ export async function fetchData<DataType>({
     .catch((error) => {
       console.log(error)
     })
+  return res
 }

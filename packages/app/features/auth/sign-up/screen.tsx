@@ -84,7 +84,7 @@ export function SignUpScreen() {
         if (data.status === 'SUCCESS') {
           router.push(formatUrl('/verification', { email: formData.email }))
         } else if (data.errorCode === 'RVF_101') {
-          Alert.alert('', 'Do verification')
+          Alert.alert('', 'Please check your email for verification code')
         } else {
           Alert.alert('', data.message)
         }
