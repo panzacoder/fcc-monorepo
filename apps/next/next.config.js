@@ -40,6 +40,19 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true
   },
+  async headers() {
+    return [
+      {
+        source: '/fccApi/2.0/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          }
+        ]
+      }
+    ]
+  },
   rewrites() {
     return [
       {
