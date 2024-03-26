@@ -17,7 +17,6 @@ export function CallPostService<T>(
   console.log(
     `Service Call: url( ${url} ) with data object: ${JSON.stringify(data)}`
   )
-  console.dir(data)
   return new Promise(function (accept, reject) {
     fetch(url, {
       method: 'POST',
@@ -27,14 +26,14 @@ export function CallPostService<T>(
       body: JSON.stringify(data)
     })
       .then((response) => {
-        if (response.status != 200) {
+        if (!response.ok) {
           Alert.alert('', `Error with code ${response.status}`)
           reject(`Error with code ${response.status}`)
           return null
         }
-        return response
+        return response.json()
       })
-      .then((response) => response && response.json())
+
       .then((response) => {
         if (response.errorCode === 'SEP_101') {
           Alert.alert('Session Expired. Please Login.', '', [

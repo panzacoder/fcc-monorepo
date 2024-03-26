@@ -13,7 +13,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@hookform/resolvers": "^3.3.4",
-    "@react-native-community/datetimepicker": "^7.6.2",
+    "@react-native-community/datetimepicker": "^7.6.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "countries-and-timezones": "^3.6.0",
@@ -24,17 +24,13 @@
     "moment-timezone": "^0.5.45",
     "moti": "^0.28.1",
     "nativewind": "^4.0.36",
-    "react": "18.2.0",
     "react-hook-form": "^7.51.0",
-    "react-native": "0.73.5",
     "react-native-autocomplete-dropdown": "^3.1.4",
     "react-native-elements": "^3.4.3",
-    "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "3.6.1",
-    "react-native-safe-area-context": "4.9.0",
+    "react-native-safe-area-context": "4.8.2",
     "react-native-vector-icons": "^10.0.3",
-    "react-native-virtualized-view": "^1.0.0",
-    "react-native-webview": "13.8.1",
+    "react-native-webview": "13.6.4",
     "react-redux": "^9.1.0",
     "redux": "^5.0.1",
     "solito": "4.2.2",
@@ -46,6 +42,8 @@
   },
   "sideEffects": false,
   "devDependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.6",
     "tailwindcss-animate": "^1.0.7"
   }
 }
