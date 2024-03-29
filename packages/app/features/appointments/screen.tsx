@@ -228,7 +228,7 @@ export function AppointmentsScreen() {
           }}
           className="w-[75%] flex-row"
         >
-          <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+          <Typography className=" ml-5 mt-7 text-[14px] font-bold text-black">
             {currentFilter}
           </Typography>
           <Feather
@@ -244,7 +244,7 @@ export function AppointmentsScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditAppointment', {
+                  formatUrl('/circles/addEditAppointment', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -256,20 +256,22 @@ export function AppointmentsScreen() {
         ) : (
           <View />
         )}
-        <Pressable
-          onPress={() => {
-            setIsShowFilter(false)
-            setIsFilter(!isFilter)
-          }}
-          className=""
-        >
-          <Feather
-            className="ml-5 mt-6 rounded-[5px] bg-[#c5dbfd] p-[3px]"
-            name={'filter'}
-            size={25}
-            color={COLORS.primary}
-          />
-        </Pressable>
+        <View className="mt-5 self-center">
+          <Pressable
+            onPress={() => {
+              setIsShowFilter(false)
+              setIsFilter(!isFilter)
+            }}
+            className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+          >
+            <Feather
+              className=""
+              name={'filter'}
+              size={25}
+              color={COLORS.primary}
+            />
+          </Pressable>
+        </View>
       </View>
       {isFilter ? (
         <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -323,14 +325,14 @@ export function AppointmentsScreen() {
                 onPress={handleSubmit(filterAppointment)}
               />
               <Button
-                className="ml-5 bg-[#287CFA]"
+                className="ml-[20px] bg-[#287CFA]"
                 title={''}
                 leadingIcon="rotate-ccw"
                 variant="default"
                 onPress={handleSubmit(resetFilter)}
               />
               <Button
-                className="ml-5 bg-[#287CFA]"
+                className="ml-[20px] bg-[#287CFA]"
                 title={''}
                 leadingIcon="x"
                 variant="default"
@@ -393,7 +395,7 @@ export function AppointmentsScreen() {
               <Pressable
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/appointmentDetails', {
+                    formatUrl('/circles/appointmentDetails', {
                       appointmentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
                     })
@@ -481,7 +483,7 @@ export function AppointmentsScreen() {
                   {data.hasTransportation ? (
                     <View className="w-[30%]">
                       <Feather
-                        className="ml-5 mt-1"
+                        className="ml-5"
                         name={'truck'}
                         size={25}
                         color={

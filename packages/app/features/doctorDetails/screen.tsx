@@ -78,9 +78,6 @@ export function DoctorDetailsScreen() {
                   {doctorInfo.specialist ? doctorInfo.specialist : ''}
                 </Typography>
                 <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
-                {/* <Typography className="font-400 text-primary ml-2 text-[16px]">
-                  {doctorInfo.status ? doctorInfo.status : ''}
-                </Typography> */}
               </View>
               <Button
                 className=""
@@ -88,7 +85,7 @@ export function DoctorDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.push(
-                    formatUrl('/(authenticated)/circles/addEditDoctor', {
+                    formatUrl('/circles/addEditDoctor', {
                       memberData: JSON.stringify(memberData),
                       doctorDetails: JSON.stringify(doctorDetails),
                       component: 'Doctor'
@@ -173,7 +170,7 @@ export function DoctorDetailsScreen() {
                 variant="border"
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/addEditLocation', {
+                    formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(doctorInfo),
                       component: 'Doctor'
@@ -234,20 +231,16 @@ export function DoctorDetailsScreen() {
                     <View key={index}>
                       <TouchableOpacity
                         onPress={() => {
-                          // router.push(
-                          //   formatUrl(
-                          //     '/(authenticated)/circles/addEditLocation',
-                          //     {
-                          //       memberData: JSON.stringify(memberData),
-                          //       doctorDetails: JSON.stringify(doctorInfo)
-                          //     }
-                          //   )
-                          // )
+                          router.push(
+                            formatUrl('/circles/addEditLocation', {
+                              memberData: JSON.stringify(memberData),
+                              doctorDetails: JSON.stringify(doctorInfo)
+                            })
+                          )
                         }}
                         className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
                       >
                         <View className="ml-2 mt-2 flex-row ">
-                          {/* <View className="ml-2 w-[2px] bg-[#184E4E]" /> */}
                           <View className="w-[95%]">
                             <Typography className="font-400 ml-2 w-[95%] text-[16px] text-[#103264]">
                               {data.purpose ? data.purpose : ''}

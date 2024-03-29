@@ -1,7 +1,7 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback } from 'react'
-import { View, Image, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { useState, useCallback } from 'react'
+import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -131,7 +131,7 @@ export function AddEditDoctorScreen() {
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/(authenticated)/circles/doctors', {
+            formatUrl('/circles/doctors', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -169,27 +169,19 @@ export function AddEditDoctorScreen() {
         }
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
           let details: any = data.data.doctor
             ? JSON.stringify(data.data.doctor)
             : {}
           router.replace(
-            formatUrl('/(authenticated)/circles/doctorDetails', {
+            formatUrl('/circles/doctorDetails', {
               doctorDetails: details,
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctors', {
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -239,27 +231,15 @@ export function AddEditDoctorScreen() {
         doctorLocationList: locationList
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // let details: any = data.data.doctor
-          //   ? JSON.stringify(data.data.doctor)
-          //   : {}
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctorDetails', {
-          //     doctorDetails: details,
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
           router.push(
-            formatUrl('/(authenticated)/circles/doctors', {
+            formatUrl('/circles/doctors', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -391,7 +371,7 @@ export function AddEditDoctorScreen() {
                   label="Specialization*"
                   maxHeight={300}
                   list={specializationList}
-                // onChangeValue={setSelectedCountryChange}
+                  // onChangeValue={setSelectedCountryChange}
                 />
               </View>
             </View>
@@ -483,7 +463,7 @@ export function AddEditDoctorScreen() {
                       label="State*"
                       maxHeight={300}
                       list={statesList}
-                    // onChangeValue={setSelectedStateChange}
+                      // onChangeValue={setSelectedStateChange}
                     />
                     <View className="w-full flex-row gap-2">
                       <ControlledTextField
@@ -536,7 +516,7 @@ export function AddEditDoctorScreen() {
                         text: 'Ok',
                         onPress: () => deleteDoctor()
                       },
-                      { text: 'Cancel', onPress: () => { } }
+                      { text: 'Cancel', onPress: () => {} }
                     ]
                   )
                 }}

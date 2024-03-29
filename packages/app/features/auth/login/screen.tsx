@@ -14,7 +14,7 @@ import userProfileAction from 'app/redux/userProfile/userProfileAction'
 import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
-import sponsororAction from 'app/redux/sponsor/sponsororAction'
+import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
@@ -33,7 +33,7 @@ const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
 
-export type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>
 
 export function LoginScreen() {
   const router = useRouter()
@@ -72,7 +72,9 @@ export function LoginScreen() {
     let deviceInfo = await getUserDeviceInformation()
     let loginURL = `${BASE_URL}${USER_LOGIN}`
     let dataObject = {
-      header: deviceInfo,
+      header: {
+        appclient:'M'
+      },
       appuserVo: {
         emailOrPhone: formData.email,
         credential: formData.password,
@@ -101,7 +103,7 @@ export function LoginScreen() {
             )
           )
           store.dispatch(
-            sponsororAction.setSponsor({
+            sponsorAction.setSponsor({
               sponsorDetails: data.data.sponsorUser,
               sponsorShipDetails: data.data.sponsorship
             })

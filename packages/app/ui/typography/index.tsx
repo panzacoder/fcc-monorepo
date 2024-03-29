@@ -8,11 +8,11 @@ const typographyVariants = tv({
   base: 'max-w-full text-base text-black',
   variants: {
     variant: {
-      h1: 'text-5xl font-extrabold',
-      h2: 'text-4xl font-extrabold',
-      h3: 'text-3xl font-bold',
+      h1: 'text-4xl font-extrabold',
+      h2: 'text-3xl font-extrabold',
+      h3: 'text-2xl font-bold',
       h4: 'text-xl font-bold',
-      h5: 'font-bold',
+      h5: 'text-lg font-bold',
       h6: 'text-sm font-bold',
       p: '',
       span: '',

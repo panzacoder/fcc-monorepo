@@ -166,10 +166,10 @@ export function EventsScreen() {
         {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <Pressable
-              className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+              className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditEvent', {
+                  formatUrl('/circles/addEditEvent', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -181,20 +181,22 @@ export function EventsScreen() {
         ) : (
           <View />
         )}
-        <Pressable
-          onPress={() => {
-            setIsShowFilter(false)
-            setIsFilter(!isFilter)
-          }}
-          className=""
-        >
-          <Feather
-            className="ml-5 mt-6 rounded-[5px] bg-[#c5dbfd] p-[3px]"
-            name={'filter'}
-            size={25}
-            color={COLORS.primary}
-          />
-        </Pressable>
+        <View className="mt-5 self-center">
+          <Pressable
+            onPress={() => {
+              setIsShowFilter(false)
+              setIsFilter(!isFilter)
+            }}
+            className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+          >
+            <Feather
+              className=""
+              name={'filter'}
+              size={25}
+              color={COLORS.primary}
+            />
+          </Pressable>
+        </View>
       </View>
       {isFilter ? (
         <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -226,14 +228,14 @@ export function EventsScreen() {
                 onPress={handleSubmit(filterEvents)}
               />
               <Button
-                className="ml-5 bg-[#287CFA]"
+                className="mx-3 bg-[#287CFA]"
                 title={''}
                 leadingIcon="rotate-ccw"
                 variant="default"
                 onPress={handleSubmit(resetFilter)}
               />
               <Button
-                className="ml-5 bg-[#287CFA]"
+                className=" bg-[#287CFA]"
                 title={''}
                 leadingIcon="x"
                 variant="default"
@@ -296,7 +298,7 @@ export function EventsScreen() {
               <Pressable
                 onPress={() => {
                   router.replace(
-                    formatUrl('/(authenticated)/circles/eventDetails', {
+                    formatUrl('/circles/eventDetails', {
                       eventDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
                     })
@@ -379,7 +381,7 @@ export function EventsScreen() {
                   {data.hasTransportation ? (
                     <View className="w-[30%]">
                       <Feather
-                        className="ml-5 mt-1"
+                        className="ml-5"
                         name={'truck'}
                         size={25}
                         color={

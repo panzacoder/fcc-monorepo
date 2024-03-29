@@ -27,9 +27,9 @@ const nextConfig = {
     'react-native',
     'react-native-css-interop',
     'react-native-gesture-handler',
+    'react-native-autocomplete-dropdown',
     'react-native-animatable',
     'react-native-elements',
-    'react-native-element-dropdown',
     'react-native-feather',
     'react-native-ratings',
     'react-native-vector-icons',
@@ -39,6 +39,19 @@ const nextConfig = {
   ],
   experimental: {
     forceSwcTransforms: true
+  },
+  async headers() {
+    return [
+      {
+        source: '/fccApi/2.0/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          }
+        ]
+      }
+    ]
   },
   rewrites() {
     return [

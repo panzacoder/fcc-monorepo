@@ -70,7 +70,7 @@ export function DoctorsScreen() {
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
-                  formatUrl('/(authenticated)/circles/addEditDoctor', {
+                  formatUrl('/circles/addEditDoctor', {
                     memberData: JSON.stringify(memberData)
                   })
                 )
@@ -87,7 +87,7 @@ export function DoctorsScreen() {
             <TouchableOpacity
               onPress={() => {
                 router.replace(
-                  formatUrl('/(authenticated)/circles/doctorDetails', {
+                  formatUrl('/circles/doctorDetails', {
                     doctorDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)
                   })

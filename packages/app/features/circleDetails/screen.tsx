@@ -12,11 +12,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { CircleSummaryCard } from './circle-summary-card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
-import {
-  BASE_URL,
-  GET_APPOINTMENTS,
-  GET_MEMBER_MENUS
-} from 'app/utils/urlConstants'
+import { BASE_URL, GET_MEMBER_MENUS } from 'app/utils/urlConstants'
 export function CircleDetailsScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
@@ -45,7 +41,6 @@ export function CircleDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            // console.log('getMemberMenus', JSON.stringify(data.data))
             if (data.member && data.member.address) {
               store.dispatch(
                 currentMemberAddressAction.setMemberAddress(data.member.address)
@@ -85,7 +80,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/(authenticated)/circles/messages', {
+                        formatUrl('/circles/messages', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -103,7 +98,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/(authenticated)/circles/messages', {
+                        formatUrl('/circles/messages', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -140,7 +135,7 @@ export function CircleDetailsScreen() {
                   className=" ml-2"
                   onPress={() => {
                     router.push(
-                      formatUrl('/(authenticated)/circles/appointments', {
+                      formatUrl('/circles/appointments', {
                         memberData: JSON.stringify(memberData)
                       })
                     )
@@ -177,7 +172,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/incidents')
+                      router.push(
+                        formatUrl('/circles/incidents', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -192,7 +191,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/incidents')
+                      router.push(
+                        formatUrl('/circles/incidents', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -227,7 +230,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/(authenticated)/circles/events', {
+                        formatUrl('/circles/events', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -246,7 +249,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/(authenticated)/circles/events', {
+                        formatUrl('/circles/events', {
                           memberData: JSON.stringify(memberData)
                         })
                       )

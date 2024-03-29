@@ -10,14 +10,13 @@ export function SplashScreen() {
   return (
     <View className="native:pt-60 web:pt-40 flex h-full w-full flex-1 px-4 md:justify-center md:pt-0">
       <Typography
-        variant="h3"
+        variant="h2"
         as="h1"
         className="text-center font-bold text-white"
       >
         Caregiving can be <Text className="italic">heavy</Text>.
         {"\n\nLet's lighten the load."}
       </Typography>
-
       <View className="absolute bottom-20 right-4 flex flex-col items-end gap-4 ">
         <AccentButton title="Log in" onPress={() => router.push('/login')} />
         <AccentButton title="Sign up" onPress={() => router.push('/sign-up')} />

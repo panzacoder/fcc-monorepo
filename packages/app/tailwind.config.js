@@ -8,6 +8,7 @@ module.exports = {
   presets: [require('nativewind/preset')],
   important: 'html',
   darkMode: ['class'],
+  plugins: [require('tailwindcss-animate')],
   theme: {
     ...theme
   }

@@ -8,10 +8,11 @@ import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data
-  let textStyle = 'ml-[10px] self-center text-[19px] font-bold text-black'
-  let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}]`
-  let textStyle2 = 'ml-5 text-[12px] text-black'
-  let textStyle3 = ' text-[12px] text-black underline'
+  let textStyle =
+    'ml-[10px] self-center text-[19px] font-bold text-black w-[70%]'
+  let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}] max-w-[90%]`
+  let textStyle2 = 'ml-5 text-[12px] text-black '
+  let textStyle3 = ' text-[12px] text-black underline max-w-[75%]'
   let fullName = '',
     appointmentText = ''
   let dateText = ''
@@ -79,8 +80,8 @@ export function CardView(data: any) {
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||
-        memberData.recentIncident ||
-        memberData.upcomingEvent ? (
+      memberData.recentIncident ||
+      memberData.upcomingEvent ? (
         <View className="m-auto flex-1 ">
           <View className="rounded-2xl bg-white px-2 pt-5">
             <View className="flex-row">
@@ -106,7 +107,7 @@ export function CardView(data: any) {
             </View>
             <View className="h-[95%] flex-row">
               <View className="my-[5] ml-[15] h-[90%] w-[2px] bg-black" />
-              <View className="my-[5px]">
+              <View className="my-[2px]">
                 {memberData.upcomingAppointment ? (
                   <View className="my-[5px]">
                     <Typography className={`${textStyle1}`}>

@@ -203,28 +203,15 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
-          // router.replace(
-          //   formatUrl('/(authenticated)/circles/doctors', {
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
-          // router.back()
           let details: any = data.data ? JSON.stringify(data.data) : {}
           if (item.component === 'Doctor') {
             router.replace(
-              formatUrl('/(authenticated)/circles/doctorDetails', {
+              formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
                 memberData: JSON.stringify(memberData)
               })
             )
           } else {
-            // router.replace(
-            //   formatUrl('/(authenticated)/circles/facilityDetails', {
-            //     facilityDetails: details,
-            //     memberData: JSON.stringify(memberData)
-            //   })
-            // )
             router.back()
           }
         } else {
@@ -240,7 +227,7 @@ export function AddEditLocationScreen() {
     setLoading(true)
     let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let dataObject = {}
+    let dataObject = {} as any
     let addressObject = {
       operation: 'add',
       shortDescription: formData.locationShortName,
@@ -323,33 +310,17 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // router.back()
-          // router.push(
-          //   formatUrl('/(authenticated)/circles/doctorDetails', {
-          //     doctorDetails: JSON.stringify(data.data.doctor),
-          //     memberData: JSON.stringify(memberData)
-          //   })
-          // )
           if (item.component === 'Doctor') {
             let details: any = data.data.doctor
               ? JSON.stringify(data.data.doctor)
               : {}
             router.replace(
-              formatUrl('/(authenticated)/circles/doctorDetails', {
+              formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
                 memberData: JSON.stringify(memberData)
               })
             )
           } else {
-            // let details: any = data.data.facility
-            //   ? JSON.stringify(data.data.facility)
-            //   : {}
-            // router.replace(
-            //   formatUrl('/(authenticated)/circles/facilityDetails', {
-            //     facilityDetails: details,
-            //     memberData: JSON.stringify(memberData)
-            //   })
-            // )
             router.back()
           }
         } else {

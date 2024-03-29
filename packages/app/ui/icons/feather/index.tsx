@@ -1,7 +1,7 @@
 import { Feather as ExpoFeather } from '@expo/vector-icons'
 import { cssInterop } from 'nativewind'
 import { ComponentProps } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { Pressable } from 'react-native'
 
 export const Feather = (props: ComponentProps<typeof ExpoFeather>) => {
   return <ExpoFeather {...props} />
@@ -18,9 +18,9 @@ export const FeatherButton = ({
   ...props
 }: ComponentProps<typeof ExpoFeather> & { onPress: () => void }) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <Pressable onPress={onPress}>
       <ExpoFeather {...props} />
-    </TouchableOpacity>
+    </Pressable>
   )
 }
 

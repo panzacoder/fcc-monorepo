@@ -1,15 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
-import {
-  BASE_URL,
-  CREATE_ACCOUNT,
-  GET_COUNTRIES,
-  GET_STATES_AND_TIMEZONES
-} from 'app/utils/urlConstants'
+import { BASE_URL, CREATE_ACCOUNT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'solito/navigation'
@@ -20,20 +15,17 @@ import { formatUrl } from 'app/utils/format-url'
 
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
 
-const schema = z
-  .object({
+const schema = addressSchema
+  .extend({
     firstName: z.string().min(1, { message: 'First Name is required' }),
     lastName: z.string().min(1, { message: 'Last Name is required' }),
     phone: z.string(),
     email: z.string().min(1, { message: 'Email is required' }).email(),
-    timezone: z.string().min(1, { message: 'Timezone is required' }),
-    state: z.number().min(1, { message: 'State is required' }),
-    country: z.number().min(1, { message: 'Country is required' }),
     password: z
       .string()
       .min(8, { message: 'Password must be at least 8 characters' })
@@ -55,104 +47,16 @@ const schema = z
     }
   })
 
-export type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
-  const [selectedCountryValue, setSelectedCountry] = useState(-1)
-  const [countries, setCountries] = useState<any>([])
-  const [states, setStates] = useState<any>([])
-  const [timezones, setTimezones] = useState<any>([])
   const [isLoading, setLoading] = useState(false)
 
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-      timezone: '',
-      country: -1,
-      state: -1,
-      acceptTc: false
-    },
+  const formMethods = useForm<Schema>({
     resolver: zodResolver(schema)
   })
 
   const router = useRouter()
-
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId || 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        console.log('data', data)
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // set available states
-          const statesList = data.data.stateList.map((data: any) => {
-            return {
-              label: data.name,
-              value: data.id
-            }
-          })
-          setStates(statesList)
-
-          // set available timezones
-          const timeZones = data.data.timeZoneList.map((data: any) => {
-            return {
-              label: data.name,
-              value: data.name
-            }
-          })
-          setTimezones(timeZones)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }, [])
-
-  useEffect(() => {
-    async function getCountries() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_COUNTRIES}`
-      CallPostService(url, {})
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            const countryList = data.data.map((data: any, index: any) => {
-              return {
-                label: data.name,
-                value: data.id
-              }
-            })
-            setCountries(countryList)
-            if (selectedCountryValue !== -1) {
-              getStates(selectedCountryValue)
-            }
-          } else {
-            setLoading(false)
-            Alert.alert('', data.message)
-          }
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log(error)
-        })
-    }
-    getCountries()
-  }, [])
 
   async function submitRegistration(formData: Schema) {
     console.log('formData', formData)
@@ -180,7 +84,7 @@ export function SignUpScreen() {
         if (data.status === 'SUCCESS') {
           router.push(formatUrl('/verification', { email: formData.email }))
         } else if (data.errorCode === 'RVF_101') {
-          Alert.alert('', 'Do verification')
+          Alert.alert('', 'Please check your email for verification code')
         } else {
           Alert.alert('', data.message)
         }
@@ -190,13 +94,9 @@ export function SignUpScreen() {
         console.log(error)
       })
   }
-  async function setSelectedCountryChange(value: any) {
-    setSelectedCountry(value)
-    await getStates(value)
-  }
 
   return (
-    <CardView scroll>
+    <CardView>
       <CardHeader
         actionSlot={
           <View className="flex flex-1 flex-col items-end">
@@ -216,94 +116,89 @@ export function SignUpScreen() {
       />
 
       <PtsLoader loading={isLoading} />
-      <View className="my-5 flex flex-wrap justify-end gap-y-4">
-        <View className="flex w-full gap-2">
-          <View className="flex w-full flex-row justify-between gap-2">
+      <FormProvider {...formMethods}>
+        <View className="my-5 flex flex-wrap justify-end gap-y-4">
+          <View className="flex w-full gap-2">
+            <View className="flex w-full flex-row justify-between gap-2">
+              <ControlledTextField
+                name="firstName"
+                className="flex-1"
+                placeholder={'First Name*'}
+                onSubmitEditing={() => {
+                  formMethods.setFocus('lastName')
+                }}
+              />
+              <ControlledTextField
+                name="lastName"
+                className="flex-1"
+                placeholder={'Last Name*'}
+                onSubmitEditing={() => {
+                  formMethods.setFocus('email')
+                }}
+              />
+            </View>
             <ControlledTextField
-              control={control}
-              name="firstName"
-              className="flex-1"
-              placeholder={'First Name*'}
+              name="email"
+              placeholder={'Email Address*'}
+              autoCapitalize="none"
+              onSubmitEditing={() => {
+                formMethods.setFocus('phone')
+              }}
             />
             <ControlledTextField
-              control={control}
-              name="lastName"
-              className="flex-1"
-              placeholder={'Last Name*'}
+              name="phone"
+              placeholder={'Phone'}
+              keyboard={'numeric'}
+              onSubmitEditing={() => {
+                formMethods.setFocus('password')
+              }}
+            />
+            <ControlledSecureField
+              name="password"
+              placeholder="Password*"
+              onSubmitEditing={() => {
+                formMethods.setFocus('confirmPassword')
+              }}
+            />
+            <ControlledSecureField
+              name="confirmPassword"
+              placeholder="Confirm Password*"
+              onSubmitEditing={() => {
+                formMethods.setFocus('address')
+              }}
+            />
+
+            <AddressFields
+              onSubmitEditing={() => {
+                formMethods.setFocus('acceptTc')
+              }}
             />
           </View>
-          <ControlledTextField
-            control={control}
-            name="email"
-            placeholder={'Email Address*'}
-            autoCapitalize="none"
-          />
-          <ControlledTextField
-            control={control}
-            name="phone"
-            placeholder={'Phone'}
-            keyboard={'numeric'}
-          />
-          <ControlledSecureField
-            control={control}
-            name="password"
-            placeholder="Password*"
-          />
-          <ControlledSecureField
-            control={control}
-            name="confirmPassword"
-            placeholder="Confirm Password*"
-          />
-
-          <Typography className=" font-bold">{'Address'}</Typography>
-          <ControlledDropdown
-            control={control}
-            name="country"
-            label="Country*"
-            maxHeight={300}
-            list={countries}
-            onChangeValue={setSelectedCountryChange}
-          />
-          <ControlledDropdown
-            control={control}
-            name="state"
-            label="State*"
-            maxHeight={300}
-            list={states}
-          />
-          <ControlledDropdown
-            control={control}
-            name="timezone"
-            label="Time Zone*"
-            maxHeight={300}
-            list={timezones}
+          <View className="flex flex-row items-center justify-center">
+            <Controller
+              name="acceptTc"
+              render={({ field: { onChange, value }, fieldState }) => (
+                <CheckBox
+                  checked={value}
+                  checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
+                  onPress={() => {
+                    onChange(!value)
+                  }}
+                  className="flex-shrink"
+                />
+              )}
+            />
+            <Typography className="flex-1">
+              {'I accept the Terms and Conditions and Privacy Policy'}
+            </Typography>
+          </View>
+          <Button
+            onPress={formMethods.handleSubmit(submitRegistration)}
+            className="w-full"
+            title="Sign Up"
           />
         </View>
-        <View className="flex flex-row items-center justify-center">
-          <Controller
-            name="acceptTc"
-            control={control}
-            render={({ field: { onChange, value }, fieldState }) => (
-              <CheckBox
-                checked={value}
-                checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
-                onPress={() => {
-                  onChange(!value)
-                }}
-                className="flex-shrink"
-              />
-            )}
-          />
-          <Typography className="flex-1">
-            {'I accept the Terms and Conditions and Privacy Policy'}
-          </Typography>
-        </View>
-        <Button
-          onPress={handleSubmit(submitRegistration)}
-          className="w-full"
-          title="Sign Up"
-        />
-      </View>
+      </FormProvider>
     </CardView>
   )
 }

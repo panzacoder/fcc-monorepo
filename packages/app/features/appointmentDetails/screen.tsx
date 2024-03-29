@@ -131,7 +131,7 @@ export function AppointmentDetailsScreen() {
           setIsDataReceived(true)
           if (isFromCreateThread) {
             router.push(
-              formatUrl('/(authenticated)/circles/noteMessage', {
+              formatUrl('/circles/noteMessage', {
                 component: 'Appointment',
                 memberData: JSON.stringify(memberData),
                 noteData: JSON.stringify(noteData)
@@ -312,7 +312,6 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants')
           const list = data.data.map((data: any, index: any) => {
             let object = data
             object.isSelected = false
@@ -338,18 +337,15 @@ export function AppointmentDetailsScreen() {
         id: appointmentDetails.id ? appointmentDetails.id : ''
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/(authenticated)/circles/appointments', {
+            formatUrl('/circles/appointments', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -368,7 +364,6 @@ export function AppointmentDetailsScreen() {
         id: noteId
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(loginURL, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -528,12 +523,10 @@ export function AppointmentDetailsScreen() {
         }
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // refreshData(false)
           setRemindersList(data.data.reminderList ? data.data.reminderList : [])
         } else {
           Alert.alert('', data.message)
@@ -545,17 +538,14 @@ export function AppointmentDetailsScreen() {
       })
   }
   const editNote = (noteData: any) => {
-    // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
   }
   const messageThreadClicked = (noteData: any) => {
-    // console.log('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
-      // console.log('noteData', noteData)
       router.push(
-        formatUrl('/(authenticated)/circles/noteMessage', {
+        formatUrl('/circles/noteMessage', {
           component: 'Appointment',
           memberData: JSON.stringify(memberData),
           noteData: JSON.stringify(noteData)
@@ -566,7 +556,6 @@ export function AppointmentDetailsScreen() {
     }
   }
   const editReminder = (remiderData: any) => {
-    // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
   }
@@ -677,14 +666,10 @@ export function AppointmentDetailsScreen() {
                     variant="border"
                     onPress={() => {
                       router.push(
-                        formatUrl(
-                          '/(authenticated)/circles/addEditAppointment',
-                          {
-                            memberData: JSON.stringify(memberData),
-                            appointmentDetails:
-                              JSON.stringify(appointmentDetails)
-                          }
-                        )
+                        formatUrl('/circles/addEditAppointment', {
+                          memberData: JSON.stringify(memberData),
+                          appointmentDetails: JSON.stringify(appointmentDetails)
+                        })
                       )
                     }}
                   />

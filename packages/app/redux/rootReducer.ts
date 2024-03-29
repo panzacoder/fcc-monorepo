@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import headerReducer from './header/headerReducer'
 import staticDataReducer from './staticData/staticReducer'
-import sponsororReducer from './sponsor/sponsororReducer'
+import sponsorReducer from './sponsor/sponsorReducer'
 import paidAdReducer from './paidAdvertiser/paidAdReducer'
 import userProfileReducer from './userProfile/userProfileReducer'
 import subscriptionReducer from './userSubscription/subscriptionReducer'
@@ -12,7 +12,7 @@ const appReducer = combineReducers({
   headerState: headerReducer,
   staticDataState: staticDataReducer,
   userProfileState: userProfileReducer,
-  sponsor: sponsororReducer,
+  sponsor: sponsorReducer,
   paidAdvertiser: paidAdReducer,
   subscriptionState: subscriptionReducer,
   subscriptionDetailsState: subscriptionDetailsReducer,

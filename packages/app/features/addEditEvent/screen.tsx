@@ -135,9 +135,8 @@ export function AddEditEventScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          //   console.log('addEditEvent', JSON.stringify(data.data))
           router.replace(
-            formatUrl('/(authenticated)/circles/eventDetails', {
+            formatUrl('/circles/eventDetails', {
               eventDetails: JSON.stringify(data.data.event),
               memberData: JSON.stringify(memberData)
             })

@@ -1,81 +1,110 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { ComponentProps, useState } from 'react'
-import { Dropdown } from 'react-native-element-dropdown'
+import { View, Text, TextInput, Pressable } from 'react-native'
+import React, { useMemo, useState } from 'react'
 import { cn } from './utils'
+import {
+  AutocompleteDropdown,
+  AutocompleteDropdownProps
+} from 'react-native-autocomplete-dropdown'
+
+export type DropdownItem = {
+  id: string
+  title: string
+}
+
 export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
-  value?: number
-  list?: any
-  onChangeValue?: CallableFunction
+  value?: string
+  list: any[]
+  onChangeValue?: (item: DropdownItem) => void
   error?: boolean
-}
-const PtsDropdown = ({
-  label,
-  maxHeight,
-  value,
-  list,
-  onChangeValue,
-  error
-}: PtsDropdownProps) => {
+  emptyResultText?: string
+  onSubmitEditing?: (e?: any) => void
+} & Omit<AutocompleteDropdownProps, 'ref'>
+
+const DropdownInput = React.forwardRef<TextInput>(
+  function DropdownInput(props, ref) {
+    return (
+      <TextInput
+        ref={ref}
+        blurOnSubmit={false}
+        {...props}
+        style={{}}
+        className="flex h-9 shrink grow items-center overflow-hidden placeholder:text-gray-400 focus:outline-none"
+      />
+    )
+  }
+)
+
+const PtsDropdown = React.forwardRef(function PtsDropdown(
+  {
+    label,
+    // value, // unused right now, is hooked into to sync with form state but is not "controlled"
+    list,
+    onChangeValue,
+    error,
+    emptyResultText = 'No options',
+    onSubmitEditing,
+    textInputProps
+  }: PtsDropdownProps,
+  ref: React.Ref<TextInput>
+) {
   const [isFocus, setIsFocus] = useState(false)
+
+  const dataSet = useMemo(() => {
+    return list.map((item) => {
+      return {
+        title: item.title || item.name || item.label,
+        id: item.id || item.value
+      }
+    })
+  }, [list])
 
   return (
     <View className="">
       {isFocus ? (
-        <Text className="absolute left-[22] top-[8] z-[999] bg-white px-[8] text-[14px]">
+        <Text className="absolute -top-[9px] left-2 z-[999] bg-white px-1 text-sm">
           {label}
         </Text>
       ) : null}
-      <View
+      <Pressable
         className={cn(
-          'rounded-lg border-[1px] border-gray-400 px-4 py-1',
-          'border-gray-400',
-          isFocus && 'border-gray-400',
+          'web:pr-3 native:pr-0 h-11 rounded-lg border-[1px] border-gray-400 pl-4',
+
+          isFocus && 'border-primary',
           error && 'border-destructive'
         )}
       >
-        <Dropdown
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={list}
-          search
-          maxHeight={maxHeight ? maxHeight : 300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? label : '...'}
-          searchPlaceholder="Search..."
-          value={value}
+        <AutocompleteDropdown
+          ref={ref}
+          emptyResultText={emptyResultText}
+          key={`dropdown-${label}`}
+          inputContainerStyle={{
+            backgroundColor: 'transparent',
+            height: '100%',
+            alignItems: 'center',
+            margin: 0
+          }}
+          clearOnFocus={false}
+          closeOnSubmit
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={(item: any) => {
-            onChangeValue && onChangeValue(item.value)
+          onSelectItem={(item: DropdownItem) => {
+            onChangeValue?.(item)
+            item && onSubmitEditing?.()
           }}
+          dataSet={dataSet}
+          textInputProps={{
+            placeholder: isFocus ? '' : label,
+            onSubmitEditing,
+            blurOnSubmit: !!onSubmitEditing,
+            ...textInputProps
+          }}
+          InputComponent={DropdownInput}
         />
-      </View>
+      </Pressable>
     </View>
   )
-}
-const styles = StyleSheet.create({
-  icon: {
-    marginRight: 5
-  },
-  placeholderStyle: {
-    fontSize: 14
-  },
-  selectedTextStyle: {
-    fontSize: 14
-  },
-  iconStyle: {
-    width: 20,
-    height: 20
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 14
-  }
 })
 
 export default PtsDropdown
