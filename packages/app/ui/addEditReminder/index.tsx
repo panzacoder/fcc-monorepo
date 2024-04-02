@@ -1,7 +1,4 @@
-import { useState } from 'react'
-import { View, Alert } from 'react-native'
-import PtsLoader from 'app/ui/PtsLoader'
-import store from 'app/redux/store'
+import { View } from 'react-native'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -9,21 +6,21 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
+import { Typography } from '../typography'
 const schema = z.object({
   title: z.string().min(1, { message: 'Reminder title is required' })
 })
 export type Schema = z.infer<typeof schema>
 
 export const AddEditReminder = ({
+  component,
   reminderData,
   // appointmentId,
   cancelClicked,
   createUpdateReminder
 }) => {
   let selectedDate: any = ''
-  const [isLoading, setLoading] = useState(false)
-  const header = store.getState().headerState.header
-  console.log('reminderData', JSON.stringify(reminderData))
+  // console.log('reminderData', JSON.stringify(reminderData))
   const { control, handleSubmit } = useForm({
     defaultValues: {
       title:
@@ -45,7 +42,7 @@ export const AddEditReminder = ({
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
-      <PtsLoader loading={isLoading} />
+      <Typography className="font-bold self-center">{`${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField

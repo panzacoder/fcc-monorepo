@@ -7,6 +7,7 @@ import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Typography } from '../typography'
 const schema = z.object({
   title: z.string().min(1, { message: 'Note title is required' }),
   noteDetails: z.string().min(1, { message: 'Note details is required' }),
@@ -19,7 +20,7 @@ export const AddEditNote = ({
   cancelClicked,
   createUpdateNote
 }) => {
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
@@ -59,6 +60,7 @@ export const AddEditNote = ({
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">
+      <Typography className="self-center font-bold">{`${component} Note`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField

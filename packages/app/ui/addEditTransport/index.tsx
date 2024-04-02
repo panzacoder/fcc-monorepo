@@ -45,7 +45,7 @@ export const AddEditTransport = ({
   let stateIndex = -1
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   const [isLoading, setLoading] = useState(false)
   const [memberList, setMemberList] = useState([]) as any
   const [memberListFull, setMemberListFull] = useState([]) as any
@@ -222,8 +222,8 @@ export const AddEditTransport = ({
     console.log('selectedDate', selectedDate)
   }
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value].id
-      ? staticData.countryList[value].id
+    let countryId = staticData.countryList[value.id].id
+      ? staticData.countryList[value.id].id
       : 101
     await getStates(countryId)
   }
@@ -257,6 +257,7 @@ export const AddEditTransport = ({
   return (
     <View className="my-5 w-[90%] self-center rounded-[15px] bg-[#f4ecf7] py-5">
       <PtsLoader loading={isLoading} />
+      <Typography className="self-center font-bold">{`Transportation`}</Typography>
       <ScrollView className="my-2 w-full">
         {_.isEmpty(transportData) ? (
           <View>

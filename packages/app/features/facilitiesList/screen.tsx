@@ -13,7 +13,7 @@ import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 
-export function FacilitiesScreen() {
+export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [facilityList, setfacilityList] = useState([])
   const header = store.getState().headerState.header

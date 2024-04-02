@@ -15,6 +15,7 @@ export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
   value?: string
+  defaultValue?: string
   list: any[]
   onChangeValue?: (item: DropdownItem) => void
   error?: boolean
@@ -30,7 +31,7 @@ const DropdownInput = React.forwardRef<TextInput>(
         blurOnSubmit={false}
         {...props}
         style={{}}
-        className="flex h-9 shrink grow items-center overflow-hidden placeholder:text-gray-400 focus:outline-none"
+        className="flex h-9 shrink grow items-center overflow-hidden placeholder:text-black focus:outline-none"
       />
     )
   }
@@ -39,6 +40,7 @@ const DropdownInput = React.forwardRef<TextInput>(
 const PtsDropdown = React.forwardRef(function PtsDropdown(
   {
     label,
+    defaultValue,
     // value, // unused right now, is hooked into to sync with form state but is not "controlled"
     list,
     onChangeValue,
@@ -70,7 +72,6 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
       <Pressable
         className={cn(
           'web:pr-3 native:pr-0 h-11 rounded-lg border-[1px] border-gray-400 pl-4',
-
           isFocus && 'border-primary',
           error && 'border-destructive'
         )}
@@ -95,7 +96,11 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           }}
           dataSet={dataSet}
           textInputProps={{
-            placeholder: isFocus ? '' : label,
+            placeholder: isFocus
+              ? ''
+              : defaultValue !== undefined && defaultValue !== ''
+                ? defaultValue
+                : label,
             onSubmitEditing,
             blurOnSubmit: !!onSubmitEditing,
             ...textInputProps

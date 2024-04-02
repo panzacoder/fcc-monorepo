@@ -4,19 +4,26 @@ import { useState } from 'react'
 import { Alert, View, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import _ from 'lodash'
+import { Typography } from 'app/ui/typography'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
+import {
+  BASE_URL,
+  CREATE_INCIDENT,
+  UPDATE_INCIDENT
+} from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
+import { PtsComboBox } from 'app/ui/PtsComboBox'
+let incidentType: any = ''
 let selectedDate: any = new Date()
 let selectedAddress: any = {
   shortDescription: '',
@@ -46,28 +53,44 @@ let selectedAddress: any = {
 }
 const schema = z.object({
   description: z.string(),
-  title: z.string().min(1, { message: 'Enter event title' })
+  title: z.string().min(1, { message: 'Enter incident title' })
 })
 export type Schema = z.infer<typeof schema>
-export function AddEditEventScreen() {
+export function AddEditIncidentScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
+  const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const [isLoading, setLoading] = useState(false)
-  let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}
-  console.log('eventDetails', JSON.stringify(eventDetails))
+  let incidentDetails = item.incidentDetails
+    ? JSON.parse(item.incidentDetails)
+    : {}
+  // console.log('incidentDetails', JSON.stringify(incidentDetails))
   const onSelection = (date: any) => {
     selectedDate = date
   }
+  if (!_.isEmpty(incidentDetails)) {
+    incidentType = incidentDetails.type ? incidentDetails.type : ''
+  }
+  const incidentTypeList = staticData.incidentTypeList.map(
+    (data: any, index: any) => {
+      return {
+        label: data.type
+      }
+    }
+  )
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       description:
-        !_.isEmpty(eventDetails) && eventDetails.description
-          ? eventDetails.description
+        !_.isEmpty(incidentDetails) && incidentDetails.description
+          ? incidentDetails.description
           : '',
       title:
-        !_.isEmpty(eventDetails) && eventDetails.title ? eventDetails.title : ''
+        !_.isEmpty(incidentDetails) && incidentDetails.title
+          ? incidentDetails.title
+          : ''
     },
     resolver: zodResolver(schema)
   })
@@ -105,20 +128,20 @@ export function AddEditEventScreen() {
       if (index === 6) {
         selectedAddress = value
       }
+      console.log('selectedAddress', JSON.stringify(selectedAddress))
     }
-
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  async function addEditEvent(formData: Schema) {
+  async function addEditIncident(formData: Schema) {
     setLoading(true)
     let url = ''
 
     let dataObject: any = {
       header: header,
-      event: {
+      incident: {
         date: selectedDate,
         title: formData.title,
         description: formData.description,
+        type: incidentType,
         member: {
           id: memberData.member ? memberData.member : ''
         },
@@ -127,19 +150,23 @@ export function AddEditEventScreen() {
         reminderList: []
       }
     }
-    if (_.isEmpty(eventDetails)) {
-      url = `${BASE_URL}${CREATE_EVENT}`
+    if (_.isEmpty(incidentDetails)) {
+      url = `${BASE_URL}${CREATE_INCIDENT}`
     } else {
-      url = `${BASE_URL}${UPDATE_EVENT}`
-      dataObject.event.id = eventDetails.id
+      url = `${BASE_URL}${UPDATE_INCIDENT}`
+      dataObject.incident.id = incidentDetails.id
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          //   console.log('addEditIncident', JSON.stringify(data.data))
+          let details = _.isEmpty(incidentDetails)
+            ? data.data.incident
+            : data.data
           router.replace(
-            formatUrl('/circles/eventDetails', {
-              eventDetails: JSON.stringify(data.data.event),
+            formatUrl('/circles/incidentDetails', {
+              incidentDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
@@ -153,14 +180,28 @@ export function AddEditEventScreen() {
         console.log(error)
       })
   }
+  const onSelectionIncidentType = (data: any) => {
+    incidentType = data
+    // console.log('purpose1', purpose)
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">
           <PtsDateTimePicker
-            currentData={eventDetails.date ? eventDetails.date : new Date()}
+            currentData={
+              incidentDetails.date ? incidentDetails.date : new Date()
+            }
             onSelection={onSelection}
+          />
+        </View>
+        <View className="mt-2">
+          <PtsComboBox
+            currentData={incidentType}
+            listData={incidentTypeList}
+            onSelection={onSelectionIncidentType}
+            placeholderValue={'Incident Type'}
           />
         </View>
         <View className="my-2 w-full flex-row justify-center">
@@ -183,8 +224,8 @@ export function AddEditEventScreen() {
         </View>
         <LocationDetails
           data={
-            !_.isEmpty(eventDetails) && eventDetails.location
-              ? eventDetails.location
+            !_.isEmpty(incidentDetails) && incidentDetails.location
+              ? incidentDetails.location
               : {}
           }
           setAddressObject={setAddressObject}
@@ -195,7 +236,7 @@ export function AddEditEventScreen() {
             title={'Save'}
             leadingIcon="save"
             variant="default"
-            onPress={handleSubmit(addEditEvent)}
+            onPress={handleSubmit(addEditIncident)}
           />
         </View>
       </ScrollView>

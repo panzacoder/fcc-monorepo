@@ -35,18 +35,21 @@ let purpose: any = ''
 let facilityDoctorIndex = -1
 export function AddEditAppointmentScreen() {
   const router = useRouter()
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  // console.log('appointmentDetails', JSON.stringify(appointmentDetails))
+  console.log('appointmentDetails', JSON.stringify(appointmentDetails))
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
+  const [isDataReceived, setIsDataReceived] = useState(false)
   const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(null)
-  const [doctorFacilityList, setDoctorFacilityList] = useState([])
-  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState([])
+  const [doctorFacilityList, setDoctorFacilityList] = useState([]) as any
+  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState(
+    []
+  ) as any
   const [isShowDoctorFacilityDropdown, setIsShowDoctorFacilityDropdown] =
     useState(false)
   const getDoctorFacilities = useCallback(async (value: any) => {
@@ -81,13 +84,13 @@ export function AddEditAppointmentScreen() {
         if (data.status === 'SUCCESS') {
           let doctorFacilities = data.data.map((data: any, index: any) => {
             return {
-              label: data.name,
-              value: index
+              title: data.name,
+              id: index
             }
           })
           setDoctorFacilityList(doctorFacilities)
           setDoctorFacilityListFull(data.data ? data.data : [])
-
+          setIsDataReceived(true)
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
         } else {
           Alert.alert('', data.message)
@@ -125,7 +128,7 @@ export function AddEditAppointmentScreen() {
   async function addEditAppointment(formData: Schema) {
     setLoading(true)
 
-    let dataObject = {
+    let dataObject: any = {
       header: header,
       appointment: {
         date: selectedDate,
@@ -160,7 +163,7 @@ export function AddEditAppointmentScreen() {
       dataObject.appointment.facilityLocation.id =
         doctorFacilityListFull[formData.doctoFacilityIndex].locationId
     }
-    console.log('dataObject', JSON.stringify(dataObject))
+    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -204,10 +207,10 @@ export function AddEditAppointmentScreen() {
       facilityDoctorLocationId = appointmentDetails.facilityLocation.id
     }
 
-    doctorFacilityListFull.map(async (data, index) => {
+    doctorFacilityListFull.map(async (data: any, index: any) => {
       if (data.locationId === facilityDoctorLocationId) {
         facilityDoctorIndex = index
-        console.log('facilityDoctorIndex', facilityDoctorIndex)
+        console.log('facilityDoctorIndex', '' + facilityDoctorIndex)
       }
     })
   }
@@ -233,8 +236,8 @@ export function AddEditAppointmentScreen() {
   const typesList = staticData.appointmentTypeList.map(
     (data: any, index: any) => {
       return {
-        label: data.type,
-        value: index
+        title: data.type,
+        id: index
       }
     }
   )
@@ -246,11 +249,11 @@ export function AddEditAppointmentScreen() {
     // console.log('purpose1', purpose)
   }
   async function setSelectedTypeChange(value: any) {
-    // console.log('value', value)
-    setIsShowDoctorFacilityDropdown(true)
-    setSelectedDoctorFacility(value)
-    // console.log('SelectedDoctorFacility1', selectedDoctorFacility)
-    getDoctorFacilities(value)
+    if (value) {
+      setIsShowDoctorFacilityDropdown(true)
+      setSelectedDoctorFacility(value.id)
+      getDoctorFacilities(value.id)
+    }
   }
   return (
     <View className="w-full flex-1">
@@ -262,16 +265,28 @@ export function AddEditAppointmentScreen() {
               control={control}
               name="appointmentType"
               label="Appointment Type*"
+              defaultValue={
+                !_.isEmpty(appointmentDetails) &&
+                appointmentDetails.type &&
+                appointmentDetails.type.type
+                  ? appointmentDetails.type.type
+                  : ''
+              }
               maxHeight={300}
               list={typesList}
               className="w-[95%]"
               onChangeValue={setSelectedTypeChange}
             />
-            {isShowDoctorFacilityDropdown ? (
+            {isShowDoctorFacilityDropdown && isDataReceived ? (
               <ControlledDropdown
                 control={control}
                 name="doctoFacilityIndex"
                 label={selectedDoctorFacility === 0 ? 'Doctor*' : 'Facility*'}
+                defaultValue={
+                  !_.isEmpty(appointmentDetails)
+                    ? doctorFacilityList[facilityDoctorIndex].title
+                    : ''
+                }
                 maxHeight={300}
                 list={doctorFacilityList}
                 className="mt-2 w-[95%]"
