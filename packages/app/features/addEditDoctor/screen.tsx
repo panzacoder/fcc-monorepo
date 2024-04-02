@@ -51,7 +51,7 @@ let statesListFull = []
 let isDoctorActive = true
 export function AddEditDoctorScreen() {
   const router = useRouter()
-  const staticData = store.getState().staticDataState.staticData
+  const staticData = store.getState().staticDataState.staticData as any
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
@@ -109,15 +109,15 @@ export function AddEditDoctorScreen() {
   const specializationList = staticData.specializationList.map(
     (data: any, index: any) => {
       return {
-        label: data.specialization,
-        value: index
+        title: data.specialization,
+        id: index
       }
     }
   )
 
   async function deleteDoctor() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_DOCTOR}`
+    let url = `${BASE_URL}${DELETE_DOCTOR}`
     let dataObject = {
       header: header,
       doctor: {
@@ -125,13 +125,13 @@ export function AddEditDoctorScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/circles/doctors', {
+            formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -148,7 +148,7 @@ export function AddEditDoctorScreen() {
   async function updateDoctor(formData: Schema) {
     console.log('isDoctorActive updateDoctor', '' + isDoctorActive)
     setLoading(true)
-    let loginURL = `${BASE_URL}${UPDATE_DOCTOR}`
+    let url = `${BASE_URL}${UPDATE_DOCTOR}`
     let dataObject = {
       header: header,
       doctor: {
@@ -169,7 +169,7 @@ export function AddEditDoctorScreen() {
         }
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -196,7 +196,7 @@ export function AddEditDoctorScreen() {
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let addressObject = {
+    let addressObject: any = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
       fax: formData.fax,
@@ -212,7 +212,7 @@ export function AddEditDoctorScreen() {
     }
     addressObject.address.state.country = countryObject
     locationList.push(addressObject)
-    let loginURL = `${BASE_URL}${CREATE_DOCTOR}`
+    let url = `${BASE_URL}${CREATE_DOCTOR}`
     let dataObject = {
       header: header,
       doctor: {
@@ -231,12 +231,12 @@ export function AddEditDoctorScreen() {
         doctorLocationList: locationList
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           router.push(
-            formatUrl('/circles/doctors', {
+            formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -251,8 +251,8 @@ export function AddEditDoctorScreen() {
   }
   const countryList = staticData.countryList.map((data: any, index: any) => {
     return {
-      label: data.name,
-      value: index
+      title: data.name,
+      id: index
     }
   })
   const getStates = useCallback(async (countryId: any) => {
@@ -271,8 +271,8 @@ export function AddEditDoctorScreen() {
           // set available states
           let statesList = data.data.stateList.map((data: any, index: any) => {
             return {
-              label: data.name,
-              value: index
+              title: data.name,
+              id: index
             }
           })
           setStateslist(statesList)
@@ -290,9 +290,10 @@ export function AddEditDoctorScreen() {
   }, [])
 
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value].id
-      ? staticData.countryList[value].id
-      : 101
+    let countryId =
+      value && staticData.countryList[value.id]?.id
+        ? staticData.countryList[value.id].id
+        : 101
     await getStates(countryId)
   }
   // async function setSelectedStateChange(value: any) {
@@ -367,8 +368,12 @@ export function AddEditDoctorScreen() {
               <View className="mt-5">
                 <ControlledDropdown
                   control={control}
-                  name="specialization"
-                  label="Specialization*"
+                  name={'specialization'}
+                  label={
+                    !_.isEmpty(doctorDetails) && doctorDetails.specialist
+                      ? doctorDetails.specialist
+                      : 'Specialization*'
+                  }
                   maxHeight={300}
                   list={specializationList}
                   // onChangeValue={setSelectedCountryChange}

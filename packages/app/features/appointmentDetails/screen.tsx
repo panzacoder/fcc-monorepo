@@ -245,7 +245,7 @@ export function AppointmentDetailsScreen() {
 
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
+    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -274,7 +274,7 @@ export function AppointmentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -297,7 +297,7 @@ export function AppointmentDetailsScreen() {
   }
   async function getThreadParticipants() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
+    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
       header: header,
       member: {
@@ -308,7 +308,7 @@ export function AppointmentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -330,19 +330,19 @@ export function AppointmentDetailsScreen() {
   }
   async function deleteAppointment() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_APPOINTMENT}`
+    let url = `${BASE_URL}${DELETE_APPOINTMENT}`
     let dataObject = {
       header: header,
       appointment: {
         id: appointmentDetails.id ? appointmentDetails.id : ''
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           router.push(
-            formatUrl('/circles/appointments', {
+            formatUrl('/circles/appointmentsList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -357,14 +357,14 @@ export function AppointmentDetailsScreen() {
   }
   async function deleteNote(noteId: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
+    let url = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
     let dataObject = {
       header: header,
       appointmentNote: {
         id: noteId
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -788,7 +788,6 @@ export function AppointmentDetailsScreen() {
                         <Note
                           component={'Appointment'}
                           data={data}
-                          cancelClicked={cancelClicked}
                           editNote={editNote}
                           deleteNote={deleteNote}
                           messageThreadClicked={messageThreadClicked}
@@ -966,6 +965,7 @@ export function AppointmentDetailsScreen() {
       {isAddRemider ? (
         <View className="h-full w-full justify-center self-center">
           <AddEditReminder
+            component={'Appointment'}
             reminderData={reminderData}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}

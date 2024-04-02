@@ -232,9 +232,9 @@ export function DoctorDetailsScreen() {
                       <TouchableOpacity
                         onPress={() => {
                           router.push(
-                            formatUrl('/circles/addEditLocation', {
+                            formatUrl('/circles/appointmentDetails', {
                               memberData: JSON.stringify(memberData),
-                              doctorDetails: JSON.stringify(doctorInfo)
+                              appointmentDetails: JSON.stringify(data)
                             })
                           )
                         }}

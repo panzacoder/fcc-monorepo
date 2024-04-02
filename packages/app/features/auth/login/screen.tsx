@@ -70,7 +70,7 @@ export function LoginScreen() {
     console.log('formData', formData.email)
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
-    let loginURL = `${BASE_URL}${USER_LOGIN}`
+    let url = `${BASE_URL}${USER_LOGIN}`
     let dataObject = {
       header: {
         appclient:'M'
@@ -81,7 +81,7 @@ export function LoginScreen() {
         rememberMe: true
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Alert, View, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import _ from 'lodash'
-import { Typography } from 'app/ui/typography'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
@@ -73,45 +72,48 @@ export function AddEditEventScreen() {
     resolver: zodResolver(schema)
   })
   async function setAddressObject(value: any, index: any) {
-    if (index === 0) {
-      selectedAddress.shortDescription = value
-      selectedAddress.nickName = value
+    if (value) {
+      if (index === 0) {
+        selectedAddress.shortDescription = value
+        selectedAddress.nickName = value
+      }
+      if (index === 1) {
+        selectedAddress.address.line = value
+      }
+      if (index === 2) {
+        selectedAddress.address.city = value
+      }
+      if (index === 3) {
+        selectedAddress.address.zipCode = value
+      }
+      if (index === 4) {
+        selectedAddress.address.state.country.id = value.id
+        selectedAddress.address.state.country.name = value.name
+        selectedAddress.address.state.country.code = value.code
+        selectedAddress.address.state.country.namecode = value.namecode
+        selectedAddress.address.state.country.snum = value.snum
+        selectedAddress.address.state.country.description = value.description
+      }
+      if (index === 5) {
+        selectedAddress.address.state.id = value.id
+        selectedAddress.address.state.name = value.name
+        selectedAddress.address.state.code = value.code
+        selectedAddress.address.state.namecode = value.namecode
+        selectedAddress.address.state.snum = value.snum
+        selectedAddress.address.state.description = value.description
+      }
+      if (index === 6) {
+        selectedAddress = value
+      }
     }
-    if (index === 1) {
-      selectedAddress.address.line = value
-    }
-    if (index === 2) {
-      selectedAddress.address.city = value
-    }
-    if (index === 3) {
-      selectedAddress.address.zipCode = value
-    }
-    if (index === 4) {
-      selectedAddress.address.state.country.id = value.id
-      selectedAddress.address.state.country.name = value.name
-      selectedAddress.address.state.country.code = value.code
-      selectedAddress.address.state.country.namecode = value.namecode
-      selectedAddress.address.state.country.snum = value.snum
-      selectedAddress.address.state.country.description = value.description
-    }
-    if (index === 5) {
-      selectedAddress.address.state.id = value.id
-      selectedAddress.address.state.name = value.name
-      selectedAddress.address.state.code = value.code
-      selectedAddress.address.state.namecode = value.namecode
-      selectedAddress.address.state.snum = value.snum
-      selectedAddress.address.state.description = value.description
-    }
-    if (index === 6) {
-      selectedAddress = value
-    }
+
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function addEditEvent(formData: Schema) {
     setLoading(true)
     let url = ''
 
-    let dataObject = {
+    let dataObject: any = {
       header: header,
       event: {
         date: selectedDate,

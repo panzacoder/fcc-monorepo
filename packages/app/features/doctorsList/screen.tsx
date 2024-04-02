@@ -13,7 +13,7 @@ import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 
-export function DoctorsScreen() {
+export function DoctorsListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [doctorList, setDoctorList] = useState([])
   const header = store.getState().headerState.header

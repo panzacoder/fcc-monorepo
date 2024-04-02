@@ -30,14 +30,14 @@ const yearList: object[] = [{ label: 'All', value: 0 }] as any
 const monthsList = getMonthsList() as any
 let selectedMonth = 'All'
 let selectedYear = 'All'
-export function IncidentsScreen() {
+export function IncidentsListScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [incidentsList, setIncidentsList] = useState([]) as any
   const header = store.getState().headerState.header
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}

@@ -34,13 +34,13 @@ export function ForgotPasswordForm({
 
   const onSubmit = (formData: any) => {
     onLoadingChange(true)
-    const loginURL = `${BASE_URL}${FORGOT_PASSWORD}`
+    const url = `${BASE_URL}${FORGOT_PASSWORD}`
     const dataObject = {
       appuserVo: {
         emailOrPhone: formData.email
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         onLoadingChange(false)
         if (data.status === 'SUCCESS') {

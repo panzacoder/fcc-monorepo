@@ -193,7 +193,7 @@ export function IncidentDetailsScreen() {
   }
   async function deleteNote(noteId: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_INCIDENT_NOTE}`
+    let url = `${BASE_URL}${DELETE_INCIDENT_NOTE}`
     let dataObject = {
       header: header,
       note: {
@@ -201,7 +201,7 @@ export function IncidentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -233,7 +233,7 @@ export function IncidentDetailsScreen() {
   }
   async function getThreadParticipants() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
+    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
       header: header,
       member: {
@@ -244,7 +244,7 @@ export function IncidentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -267,7 +267,7 @@ export function IncidentDetailsScreen() {
   }
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
+    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -296,7 +296,7 @@ export function IncidentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -318,7 +318,7 @@ export function IncidentDetailsScreen() {
   }
   async function deleteIncident() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_INCIDENT}`
+    let url = `${BASE_URL}${DELETE_INCIDENT}`
     let dataObject = {
       header: header,
       incident: {
@@ -326,13 +326,13 @@ export function IncidentDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
           router.push(
-            formatUrl('/circles/incidents', {
+            formatUrl('/circles/incidentsList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -435,7 +435,6 @@ export function IncidentDetailsScreen() {
                       <Note
                         component={'Incident'}
                         data={data}
-                        cancelClicked={cancelClicked}
                         editNote={editNote}
                         deleteNote={deleteNote}
                         messageThreadClicked={messageThreadClicked}

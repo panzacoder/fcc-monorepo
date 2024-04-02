@@ -6,14 +6,11 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
+import { Button } from 'app/ui/button'
 import moment from 'moment'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_APPOINTMENTS,
-  GET_DOCTOR_FACILITIES
-} from 'app/utils/urlConstants'
+import { BASE_URL, GET_EVENTS, CREATE_EVENT } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
@@ -23,56 +20,42 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { Button } from 'app/ui/button'
-let appointmentPrivileges = {}
-let selectedMonth = 'All'
-let selectedYear = 'All'
-let selectedType = 'All'
-let doctorId = 'All'
-let facilityId = 'All'
+import { AddEditEvent } from 'app/ui/addEditEvent'
+let eventsPrivileges = {}
 const schema = z.object({
   monthIndex: z.number(),
-  yearIndex: z.number(),
-  typeIndex: z.number(),
-  doctorFacilityIndex: z.number()
+  yearIndex: z.number()
 })
-const yearList: object[] = [{ label: 'All', value: 0 }] as any
-const typeList: object[] = [
-  { label: 'All', value: 0 },
-  { label: 'Doctor', value: 1 },
-  { label: 'Facility', value: 2 }
-] as any
-const monthsList = getMonthsList() as any
 export type Schema = z.infer<typeof schema>
-export function AppointmentsScreen() {
+const yearList: object[] = [{ label: 'All', value: 0 }] as any
+const monthsList = getMonthsList() as any
+let selectedMonth = 'All'
+let selectedYear = 'All'
+// let currentFilter = 'Upcoming'
+export function EventsListScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
+  const [isAddEvent, setIsAddEvent] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
-  const [appointmentsList, setAppointmentsList] = useState([]) as any
-  const [doctorFacilityList, setDoctorFacilityList] = useState([]) as any
-  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState(
-    []
-  ) as any
-  const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
+  const [eventsList, setEventsList] = useState([]) as any
+  const [eventsListFull, setEventsListFull] = useState([]) as any
   const header = store.getState().headerState.header
+  const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
-  const staticData = store.getState().staticDataState.staticData
-  const { control, handleSubmit, reset } = useForm({
-    defaultValues: {
-      monthIndex: 0,
-      yearIndex: 0,
-      typeIndex: 0,
-      doctorFacilityIndex: 0
-    },
-    resolver: zodResolver(schema)
-  })
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      monthIndex: 0,
+      yearIndex: 0
+    },
+    resolver: zodResolver(schema)
+  })
   staticData.yearList.map((data: any, index: any) => {
     let object = {
       label: data.name,
@@ -80,68 +63,36 @@ export function AppointmentsScreen() {
     }
     yearList.push(object)
   })
-  const getDoctorFacilities = useCallback(async () => {
+
+  const getEventDetails = useCallback(async () => {
     setLoading(true)
-    let url = `${BASE_URL}${GET_DOCTOR_FACILITIES}`
+    let url = `${BASE_URL}${GET_EVENTS}`
     let dataObject = {
       header: header,
-      doctor: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
+      member: {
+        id: memberData.member ? memberData.member : ''
       },
-      appointmentType: selectedType
+      month: selectedMonth,
+      year: selectedYear
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          const list: object[] = [{ label: 'All', value: 0 }]
-          data.data.map((data: any, index: any) => {
-            let object = {
-              label: data.name,
-              value: index + 1
-            }
-            list.push(object)
-          })
-          setDoctorFacilityList(list)
-          setDoctorFacilityListFull(data.data ? data.data : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
-  const getAppointmentDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_APPOINTMENTS}`
-    let dataObject = {
-      header: header,
-      memberDetails: {
-        id: memberData.member ? memberData.member : '',
-        month: selectedMonth,
-        year: selectedYear,
-        type: selectedType,
-        doctorId: doctorId,
-        facilityId: facilityId
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+          // console.log('data', JSON.stringify(data.data.eventList))
           if (data.data.domainObjectPrivileges) {
-            appointmentPrivileges = data.data.domainObjectPrivileges.Appointment
-              ? data.data.domainObjectPrivileges.Appointment
+            eventsPrivileges = data.data.domainObjectPrivileges.Event
+              ? data.data.domainObjectPrivileges.Event
               : {}
           }
-          setAppointmentsListFull(data.data.list ? data.data.list : [])
-          getFilteredList(data.data.list ? data.data.list : [], currentFilter)
-          // console.log('setAppointments', data.data)
+          setEventsList(data.data.eventList ? data.data.eventList : [])
+          setEventsListFull(data.data.eventList ? data.data.eventList : [])
+          getFilteredList(
+            data.data.eventList ? data.data.eventList : [],
+            currentFilter
+          )
           setIsDataReceived(true)
           setIsFilter(false)
+          // console.log('eventList', eventsList)
         } else {
           Alert.alert('', data.message)
         }
@@ -153,13 +104,15 @@ export function AppointmentsScreen() {
       })
   }, [])
   useEffect(() => {
-    getAppointmentDetails()
-    getDoctorFacilities()
+    getEventDetails()
   }, [])
-
+  function setFilteredList(filter: any) {
+    setIsShowFilter(false)
+    setCurrentFilter(filter)
+    getFilteredList(eventsListFull, filter)
+  }
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
-    console.log('filter', filter)
     list.map((data: any, index: any) => {
       if (
         filter === 'Upcoming' &&
@@ -173,49 +126,64 @@ export function AppointmentsScreen() {
         filteredList = list
       }
     })
-    setAppointmentsList(filteredList)
+    setEventsList(filteredList)
   }
-  function setFilteredList(filter: any) {
-    setIsShowFilter(false)
-    setCurrentFilter(filter)
-    getFilteredList(appointmentsListFull, filter)
-  }
-  function filterAppointment(formData: Schema) {
+  function filterEvents(formData: Schema) {
     selectedMonth = monthsList[formData.monthIndex].label
     selectedYear = yearList[formData.yearIndex].label
-    doctorId =
-      formData.doctorFacilityIndex !== 0
-        ? doctorFacilityListFull[formData.doctorFacilityIndex].doctorId
-        : 'All'
-    facilityId =
-      formData.doctorFacilityIndex !== 0
-        ? doctorFacilityListFull[formData.doctorFacilityIndex].facilityId
-        : 'All'
-    getAppointmentDetails()
+    getEventDetails()
   }
   function resetFilter() {
     selectedMonth = 'All'
     selectedYear = 'All'
-    selectedType = 'All'
-    doctorId = 'All'
-    facilityId = 'All'
-    getAppointmentDetails()
+    getEventDetails()
     reset({
       monthIndex: 0,
-      yearIndex: 0,
-      doctorFacilityIndex: 0,
-      typeIndex: 0
+      yearIndex: 0
     })
   }
-  async function setSelectedTypeChange(value: any) {
-    if (value === 0) {
-      selectedType = 'All'
-    } else if (value === 1) {
-      selectedType = 'Doctor Appointment'
-    } else {
-      selectedType = 'Facility Appointment'
+  async function createUpdateEvent(formData: Schema, selectedDate: any) {
+    console.log('in createUpdateEvent')
+    // setLoading(true)
+    let url = `${BASE_URL}${CREATE_EVENT}`
+
+    let dataObject: any = {
+      header: header,
+      event: {
+        date: selectedDate,
+        title: formData.title,
+        description: formData.description,
+        member: {
+          id: memberData.member ? memberData.member : ''
+        },
+        location: formData.address,
+        contactList: [],
+        reminderList: []
+      }
     }
-    getDoctorFacilities()
+    console.log('dataObject', JSON.stringify(dataObject))
+    // CallPostService(url, dataObject)
+    //   .then(async (data: any) => {
+    //     setLoading(false)
+    //     if (data.status === 'SUCCESS') {
+    //       router.replace(
+    //         formatUrl('/circles/eventDetails', {
+    //           eventDetails: JSON.stringify(data.data.event),
+    //           memberData: JSON.stringify(memberData)
+    //         })
+    //       )
+    //     } else {
+    //       Alert.alert('', data.message)
+    //     }
+    //     setLoading(false)
+    //   })
+    //   .catch((error) => {
+    //     setLoading(false)
+    //     console.log(error)
+    //   })
+  }
+  async function cancelClicked() {
+    setIsAddEvent(false)
   }
   return (
     <View className="flex-1">
@@ -228,7 +196,7 @@ export function AppointmentsScreen() {
           }}
           className="w-[75%] flex-row"
         >
-          <Typography className=" ml-5 mt-7 text-[14px] font-bold text-black">
+          <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
             {currentFilter}
           </Typography>
           <Feather
@@ -238,16 +206,17 @@ export function AppointmentsScreen() {
             color={'black'}
           />
         </Pressable>
-        {getUserPermission(appointmentPrivileges).createPermission ? (
-          <View className=" mt-[20] self-center">
+        {getUserPermission(eventsPrivileges).createPermission ? (
+          <View className="mt-[20] self-center">
             <Pressable
-              className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+              className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
-                router.push(
-                  formatUrl('/circles/addEditAppointment', {
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
+                // router.push(
+                //   formatUrl('/circles/addEditEvent', {
+                //     memberData: JSON.stringify(memberData)
+                //   })
+                // )
+                setIsAddEvent(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
@@ -274,28 +243,8 @@ export function AppointmentsScreen() {
         </View>
       </View>
       {isFilter ? (
-        <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
-          <View className="mt-2 w-full justify-center">
-            <ControlledDropdown
-              control={control}
-              name="typeIndex"
-              label="All"
-              maxHeight={300}
-              list={typeList}
-              className="w-[95%] self-center"
-              onChangeValue={setSelectedTypeChange}
-            />
-            <ControlledDropdown
-              control={control}
-              name="doctorFacilityIndex"
-              label="All"
-              maxHeight={300}
-              list={doctorFacilityList}
-              className="mt-2 w-[95%] self-center"
-              // onChangeValue={setSelectedTypeChange}
-            />
-          </View>
-          <View className="mt-2 w-full flex-row justify-center">
+        <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View className="mt-5 w-full flex-row justify-center">
             <ControlledDropdown
               control={control}
               name="monthIndex"
@@ -303,7 +252,6 @@ export function AppointmentsScreen() {
               maxHeight={300}
               list={monthsList}
               className="w-[45%]"
-              // onChangeValue={setSelectedMonthChange}
             />
             <ControlledDropdown
               control={control}
@@ -312,7 +260,6 @@ export function AppointmentsScreen() {
               maxHeight={300}
               list={yearList}
               className="ml-5 w-[45%]"
-              // onChangeValue={setSelectedTypeChange}
             />
           </View>
           <View className="flex-row self-center">
@@ -322,17 +269,17 @@ export function AppointmentsScreen() {
                 title={''}
                 leadingIcon="filter"
                 variant="default"
-                onPress={handleSubmit(filterAppointment)}
+                onPress={handleSubmit(filterEvents)}
               />
               <Button
-                className="ml-[20px] bg-[#287CFA]"
+                className="mx-3 bg-[#287CFA]"
                 title={''}
                 leadingIcon="rotate-ccw"
                 variant="default"
                 onPress={handleSubmit(resetFilter)}
               />
               <Button
-                className="ml-[20px] bg-[#287CFA]"
+                className=" bg-[#287CFA]"
                 title={''}
                 leadingIcon="x"
                 variant="default"
@@ -388,15 +335,15 @@ export function AppointmentsScreen() {
       ) : (
         <View />
       )}
-      {appointmentsList.length > 0 ? (
+      {eventsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-[95%] self-center">
-          {appointmentsList.map((data: any, index: number) => {
+          {eventsList.map((data: any, index: number) => {
             return (
               <Pressable
                 onPress={() => {
                   router.replace(
-                    formatUrl('/circles/appointmentDetails', {
-                      appointmentDetails: JSON.stringify(data),
+                    formatUrl('/circles/eventDetails', {
+                      eventDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
                     })
                   )
@@ -406,7 +353,7 @@ export function AppointmentsScreen() {
               >
                 <View className="my-2 flex-row">
                   <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
-                    {data.appointment ? data.appointment : ''}
+                    {data.title ? data.title : ''}
                   </Typography>
                   <View className="">
                     <Typography className="font-bold text-black">
@@ -416,17 +363,12 @@ export function AppointmentsScreen() {
                 </View>
                 <View className="flex-row">
                   <Typography className="font-400 ml-5 w-full text-black">
-                    {data.purpose ? data.purpose : ''}
+                    {data.location ? data.location : ''}
                   </Typography>
                 </View>
                 <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-[75%] max-w-[75%] text-black">
+                  <Typography className="font-400 ml-5 w-full text-black">
                     {data.date ? formatTimeToUserLocalTime(data.date) : ''}
-                  </Typography>
-                  <Typography className="font-400 ml-[10px] text-black">
-                    {data.type.toLowerCase() === 'doctor appointment'
-                      ? 'Doctor'
-                      : 'Facility'}
                   </Typography>
                 </View>
                 {data.hasNotes ||
@@ -491,7 +433,7 @@ export function AppointmentsScreen() {
                             ? '#cf8442'
                             : data.transportationStatus === 'Rejected'
                               ? 'red'
-                              : 'black'
+                              : 'green'
                         }
                       />
                     </View>
@@ -506,9 +448,20 @@ export function AppointmentsScreen() {
       ) : (
         <View />
       )}
-      {isDataReceived && appointmentsList.length === 0 ? (
+      {isDataReceived && eventsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
-          <Typography className="font-bold">{`No ${currentFilter} appointments`}</Typography>
+          <Typography className="font-bold">{`No ${currentFilter} events`}</Typography>
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddEvent ? (
+        <View className="mt-2 h-full w-full items-center self-center">
+          <AddEditEvent
+            component={'Appointment'}
+            createUpdateEvent={createUpdateEvent}
+            cancelClicked={cancelClicked}
+          />
         </View>
       ) : (
         <View />

@@ -61,7 +61,7 @@ export function SetPasswordForm({
 
   const onSubmit = (formData: any) => {
     onLoadingChange(true)
-    const loginURL = `${BASE_URL}${RESET_PASSWORD}`
+    const url = `${BASE_URL}${RESET_PASSWORD}`
     const dataObject = {
       appuserVo: {
         emailOrPhone: formData.email,
@@ -69,7 +69,7 @@ export function SetPasswordForm({
         credential: formData.password
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         onLoadingChange(false)
         if (data.status === 'SUCCESS') {

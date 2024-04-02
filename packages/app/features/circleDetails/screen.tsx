@@ -135,7 +135,7 @@ export function CircleDetailsScreen() {
                   className=" ml-2"
                   onPress={() => {
                     router.push(
-                      formatUrl('/circles/appointments', {
+                      formatUrl('/circles/appointmentsList', {
                         memberData: JSON.stringify(memberData)
                       })
                     )
@@ -173,7 +173,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/incidents', {
+                        formatUrl('/circles/incidentsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -192,7 +192,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/incidents', {
+                        formatUrl('/circles/incidentsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -230,7 +230,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/events', {
+                        formatUrl('/circles/eventsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -249,7 +249,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/events', {
+                        formatUrl('/circles/eventsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
