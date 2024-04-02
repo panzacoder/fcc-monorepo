@@ -60,7 +60,7 @@ export function SignUpScreen() {
 
   async function submitRegistration(formData: Schema) {
     console.log('formData', formData)
-    const loginURL = `${BASE_URL}${CREATE_ACCOUNT}`
+    const url = `${BASE_URL}${CREATE_ACCOUNT}`
     const dataObject = {
       registration: {
         firstName: formData.firstName,
@@ -78,7 +78,7 @@ export function SignUpScreen() {
       }
     }
     setLoading(true)
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {

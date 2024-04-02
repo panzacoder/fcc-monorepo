@@ -101,7 +101,7 @@ export const Transportation = ({
       url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER_EVENT}`
     }
 
-    let dataObject = {
+    let dataObject: any = {
       header: header,
       reminder: {
         id: reminderData.id ? reminderData.id : ''
@@ -140,7 +140,7 @@ export const Transportation = ({
   ) {
     setLoading(true)
     let url = ''
-    let dataObject = {
+    let dataObject: any = {
       header: header,
       reminder: {
         content: title,
@@ -259,6 +259,7 @@ export const Transportation = ({
       {isAddReminder ? (
         <View className="">
           <AddEditReminder
+            component={'Transportation'}
             reminderData={remindersData}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}

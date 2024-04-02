@@ -101,7 +101,7 @@ export function NoteMessageScreen() {
 
   async function getThreadParticipants() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
+    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
       header: header,
       member: {
@@ -112,7 +112,7 @@ export function NoteMessageScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -151,7 +151,7 @@ export function NoteMessageScreen() {
   }
   async function updateMessageThreadParticipants() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${UPDATE_THREAD_PARTICIPANTS}`
+    let url = `${BASE_URL}${UPDATE_THREAD_PARTICIPANTS}`
     let list: object[] = []
     threadParticipantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -175,7 +175,7 @@ export function NoteMessageScreen() {
       }
     }
     console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -196,7 +196,7 @@ export function NoteMessageScreen() {
       Alert.alert('', 'Please type a message')
     } else {
       setLoading(true)
-      let loginURL = `${BASE_URL}${UPDATE_MESSAGE_THREAD}`
+      let url = `${BASE_URL}${UPDATE_MESSAGE_THREAD}`
       let list: object[] = []
       let object = {
         body: message,
@@ -211,7 +211,7 @@ export function NoteMessageScreen() {
         }
       }
       // console.log('dataObject', JSON.stringify(dataObject))
-      CallPostService(loginURL, dataObject)
+      CallPostService(url, dataObject)
         .then(async (data: any) => {
           setLoading(false)
           if (data.status === 'SUCCESS') {

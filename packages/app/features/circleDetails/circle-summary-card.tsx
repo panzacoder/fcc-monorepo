@@ -79,7 +79,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 leadingIcon="arrow-right"
                 onPress={() => {
                   router.push(
-                    formatUrl('/circles/doctors', {
+                    formatUrl('/circles/doctorsList', {
                       memberData: JSON.stringify(memberData)
                     })
                   )
@@ -91,7 +91,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 leadingIcon="home"
                 onPress={() => {
                   router.push(
-                    formatUrl('/circles/facilities', {
+                    formatUrl('/circles/facilitiesList', {
                       memberData: JSON.stringify(memberData)
                     })
                   )

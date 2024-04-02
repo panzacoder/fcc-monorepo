@@ -17,7 +17,7 @@ export function Location(data: any) {
       {locationData.nickName && locationData.nickName !== '' ? (
         <View className="mt-2 w-[80%] max-w-[80%] flex-row items-center ">
           <View className="flex-row">
-            <Typography className="font-400 text-[12px] text-[#1A1A1A]">
+            <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A]">
               {locationData.nickName ? locationData.nickName : ''}
             </Typography>
             {locationData.component !== 'Appointment' ? (
@@ -52,7 +52,7 @@ export function Location(data: any) {
       )}
       {locationData.address && locationData.address !== '' ? (
         <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[95%] flex-row">
+          <View className="w-[90%] flex-row">
             <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>
@@ -77,7 +77,7 @@ export function Location(data: any) {
           }}
           className="ml-2 mt-2 w-full flex-row items-center"
         >
-          <View className="w-[95%] flex-row">
+          <View className="w-[90%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Phone:'}
             </Typography>
@@ -93,7 +93,7 @@ export function Location(data: any) {
 
       {locationData.fax && locationData.fax !== '' ? (
         <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[95%] flex-row">
+          <View className="w-[90%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Fax:'}
             </Typography>
@@ -113,7 +113,7 @@ export function Location(data: any) {
           }}
           className="ml-2 mt-2 w-full flex-row items-center"
         >
-          <View className="w-[95%] flex-row">
+          <View className="w-[90%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Website:'}
             </Typography>
