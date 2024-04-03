@@ -10,11 +10,11 @@ const PtsNameInitials = ({ fullName, className }: Props) => {
   return (
     <View
       className={cn(
-        'bg-primary h-[40px] w-[40px] items-center justify-center rounded-full',
+        'bg-primary h-[36px] w-[36px] items-center justify-center rounded-full',
         className
       )}
     >
-      <Typography className="self-center text-[19px] text-white">
+      <Typography className="self-center text-[18px] text-white">
         {getNameInitials(fullName)}
       </Typography>
     </View>
