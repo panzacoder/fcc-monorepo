@@ -22,6 +22,7 @@ import {
   BASE_URL,
   GET_APPOINTMENT_NOTE,
   GET_EVENT_NOTE,
+  GET_THREAD,
   GET_THREAD_PARTICIPANTS,
   UPDATE_THREAD_PARTICIPANTS,
   UPDATE_MESSAGE_THREAD
@@ -41,9 +42,10 @@ export function NoteMessageScreen() {
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
   const item = useParams<any>()
-  let noteData = !_.isEmpty(item.noteData) ? JSON.parse(item.noteData) : {}
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  // console.log('userDetails', userDetails)
+  let noteData = item.noteData !== undefined ? JSON.parse(item.noteData) : {}
+  let memberData =
+    item.memberData !== undefined ? JSON.parse(item.memberData) : {}
+  console.log('noteData', JSON.stringify(noteData))
 
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
@@ -55,6 +57,14 @@ export function NoteMessageScreen() {
       dataObject = {
         header: header,
         appointmentNote: {
+          id: noteData.id ? noteData.id : ''
+        }
+      }
+    } else if (item.component === 'General') {
+      url = `${BASE_URL}${GET_THREAD}`
+      dataObject = {
+        header: header,
+        messageThread: {
           id: noteData.id ? noteData.id : ''
         }
       }
