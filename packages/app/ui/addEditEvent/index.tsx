@@ -43,6 +43,9 @@ export const AddEditEvent = ({
     console.log('in callCreateUpdateEvent', JSON.stringify(formData))
     // createUpdateEvent(formData,selectedDate)
   }
+  async function callFunction() {
+    console.log('in callFunction')
+  }
   return (
     <View className="my-2 mb-10 w-full rounded-[2px] border-[1px] border-gray-400 bg-white py-5">
       <FormProvider {...formMethods}>
@@ -75,11 +78,7 @@ export const AddEditEvent = ({
             />
           </View>
           <View className="mt-2 w-[95%] self-center">
-            <AddressFields
-              onSubmitEditing={() => {
-                formMethods.setFocus('description')
-              }}
-            />
+            <AddressFields />
           </View>
 
           <View className="my-2 mb-5 flex-row justify-center">

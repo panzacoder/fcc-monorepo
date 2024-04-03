@@ -24,6 +24,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
+import { AddEditAppointment } from 'app/ui/addEditAppointment'
 let appointmentPrivileges = {}
 let selectedMonth = 'All'
 let selectedYear = 'All'
@@ -49,6 +50,7 @@ export function AppointmentsListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [isAddAppointment, setIsAddAppointment] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [appointmentsList, setAppointmentsList] = useState([]) as any
@@ -217,6 +219,12 @@ export function AppointmentsListScreen() {
     }
     getDoctorFacilities()
   }
+  async function cancelClicked() {
+    setIsAddAppointment(false)
+  }
+  async function createUpdateAppointment() {
+    console.log('in createUpdateAppointment')
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -243,11 +251,12 @@ export function AppointmentsListScreen() {
             <Pressable
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
-                router.push(
-                  formatUrl('/circles/addEditAppointment', {
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
+                // router.push(
+                //   formatUrl('/circles/addEditAppointment', {
+                //     memberData: JSON.stringify(memberData)
+                //   })
+                // )
+                setIsAddAppointment(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
@@ -508,7 +517,17 @@ export function AppointmentsListScreen() {
       )}
       {isDataReceived && appointmentsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
-          <Typography className="font-bold">{`No ${currentFilter} appointments`}</Typography>
+          <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} appointments`}</Typography>
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddAppointment ? (
+        <View className="mt-2 h-full w-full items-center self-center">
+          <AddEditAppointment
+            createUpdateAppointment={createUpdateAppointment}
+            cancelClicked={cancelClicked}
+          />
         </View>
       ) : (
         <View />

@@ -145,23 +145,23 @@ export function EventsListScreen() {
   async function createUpdateEvent(formData: Schema, selectedDate: any) {
     console.log('in createUpdateEvent')
     // setLoading(true)
-    let url = `${BASE_URL}${CREATE_EVENT}`
+    // let url = `${BASE_URL}${CREATE_EVENT}`
 
-    let dataObject: any = {
-      header: header,
-      event: {
-        date: selectedDate,
-        title: formData.title,
-        description: formData.description,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        location: formData.address,
-        contactList: [],
-        reminderList: []
-      }
-    }
-    console.log('dataObject', JSON.stringify(dataObject))
+    // let dataObject: any = {
+    //   header: header,
+    //   event: {
+    //     date: selectedDate,
+    //     title: formData.title,
+    //     description: formData.description,
+    //     member: {
+    //       id: memberData.member ? memberData.member : ''
+    //     },
+    //     location: formData.address,
+    //     contactList: [],
+    //     reminderList: []
+    //   }
+    // }
+    // console.log('dataObject', JSON.stringify(dataObject))
     // CallPostService(url, dataObject)
     //   .then(async (data: any) => {
     //     setLoading(false)
@@ -211,12 +211,12 @@ export function EventsListScreen() {
             <Pressable
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
-                // router.push(
-                //   formatUrl('/circles/addEditEvent', {
-                //     memberData: JSON.stringify(memberData)
-                //   })
-                // )
-                setIsAddEvent(true)
+                router.push(
+                  formatUrl('/circles/addEditEvent', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+                // setIsAddEvent(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
@@ -450,7 +450,7 @@ export function EventsListScreen() {
       )}
       {isDataReceived && eventsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
-          <Typography className="font-bold">{`No ${currentFilter} events`}</Typography>
+          <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} events`}</Typography>
         </View>
       ) : (
         <View />
@@ -458,7 +458,7 @@ export function EventsListScreen() {
       {isAddEvent ? (
         <View className="mt-2 h-full w-full items-center self-center">
           <AddEditEvent
-            component={'Appointment'}
+            component={'Event'}
             createUpdateEvent={createUpdateEvent}
             cancelClicked={cancelClicked}
           />
