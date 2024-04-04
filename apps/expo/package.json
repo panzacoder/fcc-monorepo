@@ -2,6 +2,7 @@
   "dependencies": {
     "@react-native-community/datetimepicker": "7.6.4",
     "@react-navigation/drawer": "^6.6.15",
+    "@react-navigation/stack": "^6.3.29",
     "app": "workspace:*",
     "expo": "^50.0.14",
     "expo-dev-client": "~3.3.11",

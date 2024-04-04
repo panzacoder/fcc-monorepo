@@ -22,30 +22,9 @@ export default function Root() {
                 tabBarShowLabel: false
               }}
             >
-              <Tabs.Screen
-                name="home"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="home" size={size} color={color} />
-              //   ),
-              // }}
-              />
-              <Tabs.Screen
-                name="circles"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="circle" size={size} color={color} />
-              //   ),
-              // }}
-              />
-              <Tabs.Screen
-                name="planner"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="calendar" size={size} color={color} />
-              //   ),
-              // }}
-              />
+              <Tabs.Screen name="home" />
+              <Tabs.Screen name="circles" />
+              <Tabs.Screen name="planner" />
             </Tabs>
           </View>
         </SafeAreaView>
