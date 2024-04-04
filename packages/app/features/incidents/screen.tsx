@@ -7,6 +7,7 @@ import { Typography } from 'app/ui/typography'
 
 export function IncidentsScreen() {
   const [isLoading, setLoading] = useState(false)
+  // This is a change
   return (
     <View className="flex-1  bg-white">
       <PtsLoader loading={isLoading} />
