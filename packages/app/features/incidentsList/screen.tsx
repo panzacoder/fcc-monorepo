@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { View } from 'react-native'
+import { useState, useEffect, useCallback } from 'react'
+import { View, Alert, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -111,11 +111,176 @@ export function IncidentsListScreen() {
   }
   async function refreshPage() {}
   return (
-    <View className="flex-1  bg-white">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <Typography className="mt-[150px] flex-1 items-center justify-center self-center text-[20px] font-bold">
-        {'Incidents'}
-      </Typography>
+      <View className="flex-row">
+        <View className="w-[75%]" />
+
+        {getUserPermission(incidentsPrivileges).createPermission ? (
+          <View className="mt-5 self-center">
+            <Pressable
+              className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+              onPress={() => {
+                router.push(
+                  formatUrl('/circles/addEditIncident', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }}
+            >
+              <Feather name={'plus'} size={25} color={COLORS.primary} />
+            </Pressable>
+          </View>
+        ) : (
+          <View />
+        )}
+        <View className="mt-5 self-center">
+          <Pressable
+            onPress={() => {
+              setIsFilter(!isFilter)
+            }}
+            className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+          >
+            <Feather
+              className=""
+              name={'filter'}
+              size={25}
+              color={COLORS.primary}
+            />
+          </Pressable>
+        </View>
+      </View>
+      {isFilter ? (
+        <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View className="mt-5 w-full flex-row justify-center">
+            <ControlledDropdown
+              control={control}
+              name="monthIndex"
+              label="All"
+              maxHeight={300}
+              list={monthsList}
+              className="w-[45%]"
+            />
+            <ControlledDropdown
+              control={control}
+              name="yearIndex"
+              label="All"
+              maxHeight={300}
+              list={yearList}
+              className="ml-5 w-[45%]"
+            />
+          </View>
+          <View className="flex-row self-center">
+            <View className="mt-5 flex-row justify-center ">
+              <Button
+                className="bg-[#287CFA]"
+                title={''}
+                leadingIcon="filter"
+                variant="default"
+                onPress={handleSubmit(filterEvents)}
+              />
+              <Button
+                className="mx-3 bg-[#287CFA]"
+                title={''}
+                leadingIcon="rotate-ccw"
+                variant="default"
+                onPress={handleSubmit(resetFilter)}
+              />
+              <Button
+                className=" bg-[#287CFA]"
+                title={''}
+                leadingIcon="x"
+                variant="default"
+                onPress={() => {
+                  setIsFilter(!isFilter)
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      ) : (
+        <View />
+      )}
+
+      {incidentsList.length > 0 ? (
+        <ScrollView className="m-2 mx-5 w-full self-center">
+          {incidentsList.map((data: any, index: number) => {
+            return (
+              <Pressable
+                onPress={() => {
+                  router.replace(
+                    formatUrl('/circles/incidentDetails', {
+                      incidentDetails: JSON.stringify(data),
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
+                key={index}
+                className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+              >
+                <View className="my-2 flex-row">
+                  <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                    {data.title ? data.title : ''}
+                  </Typography>
+                  <View className="">
+                    <Typography className="font-bold text-black">
+                      {data.type ? data.type : ''}
+                    </Typography>
+                  </View>
+                </View>
+                <View className="flex-row">
+                  <Typography className="font-400 ml-5 w-full text-black">
+                    {data.location ? data.location : ''}
+                  </Typography>
+                </View>
+                <View className="flex-row">
+                  <Typography className="font-400 ml-5 w-full text-black">
+                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                  </Typography>
+                </View>
+                {data.hasNotes ? (
+                  <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                ) : (
+                  <View />
+                )}
+
+                <View className="ml-5 flex-row">
+                  <View className="w-[30%]">
+                    {data.hasNotes ? (
+                      <View className="flex-row">
+                        <Feather
+                          className="ml-5 mt-1"
+                          name={'message-circle'}
+                          size={25}
+                          color={'green'}
+                        />
+                        {data.unreadMessageCount > 0 ? (
+                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                            {data.unreadMessageCount}
+                          </Typography>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                    ) : (
+                      <View />
+                    )}
+                  </View>
+                </View>
+              </Pressable>
+            )
+          })}
+        </ScrollView>
+      ) : (
+        <View />
+      )}
+      {isDataReceived && incidentsList.length === 0 ? (
+        <View className="flex-1 items-center justify-center self-center">
+          <Typography className="font-bold">{`No incidents`}</Typography>
+        </View>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

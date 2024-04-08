@@ -13,8 +13,8 @@ export const PtsComboBox = ({
   const [purpose, setPurpose] = useState(currentData)
 
   return (
-    <View>
-      <View className="focus:border-primary active:border-primary w-[95%] flex-row self-center rounded-lg border-[1px] border-gray-400 py-3">
+    <View className="">
+      <View className="focus:border-primary active:border-primary w-[95%] flex-row self-center rounded-lg border-[1px] border-gray-400 py-2">
         <TextInput
           className={'w-[80%] flex-1 px-4'}
           keyboardType={'default'}
@@ -37,8 +37,8 @@ export const PtsComboBox = ({
         />
       </View>
       {isShowDropdown ? (
-        <View className="w-[95%] self-center">
-          <ScrollView className="" keyboardShouldPersistTaps={'handled'}>
+        <View className="w-[95%] self-center ">
+          <ScrollView className="">
             {listData.map((data: any, index: number) => {
               return (
                 <Pressable
@@ -48,7 +48,7 @@ export const PtsComboBox = ({
                     onSelection(data.label)
                   }}
                   key={index}
-                  className={`bg-[${index % 2 === 0 ? '#9fc1c2' : 'white'}]  border-[1px] border-gray-400 py-3`}
+                  className={`${index % 2 === 0 ? 'bg-[#9fc1c2]' : 'bg-white'}  border-[1px] border-gray-400 py-3`}
                 >
                   <Typography className="ml-5">{data.label}</Typography>
                 </Pressable>

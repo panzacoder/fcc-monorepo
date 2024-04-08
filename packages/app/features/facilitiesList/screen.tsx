@@ -50,7 +50,7 @@ export function FacilitiesListScreen() {
   }, [])
 
   return (
-    <View className="flex-1  bg-white">
+    <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
@@ -82,7 +82,7 @@ export function FacilitiesListScreen() {
           </View>
         </View>
       </View>
-      <ScrollView className="m-2 w-[95%] self-center">
+      <ScrollView className="m-2 w-full self-center">
         {facilityList.map((data: any, index: number) => {
           return (
             <Pressable

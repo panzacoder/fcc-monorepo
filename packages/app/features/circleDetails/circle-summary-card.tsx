@@ -103,8 +103,14 @@ export function CircleSummaryCard({ memberData, userDetails }) {
               <Button
                 className="px-3"
                 title="Prescriptions"
-                leadingIcon="arrow-right"
-                onPress={buttonPressed}
+                leadingIcon="thermometer"
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/prescriptionsList', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
               />
               <Button
                 className="ml-2 px-3"
