@@ -17,7 +17,6 @@ export function ControlledDropdown<T extends FieldValues>({
   className,
   ...rest
 }: ControlledDropdownProps<T>) {
-  console.log('control', JSON.stringify(control))
   return (
     <Controller<T>
       name={name}

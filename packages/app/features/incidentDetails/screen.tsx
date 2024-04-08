@@ -85,6 +85,7 @@ export function IncidentDetailsScreen() {
           if (isFromCreateThread) {
             router.push(
               formatUrl('/circles/noteMessage', {
+                component: 'Incident',
                 memberData: JSON.stringify(memberData),
                 noteData: JSON.stringify(noteData)
               })

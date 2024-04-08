@@ -22,6 +22,7 @@ import {
   BASE_URL,
   GET_APPOINTMENT_NOTE,
   GET_EVENT_NOTE,
+  GET_INCIDENT_NOTE,
   GET_THREAD,
   GET_THREAD_PARTICIPANTS,
   UPDATE_THREAD_PARTICIPANTS,
@@ -69,7 +70,11 @@ export function NoteMessageScreen() {
         }
       }
     } else {
-      url = `${BASE_URL}${GET_EVENT_NOTE}`
+      if (item.component === 'Incident') {
+        url = `${BASE_URL}${GET_INCIDENT_NOTE}`
+      } else {
+        url = `${BASE_URL}${GET_EVENT_NOTE}`
+      }
       dataObject = {
         header: header,
         note: {
@@ -179,7 +184,7 @@ export function NoteMessageScreen() {
       messageThread: {
         id: threadDetails.id ? threadDetails.id : '',
         type: {
-          type: 'Appointment'
+          type: item.component
         },
         participantList: list
       }
