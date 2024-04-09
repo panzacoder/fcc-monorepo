@@ -9,10 +9,13 @@
   "author": "@panzacoder",
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3.10.0",
-    "@vendia/serverless-express": "^4.5.4",
-    "express": "^4.17.3",
-    "qrcode": "^1.5.0",
+    "@slack/bolt": "^3.17.1",
+    "@vendia/serverless-express": "^4.12.6",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
     "safe-compare": "^1.1.4"
+  },
+  "devDependencies": {
+    "serverless-plugin-monorepo": "^0.11.0"
   }
 }
