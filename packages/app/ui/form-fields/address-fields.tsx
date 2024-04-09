@@ -17,8 +17,21 @@ export const addressSchema = z.object({
   state: z.number().min(1, { message: 'State is required' }),
   timezone: z.number().min(1, { message: 'Timezone is required' }),
   postalCode: z.string().min(1, { message: 'Postal Code is required' })
+  // countryObject: z.object({
+  //   name: z.string(),
+  //   code: z.string(),
+  //   namecode: z.string(),
+  //   description: z.string(),
+  //   snum: z.string(),
+  //   id: z.string()
+  // }),
+  // stateName: z.string()
+  // stateCode: z.string(),
+  // stateNamecode: z.string(),
+  // stateDescription: z.string(),
+  // stateSnum: z.string(),
+  // stateId: z.string()
 })
-
 export type AddressFieldsProps = {
   control?: any
   className?: string

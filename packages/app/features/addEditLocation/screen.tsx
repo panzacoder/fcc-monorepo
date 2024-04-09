@@ -45,7 +45,7 @@ export type Schema = z.infer<typeof schema>
 let countryIndex = -1
 let stateIndex = -1
 export function AddEditLocationScreen() {
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
@@ -162,8 +162,8 @@ export function AddEditLocationScreen() {
     resolver: zodResolver(schema)
   })
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value].id
-      ? staticData.countryList[value].id
+    let countryId = staticData.countryList[value.id]?.id
+      ? staticData.countryList[value.id].id
       : 101
     await getStates(countryId)
   }

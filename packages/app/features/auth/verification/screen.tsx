@@ -38,14 +38,14 @@ export function VerificationScreen() {
   async function verifyAuthCode(formData: Schema) {
     setLoading(true)
 
-    const loginURL = `${BASE_URL}${VERIFY_ACCOUNT}`
+    const url = `${BASE_URL}${VERIFY_ACCOUNT}`
     const dataObject = {
       registrationVo: {
         emailOrPhone: email,
         varificationCode: formData.authCode
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -61,13 +61,13 @@ export function VerificationScreen() {
   }
   async function resendAuthCode() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${RESEND_OTP}`
+    let url = `${BASE_URL}${RESEND_OTP}`
     let dataObject = {
       registration: {
         email: email
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         Alert.alert('', data.message)

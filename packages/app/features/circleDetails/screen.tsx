@@ -135,7 +135,7 @@ export function CircleDetailsScreen() {
                   className=" ml-2"
                   onPress={() => {
                     router.push(
-                      formatUrl('/circles/appointments', {
+                      formatUrl('/circles/appointmentsList', {
                         memberData: JSON.stringify(memberData)
                       })
                     )
@@ -172,7 +172,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/incidents')
+                      router.push(
+                        formatUrl('/circles/incidentsList', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -187,7 +191,11 @@ export function CircleDetailsScreen() {
                   <Pressable
                     className=" ml-2"
                     onPress={() => {
-                      router.push('/circles/incidents')
+                      router.push(
+                        formatUrl('/circles/incidentsList', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
                     }}
                   >
                     <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -222,7 +230,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/events', {
+                        formatUrl('/circles/eventsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )
@@ -241,7 +249,7 @@ export function CircleDetailsScreen() {
                     className=" ml-2"
                     onPress={() => {
                       router.push(
-                        formatUrl('/circles/events', {
+                        formatUrl('/circles/eventsList', {
                           memberData: JSON.stringify(memberData)
                         })
                       )

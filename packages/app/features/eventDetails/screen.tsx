@@ -230,14 +230,14 @@ export function EventDetailsScreen() {
   }
   async function deleteNote(noteId: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_EVENT_NOTE}`
+    let url = `${BASE_URL}${DELETE_EVENT_NOTE}`
     let dataObject = {
       header: header,
       note: {
         id: noteId
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -267,7 +267,7 @@ export function EventDetailsScreen() {
   }
   async function getThreadParticipants() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
+    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
       header: header,
       member: {
@@ -278,7 +278,7 @@ export function EventDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -301,7 +301,7 @@ export function EventDetailsScreen() {
   }
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
+    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -330,7 +330,7 @@ export function EventDetailsScreen() {
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -451,19 +451,19 @@ export function EventDetailsScreen() {
   }
   async function deleteEvent() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_EVENT}`
+    let url = `${BASE_URL}${DELETE_EVENT}`
     let dataObject = {
       header: header,
       event: {
         id: eventDetails.id ? eventDetails.id : ''
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           router.push(
-            formatUrl('/circles/events', {
+            formatUrl('/circles/eventsList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -688,7 +688,6 @@ export function EventDetailsScreen() {
                       <Note
                         component={'Event'}
                         data={data}
-                        cancelClicked={cancelClicked}
                         editNote={editNote}
                         deleteNote={deleteNote}
                         messageThreadClicked={messageThreadClicked}
@@ -857,6 +856,7 @@ export function EventDetailsScreen() {
       {isAddRemider ? (
         <View className="h-full w-full justify-center self-center">
           <AddEditReminder
+            component={'Event'}
             reminderData={reminderData}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}

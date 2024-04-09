@@ -57,7 +57,7 @@ let isThisPharmacy = false
 let isFacilityActive = true
 export function AddEditFacilityScreen() {
   const router = useRouter()
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
   const item = useParams<any>()
@@ -94,7 +94,7 @@ export function AddEditFacilityScreen() {
       }
     })
   }
-  // console.log('facilityTypeIndex', '' + facilityTypeIndex)
+  console.log('facilityTypeIndex', '' + facilityTypeIndex)
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -113,8 +113,8 @@ export function AddEditFacilityScreen() {
         facilityDetails && facilityDetails.websiteuser
           ? facilityDetails.websiteuser
           : '',
-      locationDesc: _.isEmpty(facilityDetails) ? '' : 'default',
-      locationShortName: _.isEmpty(facilityDetails) ? '' : 'default',
+      locationDesc: _.isEmpty(facilityDetails) ? '' : ' ',
+      locationShortName: _.isEmpty(facilityDetails) ? '' : ' ',
       address: '',
       city: '',
       postalCode: '',
@@ -127,19 +127,19 @@ export function AddEditFacilityScreen() {
   })
   async function deleteFacility() {
     setLoading(true)
-    let loginURL = `${BASE_URL}${DELETE_FACILITY}`
+    let url = `${BASE_URL}${DELETE_FACILITY}`
     let dataObject = {
       header: header,
       facility: {
         id: facilityDetails.id ? facilityDetails.id : ''
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           router.push(
-            formatUrl('/circles/facilities', {
+            formatUrl('/circles/facilitiesList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -154,7 +154,7 @@ export function AddEditFacilityScreen() {
   }
   async function updateFacility(formData: Schema) {
     setLoading(true)
-    let loginURL = `${BASE_URL}${UPDATE_FACILITY}`
+    let url = `${BASE_URL}${UPDATE_FACILITY}`
     let dataObject = {
       header: header,
       facility: {
@@ -174,12 +174,12 @@ export function AddEditFacilityScreen() {
         }
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           router.push(
-            formatUrl('/circles/facilities', {
+            formatUrl('/circles/facilitiesList', {
               memberData: JSON.stringify(memberData)
             })
           )
@@ -197,7 +197,7 @@ export function AddEditFacilityScreen() {
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let object = {
+    let object: any = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
       fax: formData.fax,
@@ -212,7 +212,7 @@ export function AddEditFacilityScreen() {
     }
     object.address.state.country = countryObject
     locationList.push(object)
-    let loginURL = `${BASE_URL}${CREATE_FACILITY}`
+    let url = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
       facility: {
@@ -228,7 +228,7 @@ export function AddEditFacilityScreen() {
         facilityLocationList: locationList
       }
     }
-    CallPostService(loginURL, dataObject)
+    CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
@@ -282,9 +282,11 @@ export function AddEditFacilityScreen() {
       })
   }, [])
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value].id
-      ? staticData.countryList[value].id
-      : 101
+    console.log('value', JSON.stringify(value))
+    let countryId =
+      value && staticData.countryList[value.id]?.id
+        ? staticData.countryList[value.id].id
+        : 101
     await getStates(countryId)
   }
 
@@ -295,48 +297,157 @@ export function AddEditFacilityScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
-              <View className="w-[45%] flex-row">
-                <ToggleSwitch
-                  isOn={isActive}
-                  onColor="#2884F9"
-                  offColor="#2884F9"
-                  size="medium"
-                  onToggle={(isOn) => {
-                    if (isOn) {
-                      setIsActive(true)
-                      isFacilityActive = true
-                    } else {
-                      setIsActive(false)
-                      isFacilityActive = false
-                    }
-                  }}
-                />
-                <Typography className="font-400 ml-2 self-center">
-                  {isActive ? 'Active' : 'InActive'}
-                </Typography>
-              </View>
+  <View className="w-[45%] flex-row">
+      <ToggleSwitch
+        isOn={isActive}
+        onColor="#2884F9"
+        offColor="#2884F9"
+        size="medium"
+        onToggle={(isOn) => {
+          if (isOn) {
+            setIsActive(true)
+            isFacilityActive = true
+          } else {
+            setIsActive(false)
+            isFacilityActive = false
+          }
+        }}
+      />
+      <Typography className="font-400 ml-2 self-center">
+        {isActive ? 'Active' : 'InActive'}
+      </Typography>
+    </View>
               <View className=" flex-row">
-                <Button
-                  className=""
-                  title="Cancel"
-                  variant="link"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className=""
-                  title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
-                  variant="default"
-                  onPress={
-                    _.isEmpty(facilityDetails)
-                      ? handleSubmit(createFacility)
-                      : handleSubmit(updateFacility)
-                  }
-                />
-              </View>
-            </View>
-            <View className="my-5 w-full">
+      <Button
+        className=""
+        title="Cancel"
+        variant="link"
+        onPress={() => {
+          router.back()
+        }}
+      />
+      <Button
+        className=""
+        title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
+        variant="default"
+        onPress={
+          _.isEmpty(facilityDetails)
+            ? handleSubmit(createFacility)
+            : handleSubmit(updateFacility)
+        }
+      />
+    </View>
+  </View>
+    <View className="my-5 w-full">
+      <View className="w-full flex-row gap-2">
+        <ControlledTextField
+          control={control}
+          name="facilityName"
+          placeholder="Facility Name*"
+          className="w-full"
+        />
+      </View>
+      <View className="mt-5">
+        <ControlledDropdown
+          control={control}
+          name="type"
+          label="Type*"
+          maxHeight={300}
+          list={typesList}
+        // onChangeValue={setSelectedCountryChange}
+        />
+      </View>
+      <View className="mt-5">
+        <ControlledTextField
+          control={control}
+          name="description"
+          placeholder="Description"
+          className="w-full"
+        />
+      </View>
+    </View>
+    <View>
+      <View className="mb-5 flex-row items-center">
+        <Typography className="w-[30%]">{'Portal Details'}</Typography>
+        <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
+      </View>
+      <View className="flex w-full gap-2">
+        <ControlledTextField
+          control={control}
+          name="website"
+          placeholder={'Website'}
+          className="w-full"
+          autoCapitalize="none"
+        />
+        <ControlledTextField
+          control={control}
+          name="username"
+          placeholder={'Username'}
+          className="w-full"
+          autoCapitalize="none"
+        />
+      </View>
+      <View className="mt-5 w-full flex-row">
+        <Typography className=" w-[80%] font-bold">
+          {'Is this Pharmacy?'}
+        </Typography>
+        <ToggleSwitch
+          isOn={isPharmacy}
+          onColor="#2884F9"
+          offColor="#2884F9"
+          size="medium"
+          onToggle={(isOn) => {
+            isThisPharmacy = !isThisPharmacy
+            setIsPharmacy(!isPharmacy)
+          }}
+        />
+      </View>
+    </View>
+          </View >
+  {
+    _.isEmpty(facilityDetails) ? (
+      <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
+        <View className="mt-2">
+          <View className="mb-2 flex-row items-center">
+            <Typography className="w-[20%]">{'Location'}</Typography>
+            <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+          </View>
+          <View className=" w-full">
+            <View className="flex w-full gap-2">
+              <ControlledTextField
+                control={control}
+                name="locationDesc"
+                placeholder={'Location Description*'}
+                className="w-full"
+                autoCapitalize="none"
+              />
+              <ControlledTextField
+                control={control}
+                name="locationShortName"
+                placeholder="Short Name*"
+                className="w-full"
+              />
+              <ControlledTextField
+                control={control}
+                name="address"
+                placeholder="Address"
+                className="w-full"
+              />
+              <ControlledDropdown
+                control={control}
+                name="country"
+                label="Country*"
+                maxHeight={300}
+                list={countryList}
+                onChangeValue={setSelectedCountryChange}
+              />
+              <ControlledDropdown
+                control={control}
+                name="state"
+                label="State*"
+                maxHeight={300}
+                list={statesList}
+              />
               <View className="w-full flex-row gap-2">
                 <ControlledTextField
                   control={control}
@@ -352,6 +463,9 @@ export function AddEditFacilityScreen() {
                   label="Type*"
                   maxHeight={300}
                   list={typesList}
+                  defaultValue={
+                    facilityDetails.type ? facilityDetails.type : ''
+                  }
                   // onChangeValue={setSelectedCountryChange}
                 />
               </View>
@@ -379,134 +493,61 @@ export function AddEditFacilityScreen() {
                 />
                 <ControlledTextField
                   control={control}
-                  name="username"
-                  placeholder={'Username'}
-                  className="w-full"
-                  autoCapitalize="none"
+                  name="address"
+                  placeholder="Postal Code"
+                  className="w-[48%]"
                 />
               </View>
-              <View className="mt-5 w-full flex-row">
-                <Typography className=" w-[80%] font-bold">
-                  {'Is this Pharmacy?'}
-                </Typography>
-                <ToggleSwitch
-                  isOn={isPharmacy}
-                  onColor="#2884F9"
-                  offColor="#2884F9"
-                  size="medium"
-                  onToggle={(isOn) => {
-                    isThisPharmacy = !isThisPharmacy
-                    setIsPharmacy(!isPharmacy)
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-          {_.isEmpty(facilityDetails) ? (
-            <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
-              <View className="mt-2">
-                <View className="mb-2 flex-row items-center">
-                  <Typography className="w-[20%]">{'Location'}</Typography>
-                  <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
-                </View>
-                <View className=" w-full">
-                  <View className="flex w-full gap-2">
-                    <ControlledTextField
-                      control={control}
-                      name="locationDesc"
-                      placeholder={'Location Description*'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="locationShortName"
-                      placeholder="Short Name*"
-                      className="w-full"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="address"
-                      placeholder="Address"
-                      className="w-full"
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="country"
-                      label="Country*"
-                      maxHeight={300}
-                      list={countryList}
-                      onChangeValue={setSelectedCountryChange}
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="state"
-                      label="State*"
-                      maxHeight={300}
-                      list={statesList}
-                    />
-                    <View className="w-full flex-row gap-2">
-                      <ControlledTextField
-                        control={control}
-                        name="address"
-                        placeholder={'City'}
-                        className="w-[50%]"
-                        autoCapitalize="none"
-                      />
-                      <ControlledTextField
-                        control={control}
-                        name="address"
-                        placeholder="Postal Code"
-                        className="w-[48%]"
-                      />
-                    </View>
-                    <ControlledTextField
-                      control={control}
-                      name="locationPhone"
-                      placeholder={'Phone'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="fax"
-                      placeholder={'Fax'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-          ) : (
-            <View />
-          )}
-          {!_.isEmpty(facilityDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="borderRed"
-                onPress={() => {
-                  Alert.alert(
-                    'Are you sure about deleting Facility?',
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => deleteFacility()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
+              <ControlledTextField
+                control={control}
+                name="locationPhone"
+                placeholder={'Phone'}
+                className="w-full"
+                autoCapitalize="none"
+              />
+              <ControlledTextField
+                control={control}
+                name="fax"
+                placeholder={'Fax'}
+                className="w-full"
+                autoCapitalize="none"
               />
             </View>
-          ) : (
-            <View />
-          )}
-        </ScrollView>
+          </View>
+        </View>
       </View>
-    </View>
+    ) : (
+      <View />
+    )
+  }
+  {
+    !_.isEmpty(facilityDetails) ? (
+      <View className="mx-5 my-5">
+        <Button
+          className=""
+          title="Delete"
+          variant="borderRed"
+          onPress={() => {
+            Alert.alert(
+              'Are you sure about deleting Facility?',
+              'It cannot be recovered once deleted.',
+              [
+                {
+                  text: 'Ok',
+                  onPress: () => deleteFacility()
+                },
+                { text: 'Cancel', onPress: () => { } }
+              ]
+            )
+          }}
+        />
+      </View>
+    ) : (
+      <View />
+    )
+  }
+        </ScrollView >
+      </View >
+    </View >
   )
 }

@@ -25,8 +25,9 @@ let statesListFull = []
 let countryIndex = -1
 let stateIndex = -1
 export const LocationDetails = ({ data, setAddressObject }) => {
-  const [statesList, setStateslist] = useState([])
+  const [statesList, setStateslist] = useState([]) as any
   const [isRender, setIsRender] = useState(false)
+  const [isDataReceived, setIsDataReceived] = useState(false)
 
   const getStates = useCallback(async (countryId: any) => {
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -40,8 +41,8 @@ export const LocationDetails = ({ data, setAddressObject }) => {
         if (data.status === 'SUCCESS') {
           let statesList = data.data.stateList.map((data: any, index: any) => {
             return {
-              label: data.name,
-              value: index
+              title: data.name,
+              id: index
             }
           })
           setStateslist(statesList)
@@ -56,6 +57,7 @@ export const LocationDetails = ({ data, setAddressObject }) => {
               }
             })
           }
+          setIsDataReceived(true)
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
         } else {
           Alert.alert('', data.message)
@@ -91,7 +93,7 @@ export const LocationDetails = ({ data, setAddressObject }) => {
     }
     setCountryState()
   }, [])
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   let locationData = data ? data : {}
   console.log('locationData', JSON.stringify(locationData))
   const { control, handleSubmit } = useForm({
@@ -117,20 +119,27 @@ export const LocationDetails = ({ data, setAddressObject }) => {
     },
     resolver: zodResolver(schema)
   })
-  const countryList = staticData.countryList.map((data: any, index: any) => {
-    return {
-      label: data.name,
-      value: index
+  const countryList: any = staticData.countryList.map(
+    (data: any, index: any) => {
+      return {
+        title: data.name,
+        id: index
+      }
     }
-  })
+  )
   async function setSelectedCountryChange(value: any) {
-    setAddressObject(staticData.countryList[value], 4)
-    let countryId = staticData.countryList[value].id
-      ? staticData.countryList[value].id
-      : 101
+    if (value) {
+      setAddressObject(staticData.countryList[value.id], 4)
+    }
+
+    let countryId =
+      value && staticData.countryList[value.id]?.id
+        ? staticData.countryList[value.id].id
+        : 101
     await getStates(countryId)
   }
   async function setSelectedStateChange(value: any) {
+    console.log('value', JSON.stringify(value))
     setAddressObject(statesListFull[value], 5)
   }
   return (
@@ -171,20 +180,31 @@ export const LocationDetails = ({ data, setAddressObject }) => {
             name="country"
             label="Country*"
             maxHeight={300}
+            defaultValue={
+              countryIndex !== -1 ? countryList[countryIndex].title : ''
+            }
             list={countryList}
             onChangeValue={setSelectedCountryChange}
           />
         </View>
-        <View className="my-2 w-[95%] self-center">
-          <ControlledDropdown
-            control={control}
-            name="state"
-            label="State*"
-            maxHeight={300}
-            list={statesList}
-            onChangeValue={setSelectedStateChange}
-          />
-        </View>
+        {isDataReceived ? (
+          <View className="my-2 w-[95%] self-center">
+            <ControlledDropdown
+              control={control}
+              name="state"
+              label="State*"
+              defaultValue={
+                stateIndex !== -1 ? statesList[stateIndex].title : ''
+              }
+              maxHeight={300}
+              list={statesList}
+              onChangeValue={setSelectedStateChange}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
+
         <View className=" w-full flex-row justify-center">
           <ControlledTextField
             control={control}
