@@ -8,6 +8,7 @@
     "jsEngine": "hermes",
     "userInterfaceStyle": "light",
     "githubUrl": "https://github.com/panzacoder/fcc-monorepo",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "cover",
@@ -30,16 +31,6 @@
     },
     "plugins": [
       "expo-router"
-    ],
-    "hooks": {
-    "postPublish": [
-      {
-        "file": "expo-postpublish-slack-notify",
-        "config": {
-          "webhookUrl": "https://hooks.slack.com/services/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",
-        }
-      }
     ]
-  }
   }
 }
