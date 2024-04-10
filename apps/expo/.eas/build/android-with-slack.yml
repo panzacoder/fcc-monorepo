@@ -1,5 +1,5 @@
 build:
-  name: Slack your team from custom build
+  name: Custom Build - Android with Slack notifications 
   steps:
     - eas/send_slack_message:
         name: Build start Android

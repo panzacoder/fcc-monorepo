@@ -29,7 +29,6 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
-build/
 .idea
 .gradle
 local.properties
@@ -76,6 +75,7 @@ web-build/
 
 .turbo
 build/**
+!.eas/build/
 
 
 .pnp.*
