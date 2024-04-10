@@ -16,9 +16,12 @@
     "preview": {
       "distribution": "internal",
       "android": {
+        "config": "android-with-slack.yml",
         "image": "latest"
+        
       },
       "ios": {
+        "config": "ios-with-slack.yml",
         "image": "latest"
       }
     },
