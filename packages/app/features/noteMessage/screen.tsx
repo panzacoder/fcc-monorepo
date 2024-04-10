@@ -23,6 +23,7 @@ import {
   GET_APPOINTMENT_NOTE,
   GET_EVENT_NOTE,
   GET_INCIDENT_NOTE,
+  GET_MEDICAL_DEVICE_NOTE,
   GET_THREAD,
   GET_THREAD_PARTICIPANTS,
   UPDATE_THREAD_PARTICIPANTS,
@@ -46,7 +47,7 @@ export function NoteMessageScreen() {
   let noteData = item.noteData !== undefined ? JSON.parse(item.noteData) : {}
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  console.log('noteData', JSON.stringify(noteData))
+  // console.log('noteData', JSON.stringify(noteData))
 
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
@@ -72,6 +73,8 @@ export function NoteMessageScreen() {
     } else {
       if (item.component === 'Incident') {
         url = `${BASE_URL}${GET_INCIDENT_NOTE}`
+      } else if (item.component === 'Medical Device') {
+        url = `${BASE_URL}${GET_MEDICAL_DEVICE_NOTE}`
       } else {
         url = `${BASE_URL}${GET_EVENT_NOTE}`
       }
@@ -100,6 +103,23 @@ export function NoteMessageScreen() {
                 : []
             )
           }
+          if (
+            item.component === 'Medical Device' &&
+            data.data.purchaseNote &&
+            data.data.purchaseNote.messageThread
+          ) {
+            setThreadDetails(data.data.purchaseNote.messageThread)
+            setMessageList(
+              data.data.purchaseNote.messageThread.messageList
+                ? data.data.purchaseNote.messageThread.messageList
+                : []
+            )
+            setParticipantsList(
+              data.data.purchaseNote.messageThread.participantList
+                ? data.data.purchaseNote.messageThread.participantList
+                : []
+            )
+          }
         } else {
           setLoading(false)
           Alert.alert('', data.message)
@@ -123,7 +143,11 @@ export function NoteMessageScreen() {
         id: memberData.member ? memberData.member : ''
       },
       messageThreadType: {
-        type: item.component ? item.component : ''
+        type: item.component
+          ? item.component === 'Medical Device'
+            ? 'Purchase'
+            : item.component
+          : ''
       }
     }
     // console.log('dataObject', JSON.stringify(dataObject))
@@ -135,7 +159,7 @@ export function NoteMessageScreen() {
           const list = data.data.map((data: any, index: any) => {
             let object = data
             let isParticipant = false
-            participantsList.map((participant, index) => {
+            participantsList.map((participant: any, index: any) => {
               if (participant.participantName === data.name) {
                 isParticipant = true
               }
@@ -185,11 +209,15 @@ export function NoteMessageScreen() {
         id: threadDetails.id ? threadDetails.id : '',
         type: {
           type: item.component
+            ? item.component === 'Medical Device'
+              ? 'Purchase'
+              : item.component
+            : ''
         },
         participantList: list
       }
     }
-    console.log('dataObject', JSON.stringify(dataObject))
+    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)

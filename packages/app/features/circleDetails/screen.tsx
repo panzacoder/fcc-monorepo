@@ -64,7 +64,16 @@ export function CircleDetailsScreen() {
       <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
       <ScrollView className=" flex-1">
         <View className="  flex-1 items-center">
-          <View className="mt-3  w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]">
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/messages', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className="mt-3  w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
             <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
             <View className="py-5">
               <Typography className=" ml-5 flex rounded text-[18px] font-bold text-black">
@@ -76,18 +85,9 @@ export function CircleDetailsScreen() {
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'Show latest message'}
                   </Typography>
-                  <Pressable
-                    className=" ml-2"
-                    onPress={() => {
-                      router.push(
-                        formatUrl('/circles/messages', {
-                          memberData: JSON.stringify(memberData)
-                        })
-                      )
-                    }}
-                  >
+                  <View className=" ml-2">
                     <Feather name={'chevron-right'} size={20} color={'black'} />
-                  </Pressable>
+                  </View>
                 </View>
               ) : (
                 <View className="flex-row">
@@ -109,8 +109,17 @@ export function CircleDetailsScreen() {
                 </View>
               )}
             </View>
-          </View>
-          <View className=" mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]">
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/appointmentsList', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className=" mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
             <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
             <View className="py-5">
               <Typography className="ml-5 flex rounded text-[18px] font-bold text-black">
@@ -131,23 +140,23 @@ export function CircleDetailsScreen() {
                 ) : (
                   <View />
                 )}
-                <Pressable
-                  className=" ml-2"
-                  onPress={() => {
-                    router.push(
-                      formatUrl('/circles/appointmentsList', {
-                        memberData: JSON.stringify(memberData)
-                      })
-                    )
-                  }}
-                >
+                <View className=" ml-2">
                   <Feather name={'chevron-right'} size={20} color={'black'} />
-                </Pressable>
+                </View>
                 <View />
               </View>
             </View>
-          </View>
-          <View className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]">
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/incidentsList', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
             <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
             <View className="py-5">
               <Typography className="ml-5 flex rounded text-[18px] font-bold text-black">
@@ -188,23 +197,23 @@ export function CircleDetailsScreen() {
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'No recent incidents'}
                   </Typography>
-                  <Pressable
-                    className=" ml-2"
-                    onPress={() => {
-                      router.push(
-                        formatUrl('/circles/incidentsList', {
-                          memberData: JSON.stringify(memberData)
-                        })
-                      )
-                    }}
-                  >
+                  <View className=" ml-2">
                     <Feather name={'chevron-right'} size={20} color={'black'} />
-                  </Pressable>
+                  </View>
                 </View>
               )}
             </View>
-          </View>
-          <View className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]">
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/eventsList', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
             <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
             <View className="py-5">
               <Typography className="ml-5 flex rounded text-[18px] font-bold text-black">
@@ -226,18 +235,9 @@ export function CircleDetailsScreen() {
                   ) : (
                     <View />
                   )}
-                  <Pressable
-                    className=" ml-2"
-                    onPress={() => {
-                      router.push(
-                        formatUrl('/circles/eventsList', {
-                          memberData: JSON.stringify(memberData)
-                        })
-                      )
-                    }}
-                  >
+                  <View className=" ml-2">
                     <Feather name={'chevron-right'} size={20} color={'black'} />
-                  </Pressable>
+                  </View>
                   <View />
                 </View>
               ) : (
@@ -260,7 +260,7 @@ export function CircleDetailsScreen() {
                 </View>
               )}
             </View>
-          </View>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
