@@ -64,7 +64,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
               <Button
                 className="px-3"
                 title="Caregivers"
-                leadingIcon="arrow-right"
+                leadingIcon="pocket"
                 onPress={() => {
                   // router.push(
                   //   formatUrl('/circles/caregivers', {
@@ -76,7 +76,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
               <Button
                 className="ml-2 px-3"
                 title="Doctors"
-                leadingIcon="arrow-right"
+                leadingIcon="briefcase"
                 onPress={() => {
                   router.push(
                     formatUrl('/circles/doctorsList', {
@@ -116,7 +116,13 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 className="ml-2 px-3"
                 title="Medical Devices"
                 leadingIcon="watch"
-                onPress={buttonPressed}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/medicalDevicesList', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
               />
             </View>
           </View>

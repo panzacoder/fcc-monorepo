@@ -489,7 +489,7 @@ export function PrescriptionsListScreen() {
                 </Typography>
               </View>
               {data.prescribername || data.pharmacy ? (
-                <View className="my-2 flex-row">
+                <View className="flex-row">
                   <Typography className="text-primary font-400 ml-5 w-[40%]">
                     {data.prescribername ? data.prescribername : ''}
                   </Typography>

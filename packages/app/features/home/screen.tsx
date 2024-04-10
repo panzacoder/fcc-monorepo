@@ -77,7 +77,7 @@ export function HomeScreen() {
             <ScrollView persistentScrollbar={true} className="m-2 flex-1">
               {memberList.map((data: any, index: number) => {
                 return (
-                  <View key={index}>
+                  <View key={index}> 
                     <CardView data={data}></CardView>
                   </View>
                 )

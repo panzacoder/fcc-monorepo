@@ -32,7 +32,7 @@ export const AddMessageThread = ({
     createMessageThread(formData.subject, noteData)
   }
   return (
-    <View className="w-[90%] self-center rounded-[15px] bg-[#dfedcc]">
+    <View className="h-[75%] w-[90%] self-center rounded-[15px] bg-[#dfedcc]">
       <Typography className="py-2 text-center font-bold">
         {'New Communication Thread'}
       </Typography>
@@ -55,7 +55,7 @@ export const AddMessageThread = ({
           {"Caregivers' List"}
         </Typography>
         <View className="mt-1 h-[1px] w-full bg-gray-400" />
-        <ScrollView className="h-[50%] max-h-[50%]">
+        <ScrollView className="h-[70%] max-h-[70%]">
           {participantsList.map((data: any, index: number) => {
             return (
               <View className=" w-full items-center" key={index}>
@@ -78,7 +78,7 @@ export const AddMessageThread = ({
             )
           })}
         </ScrollView>
-        <View className="mb-2 mt-5 flex-row justify-center">
+        <View className="mb-2 mt-2 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
             title="Cancel"

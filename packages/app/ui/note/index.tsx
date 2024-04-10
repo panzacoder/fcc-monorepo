@@ -96,6 +96,11 @@ export const Note = ({
             : ''}
         </Typography>
       </View>
+      <Typography className="font-400 mr-5 mt-[-10] text-right text-[10px] text-[#1A1A1A]">
+        {noteData.occurance && noteData.occurance.occurance
+          ? noteData.occurance.occurance
+          : ''}
+      </Typography>
     </View>
   )
 }

@@ -9,7 +9,7 @@ export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data
   let textStyle =
-    'ml-[10px] self-center text-[19px] font-bold text-black w-[70%]'
+    'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
   let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}] max-w-[90%]`
   let textStyle2 = 'ml-5 text-[12px] text-black '
   let textStyle3 = ' text-[12px] text-black underline max-w-[75%]'
@@ -96,9 +96,8 @@ export function CardView(data: any) {
                   {getNameInitials(fullName)}
                 </Typography>
               </View>
-              <Typography className={`${textStyle}`}>{fullName}</Typography>
               <TouchableOpacity
-                className="ml-[5px] self-center"
+                className="ml-[5px] flex-row self-center"
                 onPress={() => {
                   router.push(
                     formatUrl('/circles/circleDetails', {
@@ -108,6 +107,7 @@ export function CardView(data: any) {
                   )
                 }}
               >
+                <Typography className={`${textStyle}`}>{fullName}</Typography>
                 <Feather name={'arrow-right'} size={20} color={'black'} />
               </TouchableOpacity>
             </View>
