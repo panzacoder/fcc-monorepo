@@ -7,6 +7,7 @@
   ],
   "devDependencies": {
     "@types/react": "^18.2.67",
+    "@types/react-native-calendar-picker": "^8",
     "@types/react-native__assets": "^1",
     "chromatic": "^11.0.0",
     "eslint": "^8.57.0",
@@ -26,7 +27,7 @@
     "chromatic": "npx chromatic --project-token=chpt_0d90c7462008c0a --build-script-name=web:sb:build"
   },
   "resolutions": {
-    "react-native-reanimated": "3.6.1",
+    "react-native-reanimated": "3.6.2",
     "@react-native/assets-registry@npm:0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch",
     "@react-native/assets-registry@npm:~0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch"
   },
@@ -35,5 +36,8 @@
     "**/expo-router/**"
   ],
   "packageManager": "yarn@4.1.1",
-  "version": ""
+  "version": "",
+  "dependencies": {
+    "react-native-calendar-picker": "^8.0.2"
+  }
 }
