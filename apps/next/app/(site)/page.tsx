@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 export default function ContactPage() {
   return (
-    <div className="grid grid-cols-1 gap-5 self-start py-10 md:gap-20">
+    <div className="grid grid-cols-1 gap-5 self-start py-10">
       <Card variant="glass" className="flex flex-col gap-4 text-center">
         <Typography variant="h1" className="text-center font-normal text-white">
           Caregiving can be{' '}
@@ -19,6 +19,7 @@ export default function ContactPage() {
       </Card>
       <div className="grid grid-cols-subgrid gap-2">
         <Image
+          priority
           src="/screenshots/old-to-new.webp"
           alt="A mockup of the new Family Care Circle design, overlapping a mockup of the old design"
           width={500}
@@ -30,15 +31,15 @@ export default function ContactPage() {
         >
           The new Family Care Circle app is coming soon.
         </Typography>
-      </div>
 
-      <Card
-        variant="muted"
-        className="gap-3 pb-5 pt-3"
-        title="Be the first to know when the new Family Care Circle is available."
-      >
-        <NewsletterForm />
-      </Card>
+        <Card
+          variant="muted"
+          className="gap-3 pb-6"
+          title="Be the first to know when the new Family Care Circle is available."
+        >
+          <NewsletterForm />
+        </Card>
+      </div>
     </div>
   )
 }
