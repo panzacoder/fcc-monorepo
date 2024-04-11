@@ -8,7 +8,7 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import moment from 'moment'
+import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -22,7 +22,8 @@ import {
   DELETE_MEDICAL_DEVICE,
   DELETE_MEDICAL_DEVICE_REMINDER,
   CREATE_MEDICAL_DEVICE_REMINDER,
-  UPDATE_MEDICAL_DEVICE_REMINDER
+  UPDATE_MEDICAL_DEVICE_REMINDER,
+  UPDATE_MEDICAL_DEVICE
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { Location } from 'app/ui/location'
@@ -47,6 +48,7 @@ export function MedicalDevicesDetailsScreen() {
   const [isShowReminder, setIsShowReminder] = useState(false)
   const [reminderData, setReminderData] = useState({})
   const [remindersList, setRemindersList] = useState([])
+  const [isAddDevice, setIsAddDevice] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [participantsList, setParticipantsList] = useState([]) as any
   const [isShowNotes, setIsShowNotes] = useState(false)
@@ -267,6 +269,42 @@ export function MedicalDevicesDetailsScreen() {
     setIsAddNote(false)
     setIsAddReminder(false)
     setIsMessageThread(false)
+    setIsAddDevice(false)
+  }
+  async function createUpdateMedicalDevice(object: any) {
+    console.log('in createUpdateMedicalDevice', JSON.stringify(object))
+    setLoading(true)
+    let url = `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
+    let dataObject: any = {
+      header: header,
+      purchase: {
+        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : '',
+        date: object.date ? object.date : '',
+        description: object.description ? object.description : '',
+        type: object.selectedType ? object.selectedType : '',
+        isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
+        member: {
+          id: memberData.member ? memberData.member : ''
+        },
+        doctor: {
+          id: object.doctorId ? object.doctorId : ''
+        }
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          setIsAddDevice(false)
+          getDevicesList(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
   }
   const editNote = (noteData: any) => {
     // console.log('noteData', JSON.stringify(noteData))
@@ -480,14 +518,15 @@ export function MedicalDevicesDetailsScreen() {
                     title="Edit"
                     variant="border"
                     onPress={() => {
-                      router.push(
-                        formatUrl('/circles/addEditIncident', {
-                          memberData: JSON.stringify(memberData),
-                          medicalDevicesDetails: JSON.stringify(
-                            medicalDevicesDetails
-                          )
-                        })
-                      )
+                      // router.push(
+                      //   formatUrl('/circles/addEditIncident', {
+                      //     memberData: JSON.stringify(memberData),
+                      //     medicalDevicesDetails: JSON.stringify(
+                      //       medicalDevicesDetails
+                      //     )
+                      //   })
+                      // )
+                      setIsAddDevice(true)
                     }}
                   />
                 ) : (
@@ -679,6 +718,18 @@ export function MedicalDevicesDetailsScreen() {
             isParticipantSelected={isParticipantSelected}
             createMessageThread={createMessageThread}
             isUpdateParticipants={false}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddDevice ? (
+        <View className="h-full w-full justify-center self-center">
+          <AddEditMedicalDevice
+            medicalDeviceDetails={medicalDevicesDetails}
+            cancelClicked={cancelClicked}
+            createUpdateMedicalDevice={createUpdateMedicalDevice}
+            memberData={memberData}
           />
         </View>
       ) : (

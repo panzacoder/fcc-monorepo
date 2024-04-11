@@ -7,7 +7,6 @@ import { formatUrl } from 'app/utils/format-url'
 export function Location(data: any) {
   const router = useRouter()
   let locationData = data.data ? data.data : {}
-  // console.log('locationData', locationData)
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
@@ -51,33 +50,33 @@ export function Location(data: any) {
         </View>
       )}
       {locationData.address && locationData.address !== '' ? (
-        <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[90%] flex-row">
+        <View className="mt-2 w-full flex-row items-center">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>
           </View>
-          <Feather
+          <TouchableOpacity
             onPress={() => {
               let addressString = getAddressFromObject(locationData.address)
               googleMapOpenUrl(addressString)
             }}
-            name={'navigation'}
-            size={20}
-            color={'black'}
-          />
+            className=" mt-2 w-full flex-row items-center"
+          >
+            <Feather name={'navigation'} size={20} color={'black'} />
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
       )}
-      {locationData.phone !== undefined && locationData.phone !== '' ? (
+      {locationData.phone && locationData.phone !== '' ? (
         <TouchableOpacity
           onPress={() => {
             Linking.openURL(`tel:${locationData.phone}`)
           }}
-          className="ml-2 mt-2 w-full flex-row items-center"
+          className=" mt-2 w-full flex-row items-center"
         >
-          <View className="w-[90%] flex-row">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Phone:'}
             </Typography>
@@ -92,8 +91,8 @@ export function Location(data: any) {
       )}
 
       {locationData.fax && locationData.fax !== '' ? (
-        <View className="ml-2 mt-2 w-full flex-row items-center">
-          <View className="w-[90%] flex-row">
+        <View className=" mt-2 w-full flex-row items-center">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Fax:'}
             </Typography>
@@ -111,9 +110,9 @@ export function Location(data: any) {
           onPress={() => {
             Linking.openURL(`http://${getWebsite(locationData.website)}`)
           }}
-          className="ml-2 mt-2 w-full flex-row items-center"
+          className="mt-2 w-full flex-row items-center"
         >
-          <View className="w-[90%] flex-row">
+          <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Website:'}
             </Typography>

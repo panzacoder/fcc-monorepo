@@ -148,7 +148,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
   }
   return (
     <View className="mt-2 w-[95%] self-center bg-white">
-      <View className="w-full flex-row self-center rounded-[5px] border-[1px] border-[#86939e] py-4">
+      <View className="w-full flex-row self-center rounded-[5px] border-[1px] border-[#86939e] py-2">
         <TouchableOpacity
           onPress={() => {
             setDateTimeModal(true)

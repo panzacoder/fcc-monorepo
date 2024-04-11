@@ -17,15 +17,14 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   GET_MEDICAL_DEVICES,
-  CREATE_PRESCRIPTION
+  CREATE_MEDICAL_DEVICE
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
-import { AddEditPrescription } from 'app/ui/addEditPrescription'
+import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useForm } from 'react-hook-form'
@@ -46,7 +45,6 @@ export function MedicalDevicesListScreen() {
   const [devicesList, setDevicesList] = useState([]) as any
   const [isAddDevice, setIsAddDevice] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [devicesListFull, setDevicesListFull] = useState([]) as any
   const [isFilter, setIsFilter] = useState(false)
   const header = store.getState().headerState.header
   const item = useParams<any>()
@@ -87,7 +85,6 @@ export function MedicalDevicesListScreen() {
           }
           let list = data.data.list ? data.data.list : []
           setDevicesList(list)
-          setDevicesListFull(list)
           setIsFilter(false)
           setIsDataReceived(true)
           setIsAddDevice(false)
@@ -133,8 +130,39 @@ export function MedicalDevicesListScreen() {
   const cancelClicked = () => {
     setIsAddDevice(false)
   }
-  async function createUpdateDevice(object: any) {
-    console.log('in createUpdateDevice')
+  async function createUpdateMedicalDevice(object: any) {
+    // console.log('in createUpdateMedicalDevice', JSON.stringify(object))
+    setLoading(true)
+    let url = `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
+    let dataObject: any = {
+      header: header,
+      purchase: {
+        date: object.date ? object.date : '',
+        description: object.description ? object.description : '',
+        type: object.selectedType ? object.selectedType : '',
+        isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
+        member: {
+          id: memberData.member ? memberData.member : ''
+        },
+        doctor: {
+          id: object.doctorId ? object.doctorId : ''
+        }
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          setIsAddDevice(false)
+          getDevicesList(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
   }
   return (
     <View className="flex-1">
@@ -300,7 +328,7 @@ export function MedicalDevicesListScreen() {
                         name={'clock'}
                         size={25}
                         color={'red'}
-                      /> 
+                      />
                       {data.activeReminderCount > 0 ? (
                         <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
                           {data.activeReminderCount}
@@ -326,19 +354,18 @@ export function MedicalDevicesListScreen() {
         )}
       </ScrollView>
 
-      {/* {isAddDevice ? (
+      {isAddDevice ? (
         <View className="h-full w-full ">
-          <AddEditPrescription
-            prescriptionDetails={{}}
+          <AddEditMedicalDevice
+            medicalDeviceDetails={{}}
             cancelClicked={cancelClicked}
-            createUpdateDevice={createUpdateDevice}
-            activeDoctorList={doctorListFull}
-            pharmacyList={pharmacyListFull}
+            createUpdateMedicalDevice={createUpdateMedicalDevice}
+            memberData={memberData}
           />
         </View>
       ) : (
         <View />
-      )} */}
+      )}
     </View>
   )
 }
