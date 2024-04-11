@@ -37,10 +37,16 @@ const buttonVariants = tv({
         icon: 'color-secondary-foreground'
       },
       ghost: {
-        button: 'hover:bg-accent',
-        text: 'text-secondary group-hover:text-accent-foreground',
-        icon: 'color-secondary group-hover:color-accent-foreground'
+        button: 'hover:bg-primary',
+        text: 'text-primary group-hover:text-primary-foreground',
+        icon: 'color-primary group-hover:color-primary-foreground'
       },
+      'ghost-secondary': {
+        button: 'hover:bg-secondary',
+        text: 'text-secondary group-hover:text-secondary-foreground',
+        icon: 'color-secondary group-hover:color-secondary-foreground'
+      },
+
       accent: {
         button: 'bg-accent hover:bg-accent/90',
         text: 'text-accent-foreground',

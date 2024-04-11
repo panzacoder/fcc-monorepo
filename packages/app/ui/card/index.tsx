@@ -15,8 +15,8 @@ const cardVariants = tv({
         title: 'text-secondary-foreground'
       },
       accent: { base: 'bg-accent', title: 'text-accent-foreground' },
-      muted: { base: 'bg-muted/70', title: 'text-muted-foreground' },
-      glass: { base: 'bg-secondary/20', title: 'text-muted-foreground' },
+      muted: { base: 'bg-muted/70', title: 'text-secondary/80' },
+      glass: { base: 'bg-secondary/20', title: 'text-primary-foreground' },
       destructive: {
         base: 'bg-destructive',
         title: 'text-destructive-foreground'
