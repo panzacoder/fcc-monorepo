@@ -30,13 +30,11 @@ export function NewsletterForm() {
       control={control}
       action={newsletterEndpoint}
       render={({ submit }) => (
-        <Card className="gap-3 pb-5 pt-3">
-          <Typography
-            variant="h6"
-            className="text-secondary text-center font-bold"
-          >
-            Be the first to know when the new Family Care Circle is available.
-          </Typography>
+        <Card
+          variant="secondary"
+          className="gap-3 pb-5 pt-3"
+          title="Be the first to know when the new Family Care Circle is available."
+        >
           {isSubmitSuccessful ? (
             <Typography variant="h6" className="text-primary text-center">
               🎉 {`You're in!`} 🎉
@@ -44,15 +42,15 @@ export function NewsletterForm() {
           ) : (
             <View className="flex-row items-center gap-2 ">
               <ControlledTextField
-                className="flex-1"
+                className="text-secondary-foreground flex-1"
                 control={control}
                 name="email"
                 placeholder="Enter your email"
                 trailingSlot={
                   <Button
-                    variant="link"
+                    variant="secondary"
                     iconOnly
-                    trailingIcon="arrow-right"
+                    trailingIcon="arrow-right-circle"
                     onPress={() => submit()}
                   />
                 }
