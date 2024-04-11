@@ -1,17 +1,22 @@
+'use client'
 import { ScrollView, Text, View } from 'react-native'
 import { VariantProps, tv } from 'tailwind-variants'
 
 const cardVariants = tv({
   slots: {
-    base: 'flex flex-shrink rounded-2xl px-6 pb-1 pt-5 shadow-xl',
+    base: 'flex flex-shrink rounded-2xl px-6 py-4 shadow-xl',
     title: 'text-sm font-bold'
   },
   variants: {
     variant: {
-      default: { base: 'bg-card', title: 'text-primary-foreground' },
-      secondary: { base: 'bg-secondary', title: 'text-secondary-foreground' },
+      default: { base: 'bg-card/85', title: 'text-primary-foreground' },
+      secondary: {
+        base: 'bg-secondary',
+        title: 'text-secondary-foreground'
+      },
       accent: { base: 'bg-accent', title: 'text-accent-foreground' },
-      muted: { base: 'bg-muted', title: 'text-muted-foreground' },
+      muted: { base: 'bg-muted/70', title: 'text-muted-foreground' },
+      glass: { base: 'bg-secondary/20', title: 'text-muted-foreground' },
       destructive: {
         base: 'bg-destructive',
         title: 'text-destructive-foreground'

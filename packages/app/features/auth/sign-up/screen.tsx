@@ -117,7 +117,7 @@ export function SignUpScreen() {
 
       <PtsLoader loading={isLoading} />
       <FormProvider {...formMethods}>
-        <View className="my-5 flex flex-wrap justify-end gap-y-4">
+        <View className="mb-2 mt-5 flex flex-wrap justify-end gap-y-4">
           <View className="flex w-full gap-2">
             <View className="flex w-full flex-row justify-between gap-2">
               <ControlledTextField
