@@ -1,3 +1,5 @@
+'use client'
+
 import { Pressable, PressableProps } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { Typography } from 'app/ui/typography'
@@ -107,7 +109,8 @@ export const Button = ({
   leadingIcon,
   trailingIcon,
   typographyClassName,
-  iconOnly
+  iconOnly,
+  ...rest
 }: ButtonProps) => {
   const { button, text, icon } = buttonVariants({
     variant,

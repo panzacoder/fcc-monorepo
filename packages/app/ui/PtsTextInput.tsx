@@ -1,3 +1,5 @@
+'use client'
+
 import { TextInput, TextInputProps, View } from 'react-native'
 import { cn } from './utils'
 import React from 'react'
