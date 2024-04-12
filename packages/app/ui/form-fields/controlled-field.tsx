@@ -6,7 +6,6 @@ import {
   Controller,
   ControllerProps,
   FieldValues,
-  useFormContext,
   useFormState
 } from 'react-hook-form'
 import { View } from 'react-native'
