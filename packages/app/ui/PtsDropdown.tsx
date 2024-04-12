@@ -63,10 +63,10 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
   }, [list])
 
   return (
-    <View className="">
-      <Text className="absolute -top-[9px] left-2 z-[999] bg-white px-1 text-sm">
-        {label}
-      </Text>
+    <View className="flex">
+      {label && (
+        <Text className="text-muted-foreground px-1 text-sm">{label}</Text>
+      )}
       <Pressable
         className={cn(
           'web:pr-3 native:pr-0 h-11 rounded-lg border-[1px] border-gray-400 pl-4',

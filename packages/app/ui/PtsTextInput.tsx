@@ -11,6 +11,7 @@ export type PtsTextInputProps = {
   trailingSlot?: React.ReactNode
   valid?: boolean
   textClassName?: string
+  label?: string
 } & TextInputProps
 
 const PtsTextInput = React.forwardRef(function PtsTextInput(
@@ -27,48 +28,47 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
     onSubmitEditing,
     returnKeyType = 'next',
     placeholder,
+    label = placeholder,
     value,
     ...rest
   }: PtsTextInputProps,
   ref: React.Ref<TextInput>
 ) {
   return (
-    <View
-      className={cn(
-        'flex flex-row justify-between rounded-lg',
-        valid ? 'border-gray-400' : 'border-destructive',
-        editable ? '' : 'bg-muted',
-        placeholder && value && 'mt-2',
-        className
+    <View className="flex ">
+      {label && (
+        <Text className="text-muted-foreground px-1 text-sm">{label}</Text>
       )}
-    >
-      {value && placeholder && (
-        <Text className="absolute -top-[9px] left-2 z-[999] bg-white px-1 text-sm">
-          {placeholder}
-        </Text>
-      )}
-
-      <TextInput
-        ref={ref}
+      <View
         className={cn(
-          'active:border-primary focus:border-primary flex-1 flex-row rounded-lg  border-[1px] border-gray-400 px-4 py-3 placeholder:text-gray-400',
-          editable ? '' : 'text-muted-foreground',
-          textClassName
+          'flex flex-row justify-between rounded-lg ',
+          valid ? 'border-gray-400' : 'border-destructive',
+          editable ? '' : 'bg-muted',
+          className
         )}
-        placeholder={placeholder}
-        value={value}
-        editable={editable}
-        keyboardType={keyboardType}
-        returnKeyType={returnKeyType}
-        blurOnSubmit={!onSubmitEditing}
-        onSubmitEditing={onSubmitEditing}
-        onChangeText={(text) => {
-          onChangeText && onChangeText(text)
-        }}
-        {...rest}
-      />
-      <View className="absolute bottom-0 right-3 top-0 flex justify-center">
-        {trailingSlot}
+      >
+        <TextInput
+          ref={ref}
+          className={cn(
+            'active:border-primary focus:border-primary flex-1 flex-row rounded-lg  border-[1px] border-gray-400 px-4 py-3 placeholder:text-gray-400',
+            editable ? '' : 'text-muted-foreground',
+            textClassName
+          )}
+          placeholder={placeholder}
+          value={value}
+          editable={editable}
+          keyboardType={keyboardType}
+          returnKeyType={returnKeyType}
+          blurOnSubmit={!onSubmitEditing}
+          onSubmitEditing={onSubmitEditing}
+          onChangeText={(text) => {
+            onChangeText && onChangeText(text)
+          }}
+          {...rest}
+        />
+        <View className="absolute bottom-0 right-3 top-0 flex justify-center">
+          {trailingSlot}
+        </View>
       </View>
     </View>
   )

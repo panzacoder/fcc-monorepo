@@ -1,17 +1,22 @@
-import { Pressable, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import CalendarPicker, {
   CalendarPickerProps
 } from 'react-native-calendar-picker'
 import { Button } from '../button'
 import { Typography } from '../typography'
+import { cn } from '../utils'
 
-export type CalenderViewProps = {
+export type CalendarViewProps = {
   calendarPickerProps: CalendarPickerProps
   onCancel: () => void
   onClear: () => void
 }
 
-export function CalendarView({ calendarPickerProps, onCancel, onClear }) {
+export function CalendarView({
+  calendarPickerProps,
+  onCancel,
+  onClear
+}: CalendarViewProps) {
   return (
     <View className="absolute top-[40] w-full self-center bg-white">
       <View className="bg-primary h-[50] w-full items-center justify-center rounded-tl-[20px] rounded-tr-[20px]">
@@ -38,21 +43,28 @@ export type CalendarPickerInputProps = {
   label: string
   onPress: () => void
   value: string
+  className?: string
 }
 
-export function CalendarViewInput({ label, onPress, value }) {
+export function CalendarViewInput({
+  label,
+  onPress,
+  value,
+  className
+}: CalendarPickerInputProps) {
   return (
-    <Pressable
-      onPress={onPress}
-      className="flex w-full flex-row justify-between rounded-lg border border-gray-400 px-4 py-3"
-    >
-      <Typography className={`text-muted-foreground leading-tight`}>
-        {label}
-      </Typography>
-
-      <Typography className={`text-foreground leading-tight`}>
-        {value}
-      </Typography>
-    </Pressable>
+    <View className={cn('flex', className)}>
+      {label && (
+        <Text className="text-muted-foreground px-1 text-sm">{label}</Text>
+      )}
+      <Pressable
+        onPress={onPress}
+        className="flex w-full flex-row rounded-lg border border-gray-400 px-4 py-3"
+      >
+        <Typography className={`text-foreground leading-tight`}>
+          {value}
+        </Typography>
+      </Pressable>
+    </View>
   )
 }

@@ -229,23 +229,27 @@ export const AddEditPrescription = ({
           }}
         />
 
-        <CalendarViewInput
-          label="Start date:"
-          value={startDate}
-          onPress={() => {
-            setCalenderClickedCount(1)
-            setIsShowCalender(true)
-          }}
-        />
+        <View className="flex flex-row gap-4">
+          <CalendarViewInput
+            className="flex-1"
+            label="Start date:"
+            value={startDate}
+            onPress={() => {
+              setCalenderClickedCount(1)
+              setIsShowCalender(true)
+            }}
+          />
 
-        <CalendarViewInput
-          label="End date:"
-          value={endDate}
-          onPress={() => {
-            setCalenderClickedCount(2)
-            setIsShowCalender(true)
-          }}
-        />
+          <CalendarViewInput
+            className="flex-1"
+            label="End date:"
+            value={endDate}
+            onPress={() => {
+              setCalenderClickedCount(2)
+              setIsShowCalender(true)
+            }}
+          />
+        </View>
 
         <ControlledTextField
           control={control}
