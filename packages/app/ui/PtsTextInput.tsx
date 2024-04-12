@@ -1,6 +1,6 @@
 'use client'
 
-import { TextInput, TextInputProps, View } from 'react-native'
+import { Text, TextInput, TextInputProps, View } from 'react-native'
 import { cn } from './utils'
 import React from 'react'
 
@@ -26,6 +26,8 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
     trailingSlot,
     onSubmitEditing,
     returnKeyType = 'next',
+    placeholder,
+    value,
     ...rest
   }: PtsTextInputProps,
   ref: React.Ref<TextInput>
@@ -36,9 +38,16 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
         'flex flex-row justify-between rounded-lg',
         valid ? 'border-gray-400' : 'border-destructive',
         editable ? '' : 'bg-muted',
+        placeholder && value && 'mt-2',
         className
       )}
     >
+      {value && placeholder && (
+        <Text className="absolute -top-[9px] left-2 z-[999] bg-white px-1 text-sm">
+          {placeholder}
+        </Text>
+      )}
+
       <TextInput
         ref={ref}
         className={cn(
@@ -46,6 +55,8 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
           editable ? '' : 'text-muted-foreground',
           textClassName
         )}
+        placeholder={placeholder}
+        value={value}
         editable={editable}
         keyboardType={keyboardType}
         returnKeyType={returnKeyType}
