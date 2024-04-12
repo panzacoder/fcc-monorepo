@@ -14,6 +14,7 @@ const schema = z.object({
   occurrence: z.number().min(0, { message: 'Occurrence is required' })
 })
 export type Schema = z.infer<typeof schema>
+let occurance: any = ''
 export const AddEditNote = ({
   component,
   noteData,
@@ -24,12 +25,22 @@ export const AddEditNote = ({
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
+    occurance = noteData.occurance.occurance
     // facilityTypeIdex = getTypeIndex(facilityDetails.type)
-    staticData.taskOccuranceList.map(async (data: any, index: any) => {
-      if (data.occurance === noteData.occurance.occurance) {
-        occuranceIndex = index
-      }
-    })
+    if (component === 'Appointment') {
+      staticData.taskOccuranceList.map(async (data: any, index: any) => {
+        if (data.occurance === noteData.occurance.occurance) {
+          occuranceIndex = index
+        }
+      })
+    } else if (component === 'Medical Device') {
+      staticData.purchaseOccuranceList.map(async (data: any, index: any) => {
+        if (data.occurance === noteData.occurance.occurance) {
+          occuranceIndex = index
+          console.log('occuranceIndex', '' + occuranceIndex)
+        }
+      })
+    }
   }
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -38,18 +49,35 @@ export const AddEditNote = ({
           ? noteData.shortDescription
           : '',
       noteDetails: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
-      occurrence: component === 'Appointment' ? occuranceIndex : 0
+      occurrence:
+        component === 'Appointment' || component === 'Medical Device'
+          ? occuranceIndex
+          : 0
     },
     resolver: zodResolver(schema)
   })
-  const occuranceList = staticData.taskOccuranceList.map(
-    (data: any, index: any) => {
-      return {
-        label: data.occurance,
-        value: index
+  let occuranceList = [] as any
+  if (component === 'Appointment') {
+    occuranceList = staticData.taskOccuranceList.map(
+      (data: any, index: any) => {
+        return {
+          label: data.occurance,
+          value: index
+        }
       }
-    }
-  )
+    )
+  }
+  if (component === 'Medical Device') {
+    occuranceList = staticData.purchaseOccuranceList.map(
+      (data: any, index: any) => {
+        return {
+          label: data.occurance,
+          value: index
+        }
+      }
+    )
+  }
+
   async function callCreateUpdateNote(formData: Schema) {
     createUpdateNote(
       occuranceList[formData.occurrence].label,
@@ -71,7 +99,7 @@ export const AddEditNote = ({
             autoCapitalize="none"
           />
         </View>
-        {component === 'Appointment' ? (
+        {component === 'Appointment' || component === 'Medical Device' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledDropdown
               control={control}
@@ -80,6 +108,7 @@ export const AddEditNote = ({
               className="w-[95%] bg-white"
               maxHeight={300}
               list={occuranceList}
+              defaultValue={occurance}
               // onChangeValue={setSelectedCountryChange}
             />
           </View>

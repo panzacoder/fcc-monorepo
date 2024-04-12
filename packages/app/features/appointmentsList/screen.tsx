@@ -37,12 +37,13 @@ const schema = z.object({
   typeIndex: z.number(),
   doctorFacilityIndex: z.number()
 })
-const yearList: object[] = [{ label: 'All', value: 0 }] as any
+
 const typeList: object[] = [
   { label: 'All', value: 0 },
   { label: 'Doctor', value: 1 },
   { label: 'Facility', value: 2 }
 ] as any
+const yearList: object[] = [{ label: 'All', value: 0 }] as any
 const monthsList = getMonthsList() as any
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
