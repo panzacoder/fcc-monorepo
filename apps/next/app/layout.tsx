@@ -1,4 +1,5 @@
 /** @jsxImportSource react */
+
 import 'raf/polyfill'
 import 'setimmediate'
 import 'app/config/tailwind/global.css'

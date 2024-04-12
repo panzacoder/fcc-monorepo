@@ -2,15 +2,21 @@ import PtsTextInput, { PtsTextInputProps } from 'app/ui/PtsTextInput'
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 import React from 'react'
-import { Controller, ControllerProps, FieldValues, useFormContext, useFormState } from 'react-hook-form'
+import {
+  Controller,
+  ControllerProps,
+  FieldValues,
+  useFormContext,
+  useFormState
+} from 'react-hook-form'
 import { View } from 'react-native'
 
 export type ControlledTextFieldProps<T extends FieldValues> =
   PtsTextInputProps &
-  Omit<ControllerProps<T>, 'render'> & {
-    inputClassName?: string
-    InputComponent?: React.ComponentType<any>
-  }
+    Omit<ControllerProps<T>, 'render'> & {
+      inputClassName?: string
+      InputComponent?: React.ComponentType<any>
+    }
 
 export function ControlledTextField<T extends FieldValues>({
   control,
@@ -39,7 +45,7 @@ export function ControlledTextField<T extends FieldValues>({
             <InputComponent
               className={
                 (cn('', fieldState?.invalid && 'border-destructive'),
-                  inputClassName)
+                inputClassName)
               }
               onChangeText={handleChange}
               {...fieldProps}
@@ -53,8 +59,7 @@ export function ControlledTextField<T extends FieldValues>({
             )}
           </View>
         )
-      }
-      }
+      }}
     />
   )
 }

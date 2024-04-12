@@ -81,7 +81,7 @@ body {
     --border: 180 53.47% 60.39%;
     --popover: 220 60% 99.02%;
     --primary: 216 95% 57%;
-    --secondary: 180 52.94% 20%;
+    --secondary: 215.71 72.41% 22.75%;
     --background: 216 56% 100%;
     --foreground: 215.71 72.41% 22.75%;
     --destructive: 0 86% 44%;
@@ -92,6 +92,11 @@ body {
     --primary-foreground: 0 0% 100%;
     --secondary-foreground: 216.67 90% 96.08%;
     --destructive-foreground: 0 0% 100%;
+    --gradient: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 1) 0%,
+      hsl(var(--accent-foreground) / 1) 100%
+    );
     --radius: 0.5rem;
   }
 

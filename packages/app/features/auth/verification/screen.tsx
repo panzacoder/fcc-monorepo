@@ -81,7 +81,7 @@ export function VerificationScreen() {
     <CardView>
       <PtsLoader loading={isLoading} />
       <CardHeader />
-      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+      <View className="mb-3 mt-5 flex flex-wrap justify-end gap-y-4">
         <Typography variant="h3" className="text-center">
           {'Almost There! 🎉'}
         </Typography>

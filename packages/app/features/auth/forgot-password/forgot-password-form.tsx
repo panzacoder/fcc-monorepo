@@ -57,7 +57,7 @@ export function ForgotPasswordForm({
   }
 
   return (
-    <View className="my-4 flex flex-wrap justify-end gap-y-4">
+    <View className="mb-2 mt-4 flex flex-wrap justify-end gap-y-4">
       <Typography variant="h5" as="h1" className="w-full">
         {'Enter your email to reset your account password'}
       </Typography>

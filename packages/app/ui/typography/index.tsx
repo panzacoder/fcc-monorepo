@@ -5,7 +5,7 @@ import { Text, Role } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const typographyVariants = tv({
-  base: 'max-w-full text-base text-black',
+  base: 'max-w-full text-base',
   variants: {
     variant: {
       h1: 'text-4xl font-extrabold',
