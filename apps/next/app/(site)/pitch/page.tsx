@@ -4,17 +4,17 @@ import { Typography } from 'app/ui/typography'
 
 export default function PitchPage() {
   return (
-    <div className="grid  justify-items-center gap-3 px-10">
+    <div className="grid max-w-screen-xl grid-cols-1 grid-rows-[min-content_1fr] place-items-center  gap-3">
       <Typography
         variant="h1"
         className="text-primary-foreground drop-shadow-lg"
       >
         Interested in investing?
       </Typography>
-      <div className="grid w-full justify-items-center gap-2">
+      <div className="flex w-full flex-col items-center gap-2">
         <Typography
           variant="h3"
-          className="text-primary-foreground h-min drop-shadow-lg"
+          className="text-primary-foreground drop-shadow-lg"
         >
           Check out our plans for the future 👇
         </Typography>
