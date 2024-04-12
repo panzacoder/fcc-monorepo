@@ -66,11 +66,11 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 title="Caregivers"
                 leadingIcon="pocket"
                 onPress={() => {
-                  // router.push(
-                  //   formatUrl('/circles/caregivers', {
-                  //     memberData: JSON.stringify(memberData)
-                  //   })
-                  // )
+                  router.push(
+                    formatUrl('/circles/caregiversList', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
                 }}
               />
               <Button

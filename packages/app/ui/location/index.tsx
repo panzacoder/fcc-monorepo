@@ -50,7 +50,7 @@ export function Location(data: any) {
         </View>
       )}
       {locationData.address && locationData.address !== '' ? (
-        <View className="mt-2 w-full flex-row items-center">
+        <View className="mt-2 w-[95%] flex-row items-center">
           <View className="w-[95%] flex-row">
             <Typography className="font-400  w-[95%] text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
@@ -61,9 +61,14 @@ export function Location(data: any) {
               let addressString = getAddressFromObject(locationData.address)
               googleMapOpenUrl(addressString)
             }}
-            className=" mt-2 w-full flex-row items-center"
+            className="mt-2 w-full flex-row items-center"
           >
-            <Feather name={'navigation'} size={20} color={'black'} />
+            <Feather
+              className="ml-2 "
+              name={'navigation'}
+              size={20}
+              color={'black'}
+            />
           </TouchableOpacity>
         </View>
       ) : (
@@ -74,7 +79,7 @@ export function Location(data: any) {
           onPress={() => {
             Linking.openURL(`tel:${locationData.phone}`)
           }}
-          className=" mt-2 w-full flex-row items-center"
+          className=" mt-2 w-[95%] flex-row items-center"
         >
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
@@ -84,14 +89,14 @@ export function Location(data: any) {
               {locationData.phone}
             </Typography>
           </View>
-          <Feather name={'phone'} size={20} color={'black'} />
+          <Feather className="ml-2" name={'phone'} size={20} color={'black'} />
         </TouchableOpacity>
       ) : (
         <View />
       )}
 
       {locationData.fax && locationData.fax !== '' ? (
-        <View className=" mt-2 w-full flex-row items-center">
+        <View className=" mt-2 w-[95%] flex-row items-center">
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Fax:'}
@@ -100,7 +105,7 @@ export function Location(data: any) {
               {locationData.fax}
             </Typography>
           </View>
-          <Feather name={'copy'} size={20} color={'black'} />
+          <Feather className="ml-2" name={'copy'} size={20} color={'black'} />
         </View>
       ) : (
         <View />
@@ -110,7 +115,7 @@ export function Location(data: any) {
           onPress={() => {
             Linking.openURL(`http://${getWebsite(locationData.website)}`)
           }}
-          className="mt-2 w-full flex-row items-center"
+          className="mt-2 w-[95%] flex-row items-center"
         >
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
@@ -120,7 +125,7 @@ export function Location(data: any) {
               {locationData.website}
             </Typography>
           </View>
-          <Feather name={'globe'} size={20} color={'black'} />
+          <Feather className="ml-2" name={'globe'} size={20} color={'black'} />
         </TouchableOpacity>
       ) : (
         <View />
