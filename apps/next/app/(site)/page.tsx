@@ -7,8 +7,11 @@ import Image from 'next/image'
 
 export default function ContactPage() {
   return (
-    <div className="grid grid-cols-1 gap-5 self-start py-10">
-      <Card variant="glass" className="flex flex-col gap-4 text-center">
+    <div className="grid grid-cols-1 justify-items-center gap-4 self-start">
+      <Card
+        variant="glass"
+        className="flex max-w-screen-lg flex-col gap-4 text-center"
+      >
         <Typography variant="h1" className="text-center font-normal text-white">
           Caregiving can be{' '}
           <span className="font-extrabold underline">heavy.</span>
@@ -17,7 +20,7 @@ export default function ContactPage() {
           We make it <span className="font-extralight italic">lighter.</span>
         </Typography>
       </Card>
-      <div className="grid grid-cols-subgrid gap-2">
+      <div className="grid grid-cols-subgrid justify-items-center gap-2">
         <Image
           priority
           src="/screenshots/old-to-new.webp"

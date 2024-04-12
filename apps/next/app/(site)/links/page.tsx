@@ -12,7 +12,10 @@ export default function LinkPage() {
 
   return (
     <div className="flex h-full flex-col items-center justify-start py-8">
-      <Card variant="glass" className="flex w-full items-center p-4">
+      <Card
+        variant="glass"
+        className="flex w-full max-w-screen-sm items-center p-4"
+      >
         <Typography
           variant="h1"
           className="flex w-fit text-center font-normal text-white"
