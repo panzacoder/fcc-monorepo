@@ -1,24 +1,34 @@
 'use client'
 
+import { Typography } from 'app/ui/typography'
+
 export default function PitchPage() {
   return (
-    <div className="w-full bg-transparent">
-      <div className="relative mb-5 mt-8 h-0 w-full overflow-hidden rounded-2xl bg-transparent pb-[56.25%] shadow-md">
-        <iframe
-          loading="lazy"
-          className="padding-0 margin-0 absolute left-0 top-0 h-full w-full border-none"
-          src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGBZlJxv1U&#x2F;4FRIFrPTqJe_NvWxjFPqgw&#x2F;view?embed"
-          allowFullScreen
-          allow="fullscreen"
-        ></iframe>
-      </div>
-      <a
-        href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGBZlJxv1U&#x2F;4FRIFrPTqJe_NvWxjFPqgw&#x2F;view?utm_content=DAGBZlJxv1U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link"
-        target="_blank"
-        rel="noopener"
+    <div className="absolute grid h-screen w-screen place-items-center bg-black/40 p-10">
+      <Typography
+        variant="h1"
+        className="text-primary-foreground drop-shadow-lg"
       >
-        FCC Pitch Deck
-      </a>
+        Interested in investing?
+      </Typography>
+      <div className="grid w-full place-items-center">
+        <Typography
+          variant="h3"
+          className="text-primary-foreground drop-shadow-lg"
+        >
+          Check out our plans for the future 👇
+        </Typography>
+
+        <div className="relative mb-5 mt-8 h-0 w-full overflow-hidden rounded-2xl  bg-transparent pb-[56.25%] shadow-md">
+          <iframe
+            loading="lazy"
+            className="padding-0 margin-0 absolute left-0 top-0 h-full w-full border-none"
+            src="https://www.canva.com/design/DAGBZlJxv1U/4FRIFrPTqJe_NvWxjFPqgw/view?embed"
+            allowFullScreen
+            allow="fullscreen"
+          ></iframe>
+        </div>
+      </div>
     </div>
   )
 }
