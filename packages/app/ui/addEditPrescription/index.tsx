@@ -3,7 +3,6 @@ import { Pressable, View, TouchableHighlight, ScrollView } from 'react-native'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import { COLORS } from 'app/utils/colors'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
@@ -11,9 +10,8 @@ import { getFullDateForCalender } from 'app/ui/utils'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
-import { Feather } from 'app/ui/icons'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
-import CalendarPicker from 'react-native-calendar-picker'
+import { CalendarView } from './calendar-view'
 let prescribedDateUtc: any = ''
 let startDateUtc: any = ''
 let endDateUtc: any = ''
@@ -142,65 +140,42 @@ export const AddEditPrescription = ({
     // console.log('purpose1', purpose)
   }
 
-  function getCalenderView() {
-    return (
-      <View className="absolute top-[40] w-full self-center bg-white">
-        <View className="bg-primary h-[50] w-full items-center justify-center rounded-tl-[20px] rounded-tr-[20px]">
-          <TouchableHighlight
-            style={{ paddingRight: 15, position: 'absolute', right: 0 }}
-            onPress={() => setIsShowCalender(false)}
-            underlayColor={COLORS.transparent}
-          >
-            <View className="h-[28] w-[28] items-center justify-center rounded-full bg-white">
-              <Feather name={'x'} size={15} color={COLORS.primary} />
-            </View>
-          </TouchableHighlight>
-        </View>
-        <CalendarPicker
-          textStyle={{}}
-          onDateChange={(date) => {
-            if (calenderClickedCount === 0) {
-              setPrescribedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-              prescribedDateUtc = date
-            } else if (calenderClickedCount === 1) {
-              setStartDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-              startDateUtc = date
-            } else {
-              setEndDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-              endDateUtc = date
-            }
-            setIsShowCalender(false)
-          }}
-        />
-        <View className="mt-2 h-[1px] w-[97%] self-center bg-[#86939e]" />
-        <Button
-          title={'Clear'}
-          className="mt-5 w-[40%] self-center bg-[#86939e]"
-          onPress={() => {
-            if (calenderClickedCount === 0) {
-              setPrescribedDate('Date Prescribed')
-              prescribedDateUtc = ''
-              setIsShowCalender(false)
-            }
-            if (calenderClickedCount === 1) {
-              setStartDate('Start Date')
-              startDateUtc = ''
-              setIsShowCalender(false)
-            }
-            if (calenderClickedCount === 2) {
-              setEndDate('End Date')
-              endDateUtc = ''
-              setIsShowCalender(false)
-            }
-          }}
-        />
-      </View>
-    )
+  const handleDateChange = (date: Date) => {
+    if (calenderClickedCount === 0) {
+      setPrescribedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      prescribedDateUtc = date
+    } else if (calenderClickedCount === 1) {
+      setStartDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      startDateUtc = date
+    } else {
+      setEndDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      endDateUtc = date
+    }
+    setIsShowCalender(false)
   }
+
+  const handleDateCleared = () => {
+    if (calenderClickedCount === 0) {
+      setPrescribedDate('Date Prescribed')
+      prescribedDateUtc = ''
+      setIsShowCalender(false)
+    }
+    if (calenderClickedCount === 1) {
+      setStartDate('Start Date')
+      startDateUtc = ''
+      setIsShowCalender(false)
+    }
+    if (calenderClickedCount === 2) {
+      setEndDate('End Date')
+      endDateUtc = ''
+      setIsShowCalender(false)
+    }
+  }
+
   return (
-    <ScrollView className=" my-2 max-h-[85%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
-      <View className="my-2 w-full">
-        <View className="w-full  justify-center gap-2">
+    <ScrollView automaticallyAdjustKeyboardInsets className="my-10">
+      <View className="w-full self-center rounded-2xl border border-gray-400 bg-white px-2 py-4">
+        <View className="w-full justify-center gap-2">
           <ControlledDropdown
             control={control}
             name="typeIndex"
@@ -315,7 +290,13 @@ export const AddEditPrescription = ({
             onPress={handleSubmit(callCreateUpdatePrescription)}
           />
         </View>
-        {isShowCalender ? getCalenderView() : <View />}
+        {isShowCalender && (
+          <CalendarView
+            onCancel={() => setIsShowCalender(false)}
+            onClear={handleDateCleared}
+            calendarPickerProps={{ onDateChange: handleDateChange }}
+          />
+        )}
       </View>
     </ScrollView>
   )

@@ -20,6 +20,16 @@ const buttonVariants = tv({
         text: 'text-primary-foreground',
         icon: 'color-primary-foreground'
       },
+      primary: {
+        button: 'bg-primary hover:bg-primary/90 shadow active:opacity-90',
+        text: 'text-primary-foreground',
+        icon: 'color-primary-foreground'
+      },
+      light: {
+        button: 'bg-background hover:bg-background/90 shadow active:opacity-90',
+        text: 'text-foreground',
+        icon: 'color-foreground'
+      },
       destructive: {
         button: 'bg-destructive hover:bg-destructive/90 shadow-sm',
         text: 'text-destructive-foreground',
@@ -92,7 +102,7 @@ const buttonVariants = tv({
     }
   },
   defaultVariants: {
-    variant: 'default',
+    variant: 'primary',
     size: 'default'
   }
 })
