@@ -46,14 +46,9 @@ export function Card({
   const styles = cardVariants({ variant })
 
   return (
-    <ScrollView
-      automaticallyAdjustKeyboardInsets={true}
-      className="overflow-visible"
-    >
-      <ViewComponent className={styles.base({ className })}>
-        {title && <Text className={styles.title()}>{title}</Text>}
-        {children}
-      </ViewComponent>
-    </ScrollView>
+    <ViewComponent className={styles.base({ className })}>
+      {title && <Text className={styles.title()}>{title}</Text>}
+      {children}
+    </ViewComponent>
   )
 }

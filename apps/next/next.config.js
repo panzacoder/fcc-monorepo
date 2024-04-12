@@ -7,6 +7,18 @@ const nextConfig = {
   // https://github.com/nandorojo/moti/issues/224
   // once that gets fixed, set this back to true
   reactStrictMode: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'play.google.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'developer.apple.com'
+      }
+    ]
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
