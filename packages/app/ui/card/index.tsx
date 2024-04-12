@@ -9,7 +9,7 @@ const cardVariants = tv({
   },
   variants: {
     variant: {
-      default: { base: 'bg-card/90', title: 'text-primary-foreground' },
+      default: { base: 'bg-card/85', title: 'text-primary-foreground' },
       secondary: {
         base: 'bg-secondary',
         title: 'text-secondary-foreground'
