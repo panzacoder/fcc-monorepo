@@ -11,7 +11,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
-import { CalendarView } from './calendar-view'
+import { CalendarView, CalendarViewInput } from './calendar-view'
 let prescribedDateUtc: any = ''
 let startDateUtc: any = ''
 let endDateUtc: any = ''
@@ -173,120 +173,105 @@ export const AddEditPrescription = ({
   }
 
   return (
-    <ScrollView automaticallyAdjustKeyboardInsets className="my-10">
-      <View className="w-full self-center rounded-2xl border border-gray-400 bg-white px-2 py-4">
-        <View className="w-full justify-center gap-2">
-          <ControlledDropdown
-            control={control}
-            name="typeIndex"
-            label="Type*"
-            maxHeight={300}
-            list={typesList}
-            className="w-[95%] self-center"
-            defaultValue={
-              !_.isEmpty(prescriptionDetails) &&
-              prescriptionDetails.type &&
-              prescriptionDetails.type.type
-                ? prescriptionDetails.type.type
-                : ''
-            }
-          />
-          <ControlledTextField
-            control={control}
-            name="drugName"
-            placeholder={'Drug Name*'}
-            className="w-[95%] self-center bg-white"
-            autoCapitalize="none"
-          />
-          <ControlledTextField
-            control={control}
-            name="strength"
-            placeholder={'Strength'}
-            className="w-[95%] self-center bg-white"
-            autoCapitalize="none"
-          />
-          <View className="">
-            <PtsComboBox
-              currentData={prescribedBy}
-              listData={doctorList}
-              onSelection={onSelectionPrescriber}
-              placeholderValue={'Prescribed by'}
-            />
-          </View>
-          <PtsComboBox
-            currentData={selectedPharmacy}
-            listData={pharmaciesList}
-            onSelection={onSelectionPharmacy}
-            placeholderValue={'Pharmacy'}
-          />
-          <Pressable
-            onPress={() => {
-              setCalenderClickedCount(0)
-              setIsShowCalender(true)
-            }}
-            className="w-[95%] self-center rounded-lg border-[1px] border-gray-400 py-3"
-          >
-            <Typography
-              className={`ml-4 ${prescribedDate === 'Date Prescribed' ? 'text-gray-400' : 'text-black'} `}
-            >
-              {prescribedDate}
-            </Typography>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setCalenderClickedCount(1)
-              setIsShowCalender(true)
-            }}
-            className="w-[95%] self-center rounded-lg border-[1px] border-gray-400 py-3"
-          >
-            <Typography
-              className={`ml-4 ${startDate === 'Start Date' ? 'text-gray-400' : 'text-black'} `}
-            >
-              {startDate}
-            </Typography>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setCalenderClickedCount(2)
-              setIsShowCalender(true)
-            }}
-            className="w-[95%] self-center rounded-lg border-[1px] border-gray-400 py-3"
-          >
-            <Typography
-              className={`ml-4 ${endDate === 'End Date' ? 'text-gray-400' : 'text-black'} `}
-            >
-              {endDate}
-            </Typography>
-          </Pressable>
-          <ControlledTextField
-            control={control}
-            name="instructions"
-            placeholder={'Instructions'}
-            className="w-[95%] self-center bg-white"
-            autoCapitalize="none"
-          />
-          <ControlledTextField
-            control={control}
-            name="notes"
-            placeholder={'Notes'}
-            className="w-[95%] self-center bg-white"
-            autoCapitalize="none"
-          />
-        </View>
+    <ScrollView
+      automaticallyAdjustKeyboardInsets
+      className="my-10 overflow-visible"
+    >
+      <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
+        <ControlledDropdown
+          control={control}
+          name="typeIndex"
+          label="Type*"
+          maxHeight={300}
+          list={typesList}
+          className="w-full"
+          defaultValue={
+            !_.isEmpty(prescriptionDetails) &&
+            prescriptionDetails.type &&
+            prescriptionDetails.type.type
+              ? prescriptionDetails.type.type
+              : ''
+          }
+        />
+        <ControlledTextField
+          control={control}
+          name="drugName"
+          placeholder={'Drug Name*'}
+          className="w-full"
+          autoCapitalize="none"
+        />
+        <ControlledTextField
+          control={control}
+          name="strength"
+          placeholder={'Strength'}
+          className="w-full"
+          autoCapitalize="none"
+        />
+        <PtsComboBox
+          currentData={prescribedBy}
+          listData={doctorList}
+          onSelection={onSelectionPrescriber}
+          placeholderValue={'Prescribed by'}
+        />
+        <PtsComboBox
+          currentData={selectedPharmacy}
+          listData={pharmaciesList}
+          onSelection={onSelectionPharmacy}
+          placeholderValue={'Pharmacy'}
+        />
 
-        <View className="my-2 mt-5 flex-row justify-center">
+        <CalendarViewInput
+          label="Date prescribed:"
+          value={prescribedDate}
+          onPress={() => {
+            setCalenderClickedCount(0)
+            setIsShowCalender(true)
+          }}
+        />
+
+        <CalendarViewInput
+          label="Start date:"
+          value={startDate}
+          onPress={() => {
+            setCalenderClickedCount(1)
+            setIsShowCalender(true)
+          }}
+        />
+
+        <CalendarViewInput
+          label="End date:"
+          value={endDate}
+          onPress={() => {
+            setCalenderClickedCount(2)
+            setIsShowCalender(true)
+          }}
+        />
+
+        <ControlledTextField
+          control={control}
+          name="instructions"
+          placeholder={'Instructions'}
+          autoCapitalize="none"
+        />
+        <ControlledTextField
+          control={control}
+          name="notes"
+          placeholder={'Notes'}
+          autoCapitalize="none"
+        />
+
+        <View className="mt-2 flex flex-row justify-end gap-2">
           <Button
-            className="bg-[#86939e]"
+            className="basis-1/4"
             title="Cancel"
-            variant="default"
+            variant="outline-destructive"
             onPress={() => {
               cancelClicked()
             }}
           />
           <Button
-            className="ml-5"
+            className="flex-1"
             title={'Save'}
-            variant="default"
             onPress={handleSubmit(callCreateUpdatePrescription)}
           />
         </View>

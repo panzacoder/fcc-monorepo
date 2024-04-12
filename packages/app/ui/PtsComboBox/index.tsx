@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { TextInput, ScrollView, View, Pressable } from 'react-native'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
-import store from 'app/redux/store'
 export const PtsComboBox = ({
   currentData,
   listData,
@@ -14,16 +13,15 @@ export const PtsComboBox = ({
 
   return (
     <View className="">
-      <View className="focus:border-primary active:border-primary w-[95%] flex-row self-center rounded-lg border-[1px] border-gray-400 py-2">
+      <View className="focus:border-primary active:border-primary w-full flex-row rounded-lg border border-gray-400 py-3">
         <TextInput
-          className={'w-[80%] flex-1 px-4'}
+          className={'flex-1 px-4'}
           keyboardType={'default'}
           defaultValue={purpose}
           placeholder={placeholderValue}
           onChangeText={(text) => {
             setPurpose(text)
             onSelection(text)
-            // console.log('purpose', purpose)
           }}
         />
         <Feather

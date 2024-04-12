@@ -1,14 +1,16 @@
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import CalendarPicker, {
   CalendarPickerProps
 } from 'react-native-calendar-picker'
 import { Button } from '../button'
+import { Typography } from '../typography'
 
 export type CalenderViewProps = {
   calendarPickerProps: CalendarPickerProps
   onCancel: () => void
   onClear: () => void
 }
+
 export function CalendarView({ calendarPickerProps, onCancel, onClear }) {
   return (
     <View className="absolute top-[40] w-full self-center bg-white">
@@ -29,5 +31,28 @@ export function CalendarView({ calendarPickerProps, onCancel, onClear }) {
         onPress={onClear}
       />
     </View>
+  )
+}
+
+export type CalendarPickerInputProps = {
+  label: string
+  onPress: () => void
+  value: string
+}
+
+export function CalendarViewInput({ label, onPress, value }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="flex w-full flex-row justify-between rounded-lg border border-gray-400 px-4 py-3"
+    >
+      <Typography className={`text-muted-foreground leading-tight`}>
+        {label}
+      </Typography>
+
+      <Typography className={`text-foreground leading-tight`}>
+        {value}
+      </Typography>
+    </Pressable>
   )
 }

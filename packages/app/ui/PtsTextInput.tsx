@@ -42,7 +42,7 @@ const PtsTextInput = React.forwardRef(function PtsTextInput(
       <TextInput
         ref={ref}
         className={cn(
-          'active:border-primary focus:border-primary h-11 flex-1 flex-row rounded-lg  border-[1px] border-gray-400 px-4 placeholder:text-gray-400',
+          'active:border-primary focus:border-primary flex-1 flex-row rounded-lg  border-[1px] border-gray-400 px-4 py-3 placeholder:text-gray-400',
           editable ? '' : 'text-muted-foreground',
           textClassName
         )}
