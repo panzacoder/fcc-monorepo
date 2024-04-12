@@ -49,7 +49,7 @@ export function DoctorsListScreen() {
     getDoctorDetails()
   }, [])
   return (
-    <View className="flex-1  bg-white">
+    <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
@@ -81,7 +81,7 @@ export function DoctorsListScreen() {
           </View>
         </View>
       </View>
-      <ScrollView className="m-2 mx-5 w-[95%] self-center">
+      <ScrollView className="m-2 mx-5 w-full self-center">
         {doctorList.map((data: any, index: number) => {
           return (
             <TouchableOpacity
@@ -94,7 +94,7 @@ export function DoctorsListScreen() {
                 )
               }}
               key={index}
-              className="border-primary my-[5px] w-[95%] flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+              className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
               <View className="my-2 flex-row">
                 <Typography className="text-primary font-400 ml-5 w-[45%]">
@@ -106,7 +106,7 @@ export function DoctorsListScreen() {
                 </Typography>
               </View>
               <View className="flex-row">
-                <View className="w-[65%]">
+                <View className="w-[70%]">
                   <Typography className="ml-5 ">
                     {data.locations ? data.locations : ''}
                   </Typography>

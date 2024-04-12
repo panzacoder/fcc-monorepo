@@ -2,7 +2,7 @@
 export const BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   process.env.EXPO_PUBLIC_BACKEND_URL ||
-  'http://45.79.147.166:8000/fccApi/2.0/'
+  'https://45.79.147.166:8000/fccApi/2.0/'
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
 export const CREATE_ACCOUNT = 'regms/create'
@@ -107,3 +107,11 @@ export const UPDATE_INCIDENT = 'incidentms/update'
 export const UPDATE_INCIDENT_NOTE = 'incidentms/updateNote'
 export const GET_MEMBER_THREADS = 'messageThreadms/getMemberThreads'
 export const GET_THREAD = 'messageThreadms/getThread'
+export const GET_PRESCRIPTION_LIST = 'medicinems/getFilteredList'
+export const GET_PRESCRIPTION = 'medicinems/get'
+export const DELETE_PRESCRIPTION = 'medicinems/delete'
+export const GET_PHARMACY_LIST = 'facilityms/getMemberPharmacyList'
+export const GET_ACTIVE_DOCTORS = 'doctorms/getActiveDoctors'
+export const GET_INCIDENT_NOTE = 'incidentms/getNote'
+export const CREATE_PRESCRIPTION = 'medicinems/create'
+export const UPDATE_PRESCRIPTION = 'medicinems/update'

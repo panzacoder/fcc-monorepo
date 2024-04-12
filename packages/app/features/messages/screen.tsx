@@ -21,7 +21,7 @@ import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-let eventsPrivileges = {}
+let messagePrivileges = {}
 
 export function MessagesScreen() {
   const header = store.getState().headerState.header
@@ -55,7 +55,7 @@ export function MessagesScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('data', JSON.stringify(data.data.eventList))
             if (data.data.domainObjectPrivileges) {
-              eventsPrivileges = data.data.domainObjectPrivileges.MESSAGETHREAD
+              messagePrivileges = data.data.domainObjectPrivileges.MESSAGETHREAD
                 ? data.data.domainObjectPrivileges.MESSAGETHREAD
                 : {}
             }
@@ -216,7 +216,7 @@ export function MessagesScreen() {
             color={'black'}
           />
         </Pressable>
-        {getUserPermission(eventsPrivileges).createPermission ? (
+        {getUserPermission(messagePrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <Pressable
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
