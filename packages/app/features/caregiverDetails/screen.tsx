@@ -5,33 +5,47 @@ import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
+import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { getFullDateForCalender } from 'app/ui/utils'
-import { BASE_URL, GET_CAREGIVER_DETAILS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
+import {
+  BASE_URL,
+  DELETE_CAREGIVER,
+  GET_CAREGIVER_DETAILS,
+  UPDATE_CAREGIVER
+} from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
+import { useParams } from 'solito/navigation'
 import { useRouter } from 'solito/navigation'
-import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
-
+import { getUserPermission } from 'app/utils/getUserPemissions'
+let caregiverPrivileges = {}
 export function CaregiverDetailsScreen() {
-  // console.log('in caregiverDetailsScreen')
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
+  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let caregiverInfo = item.caregiverDetails
     ? JSON.parse(item.caregiverDetails)
     : {}
-  // console.log('caregiverDetails', '' + JSON.stringify(caregiverInfo))
+  // console.log('memberData', '' + JSON.stringify(memberData))
+
   const [isLoading, setLoading] = useState(false)
+  const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
+  const [isAddCaregiver, setIsAddCaregiver] = useState(false)
+
   const [fullName, setFullName] = useState('')
   const [status, setStatus] = useState('')
   const [profile, setProfile] = useState('')
   const [email, setEmail] = useState('')
   const [caregiverDetails, setCaregiverDetails] = useState({}) as any
-
+  let memberFullName = ''
+  if (!_.isEmpty(memberData)) {
+    memberFullName += memberData.firstname ? memberData.firstname : ''
+    memberFullName += memberData.lastname ? ' ' + memberData.lastname : ''
+  }
+  const [memberName, setMemberName] = useState(memberFullName)
   const getCaregiverDetails = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_CAREGIVER_DETAILS}`
@@ -46,7 +60,11 @@ export function CaregiverDetailsScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setCaregiverDetails(data.data.familyMember || {})
-          // console.log('appointmentList', JSON.stringify(appointmentList))
+          if (data.data.domainObjectPrivileges) {
+            caregiverPrivileges = data.data.domainObjectPrivileges.Caregiver
+              ? data.data.domainObjectPrivileges.Caregiver
+              : {}
+          }
           if (data.data.familyMember) {
             let details = data.data.familyMember
             let fullName = ''
@@ -88,12 +106,7 @@ export function CaregiverDetailsScreen() {
   }, [])
   let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[75%] text-[15px] font-bold text-[#1A1A1A]'
-  function getDetailsView(
-    title: string,
-    value: string,
-    isIcon: boolean,
-    iconValue: any
-  ) {
+  function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">
         <View className="w-full flex-row">
@@ -102,29 +115,67 @@ export function CaregiverDetailsScreen() {
             <Typography className={valueStyle}>{value}</Typography>
           ) : (
             <Typography
-              // className={
-              //   value.toLowerCase() === 'active'
-              //     ? "ml-2 mr-5 rounded-[5px] bg-['#27ae60'] px-5 text-right text-white font-bold py-1"
-              //     : "ml-2 mr-5 rounded-[5px] bg-['#d5d8dc'] px-5 text-right font-bold py-1"
-              // }
               className={`ml-2 mr-5 rounded-[5px] px-5 py-1 text-right font-bold ${value.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
             >
               {value}
             </Typography>
           )}
         </View>
-        {isIcon ? (
-          <Feather
-            className="ml-[-10px]"
-            name={iconValue}
-            size={20}
-            color={'black'}
-          />
-        ) : (
-          <View />
-        )}
       </View>
     )
+  }
+  const cancelClicked = () => {
+    setIsAddCaregiver(false)
+  }
+  async function deleteCaregiver() {
+    setLoading(true)
+    let url = `${BASE_URL}${DELETE_CAREGIVER}`
+    let dataObject = {
+      header: header,
+      familyMember: {
+        id: caregiverInfo.id ? caregiverInfo.id : '',
+        memberId: memberData.member ? memberData.member : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          router.replace(
+            formatUrl('/circles/caregiversList', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
+  async function createUpdateCaregiver(object: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${UPDATE_CAREGIVER}`
+    let dataObject = {
+      header: header,
+      familyMember: object
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          getCaregiverDetails()
+          setIsAddCaregiver(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
   }
   return (
     <View className="flex-1">
@@ -140,23 +191,65 @@ export function CaregiverDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  // router.push(
-                  //   formatUrl('/circles/addEditDoctor', {
-                  //     memberData: JSON.stringify(memberData),
-                  //     caregiverDetails: JSON.stringify(caregiverDetails),
-                  //     component: 'Doctor'
-                  //   })
-                  // )
+                  setIsAddCaregiver(true)
                 }}
               />
             </View>
-            {getDetailsView('Name', fullName, false, '')}
-            {getDetailsView('Email', email, false, '')}
-            {getDetailsView('Status', status, false, '')}
-            {getDetailsView('Profile', profile, false, '')}
+            {getDetailsView('Name', fullName)}
+            {getDetailsView('Email', email)}
+            {getDetailsView('Status', status)}
+            <View className="flex-row">
+              {getDetailsView('Profile', profile)}
+              <Feather
+                onPress={() => {
+                  setIsShowProfileInfo(true)
+                }}
+                className="ml-[-10px] mt-2"
+                name={'info'}
+                size={20}
+                color={'#1a7088'}
+              />
+            </View>
+
+            {getUserPermission(caregiverPrivileges).deletePermission ? (
+              <View className="my-5">
+                <Button
+                  className=""
+                  title="Delete"
+                  variant="borderRed"
+                  onPress={() => {
+                    Alert.alert(
+                      '',
+                      `Dear ${memberName}, \nYou are about to remove ${fullName} from circle of ${memberName}.\n\nOnce removed, ${fullName} cannot view or monitor appointments, Incidents, Purchases, Notes and Communications associated with ${memberName}.\n\nDo you want to continue?`,
+                      [
+                        {
+                          text: 'Ok',
+                          onPress: () => deleteCaregiver()
+                        },
+                        { text: 'Cancel', onPress: () => {} }
+                      ]
+                    )
+                  }}
+                />
+              </View>
+            ) : (
+              <View />
+            )}
           </View>
         </ScrollView>
       </View>
+      {isAddCaregiver ? (
+        <View className="h-full w-full ">
+          <AddEditCaregiver
+            caregiverDetails={caregiverDetails}
+            cancelClicked={cancelClicked}
+            createUpdateCaregiver={createUpdateCaregiver}
+            memberData={memberData}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

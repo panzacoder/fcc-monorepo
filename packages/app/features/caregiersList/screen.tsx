@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -13,8 +13,14 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
+import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_MEMBER_CAREGIVERS } from 'app/utils/urlConstants'
+import {
+  BASE_URL,
+  GET_MEMBER_CAREGIVERS,
+  CREATE_CAREGIVER,
+  RESEND_CAREGIVER_REQEST
+} from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
 import { formatUrl } from 'app/utils/format-url'
@@ -33,40 +39,40 @@ export function CaregiversListScreen() {
   const item = useParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
-  useEffect(() => {
-    async function getCaregiversList() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_CAREGIVERS}`
-      let dataObject = {
-        header: header,
-        familyMember: {
-          memberId: memberData.member ? memberData.member : ''
-        }
+  const getCaregiversList = useCallback(async () => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_MEMBER_CAREGIVERS}`
+    let dataObject = {
+      header: header,
+      familyMember: {
+        memberId: memberData.member ? memberData.member : ''
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.domainObjectPrivileges) {
-              caregiverPrivileges = data.data.domainObjectPrivileges.Caregiver
-                ? data.data.domainObjectPrivileges.Caregiver
-                : {}
-            }
-            let list = data.data.familyMemberList
-              ? data.data.familyMemberList
-              : []
-            getFilteredList(list, currentFilter)
-            setCaregiversListFull(list)
-            setIsDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log('error', error)
-        })
     }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          if (data.data.domainObjectPrivileges) {
+            caregiverPrivileges = data.data.domainObjectPrivileges.Caregiver
+              ? data.data.domainObjectPrivileges.Caregiver
+              : {}
+          }
+          let list = data.data.familyMemberList
+            ? data.data.familyMemberList
+            : []
+          getFilteredList(list, currentFilter)
+          setCaregiversListFull(list)
+          setIsDataReceived(true)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }, [])
+  useEffect(() => {
     getCaregiversList()
   }, [])
   function setFilteredList(filter: any) {
@@ -89,7 +95,48 @@ export function CaregiversListScreen() {
   const cancelClicked = () => {
     setIsAddCaregiver(false)
   }
-  async function createUpdateMedicalDevice(object: any) {}
+  async function createUpdateCaregiver(object: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${CREATE_CAREGIVER}`
+    let dataObject = {
+      header: header,
+      familyMember: object
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          getCaregiversList()
+          setIsAddCaregiver(false)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
+  async function resendRequest(object: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${RESEND_CAREGIVER_REQEST}`
+    let dataObject = {
+      header: header,
+      memberVo: {
+        id: object.member ? object.member : '',
+        familyMemberMemberId: object.id ? object.id : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        Alert.alert('', data.message)
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
   return (
     <View className="flex-1">
       <View className="">
@@ -116,11 +163,6 @@ export function CaregiversListScreen() {
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                 onPress={() => {
-                  // router.push(
-                  //   formatUrl('/circles/addEditAppointment', {
-                  //     memberData: JSON.stringify(memberData)
-                  //   })
-                  // )
                   setIsAddCaregiver(true)
                 }}
               >
@@ -229,6 +271,20 @@ export function CaregiversListScreen() {
               ) : (
                 <View />
               )}
+              {data.showResendRequest ? (
+                <View className="flex-row justify-center">
+                  <Button
+                    className="bg-[#1a7088]"
+                    title={'Resend Request'}
+                    variant="default"
+                    onPress={() => {
+                      resendRequest(data)
+                    }}
+                  />
+                </View>
+              ) : (
+                <View />
+              )}
             </TouchableOpacity>
           )
         })}
@@ -246,7 +302,8 @@ export function CaregiversListScreen() {
           <AddEditCaregiver
             caregiverDetails={{}}
             cancelClicked={cancelClicked}
-            createUpdateCaregiver={createUpdateMedicalDevice}
+            createUpdateCaregiver={createUpdateCaregiver}
+            memberData={memberData}
           />
         </View>
       ) : (

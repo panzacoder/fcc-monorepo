@@ -227,7 +227,7 @@ export function AddEditLocationScreen() {
     setLoading(true)
     let stateObject = statesListFull[formData.state]
     let countryObject: object = staticData.countryList[formData.country]
-    let dataObject = {}
+    let dataObject = {} as any
     let addressObject = {
       operation: 'add',
       shortDescription: formData.locationShortName,
