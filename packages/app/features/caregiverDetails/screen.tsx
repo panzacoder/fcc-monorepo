@@ -9,6 +9,7 @@ import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
+import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import {
   BASE_URL,
   DELETE_CAREGIVER,
@@ -126,6 +127,12 @@ export function CaregiverDetailsScreen() {
   }
   const cancelClicked = () => {
     setIsAddCaregiver(false)
+    setIsShowProfileInfo(false)
+  }
+
+  const infoClicked = () => {
+    setIsAddCaregiver(false)
+    setIsShowProfileInfo(true)
   }
   async function deleteCaregiver() {
     setLoading(true)
@@ -245,7 +252,15 @@ export function CaregiverDetailsScreen() {
             cancelClicked={cancelClicked}
             createUpdateCaregiver={createUpdateCaregiver}
             memberData={memberData}
+            infoClicked={infoClicked}
           />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isShowProfileInfo ? (
+        <View className="h-full w-full justify-center">
+          <CaregiverProfileInfo cancelClicked={cancelClicked} />
         </View>
       ) : (
         <View />
