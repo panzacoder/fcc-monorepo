@@ -8,7 +8,8 @@ import Image from 'next/image'
 export default function LinkPage() {
   const APKUrl =
     'https://play.google.com/store/apps/details?id=com.familycarecircle.fccmobileapp&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'
-  const IOSUrl = 'https://apps.apple.com/us/app/family-care-circle/id1602521967'
+  const IOSUrl =
+    'https://apps.apple.com/us/app/family-care-circle-mobile-app/id1602521967?ppid=a1dcf835-b698-4a4d-bc42-0777b16175a0'
 
   return (
     <div className="flex h-full flex-col items-center justify-start py-8">
