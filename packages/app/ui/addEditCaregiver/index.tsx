@@ -5,9 +5,12 @@ import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import { CallPostService } from 'app/utils/fetchServerData'
+import { BASE_URL, FIND_CAREGIVER_BY_EMAIL_PHONE } from 'app/utils/urlConstants'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 let profile = ''
@@ -20,14 +23,20 @@ const schema = z.object({
   lastName: z.string().min(1, { message: 'Last name is required ' })
 })
 export type Schema = z.infer<typeof schema>
-
+let email = ''
 export const AddEditCaregiver = ({
   caregiverDetails,
   cancelClicked,
   createUpdateCaregiver,
-  memberData
+  memberData,
+  infoClicked
 }) => {
   const staticData: any = store.getState().staticDataState.staticData
+  const header = store.getState().headerState.header
+  const [isLoading, setLoading] = useState(false)
+  const [memberId, setMemberId] = useState('')
+  const [memberEmail, setMemberEmail] = useState('')
+  const [isMemberFound, setIsMemberFound] = useState(false)
   const [status, setStatus] = useState(
     !_.isEmpty(caregiverDetails) && caregiverDetails.familyMemberMemberStatus
       ? caregiverDetails.familyMemberMemberStatus.status
@@ -36,14 +45,18 @@ export const AddEditCaregiver = ({
   // console.log('caregiverDetails', JSON.stringify(caregiverDetails))
   let fullName = ''
   if (!_.isEmpty(caregiverDetails)) {
-    fullName += caregiverDetails.firstName
-    fullName += ' ' + caregiverDetails.lastName
+    fullName += caregiverDetails.firstName ? caregiverDetails.firstName : ''
+    fullName += caregiverDetails.middleName
+      ? ' ' + caregiverDetails.middleName
+      : ''
+    fullName += caregiverDetails.lastName ? ' ' + caregiverDetails.lastName : ''
     if (caregiverDetails.relationRole) {
       profile = caregiverDetails.relationRole.name
         ? caregiverDetails.relationRole.name
         : ''
     }
   }
+  const [memberName, setMemberName] = useState(fullName)
   const profileList = staticData.profileList.map((data: any, index: any) => {
     if (!_.isEmpty(caregiverDetails)) {
       if (profile === data.name) {
@@ -55,7 +68,7 @@ export const AddEditCaregiver = ({
       id: index + 1
     }
   })
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       profileIndex: profileIndex,
       email:
@@ -77,9 +90,58 @@ export const AddEditCaregiver = ({
     },
     resolver: zodResolver(schema)
   })
+  async function findCaregiver() {
+    if (email !== '') {
+      setLoading(true)
+      let url = `${BASE_URL}${FIND_CAREGIVER_BY_EMAIL_PHONE}`
+      let dataObject = {
+        header: header,
+        member: {
+          email: email
+        }
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            // console.log('findCaregiver', JSON.stringify(data))
+            data.data ? setIsMemberFound(true) : setIsMemberFound(false)
+            if (data.data) {
+              fullName += data.data.firstName ? data.data.firstName : ''
+              fullName += data.data.middleName ? '' + data.data.middleName : ''
+              fullName += data.data.lastName ? ' ' + data.data.lastName : ''
+              setMemberName(fullName)
+              setMemberId(data.data.id ? data.data.id : '')
+              setMemberEmail(data.data.email ? data.data.email : '')
+              reset({
+                email: 'default',
+                firstName: 'default',
+                phone: 'default',
+                lastName: 'default'
+              })
+            }
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    }
+  }
   async function callCreateUpdateDevice(formData: Schema) {
     let object = {}
-    if (_.isEmpty(caregiverDetails)) {
+    if (isMemberFound) {
+      object = {
+        memberId: memberData.member ? memberData.member : '',
+        familyMemberId: memberId,
+        relationRole: {
+          name: staticData.profileList[formData.profileIndex - 1].name,
+          uid: staticData.profileList[formData.profileIndex - 1].uid
+        }
+      }
+    } else if (_.isEmpty(caregiverDetails)) {
       object = {
         email: formData.email,
         phone: formData.phone,
@@ -105,7 +167,7 @@ export const AddEditCaregiver = ({
       }
     }
 
-    // console.log('object', JSON.stringify(object))
+    console.log('object', JSON.stringify(object))
     createUpdateCaregiver(object)
   }
   let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'
@@ -140,63 +202,124 @@ export const AddEditCaregiver = ({
     <ScrollView
       className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[80%]' : ' mt-10 max-h-[60%]'} w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 `}
     >
+      <PtsLoader loading={isLoading} />
+
       <View className="my-2 w-full">
-        {_.isEmpty(caregiverDetails) ? (
-          <View className="my-2 w-full justify-center">
-            <ControlledTextField
-              control={control}
-              name="email"
-              placeholder={'Email*'}
-              className="mt-2 w-[95%] self-center bg-white"
-              autoCapitalize="none"
-            />
-            <ControlledTextField
-              control={control}
-              name="phone"
-              placeholder={'Phone'}
-              className="mt-2 w-[95%] self-center bg-white"
-              autoCapitalize="none"
-            />
-            <ControlledTextField
-              control={control}
-              name="firstName"
-              placeholder={'First Name*'}
-              className="mt-2 w-[95%] self-center bg-white"
-              autoCapitalize="none"
-            />
-            <ControlledTextField
-              control={control}
-              name="lastName"
-              placeholder={'Last Name*'}
-              className="mt-2 w-[95%] self-center bg-white"
-              autoCapitalize="none"
-            />
-            <ControlledDropdown
-              control={control}
-              name="profileIndex"
-              label="Profile*"
-              maxHeight={300}
-              list={profileList}
-              className="mt-2 w-[95%] self-center"
-              defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-            />
-          </View>
-        ) : (
+        {isMemberFound ? (
           <View className="my-2 w-full justify-center">
             <View className="mx-[10px]">
-              {getDetailsView('Name', fullName)}
-              {getDetailsView('Email', caregiverDetails.email)}
-              {getDetailsView('Status', status)}
+              {getDetailsView('Name', memberName)}
+              {getDetailsView('Email', memberEmail)}
             </View>
-            <ControlledDropdown
-              control={control}
-              name="profileIndex"
-              label="Profile*"
-              maxHeight={300}
-              list={profileList}
-              className="mt-2 w-[95%] self-center"
-              defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-            />
+            <View className="flex-row">
+              <ControlledDropdown
+                control={control}
+                name="profileIndex"
+                label="Profile*"
+                maxHeight={300}
+                list={profileList}
+                className="ml-2 mt-2 w-[85%]"
+                defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+              />
+              <Feather
+                onPress={() => {
+                  infoClicked()
+                }}
+                className="ml-2 mt-2 self-center"
+                name={'info'}
+                size={20}
+                color={'#1a7088'}
+              />
+            </View>
+          </View>
+        ) : (
+          <View>
+            {_.isEmpty(caregiverDetails) ? (
+              <View className="my-2 w-full justify-center">
+                <ControlledTextField
+                  control={control}
+                  name="email"
+                  placeholder={'Email*'}
+                  className="mt-2 w-[95%] self-center bg-white"
+                  autoCapitalize="none"
+                  onChangeText={(text) => {
+                    email = text
+                  }}
+                  onBlur={() => {
+                    findCaregiver()
+                  }}
+                />
+                <ControlledTextField
+                  control={control}
+                  name="phone"
+                  placeholder={'Phone'}
+                  className="mt-2 w-[95%] self-center bg-white"
+                  autoCapitalize="none"
+                />
+                <ControlledTextField
+                  control={control}
+                  name="firstName"
+                  placeholder={'First Name*'}
+                  className="mt-2 w-[95%] self-center bg-white"
+                  autoCapitalize="none"
+                />
+                <ControlledTextField
+                  control={control}
+                  name="lastName"
+                  placeholder={'Last Name*'}
+                  className="mt-2 w-[95%] self-center bg-white"
+                  autoCapitalize="none"
+                />
+                <View className="flex-row">
+                  <ControlledDropdown
+                    control={control}
+                    name="profileIndex"
+                    label="Profile*"
+                    maxHeight={300}
+                    list={profileList}
+                    className="ml-2 mt-2 w-[85%]"
+                    defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                  />
+                  <Feather
+                    onPress={() => {
+                      infoClicked()
+                    }}
+                    className="ml-2 mt-2 self-center"
+                    name={'info'}
+                    size={20}
+                    color={'#1a7088'}
+                  />
+                </View>
+              </View>
+            ) : (
+              <View className="my-2 w-full justify-center">
+                <View className="mx-[10px]">
+                  {getDetailsView('Name', fullName)}
+                  {getDetailsView('Email', caregiverDetails.email)}
+                  {getDetailsView('Status', status)}
+                </View>
+                <View className="flex-row">
+                  <ControlledDropdown
+                    control={control}
+                    name="profileIndex"
+                    label="Profile*"
+                    maxHeight={300}
+                    list={profileList}
+                    className="ml-2 mt-2 w-[85%]"
+                    defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                  />
+                  <Feather
+                    onPress={() => {
+                      infoClicked()
+                    }}
+                    className="ml-2 mt-2 self-center"
+                    name={'info'}
+                    size={20}
+                    color={'#1a7088'}
+                  />
+                </View>
+              </View>
+            )}
           </View>
         )}
 

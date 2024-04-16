@@ -26,12 +26,14 @@ import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 let caregiverPrivileges = {}
 export function CaregiversListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isAddCaregiver, setIsAddCaregiver] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
   const [caregiversList, setCaregiversList] = useState([]) as any
   const [caregiversListFull, setCaregiversListFull] = useState([])
@@ -94,6 +96,11 @@ export function CaregiversListScreen() {
   }
   const cancelClicked = () => {
     setIsAddCaregiver(false)
+    setIsShowProfileInfo(false)
+  }
+  const infoClicked = () => {
+    setIsAddCaregiver(false)
+    setIsShowProfileInfo(true)
   }
   async function createUpdateCaregiver(object: any) {
     setLoading(true)
@@ -304,7 +311,15 @@ export function CaregiversListScreen() {
             cancelClicked={cancelClicked}
             createUpdateCaregiver={createUpdateCaregiver}
             memberData={memberData}
+            infoClicked={infoClicked}
           />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isShowProfileInfo ? (
+        <View className="h-full w-full ">
+          <CaregiverProfileInfo cancelClicked={cancelClicked} />
         </View>
       ) : (
         <View />
