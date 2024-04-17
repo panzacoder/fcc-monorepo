@@ -79,12 +79,10 @@ export const AddEditNote = ({
   }
 
   async function callCreateUpdateNote(formData: Schema) {
-    createUpdateNote(
-      occuranceList[formData.occurrence].label,
-      formData.noteDetails,
-      formData.title,
-      noteData
-    )
+    let occurance = occuranceList[formData.occurrence]?.label
+      ? occuranceList[formData.occurrence]?.label
+      : ''
+    createUpdateNote(occurance, formData.noteDetails, formData.title, noteData)
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">

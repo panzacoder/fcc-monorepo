@@ -134,3 +134,4 @@ export const UPDATE_CAREGIVER = 'caregiverms/update'
 export const DELETE_CAREGIVER = 'caregiverms/delete'
 export const FIND_CAREGIVER_BY_EMAIL_PHONE = 'memberms/findByEmailOrPhone'
 export const RESEND_CAREGIVER_REQEST = 'memberms/resendRequest'
+export const GET_TC_HTML_CONTENT = 'apTermsConditions/geActive';

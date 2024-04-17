@@ -11,11 +11,16 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
+import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'solito/navigation'
-
+let facilityPrivileges = {}
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [facilityList, setfacilityList] = useState([])
+  const [isDataReceived, setIsDataReceived] = useState(false)
+  const [facilityList, setFacilityList] = useState([]) as any
+  const [facilityListFull, setFacilityListFull] = useState([]) as any
+  const [currentFilter, setCurrentFilter] = useState('Active')
+  const [isShowFilter, setIsShowFilter] = useState(false)
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
@@ -35,7 +40,16 @@ export function FacilitiesListScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            setfacilityList(data.data.list ? data.data.list : [])
+            if (data.data.domainObjectPrivileges) {
+              facilityPrivileges = data.data.domainObjectPrivileges.Facility
+                ? data.data.domainObjectPrivileges.Facility
+                : {}
+            }
+            let list = data.data.list ? data.data.list : []
+            setFacilityList(list)
+            setFacilityListFull(list)
+            getFilteredList(list, currentFilter)
+            setIsDataReceived(true)
           } else {
             Alert.alert('', data.message)
           }
@@ -48,40 +62,107 @@ export function FacilitiesListScreen() {
     }
     getFacilityDetails()
   }, [])
-
+  function setFilteredList(filter: any) {
+    setIsShowFilter(false)
+    setCurrentFilter(filter)
+    getFilteredList(facilityListFull, filter)
+  }
+  async function getFilteredList(list: any, filter: any) {
+    let filteredList: any[] = []
+    list.map((data: any, index: any) => {
+      let type = data.type && data.type.type ? data.type.type : ''
+      if (filter === 'All') {
+        filteredList = list
+      } else if (filter === data.status) {
+        filteredList.push(data)
+      }
+    })
+    setFacilityList(filteredList)
+  }
   return (
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
-          <Pressable className="w-[85%] flex-row">
+          <Pressable
+            onPress={() => {
+              setIsShowFilter(!isShowFilter)
+            }}
+            className="w-[85%] flex-row"
+          >
             <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-              {'Filter'}
+              {currentFilter}
             </Typography>
-
             <Feather
               className="ml-2 mt-6"
-              name={'chevron-down'}
+              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
               size={25}
               color={'black'}
             />
           </Pressable>
-          <View className=" mt-[20] self-center">
-            <Pressable
-              className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-              onPress={() => {
-                router.push(
-                  formatUrl('/circles/addEditFacility', {
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
-              }}
-            >
-              <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
-          </View>
+          {getUserPermission(facilityPrivileges).createPermission ? (
+            <View className=" mt-[20] self-center">
+              <Pressable
+                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/addEditFacility', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
+              >
+                <Feather name={'plus'} size={25} color={COLORS.primary} />
+              </Pressable>
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
       </View>
+      {isShowFilter ? (
+        <View className="ml-5 w-[40%]">
+          <Pressable
+            className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
+            onPress={() => {
+              setFilteredList('Active')
+            }}
+          >
+            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
+              {'Active'}
+            </Typography>
+          </Pressable>
+          <Pressable
+            className={`${currentFilter === 'InActive' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
+            onPress={() => {
+              setFilteredList('InActive')
+            }}
+          >
+            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+              {'InActive'}
+            </Typography>
+          </Pressable>
+          <Pressable
+            className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
+            onPress={() => {
+              setFilteredList('All')
+            }}
+          >
+            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+              {'All'}
+            </Typography>
+          </Pressable>
+        </View>
+      ) : (
+        <View />
+      )}
+      {isDataReceived && facilityList.length === 0 ? (
+        <View className="flex-1 items-center justify-center self-center">
+          <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} facilities`}</Typography>
+        </View>
+      ) : (
+        <View />
+      )}
       <ScrollView className="m-2 w-full self-center">
         {facilityList.map((data: any, index: number) => {
           return (

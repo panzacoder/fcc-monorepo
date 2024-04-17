@@ -270,7 +270,7 @@ export function AddEditAppointmentScreen() {
                 appointmentDetails.type &&
                 appointmentDetails.type.type
                   ? appointmentDetails.type.type
-                  : ''
+                  : '' 
               }
               maxHeight={300}
               list={typesList}
