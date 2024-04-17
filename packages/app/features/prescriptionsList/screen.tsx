@@ -427,6 +427,7 @@ export function PrescriptionsListScreen() {
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
           <Pressable
+            className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Active')
             }}
@@ -436,6 +437,7 @@ export function PrescriptionsListScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'NotTaking' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('NotTaking')
             }}
@@ -445,6 +447,7 @@ export function PrescriptionsListScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
             }}

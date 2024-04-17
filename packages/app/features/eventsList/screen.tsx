@@ -296,6 +296,7 @@ export function EventsListScreen() {
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
           <Pressable
+            className={`${currentFilter === 'Upcoming' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Upcoming')
             }}
@@ -305,6 +306,7 @@ export function EventsListScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Completed' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Completed')
             }}
@@ -314,6 +316,7 @@ export function EventsListScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Cancelled' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Cancelled')
             }}
@@ -323,6 +326,7 @@ export function EventsListScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
             }}

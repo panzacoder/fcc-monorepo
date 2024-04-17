@@ -174,7 +174,7 @@ export function SignUpScreen() {
               }}
             />
           </View>
-          <View className="flex flex-row items-center justify-center">
+          <View className="flex flex-row items-center justify-center ">
             <Controller
               name="acceptTc"
               render={({ field: { onChange, value }, fieldState }) => (
@@ -188,8 +188,22 @@ export function SignUpScreen() {
                 />
               )}
             />
-            <Typography className="flex-1">
-              {'I accept the Terms and Conditions and Privacy Policy'}
+            <Typography className="flex-1 ml-[-10px]">
+              {'I accept the '}
+              <Typography
+                onPress={() => {
+                  router.push(
+                    formatUrl('/(termsAndPolicy)/termsAndConditions', {})
+                  )
+                }}
+                className="text-primary  font-bold"
+              >
+                {' Terms and Conditions '}
+              </Typography>
+              <Typography>{' and '}</Typography>
+              <Typography className="text-primary font-bold">
+                {' Privacy Policy '}
+              </Typography>
             </Typography>
           </View>
           <Button

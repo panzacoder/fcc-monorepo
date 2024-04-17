@@ -47,7 +47,7 @@ export function NoteMessageScreen() {
   let noteData = item.noteData !== undefined ? JSON.parse(item.noteData) : {}
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  // console.log('noteData', JSON.stringify(noteData))
+  console.log('noteData', JSON.stringify(noteData))
 
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
