@@ -111,13 +111,9 @@ export function DoctorsListScreen() {
                     {data.locations ? data.locations : ''}
                   </Typography>
                 </View>
-                <View className="self-center">
+                <View className="self-center text-center">
                   <Typography
-                    className={
-                      data.status.toLowerCase() === 'active'
-                        ? "ml-2 rounded-[20px] bg-['#83D991'] px-5 text-right"
-                        : "ml-2 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
-                    }
+                    className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
                   >
                     {data.status ? data.status : ''}
                   </Typography>
