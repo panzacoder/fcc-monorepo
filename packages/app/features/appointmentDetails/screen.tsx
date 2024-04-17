@@ -279,7 +279,6 @@ export function AppointmentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          setNoteData(noteData)
           getAppointmentDetails(true)
         } else {
           Alert.alert('', data.message)

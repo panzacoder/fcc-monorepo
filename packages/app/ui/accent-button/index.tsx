@@ -16,6 +16,7 @@ export function AccentButton({ title, onPress, className = '' }) {
         {title}
       </Typography>
       <Feather
+        onPress={onPress}
         name="arrow-right-circle"
         size={44}
         color="white"
