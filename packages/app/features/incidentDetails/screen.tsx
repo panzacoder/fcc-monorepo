@@ -5,10 +5,8 @@ import { View, Alert, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import moment from 'moment'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -393,7 +391,12 @@ export function IncidentDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[60%] flex-row">
+              <Pressable
+                onPress={() => {
+                  setIsShowNotes(!isShowNotes)
+                }}
+                className="w-[60%] flex-row"
+              >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Notes'}
                   {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
@@ -404,14 +407,11 @@ export function IncidentDetailsScreen() {
                     name={!isShowNotes ? 'chevron-down' : 'chevron-up'}
                     size={20}
                     color={'black'}
-                    onPress={() => {
-                      setIsShowNotes(!isShowNotes)
-                    }}
                   />
                 ) : (
                   <View />
                 )}
-              </View>
+              </Pressable>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
