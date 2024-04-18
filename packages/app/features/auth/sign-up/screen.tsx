@@ -10,15 +10,15 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'solito/navigation'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
-import { CheckBox } from 'react-native-elements'
 import { formatUrl } from 'app/utils/format-url'
 
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
+import { ControlledCheckbox } from 'app/ui/form-fields/controlled-checkbox'
 
 const schema = addressSchema
   .extend({
@@ -109,7 +109,7 @@ export function SignUpScreen() {
               onPress={() => {
                 router.push('/login')
               }}
-              className="p-0"
+              className="p-0 leading-none"
             />
           </View>
         }
@@ -117,7 +117,7 @@ export function SignUpScreen() {
 
       <PtsLoader loading={isLoading} />
       <FormProvider {...formMethods}>
-        <View className="mb-2 mt-5 flex flex-wrap justify-end gap-y-4">
+        <View className="mb-2 flex flex-wrap gap-2">
           <View className="flex w-full gap-2">
             <View className="flex w-full flex-row justify-between gap-2">
               <ControlledTextField
@@ -174,22 +174,22 @@ export function SignUpScreen() {
               }}
             />
           </View>
-          <View className="flex flex-row items-center justify-center">
-            <Controller
-              name="acceptTc"
-              render={({ field: { onChange, value }, fieldState }) => (
-                <CheckBox
-                  checked={value}
-                  checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
-                  onPress={() => {
-                    onChange(!value)
-                  }}
-                  className="flex-shrink"
-                />
-              )}
-            />
-            <Typography className="flex-1">
-              {'I accept the Terms and Conditions and Privacy Policy'}
+          <View className="m-1 flex flex-row items-center justify-center gap-4 ">
+            <ControlledCheckbox name="acceptTc" />
+            <Typography className="flex-1 text-sm">
+              {'Accept the '}
+              <Typography
+                onPress={() => {
+                  router.push('/termsAndConditions')
+                }}
+                className="text-primary text-sm font-bold"
+              >
+                {'Terms and Conditions '}
+              </Typography>
+              {'& '}
+              <Typography className="text-primary text-sm font-bold">
+                {'Privacy Policy '}
+              </Typography>
             </Typography>
           </View>
           <Button

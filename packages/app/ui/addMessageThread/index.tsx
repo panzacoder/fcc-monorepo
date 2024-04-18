@@ -55,7 +55,7 @@ export const AddMessageThread = ({
           {"Caregivers' List"}
         </Typography>
         <View className="mt-1 h-[1px] w-full bg-gray-400" />
-        <ScrollView className="h-[70%] max-h-[70%]">
+        <ScrollView className="h-[65%] max-h-[65%]">
           {participantsList.map((data: any, index: number) => {
             return (
               <View className=" w-full items-center" key={index}>
@@ -78,7 +78,7 @@ export const AddMessageThread = ({
             )
           })}
         </ScrollView>
-        <View className="mb-2 mt-2 flex-row justify-center">
+        <View className="mb-4 mt-1 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
             title="Cancel"

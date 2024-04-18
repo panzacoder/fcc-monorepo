@@ -183,6 +183,7 @@ export function CaregiversListScreen() {
         {isShowFilter ? (
           <View className="ml-5 w-[40%]">
             <Pressable
+              className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('All')
               }}
@@ -192,6 +193,7 @@ export function CaregiversListScreen() {
               </Typography>
             </Pressable>
             <Pressable
+              className={`${currentFilter === 'Accepted' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Accepted')
               }}
@@ -201,6 +203,7 @@ export function CaregiversListScreen() {
               </Typography>
             </Pressable>
             <Pressable
+              className={`${currentFilter === 'Requested' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Requested')
               }}
@@ -210,6 +213,7 @@ export function CaregiversListScreen() {
               </Typography>
             </Pressable>
             <Pressable
+              className={`${currentFilter === 'Rejected' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Rejected')
               }}
@@ -219,6 +223,7 @@ export function CaregiversListScreen() {
               </Typography>
             </Pressable>
             <Pressable
+              className={`${currentFilter === 'Not Yet Registered' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Not Yet Registered')
               }}

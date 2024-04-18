@@ -121,7 +121,7 @@ export function Location(data: any) {
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
               {'Website:'}
             </Typography>
-            <Typography className="font-400 text-primary ml-2 w-[70%] text-[16px] font-bold">
+            <Typography className="font-400 text-primary ml-2 w-[70%] text-[16px]">
               {locationData.website}
             </Typography>
           </View>

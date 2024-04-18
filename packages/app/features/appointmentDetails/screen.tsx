@@ -1,7 +1,7 @@
 'use client'
 import _ from 'lodash'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView } from 'react-native'
+import { View, Alert, ScrollView, Pressable, Linking } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -279,7 +279,6 @@ export function AppointmentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          setNoteData(noteData)
           getAppointmentDetails(true)
         } else {
           Alert.alert('', data.message)
@@ -617,6 +616,10 @@ export function AppointmentDetailsScreen() {
   async function refreshData() {
     getAppointmentDetails(false)
   }
+  function getWebsite(url: string) {
+    let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
+    return newUrl
+  }
   function getDetailsView(
     title: string,
     value: string,
@@ -631,6 +634,15 @@ export function AppointmentDetailsScreen() {
         </View>
         {isIcon ? (
           <Feather
+            onPress={() => {
+              if (title === 'Phone:' && value !== '') {
+                Linking.openURL(`tel:${value}`)
+              } else if (title === 'Email:' && value !== '') {
+                Linking.openURL(`mailto:${value}`)
+              } else if (title === 'Website:' && value !== '') {
+                Linking.openURL(`http://${getWebsite(value)}`)
+              }
+            }}
             className="ml-[-10px]"
             name={iconValue}
             size={20}
@@ -683,8 +695,8 @@ export function AppointmentDetailsScreen() {
               {getDetailsView('Username:', websiteUser, true, 'copy')}
               <View className="my-3 h-[1px] w-full self-center bg-[##86939e]" />
               {getDetailsView('Date:', apptDate, false, '')}
-              {getDetailsView('Purpose:', status, false, '')}
-              {getDetailsView('Status:', purpose, false, '')}
+              {getDetailsView('Purpose:', purpose, false, '')}
+              {getDetailsView('Status:', status, false, '')}
               {getDetailsView('Description:', description, false, '')}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(appointmentPrivileges).createPermission ||
@@ -745,7 +757,12 @@ export function AppointmentDetailsScreen() {
 
             <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View className=" w-full flex-row items-center">
-                <View className="w-[60%] flex-row">
+                <Pressable
+                  onPress={() => {
+                    setIsShowNotes(!isShowNotes)
+                  }}
+                  className="w-[60%] flex-row"
+                >
                   <Typography className="font-400 text-[14px] font-bold text-black">
                     {'Notes'}
                     {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
@@ -756,14 +773,11 @@ export function AppointmentDetailsScreen() {
                       name={!isShowNotes ? 'chevron-down' : 'chevron-up'}
                       size={20}
                       color={'black'}
-                      onPress={() => {
-                        setIsShowNotes(!isShowNotes)
-                      }}
                     />
                   ) : (
                     <View />
                   )}
-                </View>
+                </Pressable>
                 {getUserPermission(notePrivileges).createPermission ? (
                   <Button
                     className=""
@@ -804,7 +818,12 @@ export function AppointmentDetailsScreen() {
 
             <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View className=" w-full flex-row items-center">
-                <View className="w-[50%] flex-row">
+                <Pressable
+                  onPress={() => {
+                    setIsShowReminder(!isShowReminder)
+                  }}
+                  className="w-[50%] flex-row"
+                >
                   <Typography className="font-400 text-[14px] font-bold text-black">
                     {'Reminders'}
                     {remindersList.length > 0
@@ -817,24 +836,27 @@ export function AppointmentDetailsScreen() {
                       name={!isShowReminder ? 'chevron-down' : 'chevron-up'}
                       size={20}
                       color={'black'}
-                      onPress={() => {
-                        setIsShowReminder(!isShowReminder)
-                      }}
                     />
                   ) : (
                     <View />
                   )}
-                </View>
-                <Button
-                  className=""
-                  title="Add Reminder"
-                  leadingIcon="plus"
-                  variant="border"
-                  onPress={() => {
-                    setReminderData({})
-                    setIsAddReminder(true)
-                  }}
-                />
+                </Pressable>
+                {moment(appointmentDetails.date ? appointmentDetails.date : '')
+                  .utc()
+                  .isAfter(moment().utc()) ? (
+                  <Button
+                    className=""
+                    title="Add Reminder"
+                    leadingIcon="plus"
+                    variant="border"
+                    onPress={() => {
+                      setReminderData({})
+                      setIsAddReminder(true)
+                    }}
+                  />
+                ) : (
+                  <View />
+                )}
               </View>
 
               {remindersList.length > 0 && isShowReminder ? (
@@ -859,7 +881,12 @@ export function AppointmentDetailsScreen() {
 
             <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View className=" w-full flex-row items-center">
-                <View className="w-[50%] flex-row">
+                <Pressable
+                  onPress={() => {
+                    setIsShowTransportation(!isShowTransportation)
+                  }}
+                  className="w-[50%] flex-row"
+                >
                   <Typography className="font-400 text-[14px] font-bold text-black">
                     {'Transportation'}
                     {transportationList.length > 0
@@ -874,16 +901,15 @@ export function AppointmentDetailsScreen() {
                       }
                       size={20}
                       color={'black'}
-                      onPress={() => {
-                        setIsShowTransportation(!isShowTransportation)
-                      }}
                     />
                   ) : (
                     <View />
                   )}
-                </View>
-                {getUserPermission(transportationPrivileges)
-                  .createPermission ? (
+                </Pressable>
+                {moment(appointmentDetails.date ? appointmentDetails.date : '')
+                  .utc()
+                  .isAfter(moment().utc()) &&
+                getUserPermission(transportationPrivileges).createPermission ? (
                   <Button
                     className=""
                     title="Transportation"

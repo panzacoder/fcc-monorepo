@@ -235,6 +235,7 @@ export function MessagesScreen() {
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
           <Pressable
+            className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
             }}
@@ -244,6 +245,7 @@ export function MessagesScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'General' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('General')
             }}
@@ -253,6 +255,7 @@ export function MessagesScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Appointment' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Appointment')
             }}
@@ -262,6 +265,7 @@ export function MessagesScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Incident' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Incident')
             }}
@@ -271,6 +275,7 @@ export function MessagesScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Purchase' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Purchase')
             }}
@@ -280,6 +285,7 @@ export function MessagesScreen() {
             </Typography>
           </Pressable>
           <Pressable
+            className={`${currentFilter === 'Event' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Event')
             }}
@@ -344,21 +350,6 @@ export function MessagesScreen() {
                     <View />
                   )}
                 </View>
-                {/* <View className="flex-row">
-                  {data.participantDetailsList.map(
-                    (data: any, index: number) => {
-                      return (
-                        <ScrollView key={index} horizontal={true}>
-                          <View className="bg-primary ml-2 h-[40px] w-[40px] items-center justify-center rounded-[20px]">
-                            <Typography className=" text-[19px] text-white">
-                              {getNameInitials(data.name)}
-                            </Typography>
-                          </View>
-                        </ScrollView>
-                      )
-                    }
-                  )}
-                </View> */}
                 <ScrollView
                   horizontal={true}
                   className="w-[95%] max-w-[95%] flex-row"

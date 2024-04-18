@@ -1,7 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import {
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Linking,
+  Pressable
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -21,8 +28,10 @@ export function DoctorDetailsScreen() {
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  console.log('doctorDetails', '' + JSON.stringify(doctorInfo))
+  // console.log('doctorDetails', '' + JSON.stringify(doctorInfo))
   const [isLoading, setLoading] = useState(false)
+  const [isShowLocations, setIsShowLocations] = useState(false)
+  const [isShowAppointments, setIsShowAppointments] = useState(false)
   const [doctorDetails, setDoctorDetails] = useState({}) as any
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
@@ -64,7 +73,56 @@ export function DoctorDetailsScreen() {
   useEffect(() => {
     getDoctorDetails()
   }, [])
-
+  function getWebsite(url: string) {
+    let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
+    return newUrl
+  }
+  let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
+  function getDetailsView(
+    title: string,
+    value: string,
+    isIcon: boolean,
+    iconValue: any
+  ) {
+    return (
+      <View className="mt-2 w-full flex-row items-center">
+        <View className="w-[95%] flex-row">
+          <Typography className={titleStyle}>{title}</Typography>
+          {title !== 'Status:' ? (
+            <Typography className={valueStyle}>{value}</Typography>
+          ) : (
+            <View>
+              <Typography
+                className={`ml-2 mr-5 rounded-[5px] px-5 py-1 text-right font-bold ${value.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
+              >
+                {value}
+              </Typography>
+            </View>
+          )}
+        </View>
+        {isIcon ? (
+          <Feather
+            onPress={() => {
+              if (title === 'Phone:' && value !== '') {
+                Linking.openURL(`tel:${value}`)
+              } else if (title === 'Email:' && value !== '') {
+                Linking.openURL(`mailto:${value}`)
+              } else if (title === 'Website:' && value !== '') {
+                Linking.openURL(`http://${getWebsite(value)}`)
+              }
+            }}
+            className=""
+            name={iconValue}
+            size={20}
+            color={'black'}
+          />
+        ) : (
+          <View />
+        )}
+      </View>
+    )
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -101,28 +159,25 @@ export function DoctorDetailsScreen() {
                 </Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
               </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                    {'Phone:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.phone ? doctorDetails.phone : ''}
-                  </Typography>
-                </View>
-                <Feather name={'phone'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                    {'Email:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.email ? doctorDetails.email : ''}
-                  </Typography>
-                </View>
-                <Feather name={'mail'} size={20} color={'black'} />
-              </View>
+
+              {getDetailsView(
+                'Name:',
+                doctorInfo.doctorName ? doctorInfo.doctorName : '',
+                true,
+                'user'
+              )}
+              {getDetailsView(
+                'Phone:',
+                doctorDetails.phone ? doctorDetails.phone : '',
+                true,
+                'phone'
+              )}
+              {getDetailsView(
+                'Email:',
+                doctorDetails.email ? doctorDetails.email : '',
+                true,
+                'mail'
+              )}
             </View>
 
             <View>
@@ -132,38 +187,55 @@ export function DoctorDetailsScreen() {
                 </Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Username:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[60%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.websiteuser ? doctorDetails.websiteuser : ''}
-                  </Typography>
-                </View>
-                <Feather name={'copy'} size={20} color={'black'} />
-              </View>
-              <View className="mt-2 w-full flex-row items-center">
-                <View className="w-[95%] flex-row">
-                  <Typography className="font-400 w-[30%] text-[16px] text-[#1A1A1A]">
-                    {'Website:'}
-                  </Typography>
-                  <Typography className="font-400 ml-2 w-[60%] text-[16px] font-bold text-[#1A1A1A]">
-                    {doctorDetails.website ? doctorDetails.website : ''}
-                  </Typography>
-                </View>
-                <Feather name={'external-link'} size={20} color={'black'} />
-              </View>
+
+              {getDetailsView(
+                'Username:',
+                doctorDetails.websiteuser ? doctorDetails.websiteuser : '',
+                true,
+                'copy'
+              )}
+              {getDetailsView(
+                'Website:',
+                doctorDetails.website ? doctorDetails.website : '',
+                true,
+                'globe'
+              )}
+              {getDetailsView(
+                'Status:',
+                doctorDetails.status && doctorDetails.status.status
+                  ? doctorDetails.status.status
+                  : '',
+                false,
+                ''
+              )}
             </View>
           </View>
 
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[60%] flex-row">
-                <Typography className="font-400 text-[16px] font-bold text-black">
+              <Pressable
+                onPress={() => {
+                  setIsShowLocations(!isShowLocations)
+                }}
+                className="w-[60%] flex-row"
+              >
+                <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Locations'}
+                  {locationList.length > 0
+                    ? ' (' + locationList.length + ') '
+                    : ''}
                 </Typography>
-              </View>
+                {locationList.length > 0 ? (
+                  <Feather
+                    className=""
+                    name={!isShowLocations ? 'chevron-down' : 'chevron-up'}
+                    size={20}
+                    color={'black'}
+                  />
+                ) : (
+                  <View />
+                )}
+              </Pressable>
               <Button
                 className=""
                 title="Add Location"
@@ -179,7 +251,7 @@ export function DoctorDetailsScreen() {
                 }}
               />
             </View>
-            {locationList.length > 0 ? (
+            {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
                 {locationList.map((data: any, index: number) => {
                   data.component = 'Doctor'
@@ -196,36 +268,40 @@ export function DoctorDetailsScreen() {
             )}
           </View>
 
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[50%] flex-row">
-                <Typography className="font-400 text-[16px] font-bold text-black">
+              <Pressable
+                onPress={() => {
+                  setIsShowAppointments(!isShowAppointments)
+                }}
+                className="w-[50%] flex-row"
+              >
+                <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Appointments'}
+                  {appointmentList.length > 0
+                    ? ' (' + appointmentList.length + ') '
+                    : ''}
                 </Typography>
-              </View>
+                {appointmentList.length > 0 ? (
+                  <Feather
+                    className=""
+                    name={!isShowAppointments ? 'chevron-down' : 'chevron-up'}
+                    size={20}
+                    color={'black'}
+                  />
+                ) : (
+                  <View />
+                )}
+              </Pressable>
               <Button
-                className=""
+                className="ml-2"
                 title="Add Appointment"
                 variant="default"
                 onPress={() => {}}
               />
             </View>
-            <View className="mt-5 flex-row items-center">
-              <View className="w-[20%] flex-row">
-                <Typography className="font-400 mr-2 text-[12px] text-[#1A1A1A] ">
-                  {'All'}
-                </Typography>
-                <Feather
-                  onPress={() => {}}
-                  name={'chevron-down'}
-                  size={15}
-                  color={'black'}
-                />
-              </View>
-              <View className="bg-primary h-[1px] w-[80%]" />
-            </View>
-            {appointmentList.length > 0 ? (
-              <ScrollView className="h-[60%] flex-1">
+            {appointmentList.length > 0 && isShowAppointments ? (
+              <ScrollView className="mt-2 h-[60%] flex-1">
                 {appointmentList.map((data: any, index: number) => {
                   return (
                     <View key={index}>
