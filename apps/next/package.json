@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@expo/next-adapter": "6.0.0",
+    "@vercel/analytics": "^1.2.2",
+    "@vercel/speed-insights": "^1.0.10",
     "app": "workspace:*",
     "nativewind": "^4.0.36",
     "next": "14.1.3",
