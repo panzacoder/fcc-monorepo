@@ -393,7 +393,12 @@ export function IncidentDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[60%] flex-row">
+              <Pressable
+                onPress={() => {
+                  setIsShowNotes(!isShowNotes)
+                }}
+                className="w-[60%] flex-row"
+              >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Notes'}
                   {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
@@ -404,14 +409,11 @@ export function IncidentDetailsScreen() {
                     name={!isShowNotes ? 'chevron-down' : 'chevron-up'}
                     size={20}
                     color={'black'}
-                    onPress={() => {
-                      setIsShowNotes(!isShowNotes)
-                    }}
                   />
                 ) : (
                   <View />
                 )}
-              </View>
+              </Pressable>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""

@@ -356,8 +356,8 @@ export function EventsListScreen() {
                 className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
               >
                 <View className="my-2 flex-row">
-                  <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
-                    {data.title ? data.title : ''}
+                  <Typography className="font-400 ml-5 w-[70%] text-black">
+                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
                   </Typography>
                   <View className="">
                     <Typography className="font-bold text-black">
@@ -371,9 +371,16 @@ export function EventsListScreen() {
                   </Typography>
                 </View>
                 <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-full text-black">
-                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                  <Typography className="text-primary font-400 ml-5 w-[55%] max-w-[55%] text-[16px]">
+                    {data.title ? data.title : ''}
                   </Typography>
+                  {data.markCompleteCancel ? (
+                    <Typography className="font-400 ml-5 w-[40%] text-[#FF0000]">
+                      {'Mark Complete/Cancel'}
+                    </Typography>
+                  ) : (
+                    <View />
+                  )}
                 </View>
                 {data.hasNotes ||
                 data.hasReminders ||

@@ -1,0 +1,31 @@
+org: panzacoder
+app: eas-slack-notify
+service: eas-build-notify
+
+provider:
+  name: aws
+  architecture: arm64
+  runtime: nodejs20.x
+  region: ap-northeast-1
+
+plugins:
+  - serverless-plugin-monorepo
+
+package:
+  exclude:
+    - .git/**
+    - .gh-assets/**
+    - README.md
+
+functions:
+  eas-build-webhook:
+    handler: lambda.handler
+    events:
+      - http: ANY /
+    environment:
+      EAS_SECRET_WEBHOOK_KEY: "eas-slack-bot-6933047543045"
+      SLACK_TOKEN: "xoxb-5147005637303-6933047543045-UhZ2SHWZOKjhak0EtAno4IdP"
+      SLACK_CHANNEL: "expo-notifications"
+      SLACK_CLIENT_ID: "5147005637303.6935836373731"
+      SLACK_CLIENT_SECRET: "d0bb58349f0e4a33dae0fbb01e2eede5"
+      SLACK_SIGNING_SECRET: "f05c28b23f43535cade875342714cecc"

@@ -8,6 +8,7 @@
     "jsEngine": "hermes",
     "userInterfaceStyle": "light",
     "githubUrl": "https://github.com/panzacoder/fcc-monorepo",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "cover",

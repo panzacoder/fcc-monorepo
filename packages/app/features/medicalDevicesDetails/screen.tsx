@@ -9,6 +9,7 @@ import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
+import moment from 'moment'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -295,7 +296,6 @@ export function MedicalDevicesDetailsScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setIsAddDevice(false)
-          getDevicesList(false)
         } else {
           Alert.alert('', data.message)
         }
@@ -550,7 +550,12 @@ export function MedicalDevicesDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[60%] flex-row">
+              <Pressable
+                onPress={() => {
+                  setIsShowNotes(!isShowNotes)
+                }}
+                className="w-[60%] flex-row"
+              >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Notes'}
                   {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
@@ -561,14 +566,11 @@ export function MedicalDevicesDetailsScreen() {
                     name={!isShowNotes ? 'chevron-down' : 'chevron-up'}
                     size={20}
                     color={'black'}
-                    onPress={() => {
-                      setIsShowNotes(!isShowNotes)
-                    }}
                   />
                 ) : (
                   <View />
                 )}
-              </View>
+              </Pressable>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
@@ -608,7 +610,12 @@ export function MedicalDevicesDetailsScreen() {
           </View>
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <View className="w-[50%] flex-row">
+              <Pressable
+                onPress={() => {
+                  setIsShowReminder(!isShowReminder)
+                }}
+                className="w-[50%] flex-row"
+              >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Reminders'}
                   {remindersList.length > 0
@@ -621,15 +628,15 @@ export function MedicalDevicesDetailsScreen() {
                     name={!isShowReminder ? 'chevron-down' : 'chevron-up'}
                     size={20}
                     color={'black'}
-                    onPress={() => {
-                      setIsShowReminder(!isShowReminder)
-                    }}
                   />
                 ) : (
                   <View />
                 )}
-              </View>
-              <Button
+              </Pressable>
+              {moment(medicalDevicesDetails.date ? medicalDevicesDetails.date : '')
+                .utc()
+                .isAfter(moment().utc())?
+                <Button
                 className=""
                 title="Add Reminder"
                 leadingIcon="plus"
@@ -638,7 +645,8 @@ export function MedicalDevicesDetailsScreen() {
                   setReminderData({})
                   setIsAddReminder(true)
                 }}
-              />
+              />:<View/>}
+            
             </View>
 
             {remindersList.length > 0 && isShowReminder ? (

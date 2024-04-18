@@ -126,7 +126,7 @@ export function LoginScreen() {
         }
       />
 
-      <View className="my-5 flex flex-wrap justify-end gap-y-4">
+      <View className="mb-1 mt-5 flex flex-wrap justify-end gap-y-4">
         <View className="flex w-full gap-2">
           <ControlledTextField
             control={control}

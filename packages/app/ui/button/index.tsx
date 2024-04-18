@@ -1,3 +1,5 @@
+'use client'
+
 import { Pressable, PressableProps } from 'react-native'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { Typography } from 'app/ui/typography'
@@ -14,31 +16,54 @@ const buttonVariants = tv({
   variants: {
     variant: {
       default: {
-        button: 'bg-primary hover:bg-primary/90 shadow active:opacity-90',
+        button: 'bg-primary hover:bg-primary/90 active:bg-primary/90 shadow',
         text: 'text-primary-foreground',
         icon: 'color-primary-foreground'
       },
+      primary: {
+        button: 'bg-primary hover:bg-primary/90 active:bg-primary/90 shadow',
+        text: 'text-primary-foreground',
+        icon: 'color-primary-foreground'
+      },
+      light: {
+        button:
+          'bg-background hover:bg-background/90 active:bg-background/90 shadow',
+        text: 'text-foreground',
+        icon: 'color-foreground'
+      },
       destructive: {
-        button: 'bg-destructive hover:bg-destructive/90 shadow-sm',
+        button:
+          'bg-destructive hover:bg-destructive/90 active:bg-destructive/90 shadow',
         text: 'text-destructive-foreground',
         icon: 'color-destructive-foreground'
       },
       outline: {
+        button: 'border-primary hover:bg-accent active:bg-accent border  ',
+        text: 'text-primary group-hover:text-accent-foreground group-active:text-accent-foreground',
+        icon: ' group-hover:color-accent-foreground group-active:color-accent-foreground'
+      },
+      'outline-destructive': {
         button:
-          'text-primary-foreground border-primary hover:bg-accent border  ',
-        text: 'text-primary group-hover:text-accent-foreground',
-        icon: 'hover:color-accent-foreground'
+          'border-destructive hover:bg-destructive/90 active:bg-destructive/80 border',
+        text: 'text-destructive group-hover:text-destructive-foreground group-active:text-destructive-foreground',
+        icon: 'group-hover:color-destructive-foreground group-active:text-destructive-foreground'
       },
       secondary: {
-        button: 'bg-secondary hover:bg-secondary/80',
-        text: 'text-secondary-foreground',
-        icon: 'color-secondary-foreground'
+        button: 'bg-secondary hover:bg-secondary/80 active:bg-secondary/90',
+        text: 'text-secondary-foreground group-hover:text-secondary-foreground group-active:text-secondary-foreground',
+        icon: 'color-secondary-foreground group-hover:color-secondary-foreground group-active:color-secondary-foreground'
       },
       ghost: {
-        button: 'hover:bg-accent',
-        text: 'text-secondary group-hover:text-accent-foreground',
-        icon: 'color-secondary group-hover:color-accent-foreground'
+        button: 'hover:bg-primary active:bg-primary/80',
+        text: 'text-primary group-hover:text-primary-foreground group-active:text-primary-foreground',
+        icon: 'color-primary group-hover:color-primary-foreground group-active:color-primary-foreground'
       },
+      'ghost-secondary': {
+        button: 'hover:bg-secondary active:bg-secondary/80',
+        text: 'text-secondary group-hover:text-secondary-foreground group-active:text-secondary-foreground',
+        icon: 'color-secondary group-hover:color-secondary-foreground group-active:color-secondary-foreground'
+      },
+
       accent: {
         button: 'bg-accent hover:bg-accent/90',
         text: 'text-accent-foreground',
@@ -54,6 +79,11 @@ const buttonVariants = tv({
         button: '',
         text: 'text-secondary group-hover:underline',
         icon: 'color-secondary'
+      },
+      'link-destructive': {
+        button: '',
+        text: 'text-destructive group-hover:underline',
+        icon: 'color-destructive'
       },
       border: {
         button: 'border-primary border-[2px]',
@@ -84,7 +114,7 @@ const buttonVariants = tv({
     }
   },
   defaultVariants: {
-    variant: 'default',
+    variant: 'primary',
     size: 'default'
   }
 })
@@ -107,7 +137,8 @@ export const Button = ({
   leadingIcon,
   trailingIcon,
   typographyClassName,
-  iconOnly
+  iconOnly,
+  ...rest
 }: ButtonProps) => {
   const { button, text, icon } = buttonVariants({
     variant,

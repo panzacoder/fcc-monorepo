@@ -313,7 +313,7 @@ export function PrescriptionsListScreen() {
             <Feather
               className="ml-2 mt-6"
               name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-              size={25}
+              size={25} 
               color={'black'}
             />
           </Pressable>

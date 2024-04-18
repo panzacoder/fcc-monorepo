@@ -1,0 +1,21 @@
+{
+  "name": "eas-slack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./index.js"
+  },
+  "author": "@panzacoder",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.17.1",
+    "@vendia/serverless-express": "^4.12.6",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "safe-compare": "^1.1.4"
+  },
+  "devDependencies": {
+    "serverless-plugin-monorepo": "^0.11.0"
+  }
+}
