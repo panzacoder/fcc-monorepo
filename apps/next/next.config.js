@@ -34,6 +34,7 @@ const nextConfig = {
     '@expo/vector-icons',
     'app',
     'expo',
+    'expo-checkbox',
     'moti',
     'nativewind',
     'react-native',
