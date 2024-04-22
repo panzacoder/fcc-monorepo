@@ -13,7 +13,7 @@ export const PtsComboBox = ({
 
   return (
     <View className="">
-      <View className="focus:border-primary active:border-primary w-full flex-row rounded-lg border border-gray-400 py-3">
+      <View className="focus:border-primary active:border-primary w-full flex-row rounded-lg border border-gray-400 py-2">
         <TextInput
           className={'flex-1 px-4'}
           keyboardType={'default'}

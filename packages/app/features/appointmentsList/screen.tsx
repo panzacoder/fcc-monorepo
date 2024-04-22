@@ -252,12 +252,12 @@ export function AppointmentsListScreen() {
             <Pressable
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
-                // router.push(
-                //   formatUrl('/circles/addEditAppointment', {
-                //     memberData: JSON.stringify(memberData)
-                //   })
-                // )
-                setIsAddAppointment(true)
+                router.push(
+                  formatUrl('/circles/addEditAppointment', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+                // setIsAddAppointment(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />

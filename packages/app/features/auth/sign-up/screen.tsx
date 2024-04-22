@@ -116,10 +116,28 @@ export function SignUpScreen() {
       />
 
       <PtsLoader loading={isLoading} />
-      <FormProvider {...formMethods}>
-        <View className="mb-2 flex flex-wrap gap-2">
-          <View className="flex w-full gap-2">
-            <View className="flex w-full flex-row justify-between gap-2">
+      <ScrollView>
+        <FormProvider {...formMethods}>
+          <View className="mb-2 mt-5 flex flex-wrap justify-end gap-y-4">
+            <View className="flex w-full gap-2">
+              <View className="flex w-full flex-row justify-between gap-2">
+                <ControlledTextField
+                  name="firstName"
+                  className="flex-1"
+                  placeholder={'First Name*'}
+                  onSubmitEditing={() => {
+                    formMethods.setFocus('lastName')
+                  }}
+                />
+                <ControlledTextField
+                  name="lastName"
+                  className="flex-1"
+                  placeholder={'Last Name*'}
+                  onSubmitEditing={() => {
+                    formMethods.setFocus('email')
+                  }}
+                />
+              </View>
               <ControlledTextField
                 name="firstName"
                 className="flex-1"
@@ -168,10 +186,55 @@ export function SignUpScreen() {
               }}
             />
 
-            <AddressFields
-              onSubmitEditing={() => {
-                formMethods.setFocus('acceptTc')
-              }}
+              <AddressFields
+                onSubmitEditing={() => {
+                  formMethods.setFocus('acceptTc')
+                }}
+              />
+            </View>
+            <View className="flex flex-row items-center justify-center">
+              <Controller
+                name="acceptTc"
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <CheckBox
+                    checked={value}
+                    checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
+                    onPress={() => {
+                      onChange(!value)
+                    }}
+                    className="flex-shrink"
+                  />
+                )}
+              />
+              <Typography className="ml-[-10px] flex-1">
+                {'I accept the '}
+                <Typography
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/(termsAndPolicy)/termsAndConditions', {})
+                    )
+                  }}
+                  className="text-primary  font-bold"
+                >
+                  {' Terms and Conditions '}
+                </Typography>
+                <Typography>{' and '}</Typography>
+                <Typography
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/(termsAndPolicy)/privacyPolicy', {})
+                    )
+                  }}
+                  className="text-primary font-bold"
+                >
+                  {' Privacy Policy '}
+                </Typography>
+              </Typography>
+            </View>
+            <Button
+              onPress={formMethods.handleSubmit(submitRegistration)}
+              className="w-full"
+              title="Sign Up"
             />
           </View>
           <View className="m-1 flex flex-row items-center justify-center gap-4 ">

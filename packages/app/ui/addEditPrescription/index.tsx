@@ -175,7 +175,7 @@ export const AddEditPrescription = ({
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets
-      className="my-10 overflow-visible"
+      className="my-5 "
     >
       <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
         <ControlledDropdown
@@ -184,7 +184,7 @@ export const AddEditPrescription = ({
           label="Type*"
           maxHeight={300}
           list={typesList}
-          className="w-full"
+          className="w-full" 
           defaultValue={
             !_.isEmpty(prescriptionDetails) &&
             prescriptionDetails.type &&
@@ -264,7 +264,7 @@ export const AddEditPrescription = ({
           autoCapitalize="none"
         />
 
-        <View className="mt-2 flex flex-row justify-end gap-2">
+        <View className="mt-2 flex flex-row justify-end gap-2 mb-10">
           <Button
             className="basis-1/4"
             title="Cancel"
