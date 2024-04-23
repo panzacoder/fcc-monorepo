@@ -42,7 +42,7 @@ export const AddEditReminder = ({
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
-      <Typography className="font-bold self-center">{`${component} Reminder`}</Typography>
+      <Typography className="self-center font-bold">{`${_.isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField

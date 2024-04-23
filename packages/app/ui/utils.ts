@@ -35,7 +35,18 @@ export function googleMapOpenUrl(address: string) {
     })
     .catch((err) => console.error('An error occurred', err))
 }
+export const convertPhoneNumberToUsaPhoneNumberFormat = (value: any) => {
+  if (!value) return value
+  const currentValue = value.replace(/[^\d]/g, '')
+  const cvLength = currentValue.length
 
+  if (value.length > 0) {
+    if (cvLength < 4) return currentValue
+    if (cvLength < 7)
+      return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3)}`
+    return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3, 6)}-${currentValue.slice(6, 10)}`
+  }
+}
 export function getAddressFromObject(address: any) {
   if (isNull(address)) {
     return ''

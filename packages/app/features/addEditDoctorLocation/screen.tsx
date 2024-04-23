@@ -94,7 +94,7 @@ export function AddEditDoctorLocationScreen() {
     await getStates(value)
   }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <Image
         source={require('app/assets/header.png')}

@@ -301,6 +301,7 @@ export function EventDetailsScreen() {
   }
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
+    setNoteData(noteData)
     let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
@@ -335,7 +336,6 @@ export function EventDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          setNoteData(noteData)
           getEventDetails(true)
         } else {
           Alert.alert('', data.message)

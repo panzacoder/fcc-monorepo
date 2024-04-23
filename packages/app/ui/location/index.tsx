@@ -4,6 +4,7 @@ import { Feather } from 'app/ui/icons'
 import { useRouter } from 'solito/navigation'
 import { getAddressFromObject, googleMapOpenUrl } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
+import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 export function Location(data: any) {
   const router = useRouter()
   let locationData = data.data ? data.data : {}
@@ -86,7 +87,7 @@ export function Location(data: any) {
               {'Phone:'}
             </Typography>
             <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
-              {locationData.phone}
+              {convertPhoneNumberToUsaPhoneNumberFormat(locationData.phone)}
             </Typography>
           </View>
           <Feather className="ml-2" name={'phone'} size={20} color={'black'} />

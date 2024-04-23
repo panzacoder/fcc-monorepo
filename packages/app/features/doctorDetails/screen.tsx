@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
+import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -132,10 +133,10 @@ export function DoctorDetailsScreen() {
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className=" font-400 w-[65%] text-[16px] text-[#86939e]">
+                <Typography className=" font-400 max-w-[80%] text-[16px] text-[#86939e]">
                   {doctorInfo.specialist ? doctorInfo.specialist : ''}
                 </Typography>
-                <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
+                {/* <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" /> */}
               </View>
               <Button
                 className=""
@@ -153,7 +154,7 @@ export function DoctorDetailsScreen() {
               />
             </View>
             <View>
-              <View className="mt-5 flex-row items-center">
+              <View className="mt-2 flex-row items-center">
                 <Typography className="font-400 w-[25%] text-[12px] text-[#1A1A1A]">
                   {'Contact Info'}
                 </Typography>
@@ -166,17 +167,20 @@ export function DoctorDetailsScreen() {
                 true,
                 'user'
               )}
-              {getDetailsView(
-                'Phone:',
-                doctorDetails.phone ? doctorDetails.phone : '',
-                true,
-                'phone'
+              {doctorDetails.phone && doctorDetails.phone !== '' ? (
+                getDetailsView(
+                  'Phone:',
+                  convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone),
+                  true,
+                  'phone'
+                )
+              ) : (
+                <View />
               )}
-              {getDetailsView(
-                'Email:',
-                doctorDetails.email ? doctorDetails.email : '',
-                true,
-                'mail'
+              {doctorDetails.email && doctorDetails.email !== '' ? (
+                getDetailsView('Email:', doctorDetails.email, true, 'mail')
+              ) : (
+                <View />
               )}
             </View>
 
@@ -188,17 +192,20 @@ export function DoctorDetailsScreen() {
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
 
-              {getDetailsView(
-                'Username:',
-                doctorDetails.websiteuser ? doctorDetails.websiteuser : '',
-                true,
-                'copy'
+              {doctorDetails.websiteuser && doctorDetails.websiteuser !== '' ? (
+                getDetailsView(
+                  'Username:',
+                  doctorDetails.websiteuser,
+                  true,
+                  'copy'
+                )
+              ) : (
+                <View />
               )}
-              {getDetailsView(
-                'Website:',
-                doctorDetails.website ? doctorDetails.website : '',
-                true,
-                'globe'
+              {doctorDetails.website && doctorDetails.website !== '' ? (
+                getDetailsView('Website:', doctorDetails.website, true, 'globe')
+              ) : (
+                <View />
               )}
               {getDetailsView(
                 'Status:',
@@ -211,7 +218,7 @@ export function DoctorDetailsScreen() {
             </View>
           </View>
 
-          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[10px] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <Pressable
                 onPress={() => {
@@ -268,7 +275,7 @@ export function DoctorDetailsScreen() {
             )}
           </View>
 
-          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[10px] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <Pressable
                 onPress={() => {

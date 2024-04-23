@@ -9,6 +9,8 @@ import {
   ScrollView,
   Switch
 } from 'react-native'
+import { Stack } from 'expo-router'
+import { PtsComboBox } from 'app/ui/PtsComboBox'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -30,13 +32,12 @@ import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-
+let selectedType = ''
 const schema = z.object({
   website: z.string(),
   username: z.string(),
   description: z.string(),
   facilityName: z.string().min(1, { message: 'Facility name is required' }),
-  type: z.number().min(0, { message: 'Type is required' }),
   locationDesc: z
     .string()
     .min(1, { message: 'Location description is required' }),
@@ -67,6 +68,9 @@ export function AddEditFacilityScreen() {
     : {}
   // console.log('facilityDetails', JSON.stringify(facilityDetails))
   if (!_.isEmpty(facilityDetails)) {
+    if (facilityDetails.type) {
+      selectedType = facilityDetails.type
+    }
     if (
       facilityDetails.status &&
       facilityDetails.status.status.toLowerCase() === 'inactive'
@@ -80,27 +84,16 @@ export function AddEditFacilityScreen() {
   const [statesList, setStateslist] = useState([])
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
     return {
-      label: data.type,
-      value: index
+      label: data.type
     }
   })
 
-  let facilityTypeIndex: any = -1
-  if (facilityDetails.type) {
-    // facilityTypeIndex = getTypeIndex(facilityDetails.type)
-    staticData.facilityTypeList.map((data: any, index: any) => {
-      if (data.type === facilityDetails.type) {
-        facilityTypeIndex = index
-      }
-    })
-  }
-  console.log('facilityTypeIndex', '' + facilityTypeIndex)
+  // console.log('facilityTypeIndex', '' + facilityTypeIndex)
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
       facilityName:
         facilityDetails && facilityDetails.name ? facilityDetails.name : '',
-      type: facilityTypeIndex,
       website:
         facilityDetails && facilityDetails.website
           ? facilityDetails.website
@@ -153,6 +146,10 @@ export function AddEditFacilityScreen() {
       })
   }
   async function updateFacility(formData: Schema) {
+    if (selectedType === '') {
+      Alert.alert('', 'Select Type')
+      return
+    }
     setLoading(true)
     let url = `${BASE_URL}${UPDATE_FACILITY}`
     let dataObject = {
@@ -167,7 +164,7 @@ export function AddEditFacilityScreen() {
         description: formData.description,
         website: formData.website,
         websiteuser: formData.username,
-        type: typesList[formData.type].label,
+        type: selectedType,
         status: {
           status: isFacilityActive === true ? 'Active' : 'Inactive',
           id: isFacilityActive === true ? 1 : 2
@@ -193,6 +190,10 @@ export function AddEditFacilityScreen() {
       })
   }
   async function createFacility(formData: Schema) {
+    if (selectedType === '') {
+      Alert.alert('', 'Select Type')
+      return
+    }
     setLoading(true)
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
@@ -224,7 +225,7 @@ export function AddEditFacilityScreen() {
         description: formData.description,
         website: formData.website,
         websiteuser: formData.username,
-        type: typesList[formData.type].label,
+        type: selectedType,
         facilityLocationList: locationList
       }
     }
@@ -289,165 +290,66 @@ export function AddEditFacilityScreen() {
         : 101
     await getStates(countryId)
   }
-
+  const onSelectionType = (data: any) => {
+    selectedType = data
+    // console.log('purpose1', purpose)
+  }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(facilityDetails)
+            ? 'Add Facility'
+            : 'Edit Facility Details'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
-  <View className="w-[45%] flex-row">
-      <ToggleSwitch
-        isOn={isActive}
-        onColor="#2884F9"
-        offColor="#2884F9"
-        size="medium"
-        onToggle={(isOn) => {
-          if (isOn) {
-            setIsActive(true)
-            isFacilityActive = true
-          } else {
-            setIsActive(false)
-            isFacilityActive = false
-          }
-        }}
-      />
-      <Typography className="font-400 ml-2 self-center">
-        {isActive ? 'Active' : 'InActive'}
-      </Typography>
-    </View>
+              <View className="w-[45%] flex-row">
+                <ToggleSwitch
+                  isOn={isActive}
+                  onColor="#2884F9"
+                  offColor="#2884F9"
+                  size="medium"
+                  onToggle={(isOn) => {
+                    if (isOn) {
+                      setIsActive(true)
+                      isFacilityActive = true
+                    } else {
+                      setIsActive(false)
+                      isFacilityActive = false
+                    }
+                  }}
+                />
+                <Typography className="font-400 ml-2 self-center">
+                  {isActive ? 'Active' : 'InActive'}
+                </Typography>
+              </View>
               <View className=" flex-row">
-      <Button
-        className=""
-        title="Cancel"
-        variant="link"
-        onPress={() => {
-          router.back()
-        }}
-      />
-      <Button
-        className=""
-        title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
-        variant="default"
-        onPress={
-          _.isEmpty(facilityDetails)
-            ? handleSubmit(createFacility)
-            : handleSubmit(updateFacility)
-        }
-      />
-    </View>
-  </View>
-    <View className="my-5 w-full">
-      <View className="w-full flex-row gap-2">
-        <ControlledTextField
-          control={control}
-          name="facilityName"
-          placeholder="Facility Name*"
-          className="w-full"
-        />
-      </View>
-      <View className="mt-5">
-        <ControlledDropdown
-          control={control}
-          name="type"
-          label="Type*"
-          maxHeight={300}
-          list={typesList}
-        // onChangeValue={setSelectedCountryChange}
-        />
-      </View>
-      <View className="mt-5">
-        <ControlledTextField
-          control={control}
-          name="description"
-          placeholder="Description"
-          className="w-full"
-        />
-      </View>
-    </View>
-    <View>
-      <View className="mb-5 flex-row items-center">
-        <Typography className="w-[30%]">{'Portal Details'}</Typography>
-        <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
-      </View>
-      <View className="flex w-full gap-2">
-        <ControlledTextField
-          control={control}
-          name="website"
-          placeholder={'Website'}
-          className="w-full"
-          autoCapitalize="none"
-        />
-        <ControlledTextField
-          control={control}
-          name="username"
-          placeholder={'Username'}
-          className="w-full"
-          autoCapitalize="none"
-        />
-      </View>
-      <View className="mt-5 w-full flex-row">
-        <Typography className=" w-[80%] font-bold">
-          {'Is this Pharmacy?'}
-        </Typography>
-        <ToggleSwitch
-          isOn={isPharmacy}
-          onColor="#2884F9"
-          offColor="#2884F9"
-          size="medium"
-          onToggle={(isOn) => {
-            isThisPharmacy = !isThisPharmacy
-            setIsPharmacy(!isPharmacy)
-          }}
-        />
-      </View>
-    </View>
-          </View >
-  {
-    _.isEmpty(facilityDetails) ? (
-      <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
-        <View className="mt-2">
-          <View className="mb-2 flex-row items-center">
-            <Typography className="w-[20%]">{'Location'}</Typography>
-            <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
-          </View>
-          <View className=" w-full">
-            <View className="flex w-full gap-2">
-              <ControlledTextField
-                control={control}
-                name="locationDesc"
-                placeholder={'Location Description*'}
-                className="w-full"
-                autoCapitalize="none"
-              />
-              <ControlledTextField
-                control={control}
-                name="locationShortName"
-                placeholder="Short Name*"
-                className="w-full"
-              />
-              <ControlledTextField
-                control={control}
-                name="address"
-                placeholder="Address"
-                className="w-full"
-              />
-              <ControlledDropdown
-                control={control}
-                name="country"
-                label="Country*"
-                maxHeight={300}
-                list={countryList}
-                onChangeValue={setSelectedCountryChange}
-              />
-              <ControlledDropdown
-                control={control}
-                name="state"
-                label="State*"
-                maxHeight={300}
-                list={statesList}
-              />
+                <Button
+                  className=""
+                  title="Cancel"
+                  variant="link"
+                  onPress={() => {
+                    router.back()
+                  }}
+                />
+                <Button
+                  className=""
+                  title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
+                  variant="default"
+                  onPress={
+                    _.isEmpty(facilityDetails)
+                      ? handleSubmit(createFacility)
+                      : handleSubmit(updateFacility)
+                  }
+                />
+              </View>
+            </View>
+            <View className="w-full">
               <View className="w-full flex-row gap-2">
                 <ControlledTextField
                   control={control}
@@ -456,20 +358,23 @@ export function AddEditFacilityScreen() {
                   className="w-full"
                 />
               </View>
-              <View className="mt-5">
-                <ControlledDropdown
+              <View className="mt-2">
+                {/* <ControlledDropdown
                   control={control}
                   name="type"
                   label="Type*"
                   maxHeight={300}
                   list={typesList}
-                  defaultValue={
-                    facilityDetails.type ? facilityDetails.type : ''
-                  }
                   // onChangeValue={setSelectedCountryChange}
+                /> */}
+                <PtsComboBox
+                  currentData={selectedType}
+                  listData={typesList}
+                  onSelection={onSelectionType}
+                  placeholderValue={'Type*'}
                 />
               </View>
-              <View className="mt-5">
+              <View className="mt-2">
                 <ControlledTextField
                   control={control}
                   name="description"
@@ -479,7 +384,7 @@ export function AddEditFacilityScreen() {
               </View>
             </View>
             <View>
-              <View className="mb-5 flex-row items-center">
+              <View className="mt-2 flex-row items-center">
                 <Typography className="w-[30%]">{'Portal Details'}</Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
@@ -493,61 +398,146 @@ export function AddEditFacilityScreen() {
                 />
                 <ControlledTextField
                   control={control}
-                  name="address"
-                  placeholder="Postal Code"
-                  className="w-[48%]"
+                  name="username"
+                  placeholder={'Username'}
+                  className="w-full"
+                  autoCapitalize="none"
                 />
               </View>
-              <ControlledTextField
-                control={control}
-                name="locationPhone"
-                placeholder={'Phone'}
-                className="w-full"
-                autoCapitalize="none"
-              />
-              <ControlledTextField
-                control={control}
-                name="fax"
-                placeholder={'Fax'}
-                className="w-full"
-                autoCapitalize="none"
-              />
+              <View className="mt-5 w-full flex-row">
+                <Typography className=" w-[75%] font-bold">
+                  {'Is this Pharmacy?'}
+                </Typography>
+                <ToggleSwitch
+                  isOn={isPharmacy}
+                  onColor="#2884F9"
+                  offColor="#2884F9"
+                  size="medium"
+                  onToggle={(isOn) => {
+                    isThisPharmacy = !isThisPharmacy
+                    setIsPharmacy(!isPharmacy)
+                  }}
+                />
+                <Typography className="ml-[5px]">
+                  {isPharmacy ? 'Yes' : 'No'}
+                </Typography>
+              </View>
             </View>
           </View>
-        </View>
+          {_.isEmpty(facilityDetails) ? (
+            <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
+              <View className="">
+                <View className="my-2 flex-row items-center">
+                  <Typography className="w-[20%]">{'Location'}</Typography>
+                  <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+                </View>
+                <View className=" w-full">
+                  <View className="flex w-full gap-2">
+                    <ControlledTextField
+                      control={control}
+                      name="locationDesc"
+                      placeholder={'Location Name*'}
+                      className="w-full"
+                      autoCapitalize="none"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="locationShortName"
+                      placeholder="Short Name*"
+                      className="w-full"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="address"
+                      placeholder="Address"
+                      className="w-full"
+                    />
+                    <ControlledDropdown
+                      control={control}
+                      name="country"
+                      label="Country*"
+                      maxHeight={300}
+                      list={countryList}
+                      onChangeValue={setSelectedCountryChange}
+                    />
+                    <ControlledDropdown
+                      control={control}
+                      name="state"
+                      label="State*"
+                      maxHeight={300}
+                      list={statesList}
+                    />
+                  </View>
+                  <View>
+                    <View className="mt-2 w-full flex-row gap-2">
+                      <ControlledTextField
+                        control={control}
+                        name="city"
+                        placeholder={'City'}
+                        className="w-[48%]"
+                        autoCapitalize="none"
+                      />
+                      <ControlledTextField
+                        control={control}
+                        name="postalCode"
+                        placeholder="Postal Code"
+                        className="w-[48%]"
+                      />
+                    </View>
+                    <ControlledTextField
+                      control={control}
+                      name="locationPhone"
+                      placeholder={'Phone'}
+                      className="mt-2 w-full"
+                      autoCapitalize="none"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="fax"
+                      placeholder={'Fax'}
+                      className="mt-2 w-full"
+                      autoCapitalize="none"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="website"
+                      placeholder={'Website'}
+                      className="mt-2 w-full"
+                      autoCapitalize="none"
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View />
+          )}
+          {!_.isEmpty(facilityDetails) ? (
+            <View className="mx-5 my-5">
+              <Button
+                className=""
+                title="Delete"
+                variant="borderRed"
+                onPress={() => {
+                  Alert.alert(
+                    'Are you sure about deleting Facility?',
+                    'It cannot be recovered once deleted.',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => deleteFacility()
+                      },
+                      { text: 'Cancel', onPress: () => {} }
+                    ]
+                  )
+                }}
+              />
+            </View>
+          ) : (
+            <View />
+          )}
+        </ScrollView>
       </View>
-    ) : (
-      <View />
-    )
-  }
-  {
-    !_.isEmpty(facilityDetails) ? (
-      <View className="mx-5 my-5">
-        <Button
-          className=""
-          title="Delete"
-          variant="borderRed"
-          onPress={() => {
-            Alert.alert(
-              'Are you sure about deleting Facility?',
-              'It cannot be recovered once deleted.',
-              [
-                {
-                  text: 'Ok',
-                  onPress: () => deleteFacility()
-                },
-                { text: 'Cancel', onPress: () => { } }
-              ]
-            )
-          }}
-        />
-      </View>
-    ) : (
-      <View />
-    )
-  }
-        </ScrollView >
-      </View >
-    </View >
+    </View>
   )
 }

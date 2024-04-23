@@ -54,7 +54,7 @@ export const AddEditPrescription = ({
       : 'End Date'
   )
   const staticData: any = store.getState().staticDataState.staticData
-  console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
+  // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
   if (!_.isEmpty(prescriptionDetails)) {
     prescribedDateUtc = prescriptionDetails.prescribedDate
       ? prescriptionDetails.prescribedDate
@@ -141,6 +141,7 @@ export const AddEditPrescription = ({
   }
 
   const handleDateChange = (date: Date) => {
+    console.log('handleDateChange', date)
     if (calenderClickedCount === 0) {
       setPrescribedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
       prescribedDateUtc = date
@@ -155,6 +156,7 @@ export const AddEditPrescription = ({
   }
 
   const handleDateCleared = () => {
+    console.log('handleDateCleared')
     if (calenderClickedCount === 0) {
       setPrescribedDate('Date Prescribed')
       prescribedDateUtc = ''
@@ -173,10 +175,7 @@ export const AddEditPrescription = ({
   }
 
   return (
-    <ScrollView
-      automaticallyAdjustKeyboardInsets
-      className="my-5 "
-    >
+    <ScrollView automaticallyAdjustKeyboardInsets className="my-5 ">
       <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
         <ControlledDropdown
           control={control}
@@ -184,7 +183,7 @@ export const AddEditPrescription = ({
           label="Type*"
           maxHeight={300}
           list={typesList}
-          className="w-full" 
+          className="w-full"
           defaultValue={
             !_.isEmpty(prescriptionDetails) &&
             prescriptionDetails.type &&
@@ -264,9 +263,9 @@ export const AddEditPrescription = ({
           autoCapitalize="none"
         />
 
-        <View className="mt-2 flex flex-row justify-end gap-2 mb-10">
+        <View className="mb-10 mt-2 flex flex-row justify-end gap-2">
           <Button
-            className="basis-1/4"
+            className=""
             title="Cancel"
             variant="outline-destructive"
             onPress={() => {

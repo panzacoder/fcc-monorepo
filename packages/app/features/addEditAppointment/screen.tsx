@@ -5,6 +5,7 @@ import { Alert, View, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
+import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -259,6 +260,13 @@ export function AddEditAppointmentScreen() {
   }
   return (
     <View className="w-full flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(appointmentDetails)
+            ? 'Add Appointment'
+            : 'Edit Appointment'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full py-2 ">
         <ScrollView className="w-full flex-1">

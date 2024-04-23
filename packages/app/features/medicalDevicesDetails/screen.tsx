@@ -387,6 +387,7 @@ export function MedicalDevicesDetailsScreen() {
   }
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
+    setNoteData(noteData)
     let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {

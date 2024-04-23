@@ -13,6 +13,7 @@ import {
   DELETE_DOCTOR,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
+import { Stack } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -71,7 +72,7 @@ export function AddEditDoctorScreen() {
     // facilityTypeIdex = getTypeIndex(facilityDetails.type)
     staticData.specializationList.map((data: any, index: any) => {
       if (data.specialization === doctorDetails.specialist) {
-        specializationListIndex = index
+        specializationListIndex = index + 1
       }
     })
   }
@@ -110,7 +111,7 @@ export function AddEditDoctorScreen() {
     (data: any, index: any) => {
       return {
         title: data.specialization,
-        id: index
+        id: index + 1
       }
     }
   )
@@ -226,7 +227,7 @@ export function AddEditDoctorScreen() {
         phone: formData.phone,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization].label,
+        specialist: specializationList[formData.specialization - 1].label,
         isSelf: true,
         doctorLocationList: locationList
       }
@@ -301,7 +302,12 @@ export function AddEditDoctorScreen() {
   //   console.log('statesListFull', JSON.stringify(statesListFull))
   // }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(doctorDetails) ? 'Add Doctor' : 'Edit Doctor Details'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
@@ -349,7 +355,7 @@ export function AddEditDoctorScreen() {
                 />
               </View>
             </View>
-            <View className="my-5 w-full">
+            <View className="mt-2 w-full">
               <View className="w-full flex-row gap-2">
                 <ControlledTextField
                   control={control}
@@ -365,23 +371,24 @@ export function AddEditDoctorScreen() {
                   className="w-[50%]"
                 />
               </View>
-              <View className="mt-5">
+              <View className="mt-2">
                 <ControlledDropdown
                   control={control}
                   name={'specialization'}
-                  label={
-                    !_.isEmpty(doctorDetails) && doctorDetails.specialist
-                      ? doctorDetails.specialist
-                      : 'Specialization*'
-                  }
+                  label={'Specialization*'}
                   maxHeight={300}
                   list={specializationList}
-                // onChangeValue={setSelectedCountryChange}
+                  defaultValue={
+                    !_.isEmpty(doctorDetails) && doctorDetails.specialist
+                      ? doctorDetails.specialist
+                      : ''
+                  }
+                  // onChangeValue={setSelectedCountryChange}
                 />
               </View>
             </View>
             <View>
-              <View className="mb-5 flex-row items-center">
+              <View className="my-1 flex-row items-center">
                 <Typography className="w-[30%]">{'Contact Info'}</Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
@@ -404,7 +411,7 @@ export function AddEditDoctorScreen() {
             </View>
 
             <View className="mt-2">
-              <View className="mb-2 flex-row items-center">
+              <View className="my-1 flex-row items-center">
                 <Typography className="w-[30%]">{'Portal Details'}</Typography>
                 <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
               </View>
@@ -468,7 +475,7 @@ export function AddEditDoctorScreen() {
                       label="State*"
                       maxHeight={300}
                       list={statesList}
-                    // onChangeValue={setSelectedStateChange}
+                      // onChangeValue={setSelectedStateChange}
                     />
                     <View className="w-full flex-row gap-2">
                       <ControlledTextField
@@ -521,7 +528,7 @@ export function AddEditDoctorScreen() {
                         text: 'Ok',
                         onPress: () => deleteDoctor()
                       },
-                      { text: 'Cancel', onPress: () => { } }
+                      { text: 'Cancel', onPress: () => {} }
                     ]
                   )
                 }}

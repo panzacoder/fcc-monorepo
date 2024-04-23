@@ -78,7 +78,7 @@ export function FacilityDetailsScreen() {
   }, [])
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
@@ -86,7 +86,7 @@ export function FacilityDetailsScreen() {
           <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className="font-400 w-[65%] text-[16px] text-[#86939e]">
+                <Typography className="font-400 max-w-[65%] text-[16px] text-[#86939e]">
                   {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
                 <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />

@@ -257,7 +257,7 @@ export const AddEditTransport = ({
   return (
     <View className="my-5 w-[90%] self-center rounded-[15px] bg-[#f4ecf7] py-5">
       <PtsLoader loading={isLoading} />
-      <Typography className="self-center font-bold">{`Transportation`}</Typography>
+      <Typography className="self-center font-bold">{`${_.isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
       <ScrollView className="my-2 w-full">
         {_.isEmpty(transportData) ? (
           <View>

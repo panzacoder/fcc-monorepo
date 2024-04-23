@@ -61,7 +61,7 @@ export function CalendarViewInput({
         onPress={onPress}
         className="flex w-full flex-row rounded-lg border border-gray-400 px-4 py-3"
       >
-        <Typography className={`text-foreground leading-tight`}>
+        <Typography className={`text-black leading-tight`}>
           {value}
         </Typography>
       </Pressable>
