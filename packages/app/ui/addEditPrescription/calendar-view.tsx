@@ -7,12 +7,14 @@ import { Typography } from '../typography'
 import { cn } from '../utils'
 
 export type CalendarViewProps = {
+  component: any
   calendarPickerProps: CalendarPickerProps
   onCancel: () => void
   onClear: () => void
 }
 
 export function CalendarView({
+  component,
   calendarPickerProps,
   onCancel,
   onClear
@@ -30,11 +32,15 @@ export function CalendarView({
       </View>
       <CalendarPicker {...calendarPickerProps} />
       <View className="mt-2 h-[1px] w-[97%] self-center bg-[#86939e]" />
-      <Button
-        title={'Clear'}
-        className="mt-5 w-[40%] self-center bg-[#86939e]"
-        onPress={onClear}
-      />
+      {component !== 'ConsolidatedView' ? (
+        <Button
+          title={'Clear'}
+          className="mt-5 w-[40%] self-center bg-[#86939e]"
+          onPress={onClear}
+        />
+      ) : (
+        <View />
+      )}
     </View>
   )
 }
@@ -61,9 +67,7 @@ export function CalendarViewInput({
         onPress={onPress}
         className="flex w-full flex-row rounded-lg border border-gray-400 px-4 py-3"
       >
-        <Typography className={`text-black leading-tight`}>
-          {value}
-        </Typography>
+        <Typography className={`leading-tight text-black`}>{value}</Typography>
       </Pressable>
     </View>
   )

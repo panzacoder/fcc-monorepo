@@ -72,6 +72,7 @@ export function AddEditIncidentScreen() {
   }
   if (!_.isEmpty(incidentDetails)) {
     incidentType = incidentDetails.type ? incidentDetails.type : ''
+    selectedDate = incidentDetails.date ? incidentDetails.date : new Date()
   }
   const incidentTypeList = staticData.incidentTypeList.map(
     (data: any, index: any) => {
@@ -239,7 +240,15 @@ export function AddEditIncidentScreen() {
         />
         <View className="my-2 mb-5 flex-row justify-center">
           <Button
-            className="bg-[#287CFA]"
+            className="bg-[#86939e]"
+            title="Cancel"
+            variant="default"
+            onPress={() => {
+              router.back()
+            }}
+          />
+          <Button
+            className="ml-5 bg-[#287CFA]"
             title={'Save'}
             leadingIcon="save"
             variant="default"

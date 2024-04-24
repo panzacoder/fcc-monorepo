@@ -300,23 +300,25 @@ export function PrescriptionsListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="flex-row ">
-          <Pressable
-            onPress={() => {
-              setIsShowFilter(!isShowFilter)
-            }}
-            className="w-[75%] flex-row"
-          >
-            <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-              {currentFilter}
-            </Typography>
-            <Feather
-              className="ml-2 mt-6"
-              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-              size={25}
-              color={'black'}
-            />
-          </Pressable>
+        <View className="flex-row w-full">
+          <View className="min-w-[75%]">
+            <Pressable
+              onPress={() => {
+                setIsShowFilter(!isShowFilter)
+              }}
+              className=" flex-row"
+            >
+              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                {currentFilter}
+              </Typography>
+              <Feather
+                className="ml-2 mt-6"
+                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                size={25}
+                color={'black'}
+              />
+            </Pressable>
+          </View>
           {getUserPermission(prescriptionPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity

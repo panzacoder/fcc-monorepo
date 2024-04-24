@@ -28,6 +28,7 @@ import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useRouter } from 'solito/navigation'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
+import { consoleData } from 'app/ui/utils'
 const schema = z.object({
   locationShortName: z
     .string()
@@ -123,9 +124,11 @@ export function AddEditLocationScreen() {
         const countryObject = ct.getCountriesForTimezone(newTimeZone)
         countryName = countryObject[0]?.name ? countryObject[0].name : ''
       }
+      consoleData('countryName', countryName)
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
           countryIndex = index
+          consoleData('countryName index', '' + index)
         }
       })
       let countryId = staticData.countryList[countryIndex].id
@@ -163,9 +166,10 @@ export function AddEditLocationScreen() {
     resolver: zodResolver(schema)
   })
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value.id]?.id
-      ? staticData.countryList[value.id].id
-      : 101
+    let countryId =
+      value && staticData.countryList[value.id].id
+        ? staticData.countryList[value.id].id
+        : 101
     await getStates(countryId)
   }
   async function deleteLocation() {

@@ -304,7 +304,14 @@ export function DoctorDetailsScreen() {
                 className="ml-2"
                 title="Add Appointment"
                 variant="default"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/addEditAppointment', {
+                      memberData: JSON.stringify(memberData),
+                      component: 'Doctor'
+                    })
+                  )
+                }}
               />
             </View>
             {appointmentList.length > 0 && isShowAppointments ? (

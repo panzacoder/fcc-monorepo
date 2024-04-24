@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pressable, View, TouchableHighlight, ScrollView } from 'react-native'
+import { View, ScrollView } from 'react-native'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -9,12 +9,8 @@ import { useForm } from 'react-hook-form'
 import { getFullDateForCalender } from 'app/ui/utils'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Typography } from '../typography'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { CalendarView, CalendarViewInput } from './calendar-view'
-let prescribedDateUtc: any = ''
-let startDateUtc: any = ''
-let endDateUtc: any = ''
 const schema = z.object({
   typeIndex: z.number().min(0, { message: 'Type is required' }),
   drugName: z.string().min(1, { message: 'Name is required' }),
@@ -43,26 +39,34 @@ export const AddEditPrescription = ({
         )
       : 'Date Prescribed'
   )
+  const [prescribedDateUtc, setPrescribedDateUtc] = useState(
+    !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
+      ? prescriptionDetails.prescribedDate
+      : ''
+  )
   const [startDate, setStartDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.startDate
       ? getFullDateForCalender(prescriptionDetails.startDate, 'MMM DD, YYYY')
       : 'Start Date'
+  )
+  const [startDateUtc, setStartDateUtc] = useState(
+    !_.isEmpty(prescriptionDetails) && prescriptionDetails.startDate
+      ? prescriptionDetails.startDate
+      : ''
   )
   const [endDate, setEndDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.endDate
       ? getFullDateForCalender(prescriptionDetails.endDate, 'MMM DD, YYYY')
       : 'End Date'
   )
+  const [endDateUtc, setEndDateUtc] = useState(
+    !_.isEmpty(prescriptionDetails) && prescriptionDetails.endDate
+      ? prescriptionDetails.endDate
+      : ''
+  )
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
   if (!_.isEmpty(prescriptionDetails)) {
-    prescribedDateUtc = prescriptionDetails.prescribedDate
-      ? prescriptionDetails.prescribedDate
-      : ''
-    startDateUtc = prescriptionDetails.startDate
-      ? prescriptionDetails.startDate
-      : ''
-    endDateUtc = prescriptionDetails.endDate ? prescriptionDetails.endDate : ''
     prescribedBy = prescriptionDetails.doctorName
       ? prescriptionDetails.doctorName
       : ''
@@ -144,13 +148,13 @@ export const AddEditPrescription = ({
     console.log('handleDateChange', date)
     if (calenderClickedCount === 0) {
       setPrescribedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-      prescribedDateUtc = date
+      setPrescribedDateUtc(date)
     } else if (calenderClickedCount === 1) {
       setStartDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-      startDateUtc = date
+      setStartDateUtc(date)
     } else {
       setEndDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
-      endDateUtc = date
+      setEndDateUtc(date)
     }
     setIsShowCalender(false)
   }
@@ -159,17 +163,17 @@ export const AddEditPrescription = ({
     console.log('handleDateCleared')
     if (calenderClickedCount === 0) {
       setPrescribedDate('Date Prescribed')
-      prescribedDateUtc = ''
+      setPrescribedDateUtc('')
       setIsShowCalender(false)
     }
     if (calenderClickedCount === 1) {
       setStartDate('Start Date')
-      startDateUtc = ''
+      setStartDateUtc('')
       setIsShowCalender(false)
     }
     if (calenderClickedCount === 2) {
       setEndDate('End Date')
-      endDateUtc = ''
+      setEndDateUtc('')
       setIsShowCalender(false)
     }
   }
@@ -280,6 +284,7 @@ export const AddEditPrescription = ({
         </View>
         {isShowCalender && (
           <CalendarView
+            component={'Prescription'}
             onCancel={() => setIsShowCalender(false)}
             onClear={handleDateCleared}
             calendarPickerProps={{ onDateChange: handleDateChange }}
