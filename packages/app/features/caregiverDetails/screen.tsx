@@ -222,7 +222,7 @@ export function CaregiverDetailsScreen() {
               <View className="my-5">
                 <Button
                   className=""
-                  title="Delete"
+                  title="Remove from circle"
                   variant="borderRed"
                   onPress={() => {
                     Alert.alert(
