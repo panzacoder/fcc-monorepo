@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Pressable } from 'react-native'
+import { View, Alert, ScrollView, Pressable, FlatList } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -33,6 +33,13 @@ let weekFirstLastDays = [] as any
 let weekDayListDates = [] as any
 let weekDayUtcDates = [] as any
 let weekDayList = [] as any
+let listDayOne = [] as any
+let listDayTwo = [] as any
+let listDayThree = [] as any
+let listDayFour = [] as any
+let listDayFive = [] as any
+let listDaySix = [] as any
+let listDaySeven = [] as any
 let fromDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD') as any
 let toDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD') as any
 let currentDate = getFullDateForCalender(new Date(), 'DD MMM YYYY') as any
@@ -44,7 +51,16 @@ export function ConsolidatedViewScreen() {
     member: userDetails.memberId ? userDetails.memberId : ''
   }
   const [isLoading, setLoading] = useState(false)
+  const [isRender, setIsRender] = useState(false)
   const [memberActivityList, setMemberActivityList] = useState([]) as any
+
+  // const [listDayOne, setListDayOne] = useState([]) as any
+  // const [listDayTwo, setListDayTwo] = useState([]) as any
+  // const [listDayThree, setListDayThree] = useState([]) as any
+  // const [listDayFour, setListDayFour] = useState([]) as any
+  // const [listDayFive, setListDayFive] = useState([]) as any
+  // const [listDaySix, setListDaySix] = useState([]) as any
+  // const [listDaySeven, setListDaySeven] = useState([]) as any
 
   const [weekDays, setWeekDays] = useState([
     'Sunday',
@@ -92,13 +108,20 @@ export function ConsolidatedViewScreen() {
     },
     resolver: zodResolver(schema)
   })
+  function clearLists() {
+    listDayOne = []
+    listDayTwo = []
+    listDayThree = []
+    listDayFour = []
+    listDayFive = []
+    listDaySix = []
+    listDaySeven = []
+  }
   function getWeekCurrentLastDays(currentDate: any) {
-    console.log('currentDate', currentDate)
-    // setWeekDayList([])
-    // setWeekDayUtcDates([])
-    // setWeekFirstLastDays([])
-    // setWeekDayListDates([])
-
+    weekFirstLastDays = []
+    weekDayListDates = []
+    weekDayUtcDates = []
+    weekDayList = []
     var curr = new Date(currentDate)
     let day = curr.getDay()
     let firstday = new Date(curr.getTime() - 60 * 60 * 24 * day * 1000)
@@ -107,7 +130,7 @@ export function ConsolidatedViewScreen() {
     weekDayUtcDates.push(previouDayUtc)
     weekDayUtcDates.push(firstday)
     let fullDate = getFullDateForCalender(firstday, 'DD MMM')
-    console.log('fullDate', fullDate)
+    // console.log('fullDate', fullDate)
     let firstDate = '   ' + weekDaysShort[0] + '\n' + fullDate
     weekDayList.push(firstDate)
     weekDayListDates.push(fullDate)
@@ -131,6 +154,43 @@ export function ConsolidatedViewScreen() {
         weekDayUtcDates.push(nextDayUtc)
       }
     }
+    // console.log('weekDayListDates', JSON.stringify(weekDayListDates))
+    setIsRender(!isRender)
+  }
+  async function setMemberActivityWithDays() {
+    // console.log('setMemberActivityWithDays')
+    memberActivityList.map((data: any) => {
+      if (
+        weekFirstLastDays[0] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDayOne.push(data)
+      } else if (
+        weekFirstLastDays[1] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDayTwo.push(data)
+      } else if (
+        weekFirstLastDays[2] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDayThree.push(data)
+      } else if (
+        weekFirstLastDays[3] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDayFour.push(data)
+      } else if (
+        weekFirstLastDays[4] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDayFive.push(data)
+      } else if (
+        weekFirstLastDays[5] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDaySix.push(data)
+      } else if (
+        weekFirstLastDays[6] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
+      ) {
+        listDaySeven.push(data)
+      }
+    })
+
   }
   const getConsolidatedFilterOptions = useCallback(async () => {
     setLoading(true)
@@ -161,45 +221,56 @@ export function ConsolidatedViewScreen() {
         console.log('error', error)
       })
   }, [])
-  const getConsolidatedDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_CONSOLIDATED_DETAILS}`
-    let dataObject = {
-      header: header,
-      fromdate: fromDate,
-      todate: toDate
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list: object[] = []
-          data.data.memberActivityList.map((option: any) => {
-            if (isDayView) {
-              if (
-                currentDate ===
-                getFullDateForCalender(option.date, 'DD MMM YYYY')
-              ) {
+  const getConsolidatedDetails = useCallback(
+    async (fromDate: any, toDate: any) => {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_CONSOLIDATED_DETAILS}`
+      let dataObject = {
+        header: header,
+        fromdate: fromDate,
+        todate: toDate
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            let list: object[] = []
+            data.data.memberActivityList.map((option: any) => {
+              if (isDayView) {
+                if (
+                  currentDate ===
+                  getFullDateForCalender(option.date, 'DD MMM YYYY')
+                ) {
+                  list.push(option)
+                }
+              } else {
                 list.push(option)
               }
+            })
+            setMemberActivityList(list)
+            if (!isDayView) {
+              setMemberActivityWithDays()
             }
-          })
-          setMemberActivityList(list)
-          setIsDataReceived(true)
-          // console.log('memberActivityList', JSON.stringify(memberActivityList))
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
+            setIsDataReceived(true)
+            // console.log(
+            //   'memberActivityList',
+            //   JSON.stringify(memberActivityList)
+            // )
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    },
+    []
+  )
   useEffect(() => {
     getConsolidatedFilterOptions()
-    getConsolidatedDetails()
     getWeekCurrentLastDays(new Date())
+    getConsolidatedDetails(fromDate, toDate)
   }, [])
   const handleDateCleared = () => {}
   const handleDateChange = (date: Date) => {
@@ -207,6 +278,10 @@ export function ConsolidatedViewScreen() {
     setSelectedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
     setSelectedDateUtc(date)
     setIsShowCalender(false)
+  }
+  async function getPreviousWeek() {
+    getWeekCurrentLastDays(weekDayUtcDates[0])
+    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
   }
   async function getPreviousDate() {
     setDayCount(--dayCount)
@@ -217,22 +292,25 @@ export function ConsolidatedViewScreen() {
     currentDate = getFullDateForCalender(yesterday, 'DD MMM YYYY')
     toDate = getFullDateForCalender(yesterday, 'YYYY-MM-DD')
     fromDate = getFullDateForCalender(yesterday, 'YYYY-MM-DD')
-    getConsolidatedDetails()
+    getConsolidatedDetails(fromDate, toDate)
   }
-
+  async function getNextWeek() {
+    getWeekCurrentLastDays(weekDayUtcDates[8])
+    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
+  }
   async function getNextDate() {
     setDayCount(++dayCount)
     let tomorrow = new Date(currentDateUtc)
     tomorrow.setUTCDate(tomorrow.getDate() + dayCount)
-    console.log('in tomorrow', '' + tomorrow)
+    // console.log('in tomorrow', '' + tomorrow)
     setCurrentDay(weekDays[new Date(tomorrow).getDay()])
     setCurrentDateForDayView(getFullDateForCalender(tomorrow, 'DD MMM YYYY'))
     currentDate = getFullDateForCalender(tomorrow, 'DD MMM YYYY')
     toDate = getFullDateForCalender(tomorrow, 'YYYY-MM-DD')
     fromDate = getFullDateForCalender(tomorrow, 'YYYY-MM-DD')
-    console.log('fromDate', '' + fromDate)
-    console.log('toDate', '' + toDate)
-    getConsolidatedDetails()
+    // console.log('fromDate', '' + fromDate)
+    // console.log('toDate', '' + toDate)
+    getConsolidatedDetails(fromDate, toDate)
   }
   function getActivityName(type: any) {
     let activityName = ''
@@ -250,9 +328,9 @@ export function ConsolidatedViewScreen() {
   function getColor(type: any) {
     let colorStr = ''
     if (type === 'Doctor Appointment') {
-      colorStr = 'bg-[#e6dab8]'
+      colorStr = 'bg-[#e3dac1]'
     } else if (type === 'Facility Appointment') {
-      colorStr = 'bg-[#D4EFDF]'
+      colorStr = 'bg-[#d8e8de]'
     } else if (type === 'Event') {
       colorStr = 'bg-[#d6eaf8]'
     } else if (type === 'Incident') {
@@ -260,6 +338,250 @@ export function ConsolidatedViewScreen() {
     }
     return colorStr
   }
+  function getCard(data: any, index: any) {
+    return (
+      <Pressable
+        onPress={() => {
+          if (
+            data.type === 'Doctor Appointment' ||
+            data.type === 'Facility Appointment'
+          ) {
+            router.replace(
+              formatUrl('/circles/appointmentDetails', {
+                appointmentDetails: JSON.stringify(data),
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          }
+          if (data.type === 'Incident') {
+            router.replace(
+              formatUrl('/circles/incidentDetails', {
+                incidentDetails: JSON.stringify(data),
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          }
+          if (data.type === 'Event') {
+            router.replace(
+              formatUrl('/circles/eventDetails', {
+                eventDetails: JSON.stringify(data),
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          }
+        }}
+        key={index}
+        className={`mt-3 w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 py-2 ${data.type ? getColor(data.type) : 'bg-white'}`}
+      >
+        <View className=" flex-row">
+          <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm font-bold text-black">
+            {data.membername ? data.membername : ''}
+          </Typography>
+          <View className="">
+            <Typography className="text-sm text-black">
+              {data.type ? getActivityName(data.type) : ''}
+            </Typography>
+          </View>
+        </View>
+        <View className=" flex-row">
+          <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm text-black">
+            {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+          </Typography>
+          <View className="">
+            <Typography className="text-sm text-black">
+              {data.status ? data.status : ''}
+            </Typography>
+          </View>
+        </View>
+        <View className=" flex-row">
+          <Typography className="font-400 text-primary ml-2 mr-[2px] w-[95%] text-sm font-bold">
+            {data.address ? data.address : ''}
+          </Typography>
+        </View>
+        <View className=" flex-row">
+          <Typography className="font-400 ml-2 w-full text-sm text-black">
+            {data.purpose ? data.purpose : ''}
+          </Typography>
+        </View>
+        {data.hasNotes || data.hasReminders || data.hasTransportation ? (
+          <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+        ) : (
+          <View />
+        )}
+
+        <View className="ml-2 flex-row self-center">
+          <View className="w-[30%]">
+            {data.hasNotes ? (
+              <View className="flex-row">
+                <Feather
+                  className="ml-5 mt-1"
+                  name={'message-circle'}
+                  size={25}
+                  color={'green'}
+                />
+                {data.unreadMessageCount > 0 ? (
+                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center text-sm font-bold text-white">
+                    {data.unreadMessageCount}
+                  </Typography>
+                ) : (
+                  <View />
+                )}
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          <View className="w-[30%]">
+            {data.hasReminders ? (
+              <View className="flex-row">
+                <Feather
+                  className="ml-5 mt-1"
+                  name={'clock'}
+                  size={25}
+                  color={'red'}
+                />
+                {data.activeReminderCount > 0 ? (
+                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center text-sm font-bold text-white">
+                    {data.activeReminderCount}
+                  </Typography>
+                ) : (
+                  <View />
+                )}
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          {data.hasTransportation ? (
+            <View className="w-[30%]">
+              <Feather
+                className="ml-5 mt-1"
+                name={'truck'}
+                size={25}
+                color={
+                  data.transportationStatus === 'Requested'
+                    ? '#cf8442'
+                    : data.transportationStatus === 'Rejected'
+                      ? 'red'
+                      : 'black'
+                }
+              />
+            </View>
+          ) : (
+            <View />
+          )}
+        </View>
+      </Pressable>
+    )
+  }
+  const renderItem = ({ item, index }) => {
+    if (item.empty === true) {
+      return (
+        <View
+          style={[
+            {
+              backgroundColor: '#4D243D',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              margin: 1,
+              marginTop: 0
+            },
+            {
+              backgroundColor: 'transparent'
+            }
+          ]}
+        />
+      )
+    }
+    return getCard(item, index)
+  }
+  const dayTimesView = memberActivityList.map((data: any, index: any) => {
+    return getCard(data, index)
+  })
+  let itemStyle = 'ml-5 flex-1'
+  const weekView = weekDayList.map((data: any, index: any) => {
+    return (
+      <View key={index} className="flex-1 justify-center">
+        <View className="mb-5 mt-5 flex-row items-center justify-center">
+          <Typography className="font-bold">{data}</Typography>
+          <View className="max-w-[85%] flex-row">
+            {index === 0 ? (
+              <FlatList
+                data={listDayOne}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 1 ? (
+              <FlatList
+                data={listDayTwo}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 2 ? (
+              <FlatList
+                data={listDayThree}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 3 ? (
+              <FlatList
+                data={listDayFour}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 4 ? (
+              <FlatList
+                data={listDayFive}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 5 ? (
+              <FlatList
+                data={listDaySix}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+
+            {index === 6 ? (
+              <FlatList
+                data={listDaySeven}
+                className={itemStyle}
+                renderItem={renderItem}
+              />
+            ) : (
+              <View />
+            )}
+          </View>
+        </View>
+        <View className="absolute left-[50px] h-full w-[1px] bg-black" />
+        <View className="h-[1px] w-full bg-black" />
+      </View>
+    )
+  })
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -268,7 +590,7 @@ export function ConsolidatedViewScreen() {
         <Pressable
           onPress={() => {
             setIsDayView(true)
-            getConsolidatedDetails()
+            getConsolidatedDetails(fromDate, toDate)
           }}
           className={`w-[40%] items-center justify-center ${isDayView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -281,7 +603,9 @@ export function ConsolidatedViewScreen() {
         </Pressable>
         <Pressable
           onPress={() => {
+            clearLists()
             setIsDayView(false)
+            getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
           }}
           className={`w-[40%] items-center justify-center ${!isDayView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -355,6 +679,9 @@ export function ConsolidatedViewScreen() {
               onPress={() => {
                 if (isDayView) {
                   getPreviousDate()
+                } else {
+                  clearLists()
+                  getPreviousWeek()
                 }
               }}
               className="ml-5 h-[40] w-[40] items-center justify-center self-center rounded-[5px] bg-white"
@@ -387,6 +714,9 @@ export function ConsolidatedViewScreen() {
               onPress={() => {
                 if (isDayView) {
                   getNextDate()
+                } else {
+                  clearLists()
+                  getNextWeek()
                 }
               }}
               className="mr-5 h-[40] w-[40] items-center justify-center self-center rounded-[5px] bg-white"
@@ -403,157 +733,14 @@ export function ConsolidatedViewScreen() {
       </View>
       {memberActivityList.length > 0 ? (
         <ScrollView className="">
-          {isDayView ? (
-            <View>
-              {memberActivityList.map((data: any, index: number) => {
-                return (
-                  <Pressable
-                    onPress={() => {
-                      if (
-                        data.type === 'Doctor Appointment' ||
-                        data.type === 'Facility Appointment'
-                      ) {
-                        router.push(
-                          formatUrl('/circles/appointmentDetails', {
-                            appointmentDetails: JSON.stringify(data),
-                            memberData: JSON.stringify(memberData)
-                          })
-                        )
-                      }
-                      if (data.type === 'Incident') {
-                        router.push(
-                          formatUrl('/circles/incidentDetails', {
-                            incidentDetails: JSON.stringify(data),
-                            memberData: JSON.stringify(memberData)
-                          })
-                        )
-                      }
-                      if (data.type === 'Event') {
-                        router.push(
-                          formatUrl('/circles/eventDetails', {
-                            eventDetails: JSON.stringify(data),
-                            memberData: JSON.stringify(memberData)
-                          })
-                        )
-                      }
-                    }}
-                    key={index}
-                    className={`mt-3 w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 py-2 ${data.type ? getColor(data.type) : 'bg-white'}`}
-                  >
-                    <View className=" flex-row">
-                      <Typography className="font-400 ml-5 w-[70%] max-w-[70%] font-bold text-black">
-                        {data.membername ? data.membername : ''}
-                      </Typography>
-                      <View className="">
-                        <Typography className="text-black">
-                          {data.type ? getActivityName(data.type) : ''}
-                        </Typography>
-                      </View>
-                    </View>
-                    <View className=" flex-row">
-                      <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-black">
-                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
-                      </Typography>
-                      <View className="">
-                        <Typography className="text-black">
-                          {data.status ? data.status : ''}
-                        </Typography>
-                      </View>
-                    </View>
-                    <View className=" flex-row">
-                      <Typography className="font-400 text-primary ml-5 mr-[2px] w-[95%] font-bold">
-                        {data.address ? data.address : ''}
-                      </Typography>
-                    </View>
-                    <View className=" flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
-                        {data.purpose ? data.purpose : ''}
-                      </Typography>
-                    </View>
-                    {data.hasNotes ||
-                    data.hasReminders ||
-                    data.hasTransportation ? (
-                      <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                    ) : (
-                      <View />
-                    )}
-
-                    <View className="ml-5 flex-row self-center">
-                      <View className="w-[30%]">
-                        {data.hasNotes ? (
-                          <View className="flex-row">
-                            <Feather
-                              className="ml-5 mt-1"
-                              name={'message-circle'}
-                              size={25}
-                              color={'green'}
-                            />
-                            {data.unreadMessageCount > 0 ? (
-                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                {data.unreadMessageCount}
-                              </Typography>
-                            ) : (
-                              <View />
-                            )}
-                          </View>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                      <View className="w-[30%]">
-                        {data.hasReminders ? (
-                          <View className="flex-row">
-                            <Feather
-                              className="ml-5 mt-1"
-                              name={'clock'}
-                              size={25}
-                              color={'red'}
-                            />
-                            {data.activeReminderCount > 0 ? (
-                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                {data.activeReminderCount}
-                              </Typography>
-                            ) : (
-                              <View />
-                            )}
-                          </View>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                      {data.hasTransportation ? (
-                        <View className="w-[30%]">
-                          <Feather
-                            className="ml-5 mt-1"
-                            name={'truck'}
-                            size={25}
-                            color={
-                              data.transportationStatus === 'Requested'
-                                ? '#cf8442'
-                                : data.transportationStatus === 'Rejected'
-                                  ? 'red'
-                                  : 'black'
-                            }
-                          />
-                        </View>
-                      ) : (
-                        <View />
-                      )}
-                    </View>
-                  </Pressable>
-                )
-              })}
-            </View>
-          ) : (
-            <View />
-          )}
+          {isDayView ? dayTimesView : weekView}
         </ScrollView>
       ) : (
         <View className="flex-1 justify-center self-center">
-          {isDataReceived ? (
+          {isDataReceived && isDayView ? (
             <Typography className="text-lg font-bold">{'No Data'}</Typography>
           ) : (
-            <View />
+            weekView
           )}
         </View>
       )}
