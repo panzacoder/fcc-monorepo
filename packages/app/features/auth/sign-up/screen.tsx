@@ -116,151 +116,82 @@ export function SignUpScreen() {
       />
 
       <PtsLoader loading={isLoading} />
-      <ScrollView>
-        <FormProvider {...formMethods}>
-          <View className="mb-2 mt-5 flex flex-wrap justify-end gap-y-4">
-            <View className="flex w-full gap-2">
-              <View className="flex w-full flex-row justify-between gap-2">
-                <ControlledTextField
-                  name="firstName"
-                  className="flex-1"
-                  placeholder={'First Name*'}
-                  onSubmitEditing={() => {
-                    formMethods.setFocus('lastName')
-                  }}
-                />
-                <ControlledTextField
-                  name="lastName"
-                  className="flex-1"
-                  placeholder={'Last Name*'}
-                  onSubmitEditing={() => {
-                    formMethods.setFocus('email')
-                  }}
-                />
-              </View>
-              <ControlledTextField
-                name="firstName"
-                className="flex-1"
-                placeholder={'First Name*'}
-                onSubmitEditing={() => {
-                  formMethods.setFocus('lastName')
-                }}
-              />
-              <ControlledTextField
-                name="lastName"
-                className="flex-1"
-                placeholder={'Last Name*'}
-                onSubmitEditing={() => {
-                  formMethods.setFocus('email')
-                }}
-              />
-            </View>
+      <FormProvider {...formMethods}>
+        <View className="mb-2 mt-5 flex flex-wrap justify-end gap-y-2">
+          <View className="flex w-full flex-row justify-between gap-2">
             <ControlledTextField
-              name="email"
-              placeholder={'Email Address*'}
-              autoCapitalize="none"
+              name="firstName"
+              className="flex-1"
+              placeholder={'First Name*'}
               onSubmitEditing={() => {
-                formMethods.setFocus('phone')
+                formMethods.setFocus('lastName')
               }}
             />
             <ControlledTextField
-              name="phone"
-              placeholder={'Phone'}
-              keyboard={'numeric'}
+              name="lastName"
+              className="flex-1"
+              placeholder={'Last Name*'}
               onSubmitEditing={() => {
-                formMethods.setFocus('password')
+                formMethods.setFocus('email')
               }}
-            />
-            <ControlledSecureField
-              name="password"
-              placeholder="Password*"
-              onSubmitEditing={() => {
-                formMethods.setFocus('confirmPassword')
-              }}
-            />
-            <ControlledSecureField
-              name="confirmPassword"
-              placeholder="Confirm Password*"
-              onSubmitEditing={() => {
-                formMethods.setFocus('address')
-              }}
-            />
-
-              <AddressFields
-                onSubmitEditing={() => {
-                  formMethods.setFocus('acceptTc')
-                }}
-              />
-            </View>
-            <View className="flex flex-row items-center justify-center">
-              <Controller
-                name="acceptTc"
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <CheckBox
-                    checked={value}
-                    checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
-                    onPress={() => {
-                      onChange(!value)
-                    }}
-                    className="flex-shrink"
-                  />
-                )}
-              />
-              <Typography className="ml-[-10px] flex-1">
-                {'I accept the '}
-                <Typography
-                  onPress={() => {
-                    router.push(
-                      formatUrl('/(termsAndPolicy)/termsAndConditions', {})
-                    )
-                  }}
-                  className="text-primary  font-bold"
-                >
-                  {' Terms and Conditions '}
-                </Typography>
-                <Typography>{' and '}</Typography>
-                <Typography
-                  onPress={() => {
-                    router.push(
-                      formatUrl('/(termsAndPolicy)/privacyPolicy', {})
-                    )
-                  }}
-                  className="text-primary font-bold"
-                >
-                  {' Privacy Policy '}
-                </Typography>
-              </Typography>
-            </View>
-            <Button
-              onPress={formMethods.handleSubmit(submitRegistration)}
-              className="w-full"
-              title="Sign Up"
             />
           </View>
-          <View className="m-1 flex flex-row items-center justify-center gap-4 ">
-            <ControlledCheckbox name="acceptTc" />
-            <Typography className="flex-1 text-sm">
-              {'Accept the '}
-              <Typography
-                onPress={() => {
-                  router.push('/termsAndConditions')
-                }}
-                className="text-primary text-sm font-bold"
-              >
-                {'Terms and Conditions '}
-              </Typography>
-              {'& '}
-              <Typography className="text-primary text-sm font-bold">
-                {'Privacy Policy '}
-              </Typography>
-            </Typography>
-          </View>
-          <Button
-            onPress={formMethods.handleSubmit(submitRegistration)}
-            className="w-full"
-            title="Sign Up"
+          <ControlledTextField
+            name="email"
+            placeholder={'Email Address*'}
+            autoCapitalize="none"
+            onSubmitEditing={() => {
+              formMethods.setFocus('phone')
+            }}
           />
+          <ControlledTextField
+            name="phone"
+            placeholder={'Phone'}
+            keyboard={'numeric'}
+            onSubmitEditing={() => {
+              formMethods.setFocus('password')
+            }}
+          />
+          <ControlledSecureField
+            name="password"
+            placeholder="Password*"
+            onSubmitEditing={() => {
+              formMethods.setFocus('confirmPassword')
+            }}
+          />
+          <ControlledSecureField
+            name="confirmPassword"
+            placeholder="Confirm Password*"
+            onSubmitEditing={() => {
+              formMethods.setFocus('address')
+            }}
+          />
+
+          <AddressFields />
         </View>
+        <View className="m-1 my-3 flex flex-row items-center justify-center gap-4 ">
+          <ControlledCheckbox name="acceptTc" />
+          <Typography className="flex-1 text-sm">
+            {'I accept the '}
+            <Typography
+              onPress={() => {
+                router.push('/termsAndConditions')
+              }}
+              className="text-primary text-sm font-bold"
+            >
+              {'Terms and Conditions '}
+            </Typography>
+            {'& '}
+            <Typography className="text-primary text-sm font-bold">
+              {'Privacy Policy '}
+            </Typography>
+          </Typography>
+        </View>
+        <Button
+          onPress={formMethods.handleSubmit(submitRegistration)}
+          className="w-full"
+          title="Sign Up"
+        />
       </FormProvider>
     </CardView>
   )
