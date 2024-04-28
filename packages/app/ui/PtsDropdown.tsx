@@ -40,8 +40,8 @@ const DropdownInput = React.forwardRef<TextInput>(
 const PtsDropdown = React.forwardRef(function PtsDropdown(
   {
     label,
-    // defaultValue,
-    // value, // unused right now, is hooked into to sync with form state but is not "controlled"
+    defaultValue,
+    value = defaultValue,
     list,
     onChangeValue,
     error,
@@ -62,6 +62,9 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
     })
   }, [list])
 
+  const valueObject = dataSet.find((item) => item.id === value)
+
+  console.log('value', value)
   return (
     <View className="flex">
       {label && (
@@ -75,6 +78,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
         )}
       >
         <AutocompleteDropdown
+          initialValue={valueObject}
           ref={ref}
           emptyResultText={emptyResultText}
           key={`dropdown-${label}`}
@@ -85,10 +89,12 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
             margin: 0
           }}
           clearOnFocus={false}
+          closeOnBlur
           closeOnSubmit
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onSelectItem={(item: DropdownItem) => {
+            console.log('item', item)
             onChangeValue?.(item)
             item && onSubmitEditing?.()
           }}
