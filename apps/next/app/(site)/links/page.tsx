@@ -68,7 +68,7 @@ export default function LinkPage() {
           </div>
         </Card>
       </div>
-      <section className="container space-y-10">
+      <section className="mx-auto max-w-screen-md space-y-10">
         <div className="grid grid-cols-[40%_1fr] grid-rows-1 items-start gap-6">
           <Image
             width={400}
@@ -119,18 +119,16 @@ export default function LinkPage() {
         </div>
       </section>
 
-      <section className="bg-card/50  rounded-2xl py-16 shadow-2xl md:py-24 lg:py-32">
-        <div className="space-y-4 text-center">
-          <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
-            Download the App Now
-          </h2>
-          <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
-            Give the best care possible, one day at a time.{' '}
-          </p>
-          <div className="w-100 grid grid-cols-2 items-center justify-items-stretch gap-x-4">
-            <IosBadge />
-            <AndroidBadge />
-          </div>
+      <section className="bg-card/50 space-y-4 rounded-2xl py-16 text-center shadow-2xl">
+        <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
+          Download the App Now
+        </h2>
+        <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
+          Give the best care possible, one day at a time.{' '}
+        </p>
+        <div className="w-100 grid grid-cols-2 items-center justify-items-stretch gap-x-4">
+          <IosBadge />
+          <AndroidBadge />
         </div>
       </section>
     </div>
