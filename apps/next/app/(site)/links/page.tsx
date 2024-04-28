@@ -2,11 +2,10 @@
 
 import { Typography } from 'app/ui/typography'
 import { Card } from 'app/ui/card'
-import { Button } from 'app/ui/button'
 import Image from 'next/image'
 import { Feather } from 'app/ui/icons'
 
-export function IosBadge() {
+function IosBadge() {
   const IOSUrl =
     'https://apps.apple.com/us/app/family-care-circle-mobile-app/id1602521967?ppid=a1dcf835-b698-4a4d-bc42-0777b16175a0'
 
@@ -23,7 +22,7 @@ export function IosBadge() {
   )
 }
 
-export function AndroidBadge() {
+function AndroidBadge() {
   const APKUrl =
     'https://play.google.com/store/apps/details?id=com.familycarecircle.fccmobileapp&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'
 
