@@ -125,6 +125,7 @@ export type ButtonProps = PressableProps &
     typographyClassName?: string
     leadingIcon?: ComponentProps<typeof Feather>['name']
     trailingIcon?: ComponentProps<typeof Feather>['name']
+    children?: React.ReactNode
   }
 
 export const Button = ({
@@ -138,6 +139,7 @@ export const Button = ({
   trailingIcon,
   typographyClassName,
   iconOnly,
+  children,
   ...rest
 }: ButtonProps) => {
   const { button, text, icon } = buttonVariants({
@@ -147,7 +149,7 @@ export const Button = ({
     iconOnly
   })
   return (
-    <Pressable onPress={onPress} className={button({ className })}>
+    <Pressable onPress={onPress} className={button({ className })} {...rest}>
       {leadingIcon && (
         <Feather name={leadingIcon} size={16} className={icon()} />
       )}
@@ -158,6 +160,7 @@ export const Button = ({
       >
         {title}
       </Typography>
+      {children}
       {trailingIcon && (
         <Feather name={trailingIcon} size={16} className={icon()} />
       )}
