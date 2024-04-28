@@ -1,3 +1,4 @@
+'use client'
 import { Feather as ExpoFeather } from '@expo/vector-icons'
 import { cssInterop } from 'nativewind'
 import { ComponentProps } from 'react'

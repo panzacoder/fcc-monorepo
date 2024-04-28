@@ -4,6 +4,8 @@ import { Typography } from 'app/ui/typography'
 import { NewsletterForm } from 'app/features/newsletter/form'
 import { Card } from 'app/ui/card'
 import Image from 'next/image'
+import Link from 'next/link'
+import { Feather } from 'app/ui/icons'
 
 export default function ContactPage() {
   return (
@@ -19,6 +21,13 @@ export default function ContactPage() {
         <Typography variant="h2" className="text-center font-bold text-white">
           We make it <span className="font-extralight italic">lighter.</span>
         </Typography>
+        <Link href="/links" className="text-secondary group hover:text-white">
+          Learn more about the app{' '}
+          <Feather
+            name="arrow-right"
+            className="text-secondary group-hover:text-white"
+          />
+        </Link>
       </Card>
       <div className="grid grid-cols-subgrid justify-items-center gap-2">
         <Image
