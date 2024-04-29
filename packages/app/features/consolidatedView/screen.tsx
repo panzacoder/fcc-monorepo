@@ -14,7 +14,8 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   GET_CONSOLIDATED_FILTER_OPTIONS,
-  GET_CONSOLIDATED_DETAILS
+  GET_CONSOLIDATED_DETAILS,
+  GET_FILTER_CONSOLIDATED_DETAILS
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
@@ -54,14 +55,6 @@ export function ConsolidatedViewScreen() {
   const [isRender, setIsRender] = useState(false)
   const [memberActivityList, setMemberActivityList] = useState([]) as any
 
-  // const [listDayOne, setListDayOne] = useState([]) as any
-  // const [listDayTwo, setListDayTwo] = useState([]) as any
-  // const [listDayThree, setListDayThree] = useState([]) as any
-  // const [listDayFour, setListDayFour] = useState([]) as any
-  // const [listDayFive, setListDayFive] = useState([]) as any
-  // const [listDaySix, setListDaySix] = useState([]) as any
-  // const [listDaySeven, setListDaySeven] = useState([]) as any
-
   const [weekDays, setWeekDays] = useState([
     'Sunday',
     'Monday',
@@ -93,7 +86,7 @@ export function ConsolidatedViewScreen() {
   const [selectedStartDate, setSelectedStartDate] = useState(
     getFullDateForCalender(new Date(), 'DD MMM YYYY')
   )
-  const [selectedDateUtc, setSelectedDateUtc] = useState('') as any
+  const [selectedDateUtc, setSelectedDateUtc] = useState(new Date()) as any
   const [currentDay, setCurrentDay] = useState(
     weekDays[new Date().getDay()]
   ) as any
@@ -101,7 +94,8 @@ export function ConsolidatedViewScreen() {
     currentDate.split(' ')[2]
   ) as any
   const [isShowFilter, setIsShowFilter] = useState(false)
-  const [isDayView, setIsDayView] = useState(true)
+  const [isDayView, setIsDayView] = useState(false)
+  const [isWeekView, setIsWeekView] = useState(true)
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       typeIndex: 0
@@ -117,7 +111,8 @@ export function ConsolidatedViewScreen() {
     listDaySix = []
     listDaySeven = []
   }
-  function getWeekCurrentLastDays(currentDate: any) {
+  async function getWeekCurrentLastDays(currentDate: any) {
+    console.log('currentDate', currentDate)
     weekFirstLastDays = []
     weekDayListDates = []
     weekDayUtcDates = []
@@ -154,12 +149,14 @@ export function ConsolidatedViewScreen() {
         weekDayUtcDates.push(nextDayUtc)
       }
     }
-    // console.log('weekDayListDates', JSON.stringify(weekDayListDates))
-    setIsRender(!isRender)
+    // console.log('weekDayList', JSON.stringify(weekDayList))
+    // setIsRender(!isRender)
   }
-  async function setMemberActivityWithDays() {
-    // console.log('setMemberActivityWithDays')
-    memberActivityList.map((data: any) => {
+  async function setMemberActivityWithDays(list: any) {
+    // console.log('setMemberActivityWithDays', JSON.stringify(list))
+    // console.log('weekFirstLastDays', JSON.stringify(weekFirstLastDays))
+    clearLists()
+    list.map((data: any) => {
       if (
         weekFirstLastDays[0] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
       ) {
@@ -190,7 +187,7 @@ export function ConsolidatedViewScreen() {
         listDaySeven.push(data)
       }
     })
-
+    setIsRender(!isRender)
   }
   const getConsolidatedFilterOptions = useCallback(async () => {
     setLoading(true)
@@ -224,11 +221,60 @@ export function ConsolidatedViewScreen() {
   const getConsolidatedDetails = useCallback(
     async (fromDate: any, toDate: any) => {
       setLoading(true)
+      setIsDataReceived(false)
       let url = `${BASE_URL}${GET_CONSOLIDATED_DETAILS}`
       let dataObject = {
         header: header,
         fromdate: fromDate,
         todate: toDate
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            let list: object[] = []
+            if (isDayView) {
+              data.data.memberActivityList.map(async (option: any) => {
+                if (
+                  currentDate ===
+                  getFullDateForCalender(option.date, 'DD MMM YYYY')
+                ) {
+                  list.push(option)
+                }
+              })
+            }
+
+            await setMemberActivityList(
+              isDayView ? list : data.data.memberActivityList
+            )
+            if (isWeekView) {
+              setMemberActivityWithDays(data.data.memberActivityList)
+            }
+            setIsDataReceived(true)
+            console.log(
+              'memberActivityList',
+              JSON.stringify(data.data.memberActivityList)
+            )
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    },
+    []
+  )
+  const getFilterConsolidatedDetails = useCallback(
+    async (fromDate: any, toDate: any) => {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_FILTER_CONSOLIDATED_DETAILS}`
+      let dataObject = {
+        header: header,
+        fromdate: fromDate,
+        todate: toDate,
+        type: selectedType
       }
       CallPostService(url, dataObject)
         .then(async (data: any) => {
@@ -242,19 +288,23 @@ export function ConsolidatedViewScreen() {
                 ) {
                   list.push(option)
                 }
-              } else {
-                list.push(option)
               }
             })
-            setMemberActivityList(list)
-            if (!isDayView) {
-              setMemberActivityWithDays()
+            setMemberActivityList(
+              isDayView ? list : data.data.memberActivityList
+            )
+            if (isWeekView) {
+              setMemberActivityWithDays(data.data.memberActivityList)
+            } else {
+              setCurrentDateForDayView(selectedDate)
             }
+            setIsShowFilter(false)
+
+            console.log(
+              'memberActivityList',
+              JSON.stringify(data.data.memberActivityList)
+            )
             setIsDataReceived(true)
-            // console.log(
-            //   'memberActivityList',
-            //   JSON.stringify(memberActivityList)
-            // )
           } else {
             Alert.alert('', data.message)
           }
@@ -268,13 +318,16 @@ export function ConsolidatedViewScreen() {
     []
   )
   useEffect(() => {
-    getConsolidatedFilterOptions()
     getWeekCurrentLastDays(new Date())
-    getConsolidatedDetails(fromDate, toDate)
+    getConsolidatedFilterOptions()
+    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
   }, [])
   const handleDateCleared = () => {}
   const handleDateChange = (date: Date) => {
     // console.log('date', date)
+    fromDate = getFullDateForCalender(date, 'YYYY-MM-DD')
+    toDate = getFullDateForCalender(date, 'YYYY-MM-DD')
+    currentDate = getFullDateForCalender(date, 'DD MMM YYYY')
     setSelectedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
     setSelectedDateUtc(date)
     setIsShowCalender(false)
@@ -295,7 +348,7 @@ export function ConsolidatedViewScreen() {
     getConsolidatedDetails(fromDate, toDate)
   }
   async function getNextWeek() {
-    getWeekCurrentLastDays(weekDayUtcDates[8])
+    getWeekCurrentLastDays(weekDayUtcDates[6])
     getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
   }
   async function getNextDate() {
@@ -328,13 +381,13 @@ export function ConsolidatedViewScreen() {
   function getColor(type: any) {
     let colorStr = ''
     if (type === 'Doctor Appointment') {
-      colorStr = 'bg-[#e3dac1]'
+      colorStr = 'bg-[#ebe4d1]'
     } else if (type === 'Facility Appointment') {
-      colorStr = 'bg-[#d8e8de]'
+      colorStr = 'bg-[#e1ebe5]'
     } else if (type === 'Event') {
-      colorStr = 'bg-[#d6eaf8]'
+      colorStr = 'bg-[#dcebf5]'
     } else if (type === 'Incident') {
-      colorStr = 'bg-[#FADBD8]'
+      colorStr = 'bg-[#f5dedc]'
     }
     return colorStr
   }
@@ -371,7 +424,7 @@ export function ConsolidatedViewScreen() {
           }
         }}
         key={index}
-        className={`mt-3 w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 py-2 ${data.type ? getColor(data.type) : 'bg-white'}`}
+        className={`my-1 w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 py-2 ${data.type ? getColor(data.type) : 'bg-white'}`}
       >
         <View className=" flex-row">
           <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm font-bold text-black">
@@ -474,104 +527,115 @@ export function ConsolidatedViewScreen() {
       </Pressable>
     )
   }
-  const renderItem = ({ item, index }) => {
-    if (item.empty === true) {
-      return (
-        <View
-          style={[
-            {
-              backgroundColor: '#4D243D',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              margin: 1,
-              marginTop: 0
-            },
-            {
-              backgroundColor: 'transparent'
-            }
-          ]}
-        />
-      )
-    }
-    return getCard(item, index)
+  async function setSelectedTypeChange(value: any) {
+    selectedType = value && value.title !== null ? value.title : 'All'
   }
+
   const dayTimesView = memberActivityList.map((data: any, index: any) => {
     return getCard(data, index)
   })
-  let itemStyle = 'ml-5 flex-1'
   const weekView = weekDayList.map((data: any, index: any) => {
     return (
       <View key={index} className="flex-1 justify-center">
-        <View className="mb-5 mt-5 flex-row items-center justify-center">
-          <Typography className="font-bold">{data}</Typography>
+        <View className="my-2 flex-row items-center justify-center">
+          <Typography className="h-full self-center font-bold">
+            {data}
+          </Typography>
           <View className="max-w-[85%] flex-row">
             {index === 0 ? (
-              <FlatList
-                data={listDayOne}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full ">
+                {listDayOne.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 1 ? (
-              <FlatList
-                data={listDayTwo}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDayTwo.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 2 ? (
-              <FlatList
-                data={listDayThree}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDayThree.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 3 ? (
-              <FlatList
-                data={listDayFour}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDayFour.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 4 ? (
-              <FlatList
-                data={listDayFive}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDayFive.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 5 ? (
-              <FlatList
-                data={listDaySix}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDaySix.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
 
             {index === 6 ? (
-              <FlatList
-                data={listDaySeven}
-                className={itemStyle}
-                renderItem={renderItem}
-              />
+              <ScrollView className="w-full">
+                {listDaySeven.map((data: any, index: number) => {
+                  return (
+                    <View key={index} className="ml-4">
+                      {getCard(data, index)}
+                    </View>
+                  )
+                })}
+              </ScrollView>
             ) : (
               <View />
             )}
@@ -590,6 +654,7 @@ export function ConsolidatedViewScreen() {
         <Pressable
           onPress={() => {
             setIsDayView(true)
+            setIsWeekView(false)
             getConsolidatedDetails(fromDate, toDate)
           }}
           className={`w-[40%] items-center justify-center ${isDayView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
@@ -604,10 +669,11 @@ export function ConsolidatedViewScreen() {
         <Pressable
           onPress={() => {
             clearLists()
+            setIsWeekView(true)
             setIsDayView(false)
             getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
           }}
-          className={`w-[40%] items-center justify-center ${!isDayView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
+          className={`w-[40%] items-center justify-center ${isWeekView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
           <View>
             <Feather
@@ -640,6 +706,7 @@ export function ConsolidatedViewScreen() {
               maxHeight={300}
               list={typesList}
               className=" w-[95%] self-center p-2"
+              onChangeValue={setSelectedTypeChange}
             />
             <CalendarViewInput
               className="w-[90%] self-center"
@@ -657,6 +724,17 @@ export function ConsolidatedViewScreen() {
                   leadingIcon="filter"
                   variant="default"
                   // onPress={handleSubmit(filterAppointment)}
+                  onPress={() => {
+                    if (isDayView) {
+                      getFilterConsolidatedDetails(fromDate, toDate)
+                    } else {
+                      getWeekCurrentLastDays(selectedDateUtc)
+                      getFilterConsolidatedDetails(
+                        weekFirstLastDays[0],
+                        weekFirstLastDays[6]
+                      )
+                    }
+                  }}
                 />
                 <Button
                   className="ml-5 bg-black"
@@ -664,6 +742,29 @@ export function ConsolidatedViewScreen() {
                   leadingIcon="rotate-ccw"
                   variant="default"
                   // onPress={handleSubmit(resetFilter)}
+                  onPress={() => {
+                    setSelectedDate(
+                      getFullDateForCalender(new Date(), 'MMM DD, YYYY')
+                    )
+                    setIsShowFilter(false)
+                    if (isDayView) {
+                      fromDate = getFullDateForCalender(
+                        new Date(),
+                        'YYYY-MM-DD'
+                      )
+                      setCurrentDateForDayView(
+                        getFullDateForCalender(new Date(), 'DD MMM YYYY')
+                      )
+                      toDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD')
+                      getConsolidatedDetails(fromDate, toDate)
+                    } else {
+                      getWeekCurrentLastDays(new Date())
+                      getConsolidatedDetails(
+                        weekFirstLastDays[0],
+                        weekFirstLastDays[6]
+                      )
+                    }
+                  }}
                 />
               </View>
             </View>
@@ -731,16 +832,19 @@ export function ConsolidatedViewScreen() {
           </View>
         </View>
       </View>
-      {memberActivityList.length > 0 ? (
-        <ScrollView className="">
-          {isDayView ? dayTimesView : weekView}
+      {isDataReceived && memberActivityList.length > 0 ? (
+        <ScrollView className="h-full">
+          {isDayView ? dayTimesView : <View />}
+          {isWeekView ? weekView : <View />}
         </ScrollView>
       ) : (
         <View className="flex-1 justify-center self-center">
           {isDataReceived && isDayView ? (
             <Typography className="text-lg font-bold">{'No Data'}</Typography>
-          ) : (
+          ) : isWeekView ? (
             weekView
+          ) : (
+            <View />
           )}
         </View>
       )}
