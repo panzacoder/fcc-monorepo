@@ -1,5 +1,6 @@
 'use client'
-import { View, ScrollView } from 'react-native'
+import { View } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'solito/navigation'
 import { Feather } from 'app/ui/icons'

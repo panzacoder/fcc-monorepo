@@ -1,5 +1,6 @@
 import { ComponentProps } from 'react'
-import { View, ScrollView, Platform } from 'react-native'
+import { View, Platform } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 type Props = React.ComponentProps<typeof ScrollView> & {
   useWindowScrolling?: boolean
 }

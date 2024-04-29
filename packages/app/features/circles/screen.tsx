@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, ScrollView, Pressable } from 'react-native'
+import { View, Alert, Pressable } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { CircleCard } from 'app/ui/circle-card'
 import { Feather } from 'app/ui/icons'

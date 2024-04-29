@@ -1,14 +1,8 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Switch
-} from 'react-native'
+import { useState, useCallback } from 'react'
+import { View, Alert } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { Stack } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import PtsLoader from 'app/ui/PtsLoader'

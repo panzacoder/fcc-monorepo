@@ -1,5 +1,6 @@
 'use client'
-import { ScrollView, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { VariantProps, tv } from 'tailwind-variants'
 
 const cardVariants = tv({

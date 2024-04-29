@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Alert, View, ScrollView, Pressable } from 'react-native'
+import { Alert, View, Pressable } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'solito/navigation'
