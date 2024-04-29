@@ -1,7 +1,8 @@
 'use client'
 import _ from 'lodash'
 import { useState, useCallback } from 'react'
-import { View, Alert, ScrollView } from 'react-native'
+import { View, Alert } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -107,11 +108,16 @@ export function AddEditDoctorScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(isDoctorActive ? true : false)
   const [statesList, setStateslist] = useState([])
+
+  type SpecializationResponse = {
+    id: number
+    specialization: string
+  }
   const specializationList = staticData.specializationList.map(
-    (data: any, index: any) => {
+    ({ specialization, id }: SpecializationResponse) => {
       return {
-        title: data.specialization,
-        id: index + 1
+        id,
+        title: specialization
       }
     }
   )
@@ -163,7 +169,7 @@ export function AddEditDoctorScreen() {
         phone: formData.phone,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization].label,
+        specialist: specializationList[formData.specialization].title,
         status: {
           status: isDoctorActive === true ? 'Active' : 'InActive',
           id: isDoctorActive === true ? 1 : 2
@@ -193,6 +199,8 @@ export function AddEditDoctorScreen() {
       })
   }
   async function createDoctor(formData: Schema) {
+    console.log('createDoctor', formData)
+    console.log('specialist', specializationList[formData.specialization])
     setLoading(true)
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
@@ -227,7 +235,7 @@ export function AddEditDoctorScreen() {
         phone: formData.phone,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization - 1].label,
+        specialist: specializationList[formData.specialization].title,
         isSelf: true,
         doctorLocationList: locationList
       }
