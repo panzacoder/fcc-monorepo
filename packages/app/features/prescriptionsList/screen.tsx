@@ -467,7 +467,7 @@ export function PrescriptionsListScreen() {
       ) : (
         <View />
       )}
-      <ScrollView className="m-2 mx-5 w-full self-center">
+      <ScrollView className="m-2 mx-2 w-full self-center">
         {prescriptionList.map((data: any, index: number) => {
           return (
             <TouchableOpacity
@@ -482,7 +482,7 @@ export function PrescriptionsListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-2 flex-row">
+              <View className="my-1 flex-row">
                 <Typography className="text-primary font-400 ml-5 w-[40%]">
                   {data.type ? data.type : ''}
                 </Typography>

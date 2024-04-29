@@ -339,7 +339,6 @@ export function PrescriptionDetailsScreen() {
               {getDetailsView('Strength', strength)}
               {getDetailsView('Prescribed By', prescribedBy)}
               {getDetailsView('Pharmacy', pharmacy)}
-              {getDetailsView('Pharmacy', pharmacy)}
               {getDetailsView('Date Prescribed', prescribedDate)}
               {getDetailsView('Start Date', startDate)}
               {getDetailsView('End Date', endDate)}

@@ -86,7 +86,7 @@ export const AddEditNote = ({
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">
-      <Typography className="self-center font-bold">{`${component} Note`}</Typography>
+      <Typography className="self-center font-bold">{`${_.isEmpty(noteData) ? 'Add ' : 'Edit '} ${component} Note`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField

@@ -5,6 +5,7 @@ import { Alert, View, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
+import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -45,7 +46,9 @@ export function AddEditAppointmentScreen() {
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(null)
+  const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(
+    null
+  ) as any
   const [doctorFacilityList, setDoctorFacilityList] = useState([]) as any
   const [doctorFacilityListFull, setDoctorFacilityListFull] = useState(
     []
@@ -85,7 +88,7 @@ export function AddEditAppointmentScreen() {
           let doctorFacilities = data.data.map((data: any, index: any) => {
             return {
               title: data.name,
-              id: index
+              id: index + 1
             }
           })
           setDoctorFacilityList(doctorFacilities)
@@ -158,10 +161,10 @@ export function AddEditAppointmentScreen() {
 
     if (selectedDoctorFacility === 0) {
       dataObject.appointment.doctorLocation.id =
-        doctorFacilityListFull[formData.doctoFacilityIndex].locationId
+        doctorFacilityListFull[formData.doctoFacilityIndex - 1].locationId
     } else {
       dataObject.appointment.facilityLocation.id =
-        doctorFacilityListFull[formData.doctoFacilityIndex].locationId
+        doctorFacilityListFull[formData.doctoFacilityIndex - 1].locationId
     }
     // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
@@ -237,7 +240,7 @@ export function AddEditAppointmentScreen() {
     (data: any, index: any) => {
       return {
         title: data.type,
-        id: index
+        id: index + 1
       }
     }
   )
@@ -251,12 +254,19 @@ export function AddEditAppointmentScreen() {
   async function setSelectedTypeChange(value: any) {
     if (value) {
       setIsShowDoctorFacilityDropdown(true)
-      setSelectedDoctorFacility(value.id)
-      getDoctorFacilities(value.id)
+      setSelectedDoctorFacility(value.id - 1)
+      getDoctorFacilities(value.id - 1)
     }
   }
   return (
     <View className="w-full flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(appointmentDetails)
+            ? 'Add Appointment'
+            : 'Edit Appointment'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full py-2 ">
         <ScrollView className="w-full flex-1">
@@ -270,7 +280,7 @@ export function AddEditAppointmentScreen() {
                 appointmentDetails.type &&
                 appointmentDetails.type.type
                   ? appointmentDetails.type.type
-                  : '' 
+                  : ''
               }
               maxHeight={300}
               list={typesList}
@@ -305,7 +315,7 @@ export function AddEditAppointmentScreen() {
               onSelection={onSelection}
             />
           </View>
-          <View className="my-2 w-full flex-row justify-center gap-2">
+          <View className="my-2 w-full flex-row justify-center">
             <ControlledTextField
               control={control}
               name="description"
@@ -314,12 +324,14 @@ export function AddEditAppointmentScreen() {
               autoCapitalize="none"
             />
           </View>
-          <PtsComboBox
-            currentData={purpose}
-            listData={purposeList}
-            onSelection={onSelectionPurpose}
-            placeholderValue={'Select Purpose'}
-          />
+          <View className="w-[95%] self-center">
+            <PtsComboBox
+              currentData={purpose}
+              listData={purposeList}
+              onSelection={onSelectionPurpose}
+              placeholderValue={'Select Purpose'}
+            />
+          </View>
           <View className="mt-5 flex-row justify-center">
             <Button
               className="bg-[#287CFA]"

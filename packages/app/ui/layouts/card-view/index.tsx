@@ -18,7 +18,10 @@ export function CardView({ children, scroll, className = '' }: CardViewProps) {
         className
       )}
     >
-      <ScrollView className="overflow-visible">
+      <ScrollView
+        className="overflow-visible"
+        automaticallyAdjustKeyboardInsets
+      >
         <Card scroll={scroll} className="web:w-auto native:w-full">
           {children}
         </Card>

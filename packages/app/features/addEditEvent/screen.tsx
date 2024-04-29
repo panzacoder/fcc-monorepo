@@ -7,6 +7,7 @@ import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
+import { Stack } from 'expo-router'
 import { useRouter } from 'solito/navigation'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -155,6 +156,11 @@ export function AddEditEventScreen() {
   }
   return (
     <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(eventDetails) ? 'Add Event' : 'Edit Event Details'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">

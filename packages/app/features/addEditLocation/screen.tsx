@@ -5,6 +5,7 @@ import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
+import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -334,7 +335,14 @@ export function AddEditLocationScreen() {
       })
   }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(locationDetails)
+            ? 'Add Location'
+            : 'Edit Location Details'
+        }}
+      />
       <PtsLoader loading={isLoading} />
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
@@ -351,7 +359,9 @@ export function AddEditLocationScreen() {
                   className=""
                   title="Cancel"
                   variant="link"
-                  onPress={() => {}}
+                  onPress={() => {
+                    router.back()
+                  }}
                 />
                 <Button
                   className=""

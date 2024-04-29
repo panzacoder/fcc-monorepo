@@ -245,6 +245,7 @@ export function AppointmentDetailsScreen() {
 
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
+    setNoteData(noteData)
     let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
@@ -689,11 +690,35 @@ export function AppointmentDetailsScreen() {
                   <View />
                 )}
               </View>
-              {getDetailsView('Phone:', phone, true, 'phone')}
-              {getDetailsView('Email:', email, true, 'mail')}
-              {getDetailsView('Website:', website, true, 'globe')}
-              {getDetailsView('Username:', websiteUser, true, 'copy')}
-              <View className="my-3 h-[1px] w-full self-center bg-[##86939e]" />
+              {phone !== '' ? (
+                getDetailsView('Phone:', phone, true, 'phone')
+              ) : (
+                <View />
+              )}
+
+              {email !== '' ? (
+                getDetailsView('Email:', email, true, 'mail')
+              ) : (
+                <View />
+              )}
+              {website !== '' ? (
+                getDetailsView('Website:', website, true, 'globe')
+              ) : (
+                <View />
+              )}
+              {websiteUser !== '' ? (
+                getDetailsView('Username:', websiteUser, true, 'copy')
+              ) : (
+                <View />
+              )}
+              {phone !== '' ||
+              email !== '' ||
+              website !== '' ||
+              websiteUser !== '' ? (
+                <View className="my-3 h-[1px] w-full self-center bg-[##86939e]" />
+              ) : (
+                <View />
+              )}
               {getDetailsView('Date:', apptDate, false, '')}
               {getDetailsView('Purpose:', purpose, false, '')}
               {getDetailsView('Status:', status, false, '')}

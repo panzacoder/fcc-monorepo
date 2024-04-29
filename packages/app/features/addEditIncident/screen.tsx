@@ -10,6 +10,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
+import { Stack } from 'expo-router'
 import {
   BASE_URL,
   CREATE_INCIDENT,
@@ -185,6 +186,13 @@ export function AddEditIncidentScreen() {
   }
   return (
     <View className="flex-1">
+      <Stack.Screen
+        options={{
+          title: _.isEmpty(incidentDetails)
+            ? 'Add Incident'
+            : 'Edit Incident Details'
+        }}
+      />
       <PtsLoader loading={isLoading} />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">
@@ -195,7 +203,7 @@ export function AddEditIncidentScreen() {
             onSelection={onSelection}
           />
         </View>
-        <View className="mt-2">
+        <View className="mt-2 w-[95%] self-center">
           <PtsComboBox
             currentData={incidentType}
             listData={incidentTypeList}

@@ -188,19 +188,18 @@ export function FacilitiesListScreen() {
                 </Typography>
               </View>
               <View className="flex-row">
-                <Typography className="ml-5 w-[60%]">
-                  {data.locations ? data.locations : ''}
-                </Typography>
-
-                <Typography
-                  className={
-                    data.status.toLowerCase() === 'active'
-                      ? "ml-5 mr-5 rounded-[20px] bg-['#83D991'] px-5 text-right"
-                      : "ml-5 mr-5 rounded-[20px] bg-['#ffcccb'] px-5 text-right"
-                  }
-                >
-                  {data.status ? data.status : ''}
-                </Typography>
+                <View className="w-[70%]">
+                  <Typography className="ml-5 ">
+                    {data.locations ? data.locations : ''}
+                  </Typography>
+                </View>
+                <View className="self-center text-center">
+                  <Typography
+                    className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
+                  >
+                    {data.status ? data.status : ''}
+                  </Typography>
+                </View>
               </View>
             </Pressable>
           )
