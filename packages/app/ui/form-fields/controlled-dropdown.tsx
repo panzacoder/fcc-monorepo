@@ -24,7 +24,8 @@ export function ControlledDropdown<T extends FieldValues>({
       rules={rules}
       render={({ field: { onChange, ...fieldProps }, fieldState }) => {
         const handleChangeValue: PtsDropdownProps['onChangeValue'] = (item) => {
-          onChange(item?.id)
+          console.log('handleDropdownChange', item)
+          onChange(item?.id || item)
           onChangeValue && onChangeValue(item)
         }
         return (

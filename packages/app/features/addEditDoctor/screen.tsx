@@ -68,22 +68,30 @@ export function AddEditDoctorScreen() {
       isDoctorActive = false
     }
   }
-  let specializationListIndex: any = -1
-  if (doctorDetails.specialist) {
-    // facilityTypeIdex = getTypeIndex(facilityDetails.type)
-    staticData.specializationList.map((data: any, index: any) => {
-      if (data.specialization === doctorDetails.specialist) {
-        specializationListIndex = index + 1
+  const specializationList: Array<{ id: number; title: string }> =
+    staticData.specializationList.map(
+      ({ specialization, id }: SpecializationResponse) => {
+        return {
+          id,
+          title: specialization
+        }
       }
-    })
+    )
+
+  const findSpecializationFromId = (id: number) => {
+    return specializationList.find((data) => data.id === id)?.title
   }
+  const findIdFromSpecialization = (specialization: string) => {
+    return specializationList.find((data) => data.title === specialization)?.id
+  }
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       firstName:
         doctorDetails && doctorDetails.firstName ? doctorDetails.firstName : '',
       lastName:
         doctorDetails && doctorDetails.lastName ? doctorDetails.lastName : '',
-      specialization: specializationListIndex,
+      specialization: findIdFromSpecialization(doctorDetails.specialist),
       phone: doctorDetails && doctorDetails.phone ? doctorDetails.phone : '',
       website:
         doctorDetails && doctorDetails.website ? doctorDetails.website : '',
@@ -113,15 +121,6 @@ export function AddEditDoctorScreen() {
     id: number
     specialization: string
   }
-  const specializationList = staticData.specializationList.map(
-    ({ specialization, id }: SpecializationResponse) => {
-      return {
-        id,
-        title: specialization
-      }
-    }
-  )
-
   async function deleteDoctor() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_DOCTOR}`
@@ -131,12 +130,10 @@ export function AddEditDoctorScreen() {
         id: doctorDetails.id
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
           router.push(
             formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)
@@ -153,7 +150,6 @@ export function AddEditDoctorScreen() {
       })
   }
   async function updateDoctor(formData: Schema) {
-    console.log('isDoctorActive updateDoctor', '' + isDoctorActive)
     setLoading(true)
     let url = `${BASE_URL}${UPDATE_DOCTOR}`
     let dataObject = {
@@ -169,7 +165,7 @@ export function AddEditDoctorScreen() {
         phone: formData.phone,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization].title,
+        specialist: findSpecializationFromId(formData.specialization),
         status: {
           status: isDoctorActive === true ? 'Active' : 'InActive',
           id: isDoctorActive === true ? 1 : 2
@@ -199,8 +195,6 @@ export function AddEditDoctorScreen() {
       })
   }
   async function createDoctor(formData: Schema) {
-    console.log('createDoctor', formData)
-    console.log('specialist', specializationList[formData.specialization])
     setLoading(true)
     let locationList: object[] = []
     let stateObject = statesListFull[formData.state]
@@ -235,7 +229,7 @@ export function AddEditDoctorScreen() {
         phone: formData.phone,
         website: formData.website,
         websiteuser: formData.username,
-        specialist: specializationList[formData.specialization].title,
+        specialist: findSpecializationFromId(formData.specialization),
         isSelf: true,
         doctorLocationList: locationList
       }
