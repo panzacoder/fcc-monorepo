@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import moment from 'moment-timezone'
+import moment, { MomentInput } from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
 import store from '../redux/store'
 
@@ -119,7 +119,10 @@ export function getAddressFromObject(address: any) {
 
   return finalAddress
 }
-export const getFullDateForCalender = (time: any, formatType: any) => {
+export const getFullDateForCalendar = (
+  time: MomentInput,
+  formatType: string
+) => {
   return moment(time).format(formatType)
 }
 export const getMonthsList = () => {

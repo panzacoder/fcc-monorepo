@@ -681,7 +681,8 @@ export function AppointmentDetailsScreen() {
                       router.push(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
-                          appointmentDetails: JSON.stringify(appointmentDetails)
+                          appointmentDetails: JSON.stringify(appointmentDetails),
+                          component: 'Appointment'
                         })
                       )
                     }}

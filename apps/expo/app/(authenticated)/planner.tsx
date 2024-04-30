@@ -1,5 +1,5 @@
-import WebView from 'app/wrappers/webview'
+import { ConsolidatedViewScreen } from 'app/features/consolidatedView/screen'
 
 export default function PlannerTab() {
-  return <WebView path="/planner" />
+  return <ConsolidatedViewScreen />
 }

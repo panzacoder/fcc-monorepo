@@ -15,7 +15,7 @@ import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalendar } from 'app/ui/utils'
 import { BASE_URL, GET_DOCTOR_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
@@ -304,7 +304,14 @@ export function DoctorDetailsScreen() {
                 className="ml-2"
                 title="Add Appointment"
                 variant="default"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/addEditAppointment', {
+                      memberData: JSON.stringify(memberData),
+                      component: 'Doctor'
+                    })
+                  )
+                }}
               />
             </View>
             {appointmentList.length > 0 && isShowAppointments ? (
@@ -330,7 +337,7 @@ export function DoctorDetailsScreen() {
                             </Typography>
                             <View className="w-full flex-row">
                               <Typography className="font-400 ml-2 w-[35%] text-[12px] text-[#103264]">
-                                {getFullDateForCalender(
+                                {getFullDateForCalendar(
                                   new Date(data.date),
                                   'MMMM DD '
                                 ) + ' - '}

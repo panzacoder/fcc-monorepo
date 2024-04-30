@@ -1,7 +1,7 @@
 import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { getFullDateForCalender, getNameInitials } from 'app/ui/utils'
+import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
 import { COLORS } from 'app/utils/colors'
 import { formatUrl } from 'app/utils/format-url'
@@ -31,7 +31,7 @@ export function CardView(data: any) {
   }
   if (memberData.upcomingAppointment) {
     if (memberData.upcomingAppointment.date) {
-      let date = getFullDateForCalender(
+      let date = getFullDateForCalendar(
         new Date(memberData.upcomingAppointment.date),
         'MMMM DD '
       )
@@ -53,7 +53,7 @@ export function CardView(data: any) {
   }
   if (memberData.recentIncident) {
     if (memberData.recentIncident.date) {
-      let date = getFullDateForCalender(
+      let date = getFullDateForCalendar(
         new Date(memberData.recentIncident.date),
         'MMMM DD '
       )
@@ -69,7 +69,7 @@ export function CardView(data: any) {
   }
   if (memberData.upcomingEvent) {
     if (memberData.upcomingEvent.date) {
-      let date = getFullDateForCalender(
+      let date = getFullDateForCalendar(
         new Date(memberData.upcomingEvent.date),
         'MMMM DD '
       )

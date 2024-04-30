@@ -29,7 +29,7 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { Button } from 'app/ui/button'
-import { getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalendar } from 'app/ui/utils'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -300,23 +300,25 @@ export function PrescriptionsListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="flex-row ">
-          <Pressable
-            onPress={() => {
-              setIsShowFilter(!isShowFilter)
-            }}
-            className="w-[75%] flex-row"
-          >
-            <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-              {currentFilter}
-            </Typography>
-            <Feather
-              className="ml-2 mt-6"
-              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-              size={25}
-              color={'black'}
-            />
-          </Pressable>
+        <View className="w-full flex-row">
+          <View className="min-w-[75%]">
+            <Pressable
+              onPress={() => {
+                setIsShowFilter(!isShowFilter)
+              }}
+              className=" flex-row"
+            >
+              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                {currentFilter}
+              </Typography>
+              <Feather
+                className="ml-2 mt-6"
+                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                size={25}
+                color={'black'}
+              />
+            </Pressable>
+          </View>
           {getUserPermission(prescriptionPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
@@ -509,13 +511,13 @@ export function PrescriptionsListScreen() {
                 <View className="w-[95%] flex-row">
                   <Typography className="ml-5 text-[#4DA529]">
                     {data.startDate
-                      ? getFullDateForCalender(data.startDate, 'MMM DD, YYYY')
+                      ? getFullDateForCalendar(data.startDate, 'MMM DD, YYYY')
                       : ''}
                   </Typography>
                   <Typography className="text-[#ef6603]">
                     {data.endDate
                       ? ' - ' +
-                        getFullDateForCalender(data.endDate, 'MMM DD, YYYY')
+                        getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
                       : ''}
                   </Typography>
                 </View>

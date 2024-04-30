@@ -39,10 +39,10 @@ export function AddEditAppointmentScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let component = item.component ? item.component : ''
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  console.log('appointmentDetails', JSON.stringify(appointmentDetails))
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -119,10 +119,18 @@ export function AddEditAppointmentScreen() {
     } else {
       typeIndex = 1
     }
-    console.log('typeIndex', typeIndex)
+    console.log('typeIndex', '' + typeIndex)
+  }
+  if (component !== 'Appointment') {
+    typeIndex = component === 'Doctor' ? 0 : 1
+    console.log('typeIndex1', '' + typeIndex)
   }
   useEffect(() => {
-    if (!_.isEmpty(appointmentDetails)) {
+    if (
+      !_.isEmpty(appointmentDetails) ||
+      component === 'Doctor' ||
+      component === 'Facility'
+    ) {
       setIsShowDoctorFacilityDropdown(true)
       setSelectedDoctorFacility(typeIndex)
       getDoctorFacilities(typeIndex)
@@ -276,10 +284,15 @@ export function AddEditAppointmentScreen() {
               name="appointmentType"
               label="Appointment Type*"
               defaultValue={
-                !_.isEmpty(appointmentDetails) &&
-                appointmentDetails.type &&
-                appointmentDetails.type.type
-                  ? appointmentDetails.type.type
+                // !_.isEmpty(appointmentDetails) &&
+                // appointmentDetails.type &&
+                // appointmentDetails.type.type
+                //   ? appointmentDetails.type.type
+                //   : ''
+                typeIndex !== -1
+                  ? typeIndex === 0
+                    ? 'Doctor Appointmet'
+                    : 'Facility Appointmet'
                   : ''
               }
               maxHeight={300}

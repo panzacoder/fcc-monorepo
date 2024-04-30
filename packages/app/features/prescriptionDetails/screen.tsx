@@ -19,7 +19,7 @@ import {
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-import { getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalendar } from 'app/ui/utils'
 import { AddEditPrescription } from 'app/ui/addEditPrescription'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -145,19 +145,19 @@ export function PrescriptionDetailsScreen() {
     note = ''
   if (!_.isEmpty(prescriptionDetails)) {
     if (prescriptionDetails.prescribedDate) {
-      prescribedDate = getFullDateForCalender(
+      prescribedDate = getFullDateForCalendar(
         prescriptionDetails.prescribedDate,
         'MMM DD, YYYY'
       )
     }
     if (prescriptionDetails.startDate) {
-      startDate = getFullDateForCalender(
+      startDate = getFullDateForCalendar(
         prescriptionDetails.startDate,
         'MMM DD, YYYY'
       )
     }
     if (prescriptionDetails.endDate) {
-      endDate = getFullDateForCalender(
+      endDate = getFullDateForCalendar(
         prescriptionDetails.endDate,
         'MMM DD, YYYY'
       )

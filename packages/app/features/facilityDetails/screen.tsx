@@ -1,19 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Pressable
-} from 'react-native'
+import { View, Alert, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalendar } from 'app/ui/utils'
 import { BASE_URL, GET_FACILITY_DETAILS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
@@ -235,7 +229,14 @@ export function FacilityDetailsScreen() {
                 className=""
                 title="Add Appointment"
                 variant="default"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/addEditAppointment', {
+                      memberData: JSON.stringify(memberData),
+                      component: 'Facility'
+                    })
+                  )
+                }}
               />
             </View>
             {appointmentList.length > 0 && isShowAppointments ? (
@@ -264,7 +265,7 @@ export function FacilityDetailsScreen() {
                           </Typography>
                           <View className="w-full flex-row">
                             <Typography className="font-400 ml-2 w-[35%] text-[12px] text-[#103264]">
-                              {getFullDateForCalender(
+                              {getFullDateForCalendar(
                                 new Date(data.date),
                                 'MMMM DD '
                               ) + ' - '}

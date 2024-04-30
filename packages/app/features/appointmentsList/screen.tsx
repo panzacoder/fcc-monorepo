@@ -254,7 +254,8 @@ export function AppointmentsListScreen() {
               onPress={() => {
                 router.push(
                   formatUrl('/circles/addEditAppointment', {
-                    memberData: JSON.stringify(memberData)
+                    memberData: JSON.stringify(memberData),
+                    component: 'Appointment'
                   })
                 )
                 // setIsAddAppointment(true)
