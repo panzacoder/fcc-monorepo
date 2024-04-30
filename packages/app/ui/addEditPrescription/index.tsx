@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
-import { getFullDateForCalender } from 'app/ui/utils'
+import { getFullDateForCalendar } from 'app/ui/utils'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
@@ -33,7 +33,7 @@ export const AddEditPrescription = ({
   const [calenderClickedCount, setCalenderClickedCount] = useState(0)
   const [prescribedDate, setPrescribedDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
-      ? getFullDateForCalender(
+      ? getFullDateForCalendar(
           prescriptionDetails.prescribedDate,
           'MMM DD, YYYY'
         )
@@ -46,7 +46,7 @@ export const AddEditPrescription = ({
   )
   const [startDate, setStartDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.startDate
-      ? getFullDateForCalender(prescriptionDetails.startDate, 'MMM DD, YYYY')
+      ? getFullDateForCalendar(prescriptionDetails.startDate, 'MMM DD, YYYY')
       : 'Start Date'
   )
   const [startDateUtc, setStartDateUtc] = useState(
@@ -56,7 +56,7 @@ export const AddEditPrescription = ({
   )
   const [endDate, setEndDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.endDate
-      ? getFullDateForCalender(prescriptionDetails.endDate, 'MMM DD, YYYY')
+      ? getFullDateForCalendar(prescriptionDetails.endDate, 'MMM DD, YYYY')
       : 'End Date'
   )
   const [endDateUtc, setEndDateUtc] = useState(
@@ -147,13 +147,13 @@ export const AddEditPrescription = ({
   const handleDateChange = (date: Date) => {
     console.log('handleDateChange', date)
     if (calenderClickedCount === 0) {
-      setPrescribedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      setPrescribedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
       setPrescribedDateUtc(date)
     } else if (calenderClickedCount === 1) {
-      setStartDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      setStartDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
       setStartDateUtc(date)
     } else {
-      setEndDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+      setEndDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
       setEndDateUtc(date)
     }
     setIsShowCalender(false)

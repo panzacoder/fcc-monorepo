@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Pressable, FlatList } from 'react-native'
+import { View, Alert, ScrollView, Pressable } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -20,7 +20,7 @@ import {
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { getFullDateForCalender, formatTimeToUserLocalTime } from 'app/ui/utils'
+import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
   CalendarView,
   CalendarViewInput
@@ -41,9 +41,10 @@ let listDayFour = [] as any
 let listDayFive = [] as any
 let listDaySix = [] as any
 let listDaySeven = [] as any
-let fromDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD') as any
-let toDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD') as any
-let currentDate = getFullDateForCalender(new Date(), 'DD MMM YYYY') as any
+let fromDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+let toDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+let currentDate = getFullDateForCalendar(new Date(), 'DD MMM YYYY') as any
+
 export function ConsolidatedViewScreen() {
   const router = useRouter()
   const header = store.getState().headerState.header
@@ -52,51 +53,25 @@ export function ConsolidatedViewScreen() {
     member: userDetails.memberId ? userDetails.memberId : ''
   }
   const [isLoading, setLoading] = useState(false)
-  const [isRender, setIsRender] = useState(false)
   const [memberActivityList, setMemberActivityList] = useState([]) as any
 
-  const [weekDays, setWeekDays] = useState([
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday'
-  ])
-  const [weekDaysShort, setWeekDaysShort] = useState([
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat'
-  ])
+  const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [selectedDate, setSelectedDate] = useState(
-    getFullDateForCalender(new Date(), 'MMM DD, YYYY')
+    getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
   )
-  const [currentDateUtc, setCurrentDateUtc] = useState(new Date())
-  let [dayCount, setDayCount] = useState(0)
+  const currentDateUtc = new Date()
+  const [dayCount, setDayCount] = useState(0)
   const [currentDateForDayView, setCurrentDateForDayView] = useState(
-    getFullDateForCalender(new Date(), 'DD MMM YYYY')
-  )
-  const [selectedStartDate, setSelectedStartDate] = useState(
-    getFullDateForCalender(new Date(), 'DD MMM YYYY')
+    getFullDateForCalendar(new Date(), 'DD MMM YYYY')
   )
   const [selectedDateUtc, setSelectedDateUtc] = useState(new Date()) as any
-  const [currentDay, setCurrentDay] = useState(
-    weekDays[new Date().getDay()]
-  ) as any
-  const [currentYear, setCurrentYear] = useState(
-    currentDate.split(' ')[2]
-  ) as any
+  const currentYear = currentDate.split(' ')[2]
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDayView, setIsDayView] = useState(false)
   const [isWeekView, setIsWeekView] = useState(true)
-  const { control, handleSubmit, reset } = useForm({
+  const { control } = useForm({
     defaultValues: {
       typeIndex: 0
     },
@@ -124,22 +99,21 @@ export function ConsolidatedViewScreen() {
     let previouDayUtc = new Date(firstday.getTime() - 60 * 60 * 24 * 1 * 1000)
     weekDayUtcDates.push(previouDayUtc)
     weekDayUtcDates.push(firstday)
-    let fullDate = getFullDateForCalender(firstday, 'DD MMM')
-    // console.log('fullDate', fullDate)
+    let fullDate = getFullDateForCalendar(firstday, 'DD MMM')
     let firstDate = '   ' + weekDaysShort[0] + '\n' + fullDate
     weekDayList.push(firstDate)
     weekDayListDates.push(fullDate)
-    let weekFirstDate = getFullDateForCalender(firstday, 'YYYY-MM-DD')
+    let weekFirstDate = getFullDateForCalendar(firstday, 'YYYY-MM-DD')
     weekFirstLastDays.push(weekFirstDate)
     for (let i = 1; i <= 6; i++) {
       let nextDay = new Date(firstday.getTime() + 60 * 60 * 24 * i * 1000)
 
-      let fullDate = getFullDateForCalender(nextDay, 'DD MMM')
+      let fullDate = getFullDateForCalendar(nextDay, 'DD MMM')
       let firstDate = '   ' + weekDaysShort[i] + '\n' + fullDate
       weekDayList.push(firstDate)
       weekDayListDates.push(fullDate)
 
-      let weekDate = getFullDateForCalender(nextDay, 'YYYY-MM-DD')
+      let weekDate = getFullDateForCalendar(nextDay, 'YYYY-MM-DD')
       weekFirstLastDays.push(weekDate)
 
       let nextDayUtc = new Date(firstday.getTime() + 60 * 60 * 24 * 7 * 1000)
@@ -149,45 +123,36 @@ export function ConsolidatedViewScreen() {
         weekDayUtcDates.push(nextDayUtc)
       }
     }
-    // console.log('weekDayList', JSON.stringify(weekDayList))
-    // setIsRender(!isRender)
   }
   async function setMemberActivityWithDays(list: any) {
-    // console.log('setMemberActivityWithDays', JSON.stringify(list))
-    // console.log('weekFirstLastDays', JSON.stringify(weekFirstLastDays))
     clearLists()
-    list.map((data: any) => {
-      if (
-        weekFirstLastDays[0] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDayOne.push(data)
-      } else if (
-        weekFirstLastDays[1] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDayTwo.push(data)
-      } else if (
-        weekFirstLastDays[2] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDayThree.push(data)
-      } else if (
-        weekFirstLastDays[3] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDayFour.push(data)
-      } else if (
-        weekFirstLastDays[4] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDayFive.push(data)
-      } else if (
-        weekFirstLastDays[5] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDaySix.push(data)
-      } else if (
-        weekFirstLastDays[6] === getFullDateForCalender(data.date, 'YYYY-MM-DD')
-      ) {
-        listDaySeven.push(data)
+    list.forEach((data: any) => {
+      const fullDate = getFullDateForCalendar(data.date, 'YYYY-MM-DD')
+
+      switch (fullDate) {
+        case weekFirstLastDays[0]:
+          listDayOne.push(data)
+          break
+        case weekFirstLastDays[1]:
+          listDayTwo.push(data)
+          break
+        case weekFirstLastDays[2]:
+          listDayThree.push(data)
+          break
+        case weekFirstLastDays[3]:
+          listDayFour.push(data)
+          break
+        case weekFirstLastDays[4]:
+          listDayFive.push(data)
+          break
+        case weekFirstLastDays[5]:
+          listDaySix.push(data)
+          break
+        case weekFirstLastDays[6]:
+          listDaySeven.push(data)
+          break
       }
     })
-    setIsRender(!isRender)
   }
   const getConsolidatedFilterOptions = useCallback(async () => {
     setLoading(true)
@@ -236,7 +201,7 @@ export function ConsolidatedViewScreen() {
               data.data.memberActivityList.map(async (option: any) => {
                 if (
                   currentDate ===
-                  getFullDateForCalender(option.date, 'DD MMM YYYY')
+                  getFullDateForCalendar(option.date, 'DD MMM YYYY')
                 ) {
                   list.push(option)
                 }
@@ -284,7 +249,7 @@ export function ConsolidatedViewScreen() {
               if (isDayView) {
                 if (
                   currentDate ===
-                  getFullDateForCalender(option.date, 'DD MMM YYYY')
+                  getFullDateForCalendar(option.date, 'DD MMM YYYY')
                 ) {
                   list.push(option)
                 }
@@ -324,11 +289,10 @@ export function ConsolidatedViewScreen() {
   }, [])
   const handleDateCleared = () => {}
   const handleDateChange = (date: Date) => {
-    // console.log('date', date)
-    fromDate = getFullDateForCalender(date, 'YYYY-MM-DD')
-    toDate = getFullDateForCalender(date, 'YYYY-MM-DD')
-    currentDate = getFullDateForCalender(date, 'DD MMM YYYY')
-    setSelectedDate(getFullDateForCalender(date, 'MMM DD, YYYY'))
+    fromDate = getFullDateForCalendar(date, 'YYYY-MM-DD')
+    toDate = getFullDateForCalendar(date, 'YYYY-MM-DD')
+    currentDate = getFullDateForCalendar(date, 'DD MMM YYYY')
+    setSelectedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
     setSelectedDateUtc(date)
     setIsShowCalender(false)
   }
@@ -337,14 +301,13 @@ export function ConsolidatedViewScreen() {
     getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
   }
   async function getPreviousDate() {
-    setDayCount(--dayCount)
+    setDayCount((prev) => prev - 1)
     let yesterday = new Date(currentDateUtc)
     yesterday.setUTCDate(yesterday.getDate() + dayCount)
-    setCurrentDay(weekDays[new Date(yesterday).getDay()])
-    setCurrentDateForDayView(getFullDateForCalender(yesterday, 'DD MMM YYYY'))
-    currentDate = getFullDateForCalender(yesterday, 'DD MMM YYYY')
-    toDate = getFullDateForCalender(yesterday, 'YYYY-MM-DD')
-    fromDate = getFullDateForCalender(yesterday, 'YYYY-MM-DD')
+    setCurrentDateForDayView(getFullDateForCalendar(yesterday, 'DD MMM YYYY'))
+    currentDate = getFullDateForCalendar(yesterday, 'DD MMM YYYY')
+    toDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
+    fromDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
     getConsolidatedDetails(fromDate, toDate)
   }
   async function getNextWeek() {
@@ -352,17 +315,13 @@ export function ConsolidatedViewScreen() {
     getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
   }
   async function getNextDate() {
-    setDayCount(++dayCount)
+    setDayCount((prev) => prev + 1)
     let tomorrow = new Date(currentDateUtc)
     tomorrow.setUTCDate(tomorrow.getDate() + dayCount)
-    // console.log('in tomorrow', '' + tomorrow)
-    setCurrentDay(weekDays[new Date(tomorrow).getDay()])
-    setCurrentDateForDayView(getFullDateForCalender(tomorrow, 'DD MMM YYYY'))
-    currentDate = getFullDateForCalender(tomorrow, 'DD MMM YYYY')
-    toDate = getFullDateForCalender(tomorrow, 'YYYY-MM-DD')
-    fromDate = getFullDateForCalender(tomorrow, 'YYYY-MM-DD')
-    // console.log('fromDate', '' + fromDate)
-    // console.log('toDate', '' + toDate)
+    setCurrentDateForDayView(getFullDateForCalendar(tomorrow, 'DD MMM YYYY'))
+    currentDate = getFullDateForCalendar(tomorrow, 'DD MMM YYYY')
+    toDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
+    fromDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
     getConsolidatedDetails(fromDate, toDate)
   }
   function getActivityName(type: any) {
@@ -698,18 +657,16 @@ export function ConsolidatedViewScreen() {
       </View>
       {isShowFilter ? (
         <View className="my-2">
-          <View className="mt-2 w-full justify-center rounded-[1px] shadow">
+          <View className="mt-2 w-full justify-center gap-4 rounded-[1px] px-4 shadow">
             <ControlledDropdown
               control={control}
               name="typeIndex"
               label="All"
               maxHeight={300}
               list={typesList}
-              className=" w-[95%] self-center p-2"
               onChangeValue={setSelectedTypeChange}
             />
             <CalendarViewInput
-              className="w-[90%] self-center"
               label="Select Date"
               value={selectedDate}
               onPress={() => {
@@ -719,11 +676,8 @@ export function ConsolidatedViewScreen() {
             <View className="my-3 mb-2 flex-row self-center">
               <View className="flex-row justify-center ">
                 <Button
-                  className="bg-[#287CFA]"
-                  title={'Filter'}
+                  title="Filter"
                   leadingIcon="filter"
-                  variant="default"
-                  // onPress={handleSubmit(filterAppointment)}
                   onPress={() => {
                     if (isDayView) {
                       getFilterConsolidatedDetails(fromDate, toDate)
@@ -741,21 +695,20 @@ export function ConsolidatedViewScreen() {
                   title={'Reset'}
                   leadingIcon="rotate-ccw"
                   variant="default"
-                  // onPress={handleSubmit(resetFilter)}
                   onPress={() => {
                     setSelectedDate(
-                      getFullDateForCalender(new Date(), 'MMM DD, YYYY')
+                      getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
                     )
                     setIsShowFilter(false)
                     if (isDayView) {
-                      fromDate = getFullDateForCalender(
+                      fromDate = getFullDateForCalendar(
                         new Date(),
                         'YYYY-MM-DD'
                       )
                       setCurrentDateForDayView(
-                        getFullDateForCalender(new Date(), 'DD MMM YYYY')
+                        getFullDateForCalendar(new Date(), 'DD MMM YYYY')
                       )
-                      toDate = getFullDateForCalender(new Date(), 'YYYY-MM-DD')
+                      toDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
                       getConsolidatedDetails(fromDate, toDate)
                     } else {
                       getWeekCurrentLastDays(new Date())
