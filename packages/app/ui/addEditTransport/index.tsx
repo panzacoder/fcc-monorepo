@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView } from 'react-native'
+import { View, Alert } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getAddressFromObject } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'

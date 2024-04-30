@@ -1,14 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Linking,
-  Pressable
-} from 'react-native'
+import { View, TouchableOpacity, Alert, Linking, Pressable } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
@@ -23,13 +17,11 @@ import { useRouter } from 'solito/navigation'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
 export function DoctorDetailsScreen() {
-  // console.log('in DoctorDetailsScreen')
   const header = store.getState().headerState.header
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  // console.log('doctorDetails', '' + JSON.stringify(doctorInfo))
   const [isLoading, setLoading] = useState(false)
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)

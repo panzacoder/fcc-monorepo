@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { View, ScrollView } from 'react-native'
+import { View } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'

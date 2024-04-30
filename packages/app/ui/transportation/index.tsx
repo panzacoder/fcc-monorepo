@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { View, Alert, Pressable, ScrollView } from 'react-native'
+import { View, Alert, Pressable } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import _ from 'lodash'

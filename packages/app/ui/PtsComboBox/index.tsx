@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { TextInput, ScrollView, View, Pressable } from 'react-native'
+import { TextInput, View, Pressable } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 export const PtsComboBox = ({

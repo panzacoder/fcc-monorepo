@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Alert, View, ScrollView } from 'react-native'
+import { Alert, View } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
