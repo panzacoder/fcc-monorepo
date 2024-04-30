@@ -20,7 +20,11 @@ import {
 import store from 'app/redux/store'
 import { useRouter } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
+import {
+  getFullDateForCalendar,
+  formatTimeToUserLocalTime,
+  convertTimeToUserLocalTime
+} from 'app/ui/utils'
 import {
   CalendarView,
   CalendarViewInput
@@ -100,7 +104,7 @@ export function ConsolidatedViewScreen() {
     weekDayUtcDates.push(previouDayUtc)
     weekDayUtcDates.push(firstday)
     let fullDate = getFullDateForCalendar(firstday, 'DD MMM')
-    let firstDate = '   ' + weekDaysShort[0] + '\n' + fullDate
+    let firstDate = '   ' + weekDaysShort[0] + ' ' + fullDate
     weekDayList.push(firstDate)
     weekDayListDates.push(fullDate)
     let weekFirstDate = getFullDateForCalendar(firstday, 'YYYY-MM-DD')
@@ -109,7 +113,7 @@ export function ConsolidatedViewScreen() {
       let nextDay = new Date(firstday.getTime() + 60 * 60 * 24 * i * 1000)
 
       let fullDate = getFullDateForCalendar(nextDay, 'DD MMM')
-      let firstDate = '   ' + weekDaysShort[i] + '\n' + fullDate
+      let firstDate = '   ' + weekDaysShort[i] + ' ' + fullDate
       weekDayList.push(firstDate)
       weekDayListDates.push(fullDate)
 
@@ -497,15 +501,16 @@ export function ConsolidatedViewScreen() {
     return (
       <View key={index} className="flex-1 justify-center">
         <View className="my-2 flex-row items-center justify-center">
-          <Typography className="h-full self-center font-bold">
+          {/* <Typography className="h-full self-center font-bold">
             {data}
-          </Typography>
-          <View className="max-w-[85%] flex-row">
+          </Typography> */}
+          <View className="w-full flex-row items-center self-center">
             {index === 0 ? (
               <ScrollView className="w-full ">
+                <Typography className="font-bold">{data}</Typography>
                 {listDayOne.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -517,9 +522,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 1 ? (
               <ScrollView className="w-full">
+                <Typography className="font-bold">{data}</Typography>
                 {listDayTwo.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -531,9 +537,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 2 ? (
               <ScrollView className="w-full">
+                <Typography className="font-bold">{data}</Typography>
                 {listDayThree.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -545,9 +552,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 3 ? (
               <ScrollView className="w-full">
+                <Typography className=" font-bold">{data}</Typography>
                 {listDayFour.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -559,9 +567,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 4 ? (
               <ScrollView className="w-full">
+                <Typography className="font-bold">{data}</Typography>
                 {listDayFive.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -573,9 +582,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 5 ? (
               <ScrollView className="w-full">
+                <Typography className="font-bold">{data}</Typography>
                 {listDaySix.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -587,9 +597,10 @@ export function ConsolidatedViewScreen() {
 
             {index === 6 ? (
               <ScrollView className="w-full">
+                <Typography className="font-bold">{data}</Typography>
                 {listDaySeven.map((data: any, index: number) => {
                   return (
-                    <View key={index} className="ml-4">
+                    <View key={index} className="">
                       {getCard(data, index)}
                     </View>
                   )
@@ -600,7 +611,7 @@ export function ConsolidatedViewScreen() {
             )}
           </View>
         </View>
-        <View className="absolute left-[50px] h-full w-[1px] bg-black" />
+        {/* <View className="absolute left-[50px] h-full w-[1px] bg-black" /> */}
         <View className="h-[1px] w-full bg-black" />
       </View>
     )

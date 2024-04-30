@@ -56,15 +56,25 @@ export function PrescriptionsListScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
+  type TypeResponse = {
+    id: number
+    type: string
+  }
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const staticData: any = store.getState().staticDataState.staticData
 
-  let typesList: object[] = [{ title: 'All', id: 0 }]
-  staticData.medicineTypeList.map((data: any, index: any) => {
-    let object = { title: data.type, id: index + 1 }
-    typesList.push(object)
+  //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
+  let typesList: Array<{ id: number; title: string }> = [
+    { id: 1, title: 'All' }
+  ]
+  staticData.medicineTypeList.map(({ type, id }: TypeResponse, index: any) => {
+    typesList.push({
+      id: index + 2,
+      title: type
+    })
   })
+  // console.log('typesList', JSON.stringify(typesList))
   const getPrescriptionList = useCallback(async (isFromFilter: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_PRESCRIPTION_LIST}`
@@ -122,11 +132,16 @@ export function PrescriptionsListScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let list = data.data.list ? data.data.list : []
-          let pharmacyList: object[] = [{ title: 'All', id: 0 }]
+          // let pharmacyList: object[] = [{ title: 'All', id: 0 }]
+
+          //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
+          let pharmacyList: Array<{ id: number; title: string }> = [
+            { id: 1, title: 'All' }
+          ]
           list.map((data: any, index: any) => {
             let object = {
               title: data.name,
-              id: index + 1
+              id: index + 2
             }
             pharmacyList.push(object)
           })
@@ -157,11 +172,15 @@ export function PrescriptionsListScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let list = data.data.doctorList ? data.data.doctorList : []
-          let doctorList: object[] = [{ title: 'All', id: 0 }]
+          // let doctorList: object[] = [{ title: 'All', id: 0 }]
+          //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
+          let doctorList: Array<{ id: number; title: string }> = [
+            { id: 1, title: 'All' }
+          ]
           list.map((data: any, index: any) => {
             let object = {
               title: data.name,
-              id: index + 1
+              id: index + 2
             }
             doctorList.push(object)
           })
@@ -201,9 +220,9 @@ export function PrescriptionsListScreen() {
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      typeIndex: 0,
-      prescribedIndex: 0,
-      pharmacyIndex: 0,
+      typeIndex: 1,
+      prescribedIndex: 1,
+      pharmacyIndex: 1,
       drugName: ''
     },
     resolver: zodResolver(schema)
@@ -211,14 +230,16 @@ export function PrescriptionsListScreen() {
 
   function filterPrescriptions(formData: Schema) {
     drugName = formData.drugName
-    if (formData.typeIndex !== 0) {
-      selectedType = staticData.medicineTypeList[formData.typeIndex - 1].type
+    if (formData.typeIndex !== 1) {
+      selectedType = staticData.medicineTypeList[formData.typeIndex - 2].type
     } else {
       selectedType = 'All'
     }
-    selectedPharmacy = pharmacyList[formData.pharmacyIndex].title
-    if (formData.prescribedIndex !== 0) {
-      selectedPrescriber = doctorListFull[formData.prescribedIndex - 1]
+
+    selectedPharmacy = pharmacyList[formData.pharmacyIndex - 1].title
+
+    if (formData.prescribedIndex !== 1) {
+      selectedPrescriber = doctorListFull[formData.prescribedIndex - 2]
     } else {
       selectedPrescriber = 'All'
     }
@@ -227,9 +248,9 @@ export function PrescriptionsListScreen() {
   function resetFilter() {
     getPrescriptionList(false)
     reset({
-      typeIndex: 0,
-      prescribedIndex: 0,
-      pharmacyIndex: 0,
+      typeIndex: 1,
+      prescribedIndex: 1,
+      pharmacyIndex: 1,
       drugName: ''
     })
   }
@@ -352,8 +373,8 @@ export function PrescriptionsListScreen() {
         </View>
       </View>
       {isFilter ? (
-        <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-          <View className="mt-5 w-full flex-row justify-center">
+        <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View className="mt-2 w-full flex-row justify-center">
             <ControlledDropdown
               control={control}
               name="typeIndex"
@@ -361,16 +382,17 @@ export function PrescriptionsListScreen() {
               maxHeight={300}
               list={typesList}
               className="w-[45%]"
+              defaultValue="All"
             />
             <ControlledTextField
               control={control}
               name="drugName"
               placeholder={'Drug Name'}
-              className="ml-5 w-[45%]"
+              className="ml-5 h-[25%] w-[45%]"
               autoCapitalize="none"
             />
           </View>
-          <View className="mt-5 w-full flex-row justify-center">
+          <View className=" w-full flex-row justify-center">
             <ControlledDropdown
               control={control}
               name="prescribedIndex"
@@ -378,6 +400,7 @@ export function PrescriptionsListScreen() {
               maxHeight={300}
               list={doctorList}
               className="w-[45%]"
+              defaultValue="All"
             />
             <ControlledDropdown
               control={control}
@@ -386,10 +409,11 @@ export function PrescriptionsListScreen() {
               maxHeight={300}
               list={pharmacyList}
               className="ml-5 w-[45%]"
+              defaultValue="All"
             />
           </View>
           <View className="flex-row self-center">
-            <View className="mt-5 flex-row justify-center ">
+            <View className="mt-2 flex-row justify-center ">
               <Button
                 className="bg-[#287CFA]"
                 title={''}
@@ -488,10 +512,10 @@ export function PrescriptionsListScreen() {
                   {data.name ? data.name : ''}
                 </Typography>
               </View>
-              {data.prescribername || data.pharmacy ? (
+              {data.doctorname || data.pharmacy ? (
                 <View className="flex-row">
                   <Typography className="text-primary font-400 ml-5 w-[40%]">
-                    {data.prescribername ? data.prescribername : ''}
+                    {data.doctorname ? data.doctorname : ''}
                   </Typography>
 
                   <Typography className="ml-5 mr-5 w-[45%] text-right">

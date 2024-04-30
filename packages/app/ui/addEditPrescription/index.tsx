@@ -75,17 +75,31 @@ export const AddEditPrescription = ({
       ? prescriptionDetails.pharmacy
       : ''
   }
-  const typesList = staticData.medicineTypeList.map((data: any, index: any) => {
-    if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
-      if (prescriptionDetails.type.type === data.type) {
-        selectedTypeIndex = index + 1
+  type TypeResponse = {
+    id: number
+    type: string
+  }
+  // const typesList = staticData.medicineTypeList.map((data: any, index: any) => {
+  //   if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
+  //     if (prescriptionDetails.type.type === data.type) {
+  //       selectedTypeIndex = index + 1
+  //     }
+  //   }
+  //   return {
+  //     title: data.type,
+  //     id: index + 1
+  //   }
+  // })
+  //dropdown is not working for 0 as id, so we started id from 1
+  let typesList: Array<{ id: number; title: string }> =
+    staticData.medicineTypeList.map(
+      ({ type, id }: TypeResponse, index: any) => {
+        return {
+          id: index + 1,
+          title: type
+        }
       }
-    }
-    return {
-      title: data.type,
-      id: index + 1
-    }
-  })
+    )
   const { control, handleSubmit } = useForm({
     defaultValues: {
       typeIndex: selectedTypeIndex,
@@ -120,7 +134,7 @@ export const AddEditPrescription = ({
   })
   async function callCreateUpdatePrescription(formData: Schema) {
     // console.log('in callCreateUpdatePrescription')
-    let type = typesList[formData.typeIndex - 1].id
+    let type = staticData.medicineTypeList[formData.typeIndex - 1].id
     let object = {
       type: type,
       drugName: formData.drugName,

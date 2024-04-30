@@ -20,8 +20,8 @@ export function CalendarView({
   onClear
 }: CalendarViewProps) {
   return (
-    <View className="absolute top-[40] w-full self-center bg-white">
-      <View className="bg-primary h-[50] w-full items-center justify-center rounded-tl-[20px] rounded-tr-[20px]">
+    <View className="border-primary absolute top-[40] w-[110%] self-center rounded-tl-[20px] rounded-tr-[20px] border-[1px] bg-white">
+      <View className="bg-primary h-[50] w-full items-center justify-center self-center rounded-tl-[20px] rounded-tr-[20px]">
         <Button
           iconOnly
           onPress={onCancel}
@@ -35,7 +35,7 @@ export function CalendarView({
       {component !== 'ConsolidatedView' ? (
         <Button
           title={'Clear'}
-          className="mt-5 w-[40%] self-center bg-[#86939e]"
+          className="my-2 w-[40%] self-center bg-[#86939e]"
           onPress={onClear}
         />
       ) : (
@@ -61,13 +61,17 @@ export function CalendarViewInput({
   return (
     <View className={cn('flex', className)}>
       {label && (
-        <Text className="text-muted-foreground px-1 text-sm">{label}</Text>
+        <Text className="text-muted-foreground } px-1 text-sm">{label}</Text>
       )}
       <Pressable
         onPress={onPress}
         className="flex w-full flex-row rounded-lg border border-gray-400 px-4 py-3"
       >
-        <Typography className={`leading-tight text-black`}>{value}</Typography>
+        <Typography
+          className={`leading-tight text-black ${value.includes('Date') ? 'text-gray-400' : 'text-black'}`}
+        >
+          {value}
+        </Typography>
       </Pressable>
     </View>
   )
