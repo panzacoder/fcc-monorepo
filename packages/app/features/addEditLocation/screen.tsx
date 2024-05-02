@@ -62,15 +62,19 @@ export function AddEditLocationScreen() {
   let details = item.details ? JSON.parse(item.details) : {}
   // console.log('details', JSON.stringify(details))
   const [isLoading, setLoading] = useState(false)
-  const [statesList, setStatesList] = useState([])
+  const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
-
-  const countryList = staticData.countryList.map((data: any, index: any) => {
-    return {
-      label: data.name,
-      value: index
-    }
-  })
+  type Response = {
+    id: number
+    name: string
+  }
+  const countryList: Array<{ id: number; title: string }> =
+    staticData.countryList.map(({ name, id }: Response, index: any) => {
+      return {
+        title: name,
+        id: index + 1
+      }
+    })
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -83,14 +87,15 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let list = data.data.stateList.map((data: any, index: any) => {
-            return {
-              label: data.name,
-              value: index
-            }
-          })
+          let statesList: Array<{ id: number; title: string }> =
+            data.data.stateList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
           // setCountriesList(countryList)
-          setStatesList(list)
+          setStatesList(statesList)
           setStatesListFull(data.data.stateList || [])
           if (!_.isEmpty(locationDetails)) {
             let stateName = locationDetails.address.state.name
@@ -98,7 +103,7 @@ export function AddEditLocationScreen() {
               : ''
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
-                stateIndex = index
+                stateIndex = index + 1
               }
             })
           }
@@ -128,12 +133,12 @@ export function AddEditLocationScreen() {
       consoleData('countryName', countryName)
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
-          countryIndex = index
+          countryIndex = index + 1
           consoleData('countryName index', '' + index)
         }
       })
-      let countryId = staticData.countryList[countryIndex].id
-        ? staticData.countryList[countryIndex].id
+      let countryId = staticData.countryList[countryIndex - 1].id
+        ? staticData.countryList[countryIndex - 1].id
         : 101
       await getStates(countryId)
     }
@@ -168,8 +173,8 @@ export function AddEditLocationScreen() {
   })
   async function setSelectedCountryChange(value: any) {
     let countryId =
-      value && staticData.countryList[value.id].id
-        ? staticData.countryList[value.id].id
+      value && staticData.countryList[value.id - 1].id
+        ? staticData.countryList[value.id - 1].id
         : 101
     await getStates(countryId)
   }
@@ -231,8 +236,8 @@ export function AddEditLocationScreen() {
   }
   async function addUpdateLocation(formData: Schema) {
     setLoading(true)
-    let stateObject = statesListFull[formData.state]
-    let countryObject: object = staticData.countryList[formData.country]
+    let stateObject = statesListFull[formData.state - 1]
+    let countryObject: object = staticData.countryList[formData.country - 1]
     let dataObject = {} as any
     let addressObject = {
       operation: 'add',

@@ -70,19 +70,24 @@ export function AddEditDoctorScreen() {
   }
   const specializationList: Array<{ id: number; title: string }> =
     staticData.specializationList.map(
-      ({ specialization, id }: SpecializationResponse) => {
+      ({ specialization, id }: SpecializationResponse, index: any) => {
         return {
-          id,
+          id: index + 1,
           title: specialization
         }
       }
     )
-
-  const findSpecializationFromId = (id: number) => {
-    return specializationList.find((data) => data.id === id)?.title
+  const findSpecializationFromId = (index: number) => {
+    return staticData.specializationList[index - 1]?.specialization
   }
-  const findIdFromSpecialization = (specialization: string) => {
-    return specializationList.find((data) => data.title === specialization)?.id
+  const getSpecializationIndex = (specialization: string) => {
+    let specializationIndex = -1
+    staticData.specializationList.map((data: any, index: any) => {
+      if (data.specialization === specialization) {
+        specializationIndex = index + 1
+      }
+    })
+    return specializationIndex
   }
 
   const { control, handleSubmit } = useForm({
@@ -91,7 +96,9 @@ export function AddEditDoctorScreen() {
         doctorDetails && doctorDetails.firstName ? doctorDetails.firstName : '',
       lastName:
         doctorDetails && doctorDetails.lastName ? doctorDetails.lastName : '',
-      specialization: findIdFromSpecialization(doctorDetails.specialist),
+      specialization: doctorDetails.specialist
+        ? getSpecializationIndex(doctorDetails.specialist)
+        : -1,
       phone: doctorDetails && doctorDetails.phone ? doctorDetails.phone : '',
       website:
         doctorDetails && doctorDetails.website ? doctorDetails.website : '',
@@ -115,7 +122,7 @@ export function AddEditDoctorScreen() {
   })
   const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(isDoctorActive ? true : false)
-  const [statesList, setStateslist] = useState([])
+  const [statesList, setStateslist] = useState([]) as any
 
   type SpecializationResponse = {
     id: number
@@ -197,8 +204,8 @@ export function AddEditDoctorScreen() {
   async function createDoctor(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state]
-    let countryObject: object = staticData.countryList[formData.country]
+    let stateObject = statesListFull[formData.state - 1]
+    let countryObject: object = staticData.countryList[formData.country - 1]
     let addressObject: any = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
@@ -252,12 +259,17 @@ export function AddEditDoctorScreen() {
         console.log(error)
       })
   }
-  const countryList = staticData.countryList.map((data: any, index: any) => {
-    return {
-      title: data.name,
-      id: index
-    }
-  })
+  type Response = {
+    id: number
+    name: string
+  }
+  const countryList: Array<{ id: number; title: string }> =
+    staticData.countryList.map(({ name, id }: Response, index: any) => {
+      return {
+        title: name,
+        id: index + 1
+      }
+    })
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -272,12 +284,13 @@ export function AddEditDoctorScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // set available states
-          let statesList = data.data.stateList.map((data: any, index: any) => {
-            return {
-              title: data.name,
-              id: index
-            }
-          })
+          let statesList: Array<{ id: number; title: string }> =
+            data.data.stateList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
           setStateslist(statesList)
           statesListFull = data.data.stateList ? data.data.stateList : []
           // console.log('setStateslistFull', JSON.stringify(statesListFull))

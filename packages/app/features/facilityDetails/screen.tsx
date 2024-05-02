@@ -246,15 +246,6 @@ export function FacilityDetailsScreen() {
                   return (
                     <Pressable
                       onPress={() => {
-                        // router.push(
-                        //   formatUrl(
-                        //     '/circles/addEditDoctorLocation',
-                        //     {
-                        //       memberData: JSON.stringify(memberData),
-                        //       facilityDetails: JSON.stringify(facilityInfo)
-                        //     }
-                        //   )
-                        // )
                       }}
                       key={index}
                       className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"

@@ -42,7 +42,7 @@ export const AddEditTransport = ({
   cancelClicked,
   createUpdateTransportation
 }) => {
-  let countryIndex = 96
+  let countryIndex = 97
   let stateIndex = -1
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
@@ -54,6 +54,7 @@ export const AddEditTransport = ({
     selectedDate = new Date(transportData.date)
   }
   // console.log('transportData', JSON.stringify(transportData))
+ 
   useEffect(() => {
     async function getMemberList() {
       setLoading(true)
@@ -69,14 +70,14 @@ export const AddEditTransport = ({
         .then(async (data: any) => {
           setLoading(false)
           if (data.status === 'SUCCESS') {
-            let list: object[] = []
-            data.data.map((data: any, index: any) => {
-              let object = {
-                label: data.name,
-                value: index
+            let list: Array<{ id: number; title: string }> = data.data.map(
+              ({ name, id }: Response, index: any) => {
+                return {
+                  title: name,
+                  id: index + 1
+                }
               }
-              list.push(object)
-            })
+            )
             setMemberList(list)
             await setMemberListFull(data.data || [])
             // console.log('setMemberListFull', JSON.stringify(memberListFull))
@@ -95,11 +96,11 @@ export const AddEditTransport = ({
     getStates(101)
   }, [])
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     //some default data has been set for required fields in case of update
     defaultValues: {
       description: '',
-      member: _.isEmpty(transportData) ? -1 : 0,
+      member: _.isEmpty(transportData) ? -1 : 1,
       addressLine: '',
       state: _.isEmpty(transportData) ? stateIndex : 0,
       country: _.isEmpty(transportData) ? countryIndex : 0,
@@ -108,15 +109,19 @@ export const AddEditTransport = ({
     },
     resolver: zodResolver(schema)
   })
-  const [statesList, setStatesList] = useState([])
+  const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
-
-  const countryList = staticData.countryList.map((data: any, index: any) => {
-    return {
-      label: data.name,
-      value: index
-    }
-  })
+  type Response = {
+    id: number
+    name: string
+  }
+  const countryList: Array<{ id: number; title: string }> =
+    staticData.countryList.map(({ name, id }: Response, index: any) => {
+      return {
+        title: name,
+        id: index + 1
+      }
+    })
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -129,13 +134,14 @@ export const AddEditTransport = ({
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let list = data.data.stateList.map((data: any, index: any) => {
-            return {
-              label: data.name,
-              value: index
-            }
-          })
-          setStatesList(list)
+          let statesList: Array<{ id: number; title: string }> =
+            data.data.stateList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
+          setStatesList(statesList)
           setStatesListFull(data.data.stateList || [])
         } else {
           Alert.alert('', data.message)
@@ -222,11 +228,27 @@ export const AddEditTransport = ({
     selectedDate = date
     console.log('selectedDate', selectedDate)
   }
+
+  async function setSelectedStateChange(value: any) {
+    if (value === null) {
+      reset({
+        state: -1
+      })
+    }
+  }
   async function setSelectedCountryChange(value: any) {
-    let countryId = staticData.countryList[value.id].id
-      ? staticData.countryList[value.id].id
-      : 101
-    await getStates(countryId)
+    if (value) {
+      let countryId = staticData.countryList[value.id - 1].id
+        ? staticData.countryList[value.id - 1].id
+        : 101
+      await getStates(countryId)
+    } else {
+      reset({
+        country: -1
+      })
+      setStatesList([])
+      setStatesListFull([])
+    }
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
@@ -255,6 +277,13 @@ export const AddEditTransport = ({
       </View>
     )
   }
+  async function setAcompanyChange(value: any) {
+    if (value === null) {
+      reset({
+        member: -1
+      })
+    }
+  }
   return (
     <View className="my-5 w-[90%] self-center rounded-[15px] bg-[#f4ecf7] py-5">
       <PtsLoader loading={isLoading} />
@@ -270,7 +299,7 @@ export const AddEditTransport = ({
                 className="w-[95%] bg-white"
                 maxHeight={300}
                 list={memberList}
-                // onChangeValue={setSelectedCountryChange}
+                onChangeValue={setAcompanyChange}
               />
             </View>
             <View className="my-2">
@@ -319,7 +348,7 @@ export const AddEditTransport = ({
                 className="w-[95%] bg-white"
                 maxHeight={300}
                 list={statesList}
-                // onChangeValue={setSelectedCountryChange}
+                onChangeValue={setSelectedStateChange}
               />
             </View>
             <View className="my-2 w-full flex-row justify-center gap-2">

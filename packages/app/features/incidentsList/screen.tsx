@@ -26,7 +26,7 @@ const schema = z.object({
   yearIndex: z.number()
 })
 export type Schema = z.infer<typeof schema>
-const yearList: object[] = [{ label: 'All', value: 0 }] as any
+
 const monthsList = getMonthsList() as any
 let selectedMonth = 'All'
 let selectedYear = 'All'
@@ -43,17 +43,21 @@ export function IncidentsListScreen() {
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      monthIndex: 0,
-      yearIndex: 0
+      monthIndex: 1,
+      yearIndex: 1
     },
     resolver: zodResolver(schema)
   })
-  staticData.yearList.map((data: any, index: any) => {
-    let object = {
-      label: data.name,
-      value: index + 1
-    }
-    yearList.push(object)
+  type Response = {
+    id: number
+    name: string
+  }
+  let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
+  staticData.yearList.map(({ name, id }: Response, index: any) => {
+    yearList.push({
+      id: index + 2,
+      title: name
+    })
   })
 
   const getIncidentDetails = useCallback(async () => {
@@ -97,8 +101,12 @@ export function IncidentsListScreen() {
   }, [])
 
   function filterEvents(formData: Schema) {
-    selectedMonth = monthsList[formData.monthIndex].label
-    selectedYear = yearList[formData.yearIndex].label
+    selectedMonth =
+      formData.monthIndex !== -1
+        ? monthsList[formData.monthIndex - 1].title
+        : 'All'
+    selectedYear =
+      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     getIncidentDetails()
   }
   function resetFilter() {
@@ -106,11 +114,24 @@ export function IncidentsListScreen() {
     selectedYear = 'All'
     getIncidentDetails()
     reset({
-      monthIndex: 0,
-      yearIndex: 0
+      monthIndex: 1,
+      yearIndex: 1
     })
   }
-  async function refreshPage() {}
+  async function setYearChange(value: any) {
+    if (value === null) {
+      reset({
+        yearIndex: -1
+      })
+    }
+  }
+  async function setMonthChange(value: any) {
+    if (value === null) {
+      reset({
+        monthIndex: -1
+      })
+    }
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -161,6 +182,7 @@ export function IncidentsListScreen() {
               maxHeight={300}
               list={monthsList}
               className="w-[45%]"
+              onChangeValue={setMonthChange}
             />
             <ControlledDropdown
               control={control}
@@ -169,6 +191,7 @@ export function IncidentsListScreen() {
               maxHeight={300}
               list={yearList}
               className="ml-5 w-[45%]"
+              onChangeValue={setYearChange}
             />
           </View>
           <View className="flex-row self-center">

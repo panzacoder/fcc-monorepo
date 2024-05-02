@@ -58,17 +58,22 @@ export const AddEditCaregiver = ({
     }
   }
   const [memberName, setMemberName] = useState(fullName)
-  const profileList = staticData.profileList.map((data: any, index: any) => {
-    if (!_.isEmpty(caregiverDetails)) {
-      if (profile === data.name) {
-        profileIndex = index + 1
+  type ProfileResponse = {
+    id: number
+    name: string
+  }
+  const profileList: Array<{ id: number; title: string }> =
+    staticData.profileList.map(({ name, id }: ProfileResponse, index: any) => {
+      if (!_.isEmpty(caregiverDetails)) {
+        if (profile === name) {
+          profileIndex = index + 1
+        }
       }
-    }
-    return {
-      title: data.name,
-      id: index + 1
-    }
-  })
+      return {
+        id: index + 1,
+        title: name
+      }
+    })
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       profileIndex: profileIndex,
@@ -199,6 +204,7 @@ export const AddEditCaregiver = ({
       </View>
     )
   }
+
   return (
     <ScrollView
       className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[80%]' : ' mt-10 max-h-[60%]'} w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 `}
@@ -221,12 +227,13 @@ export const AddEditCaregiver = ({
                 list={profileList}
                 className="ml-2 mt-2 w-[85%]"
                 defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+
               />
               <Feather
                 onPress={() => {
                   infoClicked()
                 }}
-                className="ml-2 mt-2 self-center"
+                className="ml-2 mt-5 self-center"
                 name={'info'}
                 size={20}
                 color={'#1a7088'}
@@ -271,7 +278,7 @@ export const AddEditCaregiver = ({
                   className="mt-2 w-[95%] self-center bg-white"
                   autoCapitalize="none"
                 />
-                <View className="flex-row">
+                <View className="flex-row ">
                   <ControlledDropdown
                     control={control}
                     name="profileIndex"
@@ -285,7 +292,7 @@ export const AddEditCaregiver = ({
                     onPress={() => {
                       infoClicked()
                     }}
-                    className="ml-2 mt-2 self-center"
+                    className="ml-2 mt-5 self-center"
                     name={'info'}
                     size={20}
                     color={'#1a7088'}
@@ -313,7 +320,7 @@ export const AddEditCaregiver = ({
                     onPress={() => {
                       infoClicked()
                     }}
-                    className="ml-2 mt-2 self-center"
+                    className="ml-2 mt-5 self-center"
                     name={'info'}
                     size={20}
                     color={'#1a7088'}
