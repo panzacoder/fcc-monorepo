@@ -25,14 +25,13 @@ import { convertTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-const yearList: object[] = [{ label: 'All', value: 0 }] as any
 const monthsList = getMonthsList() as any
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
 })
-let selctedMonth = 'All'
-let selctedYear = 'All'
+let selectedMonth = 'All'
+let selectedYear = 'All'
 let medicalDevicesPrivileges = {}
 export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
@@ -48,12 +47,16 @@ export function MedicalDevicesListScreen() {
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const staticData: any = store.getState().staticDataState.staticData
 
-  staticData.yearList.map((data: any, index: any) => {
-    let object = {
-      label: data.name,
-      value: index + 1
-    }
-    yearList.push(object)
+  type Response = {
+    id: number
+    name: string
+  }
+  let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
+  staticData.yearList.map(({ name, id }: Response, index: any) => {
+    yearList.push({
+      id: index + 2,
+      title: name
+    })
   })
   const getDevicesList = useCallback(async (isFromFilter: any) => {
     setLoading(true)
@@ -67,8 +70,8 @@ export function MedicalDevicesListScreen() {
       }
     }
     if (isFromFilter) {
-      dataObject.month = selctedMonth
-      dataObject.year = selctedYear
+      dataObject.month = selectedMonth
+      dataObject.year = selectedYear
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -100,26 +103,26 @@ export function MedicalDevicesListScreen() {
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      monthIndex: 0,
-      yearIndex: 0
+      monthIndex: 1,
+      yearIndex: 1
     },
     resolver: zodResolver(schema)
   })
 
   function filterDevice(formData: Schema) {
-    if (formData.monthIndex !== 0) {
-      selctedMonth = monthsList[formData.monthIndex].label
-    }
-    if (formData.yearIndex !== 0) {
-      selctedYear = yearList[formData.yearIndex].label
-    }
+    selectedMonth =
+      formData.monthIndex !== -1
+        ? monthsList[formData.monthIndex - 1].title
+        : 'All'
+    selectedYear =
+      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     getDevicesList(true)
   }
   function resetFilter() {
     getDevicesList(false)
     reset({
-      monthIndex: 0,
-      yearIndex: 0
+      monthIndex: 1,
+      yearIndex: 1
     })
   }
   const cancelClicked = () => {
@@ -158,6 +161,20 @@ export function MedicalDevicesListScreen() {
         setLoading(false)
         console.log('error', error)
       })
+  }
+  async function setYearChange(value: any) {
+    if (value === null) {
+      reset({
+        yearIndex: -1
+      })
+    }
+  }
+  async function setMonthChange(value: any) {
+    if (value === null) {
+      reset({
+        monthIndex: -1
+      })
+    }
   }
   return (
     <View className="flex-1">
@@ -211,6 +228,7 @@ export function MedicalDevicesListScreen() {
               maxHeight={300}
               list={monthsList}
               className=" w-[45%]"
+              onChangeValue={setMonthChange}
             />
             <ControlledDropdown
               control={control}
@@ -219,6 +237,7 @@ export function MedicalDevicesListScreen() {
               maxHeight={300}
               list={yearList}
               className="ml-2 w-[45%]"
+              onChangeValue={setYearChange}
             />
           </View>
           <View className="flex-row self-center">

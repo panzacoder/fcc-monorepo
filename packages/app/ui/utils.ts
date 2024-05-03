@@ -127,19 +127,19 @@ export const getFullDateForCalendar = (
 }
 export const getMonthsList = () => {
   let monthsList: object[] = [
-    { label: 'All', value: 0 },
-    { label: 'January', value: 1 },
-    { label: 'February', value: 2 },
-    { label: 'March', value: 3 },
-    { label: 'April', value: 4 },
-    { label: 'May', value: 5 },
-    { label: 'June', value: 6 },
-    { label: 'July', value: 7 },
-    { label: 'August', value: 8 },
-    { label: 'September', value: 9 },
-    { label: 'October', value: 10 },
-    { label: 'November', value: 11 },
-    { label: 'December', value: 12 }
+    { title: 'All', id: 1 },
+    { title: 'January', id: 2 },
+    { title: 'February', id: 3 },
+    { title: 'March', id: 4 },
+    { title: 'April', id: 5 },
+    { title: 'May', id: 6 },
+    { title: 'June', id: 7 },
+    { title: 'July', id: 8 },
+    { title: 'August', id: 9 },
+    { title: 'September', id: 10 },
+    { title: 'October', id: 11 },
+    { title: 'November', id: 12 },
+    { title: 'December', id: 13 }
   ]
   return monthsList
 }

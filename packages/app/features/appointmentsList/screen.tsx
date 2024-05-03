@@ -39,12 +39,12 @@ const schema = z.object({
   doctorFacilityIndex: z.number()
 })
 
-const typeList: object[] = [
-  { label: 'All', value: 0 },
-  { label: 'Doctor', value: 1 },
-  { label: 'Facility', value: 2 }
-] as any
-const yearList: object[] = [{ label: 'All', value: 0 }] as any
+const typesList: Array<{ id: number; title: string }> = [
+  { id: 1, title: 'All' },
+  { id: 2, title: 'Doctor' },
+  { id: 3, title: 'Facility' }
+]
+
 const monthsList = getMonthsList() as any
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
@@ -63,13 +63,13 @@ export function AppointmentsListScreen() {
   const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
   const header = store.getState().headerState.header
   const item = useParams<any>()
-  const staticData = store.getState().staticDataState.staticData
+  const staticData: any = store.getState().staticDataState.staticData
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      monthIndex: 0,
-      yearIndex: 0,
-      typeIndex: 0,
-      doctorFacilityIndex: 0
+      monthIndex: 1,
+      yearIndex: 1,
+      typeIndex: 1,
+      doctorFacilityIndex: 1
     },
     resolver: zodResolver(schema)
   })
@@ -77,12 +77,17 @@ export function AppointmentsListScreen() {
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
-  staticData.yearList.map((data: any, index: any) => {
-    let object = {
-      label: data.name,
-      value: index + 1
-    }
-    yearList.push(object)
+
+  type Response = {
+    id: number
+    name: string
+  }
+  let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
+  staticData.yearList.map(({ name, id }: Response, index: any) => {
+    yearList.push({
+      id: index + 2,
+      title: name
+    })
   })
   const getDoctorFacilities = useCallback(async () => {
     setLoading(true)
@@ -99,11 +104,13 @@ export function AppointmentsListScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          const list: object[] = [{ label: 'All', value: 0 }]
+          const list: Array<{ id: number; title: string }> = [
+            { title: 'All', id: 1 }
+          ]
           data.data.map((data: any, index: any) => {
             let object = {
-              label: data.name,
-              value: index + 1
+              title: data.name,
+              id: index + 2
             }
             list.push(object)
           })
@@ -185,15 +192,19 @@ export function AppointmentsListScreen() {
     getFilteredList(appointmentsListFull, filter)
   }
   function filterAppointment(formData: Schema) {
-    selectedMonth = monthsList[formData.monthIndex].label
-    selectedYear = yearList[formData.yearIndex].label
+    selectedMonth =
+      formData.monthIndex !== -1
+        ? monthsList[formData.monthIndex - 1].title
+        : 'All'
+    selectedYear =
+      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     doctorId =
-      formData.doctorFacilityIndex !== 0
-        ? doctorFacilityListFull[formData.doctorFacilityIndex].doctorId
+      formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorId
         : 'All'
     facilityId =
-      formData.doctorFacilityIndex !== 0
-        ? doctorFacilityListFull[formData.doctorFacilityIndex].facilityId
+      formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityId
         : 'All'
     getAppointmentDetails()
   }
@@ -205,21 +216,49 @@ export function AppointmentsListScreen() {
     facilityId = 'All'
     getAppointmentDetails()
     reset({
-      monthIndex: 0,
-      yearIndex: 0,
-      doctorFacilityIndex: 0,
-      typeIndex: 0
+      monthIndex: 1,
+      yearIndex: 1,
+      doctorFacilityIndex: 1,
+      typeIndex: 1
     })
   }
-  async function setSelectedTypeChange(value: any) {
-    if (value === 0) {
-      selectedType = 'All'
-    } else if (value === 1) {
-      selectedType = 'Doctor Appointment'
-    } else {
-      selectedType = 'Facility Appointment'
+  async function setDoctorFacilityChange(value: any) {
+    if (value === null) {
+      reset({
+        doctorFacilityIndex: -1
+      })
     }
-    getDoctorFacilities()
+  }
+  async function setYearChange(value: any) {
+    if (value === null) {
+      reset({
+        yearIndex: -1
+      })
+    }
+  }
+  async function setMonthChange(value: any) {
+    if (value === null) {
+      reset({
+        monthIndex: -1
+      })
+    }
+  }
+  async function setSelectedTypeChange(value: any) {
+    if (value) {
+      if (value === 0) {
+        selectedType = 'All'
+      } else if (value === 1) {
+        selectedType = 'Doctor Appointment'
+      } else {
+        selectedType = 'Facility Appointment'
+      }
+      getDoctorFacilities()
+    } else {
+      selectedType = 'All'
+      reset({
+        typeIndex: -1
+      })
+    }
   }
   async function cancelClicked() {
     setIsAddAppointment(false)
@@ -291,7 +330,7 @@ export function AppointmentsListScreen() {
               name="typeIndex"
               label="All"
               maxHeight={300}
-              list={typeList}
+              list={typesList}
               className="w-[95%] self-center"
               onChangeValue={setSelectedTypeChange}
             />
@@ -302,7 +341,7 @@ export function AppointmentsListScreen() {
               maxHeight={300}
               list={doctorFacilityList}
               className="mt-2 w-[95%] self-center"
-              // onChangeValue={setSelectedTypeChange}
+              onChangeValue={setDoctorFacilityChange}
             />
           </View>
           <View className="mt-2 w-full flex-row justify-center">
@@ -313,7 +352,7 @@ export function AppointmentsListScreen() {
               maxHeight={300}
               list={monthsList}
               className="w-[45%]"
-              // onChangeValue={setSelectedMonthChange}
+              onChangeValue={setMonthChange}
             />
             <ControlledDropdown
               control={control}
@@ -322,7 +361,7 @@ export function AppointmentsListScreen() {
               maxHeight={300}
               list={yearList}
               className="ml-5 w-[45%]"
-              // onChangeValue={setSelectedTypeChange}
+              onChangeValue={setYearChange}
             />
           </View>
           <View className="flex-row self-center">

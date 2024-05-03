@@ -56,15 +56,16 @@ export function PrescriptionsListScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
-  type TypeResponse = {
-    id: number
-    type: string
-  }
+  
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const staticData: any = store.getState().staticDataState.staticData
 
   //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
+  type TypeResponse = {
+    id: number
+    type: string
+  }
   let typesList: Array<{ id: number; title: string }> = [
     { id: 1, title: 'All' }
   ]

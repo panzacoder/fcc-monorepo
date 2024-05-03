@@ -34,6 +34,14 @@ export type Schema = z.infer<typeof schema>
 let selectedDate: any = new Date()
 let purpose: any = ''
 let facilityDoctorIndex = -1
+type TypeResponse = {
+  id: number
+  type: string
+}
+type DoctorFacilityResponse = {
+  id: number
+  name: string
+}
 export function AddEditAppointmentScreen() {
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
@@ -85,12 +93,15 @@ export function AddEditAppointmentScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let doctorFacilities = data.data.map((data: any, index: any) => {
-            return {
-              title: data.name,
-              id: index + 1
-            }
-          })
+          let doctorFacilities: Array<{ id: number; title: string }> =
+            data.data.map(
+              ({ name, id }: DoctorFacilityResponse, index: any) => {
+                return {
+                  id: index + 1,
+                  title: name
+                }
+              }
+            )
           setDoctorFacilityList(doctorFacilities)
           setDoctorFacilityListFull(data.data ? data.data : [])
           setIsDataReceived(true)
@@ -244,14 +255,15 @@ export function AddEditAppointmentScreen() {
       }
     }
   )
-  const typesList = staticData.appointmentTypeList.map(
-    (data: any, index: any) => {
-      return {
-        title: data.type,
-        id: index + 1
+  let typesList: Array<{ id: number; title: string }> =
+    staticData.appointmentTypeList.map(
+      ({ type, id }: TypeResponse, index: any) => {
+        return {
+          id: index + 1,
+          title: type
+        }
       }
-    }
-  )
+    )
   const onSelection = (date: any) => {
     selectedDate = date
   }
@@ -320,7 +332,7 @@ export function AddEditAppointmentScreen() {
             )}
           </View>
 
-          <View className="w-full">
+          <View className="w-full mt-2">
             <PtsDateTimePicker
               currentData={
                 appointmentDetails.date ? appointmentDetails.date : new Date()

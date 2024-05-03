@@ -30,19 +30,19 @@ export const AddEditNote = ({
     if (component === 'Appointment') {
       staticData.taskOccuranceList.map(async (data: any, index: any) => {
         if (data.occurance === noteData.occurance.occurance) {
-          occuranceIndex = index
+          occuranceIndex = index + 1
         }
       })
     } else if (component === 'Medical Device') {
       staticData.purchaseOccuranceList.map(async (data: any, index: any) => {
         if (data.occurance === noteData.occurance.occurance) {
-          occuranceIndex = index
-          console.log('occuranceIndex', '' + occuranceIndex)
+          occuranceIndex = index + 1
+          // console.log('occuranceIndex', '' + occuranceIndex)
         }
       })
     }
   }
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       title:
         !_.isEmpty(noteData) && noteData.shortDescription
@@ -56,13 +56,13 @@ export const AddEditNote = ({
     },
     resolver: zodResolver(schema)
   })
-  let occuranceList = [] as any
+  let occuranceList: Array<{ id: number; title: string }> = []
   if (component === 'Appointment') {
     occuranceList = staticData.taskOccuranceList.map(
       (data: any, index: any) => {
         return {
-          label: data.occurance,
-          value: index
+          title: data.occurance,
+          id: index + 1
         }
       }
     )
@@ -72,17 +72,29 @@ export const AddEditNote = ({
       (data: any, index: any) => {
         return {
           label: data.occurance,
-          value: index
+          value: index + 1
         }
       }
     )
   }
 
   async function callCreateUpdateNote(formData: Schema) {
-    let occurance = occuranceList[formData.occurrence]?.label
-      ? occuranceList[formData.occurrence]?.label
-      : ''
+    let occurance =
+      formData.occurrence !== -1
+        ? occuranceList[formData.occurrence - 1]?.title
+        : ''
+          ? formData.occurrence !== -1
+            ? occuranceList[formData.occurrence - 1]?.title
+            : ''
+          : ''
     createUpdateNote(occurance, formData.noteDetails, formData.title, noteData)
+  }
+  async function setOccuranceChange(value: any) {
+    if (value === null) {
+      reset({
+        occurrence: -1
+      })
+    }
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#FCF3CF] py-5">
@@ -107,7 +119,7 @@ export const AddEditNote = ({
               maxHeight={300}
               list={occuranceList}
               defaultValue={occurance}
-              // onChangeValue={setSelectedCountryChange}
+              onChangeValue={setOccuranceChange}
             />
           </View>
         ) : (

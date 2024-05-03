@@ -24,7 +24,7 @@ let prescribedBy: any = ''
 let selectedType: any = ''
 let selectedDate: any = new Date()
 let selectedPrescriberIndex: any = -1
-let doctorList = [] as any
+let doctorList: Array<{ id: number; title: string }> = []
 export const AddEditMedicalDevice = ({
   medicalDeviceDetails,
   cancelClicked,
@@ -68,6 +68,7 @@ export const AddEditMedicalDevice = ({
               id: index + 1
             }
           })
+
           setDoctorListFull(list)
         } else {
           Alert.alert('', data.message)
@@ -88,7 +89,7 @@ export const AddEditMedicalDevice = ({
       label: data.type
     }
   })
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       prescriberIndex: selectedPrescriberIndex,
       description:
@@ -122,6 +123,13 @@ export const AddEditMedicalDevice = ({
   const onSelection = (date: any) => {
     selectedDate = date
   }
+  async function setPrescriberChange(value: any) {
+    if (value === null) {
+      reset({
+        prescriberIndex: -1
+      })
+    }
+  }
   return (
     <ScrollView className=" my-2 max-h-[70%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
       <View className="my-2 w-full">
@@ -133,8 +141,8 @@ export const AddEditMedicalDevice = ({
             onSelection={onSelection}
           />
         </View>
-        <View className="my-2 w-full justify-center">
-          <View className="mt-2">
+        <View className="my-2 w-full justify-center ">
+          <View className="mt-2 w-[95%] self-center">
             <PtsComboBox
               currentData={selectedType}
               listData={typesList}
@@ -166,6 +174,7 @@ export const AddEditMedicalDevice = ({
               defaultValue={
                 !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''
               }
+              onChangeValue={setPrescriberChange}
             />
           ) : (
             <View />

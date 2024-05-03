@@ -39,12 +39,13 @@ export const LocationDetails = ({ data, setAddressObject }) => {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          let statesList = data.data.stateList.map((data: any, index: any) => {
-            return {
-              title: data.name,
-              id: index
-            }
-          })
+          let statesList: Array<{ id: number; title: string }> =
+            data.data.stateList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
           setStateslist(statesList)
           statesListFull = data.data.stateList ? data.data.stateList : []
           if (!_.isEmpty(locationData)) {
@@ -53,7 +54,7 @@ export const LocationDetails = ({ data, setAddressObject }) => {
               : ''
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
-                stateIndex = index
+                stateIndex = index + 1
               }
             })
           }
@@ -82,12 +83,12 @@ export const LocationDetails = ({ data, setAddressObject }) => {
       }
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
-          countryIndex = index
+          countryIndex = index + 1
           setIsRender(!isRender)
         }
       })
-      let countryId = staticData.countryList[countryIndex].id
-        ? staticData.countryList[countryIndex].id
+      let countryId = staticData.countryList[countryIndex - 1].id
+        ? staticData.countryList[countryIndex - 1].id
         : 101
       await getStates(countryId)
     }
@@ -114,27 +115,30 @@ export const LocationDetails = ({ data, setAddressObject }) => {
         !_.isEmpty(locationData) && locationData.address.zipCode
           ? locationData.address.zipCode
           : '',
-      country: !_.isEmpty(locationData) ? countryIndex : 96,
+      country: !_.isEmpty(locationData) ? countryIndex : 97,
       state: !_.isEmpty(locationData) ? stateIndex : -1
     },
     resolver: zodResolver(schema)
   })
-  const countryList: any = staticData.countryList.map(
-    (data: any, index: any) => {
+  type Response = {
+    id: number
+    name: string
+  }
+  const countryList: Array<{ id: number; title: string }> =
+    staticData.countryList.map(({ name, id }: Response, index: any) => {
       return {
-        title: data.name,
-        id: index
+        title: name,
+        id: index + 1
       }
-    }
-  )
+    })
   async function setSelectedCountryChange(value: any) {
     if (value) {
-      setAddressObject(staticData.countryList[value.id], 4)
+      setAddressObject(staticData.countryList[value.id - 1], 4)
     }
 
     let countryId =
-      value && staticData.countryList[value.id]?.id
-        ? staticData.countryList[value.id].id
+      value && staticData.countryList[value.id - 1]?.id
+        ? staticData.countryList[value.id - 1].id
         : 101
     await getStates(countryId)
   }
@@ -181,7 +185,7 @@ export const LocationDetails = ({ data, setAddressObject }) => {
             label="Country*"
             maxHeight={300}
             defaultValue={
-              countryIndex !== -1 ? countryList[countryIndex].title : ''
+              countryIndex !== -1 ? countryList[countryIndex]?.title : ''
             }
             list={countryList}
             onChangeValue={setSelectedCountryChange}

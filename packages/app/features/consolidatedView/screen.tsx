@@ -33,7 +33,7 @@ const schema = z.object({
   typeIndex: z.number()
 })
 let selectedType = 'All'
-let typesList: object[] = [] as any
+let typesList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
 let weekFirstLastDays = [] as any
 let weekDayListDates = [] as any
 let weekDayUtcDates = [] as any
@@ -81,6 +81,10 @@ export function ConsolidatedViewScreen() {
     },
     resolver: zodResolver(schema)
   })
+  type TypeResponse = {
+    id: number
+    data: string
+  }
   function clearLists() {
     listDayOne = []
     listDayTwo = []
@@ -167,16 +171,13 @@ export function ConsolidatedViewScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          const list: object[] = [{ label: 'All', value: 0 }]
           data.data.filterOptionTypes.map((data: any, index: any) => {
             let object = {
-              label: data,
-              value: index + 1
+              title: data,
+              id: index + 2
             }
-            list.push(object)
+            typesList.push(object)
           })
-          typesList = list
-          console.log('list', JSON.stringify(list))
         } else {
           Alert.alert('', data.message)
         }

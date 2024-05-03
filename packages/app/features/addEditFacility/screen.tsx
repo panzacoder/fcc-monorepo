@@ -75,7 +75,7 @@ export function AddEditFacilityScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(isFacilityActive ? true : false)
   const [isPharmacy, setIsPharmacy] = useState(false)
-  const [statesList, setStateslist] = useState([])
+  const [statesList, setStateslist] = useState([]) as any
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
     return {
       label: data.type
@@ -190,8 +190,8 @@ export function AddEditFacilityScreen() {
     }
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state]
-    let countryObject: object = staticData.countryList[formData.country]
+    let stateObject = statesListFull[formData.state - 1]
+    let countryObject: object = staticData.countryList[formData.country - 1]
     let object: any = {
       shortDescription: formData.locationDesc,
       nickName: formData.locationShortName,
@@ -237,12 +237,17 @@ export function AddEditFacilityScreen() {
         console.log(error)
       })
   }
-  const countryList = staticData.countryList.map((data: any, index: any) => {
-    return {
-      label: data.name,
-      value: index
-    }
-  })
+  type Response = {
+    id: number
+    name: string
+  }
+  const countryList: Array<{ id: number; title: string }> =
+    staticData.countryList.map(({ name, id }: Response, index: any) => {
+      return {
+        title: name,
+        id: index + 1
+      }
+    })
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -256,13 +261,13 @@ export function AddEditFacilityScreen() {
         console.log('data', data)
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // set available states
-          let statesList = data.data.stateList.map((data: any, index: any) => {
-            return {
-              label: data.name,
-              value: index
-            }
-          })
+          let statesList: Array<{ id: number; title: string }> =
+            data.data.stateList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
           setStateslist(statesList)
           statesListFull = data.data.stateList ? data.data.stateList : []
           // console.log('statesList', statesList)
@@ -279,8 +284,8 @@ export function AddEditFacilityScreen() {
   async function setSelectedCountryChange(value: any) {
     console.log('value', JSON.stringify(value))
     let countryId =
-      value && staticData.countryList[value.id]?.id
-        ? staticData.countryList[value.id].id
+      value && staticData.countryList[value.id - 1]?.id
+        ? staticData.countryList[value.id - 1].id
         : 101
     await getStates(countryId)
   }
@@ -353,14 +358,6 @@ export function AddEditFacilityScreen() {
                 />
               </View>
               <View className="mt-2">
-                {/* <ControlledDropdown
-                  control={control}
-                  name="type"
-                  label="Type*"
-                  maxHeight={300}
-                  list={typesList}
-                  // onChangeValue={setSelectedCountryChange}
-                /> */}
                 <PtsComboBox
                   currentData={selectedType}
                   listData={typesList}
