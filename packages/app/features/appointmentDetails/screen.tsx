@@ -24,7 +24,8 @@ import {
   CREATE_MESSAGE_THREAD,
   RESEND_TRANSPORTATION_REQUEST,
   DELETE_TRANSPORTATION,
-  CANCEL_TRANSPORTATION_REQUEST
+  CANCEL_TRANSPORTATION_REQUEST,
+  SEND_CALENDAR_INVITE
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
@@ -243,7 +244,34 @@ export function AppointmentDetailsScreen() {
     setIsAddTransportation(false)
     setIsMessageThread(false)
   }
-
+  async function sendInvite() {
+    setLoading(true)
+    let url = `${BASE_URL}${SEND_CALENDAR_INVITE}`
+    let dataObject = {
+      header: header,
+      appointment: {
+        id: appointmentDetails.id ? appointmentDetails.id : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          Alert.alert(
+            '',
+            `Send to\n${
+              memberData.email ? memberData.email : ''
+            } . \n\nCheck your email for the appointment invite. `
+          )
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
   function createMessageThread(subject: any, noteData: any) {
     setLoading(true)
     setNoteData(noteData)
@@ -682,7 +710,8 @@ export function AppointmentDetailsScreen() {
                       router.push(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
-                          appointmentDetails: JSON.stringify(appointmentDetails),
+                          appointmentDetails:
+                            JSON.stringify(appointmentDetails),
                           component: 'Appointment'
                         })
                       )
@@ -975,9 +1004,18 @@ export function AppointmentDetailsScreen() {
             </View>
 
             {getUserPermission(appointmentPrivileges).deletePermission ? (
-              <View className="mx-5 my-5">
+              <View className="mx-5 my-5 flex-row self-center">
                 <Button
-                  className=""
+                  className="w-[50%]"
+                  title="Send Me Invite"
+                  variant="outline"
+                  leadingIcon="calendar"
+                  onPress={() => {
+                    sendInvite()
+                  }}
+                />
+                <Button
+                  className="ml-5 w-[45%]"
                   title="Delete"
                   variant="borderRed"
                   onPress={() => {

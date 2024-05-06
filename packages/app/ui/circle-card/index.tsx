@@ -4,6 +4,7 @@ import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
+import { googleMapOpenUrl } from 'app/ui/utils'
 
 export function CircleCard(data: any) {
   const router = useRouter()
@@ -15,10 +16,21 @@ export function CircleCard(data: any) {
   if (memberData.lastname) {
     fullName += memberData.lastname.trim()
   }
+  let sharingInfoRequestsLength = 0
+  let requestsForMemberLength = 0
+  if (memberData.sharingInfoRequests) {
+    sharingInfoRequestsLength = memberData.sharingInfoRequests.length
+  }
+  if (memberData.requestsForMember) {
+    requestsForMemberLength = memberData.requestsForMember.length
+  }
+  let iconStyle = 'mt-1 w-[33%] items-center'
+  let textStyle =
+    'ml-[-5px] h-[20px] w-[20px] rounded-[10px] bg-[#5ACC6C] text-center font-bold text-white'
   return (
     <View className="flex-1">
       <Pressable
-        className={`border-[${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? '#287CFA' : '#3DC4C4'}] mt-5 w-[95%] self-center rounded-[10px] border-[2px] bg-white py-5`}
+        className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
           router.push(
             formatUrl('/circles/circleDetails', {
@@ -45,15 +57,69 @@ export function CircleCard(data: any) {
             </View>
           </View>
           <View className="flex-row items-center">
-            <View className="bg-primary flex h-[24px] w-[24px] items-center rounded-full">
-              <Typography className="text-white">{'2'}</Typography>
-            </View>
             <Feather
               name={'chevron-right'}
               size={25}
               color={'black'}
               className="ml-2"
             />
+          </View>
+        </View>
+        <View className="ml-5 flex-row self-center">
+          <View className={iconStyle}>
+            {requestsForMemberLength > 0 ? (
+              <View className="flex-row">
+                <Feather
+                  onPress={() => {}}
+                  className="mt-1"
+                  name={'bell'}
+                  size={25}
+                  color={'black'}
+                />
+
+                <Typography onPress={() => {}} className={textStyle}>
+                  {requestsForMemberLength}
+                </Typography>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          <View className={iconStyle}>
+            {sharingInfoRequestsLength > 0 ? (
+              <View className="flex-row">
+                <Feather
+                  onPress={() => {}}
+                  className="mt-1"
+                  name={'file-text'}
+                  size={25}
+                  color={'black'}
+                />
+
+                <Typography onPress={() => {}} className={textStyle}>
+                  {sharingInfoRequestsLength}
+                </Typography>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          <View className={iconStyle}>
+            {memberData.address ? (
+              <View className="flex-row">
+                <Feather
+                  onPress={() => {
+                    googleMapOpenUrl(memberData.address)
+                  }}
+                  className="mt-1"
+                  name={'map-pin'}
+                  size={25}
+                  color={'black'}
+                />
+              </View>
+            ) : (
+              <View />
+            )}
           </View>
         </View>
       </Pressable>

@@ -137,4 +137,7 @@ export const RESEND_CAREGIVER_REQEST = 'memberms/resendRequest'
 export const GET_TC_HTML_CONTENT = 'apTermsConditions/geActive'
 export const GET_CONSOLIDATED_FILTER_OPTIONS = 'homems/getFilterOptions'
 export const GET_CONSOLIDATED_DETAILS = 'homems/getConsolidatedMemberDetails'
-export const GET_FILTER_CONSOLIDATED_DETAILS = 'homems/getFilteredConsolidatedMemberDetails'
+export const GET_FILTER_CONSOLIDATED_DETAILS =
+  'homems/getFilteredConsolidatedMemberDetails'
+export const SHARE_FACILITY_INFO = 'infoSharingMs/create'
+export const SEND_CALENDAR_INVITE = 'calendarEventMS/syncAppointmentToCalendar'

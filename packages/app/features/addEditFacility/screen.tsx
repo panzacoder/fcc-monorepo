@@ -12,7 +12,6 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   CREATE_FACILITY,
-  DELETE_FACILITY,
   UPDATE_FACILITY,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
@@ -112,33 +111,7 @@ export function AddEditFacilityScreen() {
     },
     resolver: zodResolver(schema)
   })
-  async function deleteFacility() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_FACILITY}`
-    let dataObject = {
-      header: header,
-      facility: {
-        id: facilityDetails.id ? facilityDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          router.push(
-            formatUrl('/circles/facilitiesList', {
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
+
   async function updateFacility(formData: Schema) {
     if (selectedType === '') {
       Alert.alert('', 'Select Type')
@@ -499,30 +472,6 @@ export function AddEditFacilityScreen() {
                   </View>
                 </View>
               </View>
-            </View>
-          ) : (
-            <View />
-          )}
-          {!_.isEmpty(facilityDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="borderRed"
-                onPress={() => {
-                  Alert.alert(
-                    'Are you sure about deleting Facility?',
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => deleteFacility()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
-              />
             </View>
           ) : (
             <View />
