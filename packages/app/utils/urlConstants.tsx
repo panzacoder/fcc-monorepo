@@ -139,5 +139,7 @@ export const GET_CONSOLIDATED_FILTER_OPTIONS = 'homems/getFilterOptions'
 export const GET_CONSOLIDATED_DETAILS = 'homems/getConsolidatedMemberDetails'
 export const GET_FILTER_CONSOLIDATED_DETAILS =
   'homems/getFilteredConsolidatedMemberDetails'
-export const SHARE_FACILITY_INFO = 'infoSharingMs/create'
+export const SHARE_CONTACT_INFO = 'infoSharingMs/create'
+export const ACCEPT_SHARED_INFO = 'infoSharingMs/accept'
+export const REJECT_SHARED_INFO = 'infoSharingMs/reject'
 export const SEND_CALENDAR_INVITE = 'calendarEventMS/syncAppointmentToCalendar'

@@ -16,7 +16,7 @@ import {
   BASE_URL,
   GET_DOCTOR_DETAILS,
   DELETE_DOCTOR,
-  SHARE_FACILITY_INFO
+  SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
@@ -165,7 +165,7 @@ export function DoctorDetailsScreen() {
   }
   async function shareDoctor(email: any) {
     setLoading(true)
-    let url = `${BASE_URL}${SHARE_FACILITY_INFO}`
+    let url = `${BASE_URL}${SHARE_CONTACT_INFO}`
     let dataObject = {
       header: header,
       doctorSharingInfo: {
