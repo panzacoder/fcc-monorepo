@@ -142,4 +142,6 @@ export const GET_FILTER_CONSOLIDATED_DETAILS =
 export const SHARE_CONTACT_INFO = 'infoSharingMs/create'
 export const ACCEPT_SHARED_INFO = 'infoSharingMs/accept'
 export const REJECT_SHARED_INFO = 'infoSharingMs/reject'
+export const REJECT_MEMBER_REQUEST = 'memberms/rejectMembershipRequest'
+export const ACCEPT_MEMBER_REQUEST = 'memberms/acceptMembershipRequest'
 export const SEND_CALENDAR_INVITE = 'calendarEventMS/syncAppointmentToCalendar'

@@ -75,14 +75,21 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             {requestsForMemberLength > 0 ? (
               <View className="flex-row">
                 <Feather
-                  onPress={() => {}}
+                  onPress={() => {
+                    hideCirclesView(true, index, false)
+                  }}
                   className="mt-1"
                   name={'bell'}
                   size={25}
                   color={'black'}
                 />
 
-                <Typography onPress={() => {}} className={textStyle}>
+                <Typography
+                  onPress={() => {
+                    hideCirclesView(true, index, false)
+                  }}
+                  className={textStyle}
+                >
                   {requestsForMemberLength}
                 </Typography>
               </View>
@@ -95,7 +102,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
               <View className="flex-row">
                 <Feather
                   onPress={() => {
-                    hideCirclesView(true, index)
+                    hideCirclesView(true, index, true)
                   }}
                   className="mt-1"
                   name={'file-text'}
@@ -105,7 +112,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
 
                 <Typography
                   onPress={() => {
-                    hideCirclesView(true, index)
+                    hideCirclesView(true, index, true)
                   }}
                   className={textStyle}
                 >

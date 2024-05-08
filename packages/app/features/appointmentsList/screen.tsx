@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, Pressable, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import moment from 'moment'
+import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -118,8 +118,8 @@ export function AppointmentsListScreen() {
           setDoctorFacilityListFull(data.data ? data.data : [])
         } else {
           Alert.alert('', data.message)
+          setLoading(false)
         }
-        setLoading(false)
       })
       .catch((error) => {
         setLoading(false)
@@ -164,29 +164,44 @@ export function AppointmentsListScreen() {
       })
   }, [])
   useEffect(() => {
-    getAppointmentDetails()
     getDoctorFacilities()
+    getAppointmentDetails()
   }, [])
 
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
     console.log('filter', filter)
+    if (filter === 'Upcoming') {
+      list = _.orderBy(list, (x) => x.date, 'asc')
+    } else {
+      list = _.orderBy(list, (x) => x.date, 'desc')
+    }
     list.map((data: any, index: any) => {
-      if (
-        filter === 'Upcoming' &&
-        moment(data.date).utc().isAfter(moment().utc()) &&
-        data.status === 'Scheduled'
-      ) {
-        filteredList.push(data)
-      } else if (data.status === filter) {
-        filteredList.push(data)
+      if (filter === 'Upcoming') {
+        if (
+          String(data.status).toLocaleLowerCase() ===
+            String('Scheduled').toLowerCase() ||
+          String(data.status).toLocaleLowerCase() ===
+            String('rescheduled').toLowerCase()
+        ) {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Completed') {
+        if (data.status === 'Completed') {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Cancelled') {
+        if (data.status === 'Cancelled') {
+          filteredList.push(data)
+        }
       } else if (filter === 'All') {
         filteredList = list
       }
     })
+    // console.log('filteredList', JSON.stringify(filteredList))
     setAppointmentsList(filteredList)
   }
-  function setFilteredList(filter: any) {
+  async function setFilteredList(filter: any) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(appointmentsListFull, filter)
@@ -397,7 +412,7 @@ export function AppointmentsListScreen() {
       )}
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Upcoming' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Upcoming')
@@ -406,8 +421,8 @@ export function AppointmentsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Upcoming'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Completed' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Completed')
@@ -416,8 +431,8 @@ export function AppointmentsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Completed'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Cancelled' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Cancelled')
@@ -426,8 +441,8 @@ export function AppointmentsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Cancelled'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -436,7 +451,7 @@ export function AppointmentsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
