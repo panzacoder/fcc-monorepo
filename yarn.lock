@@ -11603,6 +11603,7 @@ __metadata:
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
     react-native-calendar-picker: "npm:^8.0.2"
+    react-native-calendars: "npm:^1.1304.1"
     redux-devtools-extension: "npm:^2.13.9"
     turbo: "npm:^1.13.0"
     typescript: "npm:^5.4.3"
@@ -12677,7 +12678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.2":
+"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.1, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
   dependencies:
@@ -14850,7 +14851,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"memoize-one@npm:^5.0.0":
+"memoize-one@npm:^5.0.0, memoize-one@npm:^5.2.1":
   version: 5.2.1
   resolution: "memoize-one@npm:5.2.1"
   checksum: 10/b7141dc148b5c6fdd51e77ecf0421fd2581681eb8756e0b3dfbd4fe765b5e2b5a6bc90214bb6f19a96b6aed44de17eda3407142a7be9e24ccd0774bbd9874d1b
@@ -17217,7 +17218,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -17682,6 +17683,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-calendars@npm:^1.1304.1":
+  version: 1.1304.1
+  resolution: "react-native-calendars@npm:1.1304.1"
+  dependencies:
+    hoist-non-react-statics: "npm:^3.3.1"
+    lodash: "npm:^4.17.15"
+    memoize-one: "npm:^5.2.1"
+    moment: "npm:^2.29.4"
+    prop-types: "npm:^15.5.10"
+    react-native-swipe-gestures: "npm:^1.0.5"
+    recyclerlistview: "npm:^4.0.0"
+    xdate: "npm:^0.8.0"
+  dependenciesMeta:
+    moment:
+      optional: true
+  checksum: 10/f9b6c5077c19cb67224245bff1156416b1532d84f108fb32392476c286235f23c84ddf1bcfc740b6eac0900eae898eb507c66c82c4b3dd305b7defaac042afc3
+  languageName: node
+  linkType: hard
+
 "react-native-css-interop@npm:0.0.36":
   version: 0.0.36
   resolution: "react-native-css-interop@npm:0.0.36"
@@ -17834,6 +17854,13 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/2322cba59542ae552c25d222b6311024ea17daf2431c5ed9029d3682e61d2f8bc5428f496b237e81a6d1c6bdf29abeab0ed005cfbb48420f34e1cdffdc40823b
+  languageName: node
+  linkType: hard
+
+"react-native-swipe-gestures@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "react-native-swipe-gestures@npm:1.0.5"
+  checksum: 10/d637bc40baa50fa0ce3b6cf2b494efeceaea03cc3875cb7cf7d76922914a21d5e6b098d4a084fb291ce61bfbb0a241c03cff24b15bebf0cfae1c146f4ad10d92
   languageName: node
   linkType: hard
 
@@ -18159,6 +18186,20 @@ __metadata:
     react: ">= 15.2.1"
     react-native: ">= 0.30.0"
   checksum: 10/fbe3928f490fbca20fe47d4168b1ffb373497251d58959be0225dae1c4795e83ed3a38664e01e8be1bd9aad078103b1c30004c6a2db44cf4e0d34b0b1a7032eb
+  languageName: node
+  linkType: hard
+
+"recyclerlistview@npm:^4.0.0":
+  version: 4.2.0
+  resolution: "recyclerlistview@npm:4.2.0"
+  dependencies:
+    lodash.debounce: "npm:4.0.8"
+    prop-types: "npm:15.8.1"
+    ts-object-utils: "npm:0.0.5"
+  peerDependencies:
+    react: ">= 15.2.1"
+    react-native: ">= 0.30.0"
+  checksum: 10/84c2fc1ee7d109e21ca30813f646a5d490a33fa789d1fb3f7f7854c191895de010109563ba1c67a35ec28340a872a039ceb6233a57053480098c48205fc147e9
   languageName: node
   linkType: hard
 
@@ -21497,6 +21538,13 @@ __metadata:
     simple-plist: "npm:^1.1.0"
     uuid: "npm:^7.0.3"
   checksum: 10/539d7b808ccce648078c5ceb63c4f9c14a7018a7db688fe0ff55c7d59e685c67392f18e9f531ce524f8d71162e836714b8835fa0a8688e976d4a293b147917c3
+  languageName: node
+  linkType: hard
+
+"xdate@npm:^0.8.0":
+  version: 0.8.2
+  resolution: "xdate@npm:0.8.2"
+  checksum: 10/a53eb459151de366e1473af2f7da0c019df9b39157c28239eb9669a87f05e8ec7f3a118c9a8e72c35195e41599b0b197f7a5a8467d26e98e3f50ca9d6be38f08
   languageName: node
   linkType: hard
 

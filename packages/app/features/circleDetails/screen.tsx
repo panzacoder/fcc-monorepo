@@ -246,20 +246,26 @@ export function CircleDetailsScreen() {
                   <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
                     {'No upcoming events'}
                   </Typography>
-                  <Pressable
-                    className=" ml-2"
-                    onPress={() => {
-                      router.push(
-                        formatUrl('/circles/eventsList', {
-                          memberData: JSON.stringify(memberData)
-                        })
-                      )
-                    }}
-                  >
-                    <Feather name={'chevron-right'} size={20} color={'black'} />
-                  </Pressable>
                 </View>
               )}
+            </View>
+          </Pressable>
+
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/prescriptionsList', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className="mt-3  w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
+            <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+            <View className="py-5">
+              <Typography className=" ml-5 flex rounded text-[18px] font-bold text-black">
+                {'Prescriptions'}
+              </Typography>
             </View>
           </Pressable>
         </View>

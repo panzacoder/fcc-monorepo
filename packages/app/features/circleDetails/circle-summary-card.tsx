@@ -102,11 +102,11 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             <View className="mt-5 flex-row self-center">
               <Button
                 className="px-3"
-                title="Prescriptions"
-                leadingIcon="thermometer"
+                title="Calendar"
+                leadingIcon="calendar"
                 onPress={() => {
                   router.push(
-                    formatUrl('/circles/prescriptionsList', {
+                    formatUrl('/circles/calendar', {
                       memberData: JSON.stringify(memberData)
                     })
                   )
