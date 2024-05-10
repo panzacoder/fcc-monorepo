@@ -139,7 +139,7 @@ export function CircleDetailsScreen() {
                     </Typography>
                   </View>
                 ) : (
-                  <View />
+                  <View className="w-[10%]" />
                 )}
                 <View className=" ml-2">
                   <Feather name={'chevron-right'} size={20} color={'black'} />
@@ -177,7 +177,7 @@ export function CircleDetailsScreen() {
                       </Typography>
                     </View>
                   ) : (
-                    <View />
+                    <View className="w-[10%]" />
                   )}
                   <Pressable
                     className=" ml-2"
@@ -220,38 +220,41 @@ export function CircleDetailsScreen() {
               <Typography className="ml-5 flex rounded text-[18px] font-bold text-black">
                 {'Events'}
               </Typography>
-              {memberData.upcomingEvent ? (
-                <View className="flex-row">
-                  <Typography className=" ml-5 flex w-[70%] rounded text-[14px] text-black">
-                    {memberData.upcomingEvent.title
-                      ? memberData.upcomingEvent.title
-                      : ''}
-                  </Typography>
-                  {memberData.upcomingEvent.upcomingCount > 0 ? (
-                    <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                      <Typography className="self-center text-center font-bold text-white">
-                        {memberData.upcomingEvent.upcomingCount}
-                      </Typography>
-                    </View>
-                  ) : (
+              <View className="flex-row">
+                {memberData.upcomingEvent ? (
+                  <View className="flex-row">
+                    <Typography className=" ml-5 flex w-[70%] rounded text-[14px] text-black">
+                      {memberData.upcomingEvent.title
+                        ? memberData.upcomingEvent.title
+                        : ''}
+                    </Typography>
+                    {memberData.upcomingEvent.upcomingCount > 0 ? (
+                      <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
+                        <Typography className="self-center text-center font-bold text-white">
+                          {memberData.upcomingEvent.upcomingCount}
+                        </Typography>
+                      </View>
+                    ) : (
+                      <View className="w-[10%]" />
+                    )}
+
                     <View />
-                  )}
-                  <View className=" ml-2">
-                    <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
-                  <View />
+                ) : (
+                  <View className="flex-row">
+                    <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
+                      {'No upcoming events'}
+                    </Typography>
+                  </View>
+                )}
+                <View className=" ml-2">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
-              ) : (
-                <View className="flex-row">
-                  <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
-                    {'No upcoming events'}
-                  </Typography>
-                </View>
-              )}
+              </View>
             </View>
           </Pressable>
 
-          <Pressable
+          {/* <Pressable
             onPress={() => {
               router.push(
                 formatUrl('/circles/prescriptionsList', {
@@ -266,6 +269,29 @@ export function CircleDetailsScreen() {
               <Typography className=" ml-5 flex rounded text-[18px] font-bold text-black">
                 {'Prescriptions'}
               </Typography>
+              <View className=" ml-2">
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
+            </View>
+          </Pressable> */}
+          <Pressable
+            onPress={() => {
+              router.push(
+                formatUrl('/circles/prescriptionsList', {
+                  memberData: JSON.stringify(memberData)
+                })
+              )
+            }}
+            className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+          >
+            <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+            <View className="flex-row py-5">
+              <Typography className="ml-5 flex w-[80%] rounded text-[18px] font-bold text-black">
+                {'Prescriptions'}
+              </Typography>
+              <View className=" ml-2">
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
             </View>
           </Pressable>
         </View>

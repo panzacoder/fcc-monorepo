@@ -1,9 +1,9 @@
 import { View, ScrollView, Pressable } from 'react-native'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'solito/navigation'
-
+import { formatUrl } from 'app/utils/format-url'
 import _ from 'lodash'
 import { ExpandableCalendar, CalendarProvider } from 'react-native-calendars'
 import moment from 'moment'
@@ -12,39 +12,47 @@ import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 import testIDs from '../../utils/testIDs'
 
 const today = new Date().toISOString().split('T')[0]
-const themeColor = '#00AAAF'
-const lightThemeColor = '#EBF9F9'
-export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
+export const ExpandableCalendarView = ({
+  memberData,
+  calenderEvents,
+  handleChange,
+  isShowAddModal
+}) => {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
+  const [markedObject, setMarkedObject] = useState({})
   // console.log('data.data.calenderItemList', JSON.stringify(calenderEvents))
-
+  useEffect(() => {
+    getMarkedDates()
+  }, [])
   const onDateChanged = (date: any, updateSource: any) => {}
 
   async function onMonthChange(month: any, updateSource: any) {
     // console.log('onMonthChange: ', '' + month)
     handleChange(month)
-  }
-  async function getStatusColorForDots(status: any) {
-    if (String(status).toLowerCase() === 'Cancelled'.toLowerCase()) {
-      return 'grey'
-    }
-    if (`${status}`.toLowerCase() === 'Completed'.toLowerCase()) {
-      return '#d2bd7f'
-    } else {
-      return '#0c6b25'
-    }
+    getMarkedDates()
   }
   async function getMarkedDates() {
-    const marked = {}
+    let marked = {}
     let data = await processData(calenderEvents)
     data.forEach((item: any) => {
       if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {
         let dotsColor = item.data.map((items: any, index: any) => {
+          let color = ''
           if (String(items.type).toLowerCase() === 'appointment') {
+            switch (item.status) {
+              case 'Cancelled':
+                color = 'gray-400'
+                break
+              case 'Completed':
+                color = '#d2bd7f'
+                break
+              default:
+                color = '#0c6b25'
+            }
             return {
               key: 'Appointment' + index,
-              color: getStatusColorForDots(items.status)
+              color: color
             }
           } else if (String(items.type).toLowerCase() === 'event') {
             return { key: 'Event' + index, color: '#518b9f' }
@@ -57,7 +65,8 @@ export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
         marked[item.title] = { disabled: true }
       }
     })
-    return marked
+    console.log('marked', JSON.stringify(marked))
+    setMarkedObject(marked)
   }
   async function processData(data: any) {
     let item = data.map((calendarDetails: any) => {
@@ -103,7 +112,30 @@ export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
       return 'bg-[#D4EFDF]'
     }
   }
-
+  function itemPressed(data: any) {
+    if (data.action === 'Appointment') {
+      router.push(
+        formatUrl('/circles/appointmentDetails', {
+          appointmentDetails: JSON.stringify(data),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (data.action === 'Event') {
+      router.replace(
+        formatUrl('/circles/eventDetails', {
+          eventDetails: JSON.stringify(data),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.replace(
+        formatUrl('/circles/incidentDetails', {
+          incidentDetails: JSON.stringify(data),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+  }
   function getCard(data: any, index: any) {
     let bgColor =
       data.action === 'Incident'
@@ -126,6 +158,9 @@ export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
           {`${days[moment(data.date).day()]}, ${getFullDateForCalendar(data.date, 'MMM DD')}`}
         </Typography>
         <Pressable
+          onPress={() => {
+            itemPressed(data)
+          }}
           className={`w-[95%] justify-center self-center rounded-[10px] p-3 ${bgColor}`}
         >
           <View className="flex-row">
@@ -153,8 +188,17 @@ export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
       </View>
     )
   }
+  const marked = {
+    '2024-05-17': {
+      marked: true,
+      dots: [
+        { key: '1', color: 'red' },
+        { key: '2', color: 'green' }
+      ]
+    }
+  }
   return (
-    <View className="ml-[-5] flex-1 ">
+    <View className="ml-[-5] mt-2 flex-1">
       <PtsLoader loading={isLoading} />
 
       <CalendarProvider
@@ -176,7 +220,7 @@ export const ExpandableCalendarView = ({ calenderEvents, handleChange }) => {
           disableWeekScroll
           disableAllTouchEventsForDisabledDays
           firstDay={0}
-          markedDates={getMarkedDates()}
+          markedDates={markedObject}
           markingType={'multi-dot'}
           leftArrowImageSource={require('../../assets/previous.png')}
           rightArrowImageSource={require('../../assets/next.png')}
