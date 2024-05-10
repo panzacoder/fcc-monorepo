@@ -8,14 +8,21 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { getFullDateForCalendar } from 'app/ui/utils'
-import { BASE_URL, GET_FACILITY_DETAILS } from 'app/utils/urlConstants'
+import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
+import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import {
+  BASE_URL,
+  GET_FACILITY_DETAILS,
+  DELETE_FACILITY,
+  SHARE_CONTACT_INFO
+} from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
-
+import { getUserPermission } from 'app/utils/getUserPemissions'
+let facilityPrivileges = {}
 export function FacilityDetailsScreen() {
   const [facilityDetails, setFacilityDetails] = useState<any>({})
   const [isShowLocations, setIsShowLocations] = useState(false)
@@ -28,6 +35,7 @@ export function FacilityDetailsScreen() {
     ? JSON.parse(item.facilityDetails)
     : {}
   const [isLoading, setLoading] = useState(false)
+  const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   useEffect(() => {
@@ -43,6 +51,11 @@ export function FacilityDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
+            if (data.data.domainObjectPrivileges) {
+              facilityPrivileges = data.data.domainObjectPrivileges.Facility
+                ? data.data.domainObjectPrivileges.Facility
+                : {}
+            }
             setFacilityDetails(data.data.facilityWithAppointment.facility || {})
 
             setLocationList(
@@ -71,14 +84,66 @@ export function FacilityDetailsScreen() {
     }
     getfacilityDetails()
   }, [])
-
+  async function deleteFacility() {
+    setLoading(true)
+    let url = `${BASE_URL}${DELETE_FACILITY}`
+    let dataObject = {
+      header: header,
+      facility: {
+        id: facilityDetails.id ? facilityDetails.id : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          router.push(
+            formatUrl('/circles/facilitiesList', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  const cancelClicked = () => {
+    setIsShareFacility(false)
+  }
+  async function shareFacility(email: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${SHARE_CONTACT_INFO}`
+    let dataObject = {
+      header: header,
+      doctorSharingInfo: {
+        facilityid: facilityDetails.id ? facilityDetails.id : '',
+        targetemail: email
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          setIsShareFacility(false)
+        }
+        Alert.alert('', data.message)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
                 <Typography className="font-400 max-w-[65%] text-[16px] text-[#86939e]">
@@ -144,13 +209,13 @@ export function FacilityDetailsScreen() {
             </View>
           </View>
 
-          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <Pressable
                 onPress={() => {
                   setIsShowLocations(!isShowLocations)
                 }}
-                className="w-[60%] flex-row"
+                className="w-[60%] min-w-[60%] flex-row"
               >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Locations'}
@@ -201,13 +266,13 @@ export function FacilityDetailsScreen() {
             )}
           </View>
 
-          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <Pressable
                 onPress={() => {
                   setIsShowAppointments(!isShowAppointments)
                 }}
-                className="w-[50%] flex-row"
+                className="w-[55%] min-w-[55%] flex-row"
               >
                 <Typography className="font-400 text-[14px] font-bold text-black">
                   {'Appointments'}
@@ -246,27 +311,119 @@ export function FacilityDetailsScreen() {
                   return (
                     <Pressable
                       onPress={() => {
+                        router.replace(
+                          formatUrl('/circles/appointmentDetails', {
+                            appointmentDetails: JSON.stringify(data),
+                            memberData: JSON.stringify(memberData)
+                          })
+                        )
                       }}
                       key={index}
                       className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
                     >
-                      <View className="ml-2 mt-2 flex-row ">
-                        <View className="w-full">
-                          <Typography className="font-400 ml-2 w-full text-[16px] text-[#103264]">
-                            {data.purpose ? data.purpose : ''}
+                      <View className=" flex-row">
+                        <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
+                          {data.date
+                            ? formatTimeToUserLocalTime(data.date)
+                            : ''}
+                        </Typography>
+                        <View className="">
+                          <Typography className="text-sm font-bold text-black">
+                            {data.status ? data.status : ''}
                           </Typography>
-                          <View className="w-full flex-row">
-                            <Typography className="font-400 ml-2 w-[35%] text-[12px] text-[#103264]">
-                              {getFullDateForCalendar(
-                                new Date(data.date),
-                                'MMMM DD '
-                              ) + ' - '}
-                            </Typography>
-                            <Typography className="font-400 w-[65%] text-[12px] text-[#103264]">
-                              {data.appointment ? data.appointment : ''}
-                            </Typography>
-                          </View>
                         </View>
+                      </View>
+                      <View className="flex-row">
+                        <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
+                          {data.purpose ? data.purpose : ''}
+                        </Typography>
+                        {data.markCompleteCancel ? (
+                          <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
+                            {'Mark Complete/Cancel'}
+                          </Typography>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                      <View className="flex-row">
+                        <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
+                          {data.appointment ? data.appointment : ''}
+                        </Typography>
+                        <Typography className="font-400 ml-[10px] text-sm text-black">
+                          {data.type.toLowerCase() === 'doctor appointment'
+                            ? 'Doctor'
+                            : 'Facility'}
+                        </Typography>
+                      </View>
+                      {data.hasNotes ||
+                      data.hasReminders ||
+                      data.hasTransportation ? (
+                        <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                      ) : (
+                        <View />
+                      )}
+
+                      <View className="ml-5 flex-row self-center">
+                        <View className="w-[30%]">
+                          {data.hasNotes ? (
+                            <View className="flex-row">
+                              <Feather
+                                className="ml-5 mt-1"
+                                name={'message-circle'}
+                                size={25}
+                                color={'green'}
+                              />
+                              {data.unreadMessageCount > 0 ? (
+                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                  {data.unreadMessageCount}
+                                </Typography>
+                              ) : (
+                                <View />
+                              )}
+                            </View>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                        <View className="w-[30%]">
+                          {data.hasReminders ? (
+                            <View className="flex-row">
+                              <Feather
+                                className="ml-5 mt-1"
+                                name={'clock'}
+                                size={25}
+                                color={'red'}
+                              />
+                              {data.activeReminderCount > 0 ? (
+                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                  {data.activeReminderCount}
+                                </Typography>
+                              ) : (
+                                <View />
+                              )}
+                            </View>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                        {data.hasTransportation ? (
+                          <View className="w-[30%]">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'truck'}
+                              size={25}
+                              color={
+                                data.transportationStatus === 'Requested'
+                                  ? '#cf8442'
+                                  : data.transportationStatus === 'Rejected'
+                                    ? 'red'
+                                    : 'black'
+                              }
+                            />
+                          </View>
+                        ) : (
+                          <View />
+                        )}
                       </View>
                     </Pressable>
                   )
@@ -276,8 +433,51 @@ export function FacilityDetailsScreen() {
               <View />
             )}
           </View>
+          {getUserPermission(facilityPrivileges).deletePermission ? (
+            <View className="mx-5 my-5 flex-row self-center">
+              <Button
+                className="w-[50%]"
+                title="Share Facility"
+                variant="outline"
+                leadingIcon="share-2"
+                onPress={() => {
+                  setIsShareFacility(true)
+                }}
+              />
+              <Button
+                className="ml-5 w-[50%]"
+                title="Delete"
+                variant="borderRed"
+                onPress={() => {
+                  Alert.alert(
+                    'Are you sure about deleting Facility?',
+                    'It cannot be recovered once deleted.',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => deleteFacility()
+                      },
+                      { text: 'Cancel', onPress: () => {} }
+                    ]
+                  )
+                }}
+              />
+            </View>
+          ) : (
+            <View />
+          )}
         </ScrollView>
       </View>
+      {isShareFacility ? (
+        <View className="h-full w-full justify-center self-center">
+          <ShareDoctorFacility
+            cancelClicked={cancelClicked}
+            shareDoctorFacility={shareFacility}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

@@ -1,14 +1,17 @@
 import { View, Pressable } from 'react-native'
+import { useState } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
+import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { googleMapOpenUrl } from 'app/ui/utils'
 
-export function CircleCard(data: any) {
+export const CircleCard = ({ data, index, hideCirclesView }) => {
   const router = useRouter()
-  const memberData = data.data
+  const [isLoading, setLoading] = useState(false)
+  const memberData = data
   let fullName = ''
   if (memberData.firstname) {
     fullName += memberData.firstname.trim() + ' '
@@ -27,8 +30,10 @@ export function CircleCard(data: any) {
   let iconStyle = 'mt-1 w-[33%] items-center'
   let textStyle =
     'ml-[-5px] h-[20px] w-[20px] rounded-[10px] bg-[#5ACC6C] text-center font-bold text-white'
+
   return (
     <View className="flex-1">
+      <PtsLoader loading={isLoading} />
       <Pressable
         className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
@@ -70,14 +75,21 @@ export function CircleCard(data: any) {
             {requestsForMemberLength > 0 ? (
               <View className="flex-row">
                 <Feather
-                  onPress={() => {}}
+                  onPress={() => {
+                    hideCirclesView(true, index, false)
+                  }}
                   className="mt-1"
                   name={'bell'}
                   size={25}
                   color={'black'}
                 />
 
-                <Typography onPress={() => {}} className={textStyle}>
+                <Typography
+                  onPress={() => {
+                    hideCirclesView(true, index, false)
+                  }}
+                  className={textStyle}
+                >
                   {requestsForMemberLength}
                 </Typography>
               </View>
@@ -89,14 +101,21 @@ export function CircleCard(data: any) {
             {sharingInfoRequestsLength > 0 ? (
               <View className="flex-row">
                 <Feather
-                  onPress={() => {}}
+                  onPress={() => {
+                    hideCirclesView(true, index, true)
+                  }}
                   className="mt-1"
                   name={'file-text'}
                   size={25}
                   color={'black'}
                 />
 
-                <Typography onPress={() => {}} className={textStyle}>
+                <Typography
+                  onPress={() => {
+                    hideCirclesView(true, index, true)
+                  }}
+                  className={textStyle}
+                >
                   {sharingInfoRequestsLength}
                 </Typography>
               </View>

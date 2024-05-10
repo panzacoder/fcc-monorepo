@@ -11,7 +11,6 @@ import {
   BASE_URL,
   CREATE_DOCTOR,
   UPDATE_DOCTOR,
-  DELETE_DOCTOR,
   GET_STATES_AND_TIMEZONES
 } from 'app/utils/urlConstants'
 import { Stack } from 'expo-router'
@@ -59,7 +58,7 @@ export function AddEditDoctorScreen() {
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  console.log('doctorDetails', JSON.stringify(doctorDetails))
+  // console.log('doctorDetails', JSON.stringify(doctorDetails))
   if (!_.isEmpty(doctorDetails)) {
     if (
       doctorDetails.status &&
@@ -128,34 +127,7 @@ export function AddEditDoctorScreen() {
     id: number
     specialization: string
   }
-  async function deleteDoctor() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_DOCTOR}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        id: doctorDetails.id
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          router.push(
-            formatUrl('/circles/doctorsList', {
-              memberData: JSON.stringify(memberData)
-            })
-          )
-          // router.back()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
+
   async function updateDoctor(formData: Schema) {
     setLoading(true)
     let url = `${BASE_URL}${UPDATE_DOCTOR}`
@@ -528,30 +500,7 @@ export function AddEditDoctorScreen() {
           ) : (
             <View />
           )}
-          {!_.isEmpty(doctorDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="borderRed"
-                onPress={() => {
-                  Alert.alert(
-                    'Are you sure about deleting Doctor?',
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => deleteDoctor()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
-              />
-            </View>
-          ) : (
-            <View />
-          )}
+         
         </ScrollView>
       </View>
     </View>
