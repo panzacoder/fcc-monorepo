@@ -38,6 +38,7 @@
   "packageManager": "yarn@4.1.1",
   "version": "",
   "dependencies": {
-    "react-native-calendar-picker": "^8.0.2"
+    "react-native-calendar-picker": "^8.0.2",
+    "react-native-calendars": "^1.1304.1"
   }
 }

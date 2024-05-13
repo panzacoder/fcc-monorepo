@@ -132,9 +132,9 @@ export function AddEditAppointmentScreen() {
     }
     console.log('typeIndex', '' + typeIndex)
   }
-  if (component !== 'Appointment') {
+  if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 0 : 1
-    console.log('typeIndex1', '' + typeIndex)
+    // console.log('typeIndex1', '' + typeIndex)
   }
   useEffect(() => {
     if (
@@ -332,7 +332,7 @@ export function AddEditAppointmentScreen() {
             )}
           </View>
 
-          <View className="w-full mt-2">
+          <View className="mt-2 w-full">
             <PtsDateTimePicker
               currentData={
                 appointmentDetails.date ? appointmentDetails.date : new Date()

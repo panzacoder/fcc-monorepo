@@ -185,7 +185,14 @@ export const convertUserTimeToUTC = (time: any) => {
     .utc()
   return utcDateTime
 }
+export const getOnlyUserTimeZone = () => {
+  let timeZoneName = getTimezoneName()
+  if (timeZoneName) {
+    return `(${moment().tz(timeZoneName).format('z')})`
+  }
+}
 export const convertTimeToUserLocalTime = (time: any) => {
+  console.log('convertTimeToUserLocalTime', time)
   let timeZoneName = getTimezoneName()
   if (timeZoneName) {
     return `${getFullDate(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
