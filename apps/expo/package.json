@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@react-native-community/datetimepicker": "7.6.4",
+    "@react-native-firebase/app": "^19.2.2",
+    "@react-native-firebase/messaging": "^19.2.2",
     "@react-navigation/drawer": "^6.6.15",
     "app": "workspace:*",
     "expo": "^50.0.14",

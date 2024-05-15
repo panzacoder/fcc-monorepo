@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "521569837847",
+    "project_id": "fcc-a4c51",
+    "storage_bucket": "fcc-a4c51.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521569837847:android:c0d97df329d08368e30d52",
+        "android_client_info": {
+          "package_name": "com.familycarecircle.fccmobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521569837847-aq39a9ikdpnfjn9k7kht824ismn89q2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDehAxDxtLnz_7cPRh3Xqy4BYhlo4T8JKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521569837847-aq39a9ikdpnfjn9k7kht824ismn89q2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

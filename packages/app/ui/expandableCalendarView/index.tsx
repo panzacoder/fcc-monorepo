@@ -15,8 +15,7 @@ const today = new Date().toISOString().split('T')[0]
 export const ExpandableCalendarView = ({
   memberData,
   calenderEvents,
-  handleChange,
-  isShowAddModal
+  handleChange
 }) => {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
@@ -29,7 +28,7 @@ export const ExpandableCalendarView = ({
 
   async function onMonthChange(month: any, updateSource: any) {
     // console.log('onMonthChange: ', '' + month)
-    handleChange(month)
+    await handleChange(month)
     getMarkedDates()
   }
   async function getMarkedDates() {

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, USER_LOGIN, GET_STATIC_DATA } from 'app/utils/urlConstants'
+import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
