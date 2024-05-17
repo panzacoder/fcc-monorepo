@@ -214,7 +214,7 @@ export function CaregiversListScreen() {
               }}
             >
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
-                {'Requested'}
+                {'Rejected'}
               </Typography>
             </Pressable>
             <Pressable
@@ -237,7 +237,7 @@ export function CaregiversListScreen() {
           return (
             <TouchableOpacity
               onPress={() => {
-                router.replace(
+                router.push(
                   formatUrl('/circles/caregiverDetails', {
                     caregiverDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)

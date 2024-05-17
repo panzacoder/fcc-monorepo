@@ -232,6 +232,7 @@ export function AddEditIncidentScreen() {
           />
         </View>
         <LocationDetails
+          component={'AddEditIncident'}
           data={
             !_.isEmpty(incidentDetails) && incidentDetails.location
               ? incidentDetails.location
