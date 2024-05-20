@@ -601,7 +601,7 @@ export function ProfileScreen() {
               </View>
             </View>
             <Button
-              className="my-2 w-[50%] self-center"
+              className="my-2 w-[50%] self-center bg-[#c43416]"
               title={'Delete Account'}
               variant="default"
               onPress={() => {

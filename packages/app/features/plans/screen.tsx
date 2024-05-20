@@ -6,7 +6,6 @@ import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_ALL_PLANS } from 'app/utils/urlConstants'
@@ -92,6 +91,14 @@ export function PlansScreen() {
     }
     getPlandetails()
   }, [])
+  async function navigateToPayments(data: any) {
+    // console.log('data', JSON.stringify(data))
+    router.push(
+      formatUrl('/payments', {
+        planDetails: JSON.stringify(data)
+      })
+    )
+  }
   const getPlansView = () => {
     let planId = selectedPlanId
     if (planId === -1) {
@@ -121,7 +128,7 @@ export function PlansScreen() {
               elevation: 3
             }
           ]}
-          className="mx-[5%] my-20   rounded-[10px] bg-white "
+          className="mx-[5%] my-20  rounded-[10px] bg-white "
         >
           <View
             className={`w-full items-center justify-center p-[8px] ${colorSet[selectedPlanIndex].headingBackground}`}
@@ -129,11 +136,9 @@ export function PlansScreen() {
             <Typography className="flex-1 text-[18px] font-bold text-white">
               {planNames[selectedPlanIndex - 1].title.toUpperCase()}
             </Typography>
-            {/* <View
-              className={`w-full flex-1 items-center justify-center ${data.price > 0 ? 'h-[60]' : 'h-[0]'} ${colorSet[selectedPlanIndex].headingBackground}`}
-            > */}
             <View
-              className={`mt-[5px] h-[100] w-[100] flex-1 items-center justify-center rounded-full border-[5px] border-white ${data.price > 0 ? 'h-[60]' : 'h-[0]'} ${colorSet[selectedPlanIndex].headingBackground}`}
+              style={{ width: 100, height: 100, borderRadius: 50 }}
+              className={`mt-[5px] flex-1 items-center justify-center border-[5px] border-white ${data.price > 0 ? 'h-[60]' : 'h-[0]'} ${colorSet[selectedPlanIndex].headingBackground}`}
             >
               <Typography className="text-[25px] text-white">
                 {data.price > 0 ? `$${data.price}` : ''}
@@ -183,7 +188,7 @@ export function PlansScreen() {
               title="Buy Now"
               variant="default"
               onPress={() => {
-                router.back()
+                navigateToPayments(data)
               }}
             />
           </View>

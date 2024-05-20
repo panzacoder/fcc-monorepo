@@ -253,27 +253,6 @@ export function CircleDetailsScreen() {
               </View>
             </View>
           </Pressable>
-
-          <Pressable
-            onPress={() => {
-              router.push(
-                formatUrl('/circles/prescriptionsList', {
-                  memberData: JSON.stringify(memberData)
-                })
-              )
-            }}
-            className=" mt-3 h-[15%] w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
-          >
-            <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
-            <View className="flex-row py-5">
-              <Typography className="ml-5 flex w-[80%] rounded text-[18px] font-bold text-black">
-                {'Prescriptions'}
-              </Typography>
-              <View className=" ml-2">
-                <Feather name={'chevron-right'} size={20} color={'black'} />
-              </View>
-            </View>
-          </Pressable>
         </View>
       </ScrollView>
     </View>
