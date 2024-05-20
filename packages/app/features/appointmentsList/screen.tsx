@@ -8,6 +8,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import _ from 'lodash'
+import moment from 'moment'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -170,8 +171,8 @@ export function AppointmentsListScreen() {
 
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
-    console.log('filter', filter)
-    if (filter === 'Upcoming') {
+    // console.log('filter', filter)
+    if (filter === 'Open Items') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
       list = _.orderBy(list, (x) => x.date, 'desc')
@@ -179,10 +180,21 @@ export function AppointmentsListScreen() {
     list.map((data: any, index: any) => {
       if (filter === 'Upcoming') {
         if (
-          String(data.status).toLocaleLowerCase() ===
+          moment(data.date).utc().isAfter(moment().utc()) &&
+          (String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase() ||
-          String(data.status).toLocaleLowerCase() ===
-            String('rescheduled').toLowerCase()
+            String(data.status).toLocaleLowerCase() ===
+              String('rescheduled').toLowerCase())
+        ) {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Open Items') {
+        if (
+          moment(data.date).utc().isBefore(moment().utc()) &&
+          (String(data.status).toLocaleLowerCase() ===
+            String('Scheduled').toLowerCase() ||
+            String(data.status).toLocaleLowerCase() ===
+              String('rescheduled').toLowerCase())
         ) {
           filteredList.push(data)
         }
@@ -418,8 +430,28 @@ export function AppointmentsListScreen() {
               setFilteredList('Upcoming')
             }}
           >
-            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
+            <Typography
+              onPress={() => {
+                setFilteredList('Upcoming')
+              }}
+              className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal"
+            >
               {'Upcoming'}
+            </Typography>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`${currentFilter === 'Open Items' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
+            onPress={() => {
+              setFilteredList('Open Items')
+            }}
+          >
+            <Typography
+              onPress={() => {
+                setFilteredList('Open Items')
+              }}
+              className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal"
+            >
+              {'Open Items'}
             </Typography>
           </TouchableOpacity>
           <TouchableOpacity
@@ -428,7 +460,12 @@ export function AppointmentsListScreen() {
               setFilteredList('Completed')
             }}
           >
-            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+            <Typography
+              onPress={() => {
+                setFilteredList('Completed')
+              }}
+              className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal"
+            >
               {'Completed'}
             </Typography>
           </TouchableOpacity>
@@ -438,7 +475,12 @@ export function AppointmentsListScreen() {
               setFilteredList('Cancelled')
             }}
           >
-            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+            <Typography
+              onPress={() => {
+                setFilteredList('Cancelled')
+              }}
+              className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal"
+            >
               {'Cancelled'}
             </Typography>
           </TouchableOpacity>
@@ -448,7 +490,12 @@ export function AppointmentsListScreen() {
               setFilteredList('All')
             }}
           >
-            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+            <Typography
+              onPress={() => {
+                setFilteredList('All')
+              }}
+              className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal"
+            >
               {'All'}
             </Typography>
           </TouchableOpacity>

@@ -156,3 +156,11 @@ export const CHECK_VALID_CREDENTIAL = 'userms/checkValidCredential'
 export const UPDATE_PROFILE = 'memberms/updateUserProfile'
 export const UPDATE_MEMBER_ADDRESS = 'memberms/updateAddress'
 export const GET_ALL_PLANS = 'planms/geAllPlans'
+
+export const APPLE_SUCCESS_PAYMENT_FOR_OUR_SERVER = 'apple/paymentSuccess'
+export const PAYMENT_SUCCESS = 'pg/checkout-session'
+export const PAYMENT_FAIL = 'pg/cancel-session'
+export const IOS_RECEIPT_VERIFICATION_URL =
+  'https://buy.itunes.apple.com/verifyReceipt'
+export const PAYMENT_CHECK_OUT_SESSION = 'pg/makePayment'
+export const PAYMENT_GET_PAYMENT_CONFIG = 'pg/config'

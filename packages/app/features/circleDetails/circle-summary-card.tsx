@@ -38,7 +38,18 @@ export function CircleSummaryCard({ memberData, userDetails }) {
           <Feather name={'menu'} size={20} color={'#5ACC6C'} />
         </Pressable>
       </View>
-      <TodayCard memberData={memberData} userDetails={userDetails} />
+      <Pressable
+        onPress={() => {
+          router.push(
+            formatUrl('/circles/calendar', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+        }}
+      >
+        <TodayCard memberData={memberData} userDetails={userDetails} />
+      </Pressable>
+
       <View className="mx-2 items-center gap-2">
         <View className="flex-row items-center gap-2">
           <Pressable
@@ -102,11 +113,11 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             <View className="mt-5 flex-row self-center">
               <Button
                 className="px-3"
-                title="Calendar"
-                leadingIcon="calendar"
+                title="Prescriptions"
+                leadingIcon="thermometer"
                 onPress={() => {
                   router.push(
-                    formatUrl('/circles/calendar', {
+                    formatUrl('/circles/prescriptionsList', {
                       memberData: JSON.stringify(memberData)
                     })
                   )

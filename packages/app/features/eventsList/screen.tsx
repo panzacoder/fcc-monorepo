@@ -10,12 +10,17 @@ import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import moment from 'moment'
 import store from 'app/redux/store'
+import _ from 'lodash'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_EVENTS, CREATE_EVENT } from 'app/utils/urlConstants'
+import { BASE_URL, GET_EVENTS } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
-import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
+import {
+  formatTimeToUserLocalTime,
+  getMonthsList,
+  convertUserTimeToUTC
+} from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -116,15 +121,38 @@ export function EventsListScreen() {
   }
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
+    if (filter === 'Open Items') {
+      list = _.orderBy(list, (x) => x.date, 'asc')
+    } else {
+      list = _.orderBy(list, (x) => x.date, 'desc')
+    }
     list.map((data: any, index: any) => {
-      if (
-        filter === 'Upcoming' &&
-        moment(data.date).utc().isAfter(moment().utc()) &&
-        data.status === 'Scheduled'
-      ) {
-        filteredList.push(data)
-      } else if (data.status === filter) {
-        filteredList.push(data)
+      if (filter === 'Upcoming') {
+        if (
+          moment(data.date).utc().isAfter(moment().utc()) &&
+          String(data.status).toLocaleLowerCase() ===
+            String('Scheduled').toLowerCase()
+        ) {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Open Items') {
+        if (
+          moment(data.date)
+            .utc()
+            .isBefore(convertUserTimeToUTC(moment().utc())) &&
+          String(data.status).toLocaleLowerCase() ===
+            String('Scheduled').toLowerCase()
+        ) {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Completed') {
+        if (data.status === 'Completed') {
+          filteredList.push(data)
+        }
+      } else if (filter === 'Cancelled') {
+        if (data.status === 'Cancelled') {
+          filteredList.push(data)
+        }
       } else if (filter === 'All') {
         filteredList = list
       }
@@ -326,6 +354,16 @@ export function EventsListScreen() {
           >
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Upcoming'}
+            </Typography>
+          </Pressable>
+          <Pressable
+            className={`${currentFilter === 'Open Items' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
+            onPress={() => {
+              setFilteredList('Open Items')
+            }}
+          >
+            <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
+              {'Open Items'}
             </Typography>
           </Pressable>
           <Pressable
