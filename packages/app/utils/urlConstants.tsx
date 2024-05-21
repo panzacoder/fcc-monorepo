@@ -164,3 +164,4 @@ export const IOS_RECEIPT_VERIFICATION_URL =
   'https://buy.itunes.apple.com/verifyReceipt'
 export const PAYMENT_CHECK_OUT_SESSION = 'pg/makePayment'
 export const PAYMENT_GET_PAYMENT_CONFIG = 'pg/config'
+export const UPDATE_SPONSOR_CODE = 'memberms/updateSponsorCode'

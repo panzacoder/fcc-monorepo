@@ -454,7 +454,7 @@ export function PaymentsScreen() {
     }
   }
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="ml-5 mt-[40px] flex-row">
         <Feather
@@ -510,7 +510,7 @@ export function PaymentsScreen() {
               {`$ ${planDetails.price ? planDetails.price : ''}`}
             </Typography>
           </View>
-          <View className="h-[1px] w-full bg-gray-400" />
+          <View className="h-[0.5px] w-full bg-gray-400" />
           {planDetails.discountPercent === '0.0' ? (
             <View />
           ) : (
@@ -551,11 +551,49 @@ export function PaymentsScreen() {
             title="Pay Now"
             variant="default"
             onPress={() => {
-              requestSubscription()
+              if (Platform.OS === 'android') {
+                initializePaymentSheet()
+              } else {
+                requestSubscription()
+              }
             }}
           />
+          {Platform.OS === 'ios' ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                padding: 10,
+                justifyContent: 'center'
+              }}
+            >
+              <Button
+                title={'Terms of service'}
+                onPress={() =>
+                  Linking.openURL(
+                    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
+                  )
+                }
+                className="bg-primary"
+              />
+              <Button
+                title={'Terms and Conditions'}
+                onPress={() => {
+                  router.push('/termsAndConditions')
+                }}
+                className="ml-5 bg-[#55c2b0]"
+              />
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
       </ScrollView>
-    </View>
+      <StripeProvider
+        publishableKey={publishableKey}
+        setUrlSchemeOnAndroid={false}
+      >
+        <View />
+      </StripeProvider>
+    </SafeAreaView>
   )
 }

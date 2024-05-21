@@ -30,6 +30,14 @@ export function PlansScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
+  let isRenewPlan =
+    item.isRenewPlan && item.isRenewPlan === 'true' ? true : false
+  let isFromUpgradePlan =
+    item.isFromUpgradePlan && item.isFromUpgradePlan === 'true' ? true : false
+  let previousPlanDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
+  // console.log('planDetails', planDetails)
+  // console.log('isRenewPlan', '' + isRenewPlan)
+  // console.log('isFromUpgradePlan', '' + isFromUpgradePlan)
   const { control, handleSubmit } = useForm({
     defaultValues: {
       planIndex: 1
@@ -55,6 +63,22 @@ export function PlansScreen() {
             })
 
             let plansData: any = plan.planList
+            if (isFromUpgradePlan) {
+              plansData = []
+              let previousPlanIndex = 0
+              plan.planList.map((data: any, index: any) => {
+                if (data.plantype === previousPlanDetails.plan.plantype) {
+                  previousPlanIndex = index
+                  // console.log('previousPlanIndex', '' + previousPlanIndex)
+                }
+              })
+              plan.planList.map((data: any, index: any) => {
+                if (index > previousPlanIndex) {
+                  plansData.push(data)
+                }
+              })
+              // console.log('plansData', JSON.stringify(plansData))
+            }
             type Response = {
               id: number
               plantype: string
@@ -184,8 +208,14 @@ export function PlansScreen() {
               }}
             />
             <Button
-              className={`my-[10px] w-[40%] self-center ${colorSet[selectedPlanIndex].headingBackground}`}
-              title="Buy Now"
+              className={`my-[10px] self-center ${isFromUpgradePlan ? 'w-[50%]' : 'w-[40%]'}    ${colorSet[selectedPlanIndex].headingBackground}`}
+              title={
+                isFromUpgradePlan
+                  ? 'Upgrade to this plan'
+                  : isRenewPlan
+                    ? 'Renew Plan'
+                    : 'Buy Now'
+              }
               variant="default"
               onPress={() => {
                 navigateToPayments(data)
