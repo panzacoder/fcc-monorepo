@@ -1,18 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, ScrollView } from 'react-native'
+import { View, Alert, ScrollView, Pressable } from 'react-native'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
+import { getMonthsListOnly } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_ALL_PLANS } from 'app/utils/urlConstants'
+import {
+  BASE_URL,
+  GET_ALL_PLANS,
+  GET_CARD_LIST,
+  UPGRADE_PLAN
+} from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,16 +27,27 @@ import { Button } from 'app/ui/button'
 const schema = z.object({
   planIndex: z.number()
 })
+const cardSchema = z.object({
+  cardNumber: z.string().min(0, { message: 'Card number is required' }),
+  monthIndex: z.number().min(0, { message: 'Month is required' }),
+  expiryYear: z.string().min(0, { message: 'Expiry year is required' }),
+})
+export type CardSchema = z.infer<typeof cardSchema>
+const monthsList = getMonthsListOnly() as any
 export function PlansScreen() {
   const [isLoading, setLoading] = useState(false)
   const [selectedPlanId, setSelectedPlanId] = useState(-1)
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(1)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [isShowCardModal, setIsShowCardModal] = useState(false)
+  const [isAddCard, setIsAddCardModal] = useState(false)
   const [plansList, setPlansList] = useState([]) as any
   const [planNames, setPlanNames] = useState([]) as any
+  const [cardDetails, setCardDetails] = useState([]) as any
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
+  const userDetails = store.getState().userProfileState.header
   let isRenewPlan =
     item.isRenewPlan && item.isRenewPlan === 'true' ? true : false
   let isFromUpgradePlan =
@@ -44,6 +62,37 @@ export function PlansScreen() {
     },
     resolver: zodResolver(schema)
   })
+  const { handleSubmit: handleSubmit1, control: control1 } = useForm({
+    defaultValues: {
+      cardNumber: '',
+      monthIndex: 1,
+      expiryYear:''
+    },
+    resolver: zodResolver(cardSchema)
+  })
+  async function getCardsInfoFromServer() {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_CARD_LIST}`
+    let dataObject = {
+      header: header,
+      email: userDetails.email ? userDetails.email : ''
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          // console.log('setCardDetails', JSON.stringify(data.data))
+          setCardDetails(data.data ? data.data : [])
+          setIsShowCardModal(true)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
   useEffect(() => {
     async function getPlandetails() {
       setLoading(true)
@@ -63,7 +112,7 @@ export function PlansScreen() {
             })
 
             let plansData: any = plan.planList
-            if (isFromUpgradePlan) {
+            if (isFromUpgradePlan || isRenewPlan) {
               plansData = []
               let previousPlanIndex = 0
               plan.planList.map((data: any, index: any) => {
@@ -73,8 +122,14 @@ export function PlansScreen() {
                 }
               })
               plan.planList.map((data: any, index: any) => {
-                if (index > previousPlanIndex) {
-                  plansData.push(data)
+                if (isFromUpgradePlan) {
+                  if (index > previousPlanIndex) {
+                    plansData.push(data)
+                  }
+                } else {
+                  if (index === previousPlanIndex) {
+                    plansData.push(data)
+                  }
                 }
               })
               // console.log('plansData', JSON.stringify(plansData))
@@ -115,6 +170,37 @@ export function PlansScreen() {
     }
     getPlandetails()
   }, [])
+  async function upgradePlan() {
+    getCardsInfoFromServer()
+  }
+  async function upgradePlanOnServer(data: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${UPGRADE_PLAN}`
+    let dataObject = {
+      header: header,
+      email: userDetails.email ? userDetails.email : '',
+      subscriptionId: '',
+      paymentMethodId: data.paymentMethodId ? data.paymentMethodId : '',
+      plan: {
+        id: selectedPlanId,
+        plantype: plansList[selectedPlanIndex - 1].plantype
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          // console.log('setCardDetails', JSON.stringify(data.data))
+          router.back()
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
   async function navigateToPayments(data: any) {
     // console.log('data', JSON.stringify(data))
     router.push(
@@ -218,10 +304,145 @@ export function PlansScreen() {
               }
               variant="default"
               onPress={() => {
-                navigateToPayments(data)
+                if (isFromUpgradePlan) {
+                  upgradePlan()
+                } else {
+                  navigateToPayments(data)
+                }
               }}
             />
           </View>
+        </View>
+      </View>
+    )
+  }
+  const showCardModal = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: 'white'
+        }}
+        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
+      >
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Saved Cards`}</Typography>
+          <View className="mr-[30] flex-row justify-end self-center">
+            <Pressable
+              className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
+              onPress={() => {
+                setIsShowCardModal(false)
+              }}
+            >
+              <Feather name={'x'} size={25} className="color-primary" />
+            </Pressable>
+          </View>
+        </View>
+        <View className="m-2 flex-row">
+          <View className="w-[60%]" />
+          <Button
+            className={`w-[40%] bg-[#ef6603]`}
+            title={'Add new card'}
+            variant="default"
+            onPress={() => {
+              setIsShowCardModal(false)
+              setIsAddCardModal(true)
+            }}
+          />
+        </View>
+        <View className=" items-center">
+          {cardDetails.length > 0 ? (
+            <ScrollView className="my-2 h-full w-[95%]">
+              {cardDetails.map((data: any, index: number) => {
+                return (
+                  <View key={index}>
+                    <View className="my-1 max-h-[90%] w-full self-center rounded-[5px] border-[1px] border-[#e0deda] bg-[#3c7eb0] p-5">
+                      <Typography className="self-center text-[16px] font-bold text-white">
+                        {`XXXX XXXX XXXX ${data.number ? data.number : ''}`}
+                      </Typography>
+                      <View className="my-2 flex-row">
+                        <View className="w-[70%]">
+                          <Typography className="text-[16px] text-white">
+                            {`CARD HOLDER`}
+                          </Typography>
+                          <Typography className=" text-[16px] font-bold text-white">
+                            {`${data.name ? data.name : 'XXXX XXXX'}`}
+                          </Typography>
+                        </View>
+                        <View>
+                          <Typography className=" text-[16px] text-white ">
+                            {`EXPIRES`}
+                          </Typography>
+                          <Typography className=" text-[16px] font-bold text-white">
+                            {`${data.exp_month ? data.exp_month : 'XX'}${data.exp_year ? '/' + data.exp_year : '/XXXX'}`}
+                          </Typography>
+                        </View>
+                      </View>
+                    </View>
+                    <Button
+                      className={`mb-5 mt-2 self-center ${isFromUpgradePlan ? 'w-[50%]' : 'w-[40%]'} bg-[#ef6603]`}
+                      title={'Pay with card'}
+                      variant="default"
+                      onPress={() => {
+                        upgradePlanOnServer(data)
+                      }}
+                    />
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
+        </View>
+      </View>
+    )
+  }
+  const showAddCardModal = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: 'white'
+        }}
+        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
+      >
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Add New Card`}</Typography>
+          <View className="mr-[30] flex-row justify-end self-center">
+            <Pressable
+              className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
+              onPress={() => {
+                setIsAddCardModal(false)
+                setIsShowCardModal(true)
+              }}
+            >
+              <Feather name={'x'} size={25} className="color-primary" />
+            </Pressable>
+          </View>
+        </View>
+        <View className="my-2 mb-5 w-[95%] ">
+          <ControlledTextField
+            control={control1}
+            name="cardNumber"
+            placeholder={'Card Number*'}
+            className="w-[95%] self-center"
+            autoCapitalize="none"
+          />
+          <ControlledDropdown
+            control={control1}
+            name="monthIndex"
+            label="Month"
+            maxHeight={300}
+            list={monthsList}
+            className="w-[95%] self-center"
+            // onChangeValue={setMonthChange}
+          />
+          <ControlledTextField
+            control={control1}
+            name="expiryYear"
+            placeholder={'Expiration Year*'}
+            className="w-[95%] self-center"
+            autoCapitalize="none"
+          />
         </View>
       </View>
     )
@@ -244,10 +465,28 @@ export function PlansScreen() {
             {'Plans'}
           </Typography>
         </View>
-        <ScrollView>
-          <View>{getPlansView()}</View>
-        </ScrollView>
+        {!isShowCardModal && !isAddCard ? (
+          <ScrollView>
+            <View>{getPlansView()}</View>
+          </ScrollView>
+        ) : (
+          <View />
+        )}
       </View>
+      {isShowCardModal ? (
+        <View className="absolute top-[100] self-center">
+          {showCardModal()}
+        </View>
+      ) : (
+        <View />
+      )}
+      {isAddCard ? (
+        <View className="absolute top-[100] self-center">
+          {showAddCardModal()}
+        </View>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

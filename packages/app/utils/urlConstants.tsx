@@ -165,3 +165,4 @@ export const IOS_RECEIPT_VERIFICATION_URL =
 export const PAYMENT_CHECK_OUT_SESSION = 'pg/makePayment'
 export const PAYMENT_GET_PAYMENT_CONFIG = 'pg/config'
 export const UPDATE_SPONSOR_CODE = 'memberms/updateSponsorCode'
+export const GET_CARD_LIST = 'cardms/getlist'
