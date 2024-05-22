@@ -80,6 +80,7 @@ let selectedAddress: any = {
     }
   }
 }
+let isShowRenewButton = false
 export function ProfileScreen() {
   const header = store.getState().headerState.header
   const userProfile = store.getState().userProfileState.header
@@ -155,6 +156,7 @@ export function ProfileScreen() {
               data.data.expiringSubscription &&
               userSubscription.status.toLowerCase() === 'active'
             ) {
+              isShowRenewButton = true
               // console.log(data.data, '../')
               Alert.alert(
                 '',
@@ -175,16 +177,6 @@ export function ProfileScreen() {
                             ).toLowerCase() === 'Stripe'.toLowerCase()
                           ) {
                             let plan = data.data.userSubscription.plan
-                            // this.props.navigation.navigate(SCREENNAMES.PLANS, {
-                            //   oneTime: false,
-                            //   price: String(plan.oneUserPrice),
-                            //   planId: plan.id,
-                            //   description: plan.description,
-                            //   userHeader: this.state.userHeaders,
-                            //   isRenewPlan: true,
-                            //   isFromUpgradePlan: false,
-                            //   refreshPage: this.refreshPage.bind(this),
-                            // });
                             router.push(
                               formatUrl('/plans', {
                                 planDetails: JSON.stringify(plan),
@@ -928,8 +920,8 @@ export function ProfileScreen() {
                   <View />
                 )}
                 <View className="self-center">
-                  {showUpgradeButton ? (
-                    <View className="flex-row self-center">
+                  <View className="flex-row self-center">
+                    {showUpgradeButton ? (
                       <Button
                         className="my-2 w-[40%] self-center bg-[#ef6603]"
                         title={'Upgrade Plan'}
@@ -938,6 +930,10 @@ export function ProfileScreen() {
                           upgradeButtonClicked()
                         }}
                       />
+                    ) : (
+                      <View />
+                    )}
+                    {isShowRenewButton ? (
                       <Button
                         className="my-2 ml-5 w-[40%] self-center bg-[#ef6603]"
                         title={'Renew Plan'}
@@ -946,18 +942,34 @@ export function ProfileScreen() {
                           renewButtonClicked()
                         }}
                       />
-                    </View>
+                    ) : (
+                      <View />
+                    )}
+                    {!isShowRenewButton ? (
+                      <Button
+                        className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
+                        title={'Cancel Subscription'}
+                        variant="default"
+                        onPress={() => {
+                          cancelSubscriptionButtonClicked()
+                        }}
+                      />
+                    ) : (
+                      <View />
+                    )}
+                  </View>
+                  {isShowRenewButton ? (
+                    <Button
+                      className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
+                      title={'Cancel Subscription'}
+                      variant="default"
+                      onPress={() => {
+                        cancelSubscriptionButtonClicked()
+                      }}
+                    />
                   ) : (
                     <View />
                   )}
-                  <Button
-                    className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
-                    title={'Cancel Subscription'}
-                    variant="default"
-                    onPress={() => {
-                      cancelSubscriptionButtonClicked()
-                    }}
-                  />
                 </View>
               </View>
             )}
