@@ -157,7 +157,7 @@ export function ProfileScreen() {
               userSubscription.status.toLowerCase() === 'active'
             ) {
               isShowRenewButton = true
-              // console.log(data.data, '../')
+              // console.log('expiringSubscription../', JSON.stringify(data.data))
               Alert.alert(
                 '',
                 `Your subscription will expire on ${moment(
@@ -801,7 +801,7 @@ export function ProfileScreen() {
                 </View>
                 {!_.isEmpty(userSubscription) ? (
                   <View className="mt-1 rounded-[5px] border-[1px] border-gray-400 py-1">
-                    <Typography className="mx-2 py-1 text-center font-bold text-black">
+                    <Typography className="mx-2 py-1 font-bold text-black">
                       {'Plan Details'}
                     </Typography>
                     {getDetailsView(
@@ -933,7 +933,7 @@ export function ProfileScreen() {
                     ) : (
                       <View />
                     )}
-                    {isShowRenewButton ? (
+                    {!isShowRenewButton ? (
                       <Button
                         className="my-2 ml-5 w-[40%] self-center bg-[#ef6603]"
                         title={'Renew Plan'}
@@ -945,37 +945,22 @@ export function ProfileScreen() {
                     ) : (
                       <View />
                     )}
-                    {!isShowRenewButton ? (
-                      <Button
-                        className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
-                        title={'Cancel Subscription'}
-                        variant="default"
-                        onPress={() => {
-                          cancelSubscriptionButtonClicked()
-                        }}
-                      />
-                    ) : (
-                      <View />
-                    )}
                   </View>
-                  {isShowRenewButton ? (
-                    <Button
-                      className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
-                      title={'Cancel Subscription'}
-                      variant="default"
-                      onPress={() => {
-                        cancelSubscriptionButtonClicked()
-                      }}
-                    />
-                  ) : (
-                    <View />
-                  )}
+
+                  <Button
+                    className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
+                    title={'Cancel Subscription'}
+                    variant="default"
+                    onPress={() => {
+                      cancelSubscriptionButtonClicked()
+                    }}
+                  />
                 </View>
               </View>
             )}
             {orderList.length > 0 ? (
               <View>
-                <View className="bg-primary flex-row">
+                <View className="bg-primary flex-row rounded-tl-[5px] rounded-tr-[5px]" >
                   <Typography className=" w-[90%] py-2 text-center font-bold text-white">
                     {'Order History'}
                   </Typography>
