@@ -273,8 +273,8 @@ export function PaymentsScreen() {
               commercialPageMappings: {}
             })
           )
-
-          router.back()
+          router.push('/profile')
+          // router.back()
         } else {
           Alert.alert('', response.message)
         }
@@ -476,20 +476,34 @@ export function PaymentsScreen() {
             {'Billing Details'}
           </Typography>
           <View className="h-[1px] w-full bg-gray-400" />
-          <Typography className="mx-5 my-1 text-[16px]">
-            {userDetails.memberName ? userDetails.memberName : ''}
-          </Typography>
-          <Typography className="mx-5 my-1 text-[16px]">
-            {userDetails.email ? userDetails.email : ''}
-          </Typography>
-          <Typography className="mx-5 my-1 text-[16px]">
-            {userDetails.phone ? userDetails.phone : ''}
-          </Typography>
-          <Typography className="mx-5 my-1 text-[16px]">
-            {userDetails.address
-              ? getAddressFromObject(userDetails.address)
-              : ''}
-          </Typography>
+          {userDetails.memberName ? (
+            <Typography className="mx-5 my-1 text-[16px]">
+              {userDetails.memberName}
+            </Typography>
+          ) : (
+            <View />
+          )}
+          {userDetails.email ? (
+            <Typography className="mx-5 my-1 text-[16px]">
+              {userDetails.email}
+            </Typography>
+          ) : (
+            <View />
+          )}
+          {userDetails.phone ? (
+            <Typography className="mx-5 my-1 text-[16px]">
+              {userDetails.phone}
+            </Typography>
+          ) : (
+            <View />
+          )}
+          {userDetails.address ? (
+            <Typography className="mx-5 my-1 text-[16px]">
+              {getAddressFromObject(userDetails.address)}
+            </Typography>
+          ) : (
+            <View />
+          )}
         </View>
 
         <View className="my-2 max-h-[95%] w-[95%] self-center rounded-[10px] border-[1px] border-[#e0deda] bg-white ">
