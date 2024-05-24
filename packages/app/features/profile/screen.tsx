@@ -923,7 +923,7 @@ export function ProfileScreen() {
                   <View className="flex-row self-center">
                     {showUpgradeButton ? (
                       <Button
-                        className="my-2 w-[40%] self-center bg-[#ef6603]"
+                        className="my-2 w-[50%] self-center bg-[#ef6603]"
                         title={'Upgrade Plan'}
                         variant="default"
                         onPress={() => {
@@ -933,7 +933,7 @@ export function ProfileScreen() {
                     ) : (
                       <View />
                     )}
-                    {!isShowRenewButton ? (
+                    {isShowRenewButton ? (
                       <Button
                         className="my-2 ml-5 w-[40%] self-center bg-[#ef6603]"
                         title={'Renew Plan'}
@@ -948,7 +948,7 @@ export function ProfileScreen() {
                   </View>
 
                   <Button
-                    className="my-2 ml-5 w-[50%] self-center bg-[#c43416]"
+                    className="my-2 w-[50%] self-center bg-[#c43416]"
                     title={'Cancel Subscription'}
                     variant="default"
                     onPress={() => {
