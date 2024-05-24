@@ -98,7 +98,14 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         countryName = locationData.address.state.country.name
           ? locationData.address.state.country.name
           : ''
-        setAddressObject(locationData, 6)
+        let addressObject = {
+          nickName: locationData.nickName ? locationData.nickName : '',
+          shortDescription: locationData.shortDescription
+            ? locationData.shortDescription
+            : '',
+          address: locationData.address ? locationData.address : {}
+        }
+        setAddressObject(addressObject, 6)
       } else {
         let newTimeZone = moment.tz.guess()
         const countryObject = ct.getCountriesForTimezone(newTimeZone)
@@ -221,29 +228,29 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             label="Country*"
             maxHeight={300}
             defaultValue={
-              countryIndex !== -1 ? countryList[countryIndex]?.title : ''
+              countryIndex !== -1 && countryList[countryIndex - 1]
+                ? countryList[countryIndex - 1]?.title
+                : ''
             }
             list={countryList}
             onChangeValue={setSelectedCountryChange}
           />
         </View>
-        {isDataReceived ? (
-          <View className="my-2 w-[95%] self-center">
-            <ControlledDropdown
-              control={control}
-              name="state"
-              label="State*"
-              defaultValue={
-                stateIndex !== -1 ? statesList[stateIndex].title : ''
-              }
-              maxHeight={300}
-              list={statesList}
-              onChangeValue={setSelectedStateChange}
-            />
-          </View>
-        ) : (
-          <View />
-        )}
+        <View className="my-2 w-[95%] self-center">
+          <ControlledDropdown
+            control={control}
+            name="state"
+            label="State*"
+            defaultValue={
+              stateIndex !== -1 && statesList[stateIndex - 1]
+                ? statesList[stateIndex - 1].title
+                : ''
+            }
+            maxHeight={300}
+            list={statesList}
+            onChangeValue={setSelectedStateChange}
+          />
+        </View>
 
         <View className=" w-full flex-row justify-center">
           <ControlledTextField
@@ -271,14 +278,16 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             }}
           />
         </View>
-        {isDataReceived && component === 'Profile' ? (
+        {component === 'Profile' ? (
           <View className="w-[95%] self-center">
             <ControlledDropdown
               control={control}
               name="timeZone"
               label="Timezone*"
               defaultValue={
-                timeZoneIndex !== -1 ? timezonesList[timeZoneIndex].title : ''
+                timeZoneIndex !== -1 && timezonesList[timeZoneIndex - 1]
+                  ? timezonesList[timeZoneIndex - 1].title
+                  : ''
               }
               maxHeight={300}
               list={timezonesList}

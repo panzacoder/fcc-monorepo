@@ -47,6 +47,9 @@ export function AddEditAppointmentScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let isFromCreateSimilar = item.isFromCreateSimilar
+    ? item.isFromCreateSimilar
+    : 'false'
   let component = item.component ? item.component : ''
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
@@ -105,6 +108,24 @@ export function AddEditAppointmentScreen() {
           setDoctorFacilityList(doctorFacilities)
           setDoctorFacilityListFull(data.data ? data.data : [])
           setIsDataReceived(true)
+          let facilityDoctorLocationId = -1
+          if (
+            appointmentDetails.doctorLocation &&
+            appointmentDetails.doctorLocation.id
+          ) {
+            facilityDoctorLocationId = appointmentDetails.doctorLocation.id
+          } else if (
+            appointmentDetails.facilityLocation &&
+            appointmentDetails.facilityLocation.id
+          ) {
+            facilityDoctorLocationId = appointmentDetails.facilityLocation.id
+          }
+
+          doctorFacilityListFull.map(async (data: any, index: any) => {
+            if (data.locationId === facilityDoctorLocationId) {
+              facilityDoctorIndex = index + 1
+            }
+          })
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
         } else {
           Alert.alert('', data.message)
@@ -117,7 +138,7 @@ export function AddEditAppointmentScreen() {
       })
   }, [])
   let typeIndex: any = -1
-  if (!_.isEmpty(appointmentDetails)) {
+  if (!_.isEmpty(appointmentDetails) && !isLoading) {
     purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
     selectedDate = appointmentDetails.date
       ? appointmentDetails.date
@@ -126,30 +147,23 @@ export function AddEditAppointmentScreen() {
       appointmentDetails.type &&
       appointmentDetails.type.type === 'Doctor Appointment'
     ) {
-      typeIndex = 0
-    } else {
       typeIndex = 1
+    } else {
+      typeIndex = 2
     }
+
     console.log('typeIndex', '' + typeIndex)
+    console.log('facilityDoctorIndex', '' + facilityDoctorIndex)
   }
   if (component === 'Doctor' || component === 'Facility') {
-    typeIndex = component === 'Doctor' ? 0 : 1
+    typeIndex = component === 'Doctor' ? 1 : 2
     // console.log('typeIndex1', '' + typeIndex)
   }
-  useEffect(() => {
-    if (
-      !_.isEmpty(appointmentDetails) ||
-      component === 'Doctor' ||
-      component === 'Facility'
-    ) {
-      setIsShowDoctorFacilityDropdown(true)
-      setSelectedDoctorFacility(typeIndex)
-      getDoctorFacilities(typeIndex)
-    }
-  }, [])
+
   async function addEditAppointment(formData: Schema) {
     setLoading(true)
-
+    console.log('selectedDate', selectedDate)
+    console.log('purpose', purpose)
     let dataObject: any = {
       header: header,
       appointment: {
@@ -159,7 +173,7 @@ export function AddEditAppointmentScreen() {
         purpose: purpose,
         type: {
           type:
-            selectedDoctorFacility === 0
+            selectedDoctorFacility === 1
               ? 'Doctor Appointment'
               : 'Facility Appointment'
         },
@@ -171,14 +185,14 @@ export function AddEditAppointmentScreen() {
       }
     }
     let url = ''
-    if (_.isEmpty(appointmentDetails)) {
+    if (_.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_APPOINTMENT}`
     } else {
       url = `${BASE_URL}${UPDATE_APPOINTMENT}`
       dataObject.appointment.id = appointmentDetails.id
     }
 
-    if (selectedDoctorFacility === 0) {
+    if (selectedDoctorFacility === 1) {
       dataObject.appointment.doctorLocation.id =
         doctorFacilityListFull[formData.doctoFacilityIndex - 1].locationId
     } else {
@@ -215,28 +229,7 @@ export function AddEditAppointmentScreen() {
         console.log(error)
       })
   }
-  if (!_.isEmpty(appointmentDetails)) {
-    let facilityDoctorLocationId = -1
-    if (
-      appointmentDetails.doctorLocation &&
-      appointmentDetails.doctorLocation.id
-    ) {
-      facilityDoctorLocationId = appointmentDetails.doctorLocation.id
-    } else if (
-      appointmentDetails.facilityLocation &&
-      appointmentDetails.facilityLocation.id
-    ) {
-      facilityDoctorLocationId = appointmentDetails.facilityLocation.id
-    }
 
-    doctorFacilityListFull.map(async (data: any, index: any) => {
-      if (data.locationId === facilityDoctorLocationId) {
-        facilityDoctorIndex = index
-        console.log('facilityDoctorIndex', '' + facilityDoctorIndex)
-      }
-    })
-  }
-  // console.log('facilityDoctorIndex1', facilityDoctorIndex)
   const { control, handleSubmit } = useForm({
     defaultValues: {
       description:
@@ -265,26 +258,39 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: any) => {
+    // console.log('onSelection', '' + date)
     selectedDate = date
   }
   const onSelectionPurpose = (data: any) => {
     purpose = data
-    // console.log('purpose1', purpose)
+    console.log('purpose1', purpose)
   }
   async function setSelectedTypeChange(value: any) {
     if (value) {
       setIsShowDoctorFacilityDropdown(true)
-      setSelectedDoctorFacility(value.id - 1)
+      setSelectedDoctorFacility(value.id)
       getDoctorFacilities(value.id - 1)
     }
   }
+  useEffect(() => {
+    if (
+      !_.isEmpty(appointmentDetails) ||
+      component === 'Doctor' ||
+      component === 'Facility'
+    ) {
+      setIsShowDoctorFacilityDropdown(true)
+      getDoctorFacilities(typeIndex - 1)
+      setSelectedDoctorFacility(facilityDoctorIndex)
+    }
+  }, [])
   return (
     <View className="w-full flex-1">
       <Stack.Screen
         options={{
-          title: _.isEmpty(appointmentDetails)
-            ? 'Add Appointment'
-            : 'Edit Appointment'
+          title:
+            _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+              ? 'Add Appointment'
+              : 'Edit Appointment'
         }}
       />
       <PtsLoader loading={isLoading} />
@@ -296,13 +302,8 @@ export function AddEditAppointmentScreen() {
               name="appointmentType"
               label="Appointment Type*"
               defaultValue={
-                // !_.isEmpty(appointmentDetails) &&
-                // appointmentDetails.type &&
-                // appointmentDetails.type.type
-                //   ? appointmentDetails.type.type
-                //   : ''
                 typeIndex !== -1
-                  ? typeIndex === 0
+                  ? typeIndex === 1
                     ? 'Doctor Appointmet'
                     : 'Facility Appointmet'
                   : ''
@@ -316,12 +317,8 @@ export function AddEditAppointmentScreen() {
               <ControlledDropdown
                 control={control}
                 name="doctoFacilityIndex"
-                label={selectedDoctorFacility === 0 ? 'Doctor*' : 'Facility*'}
-                defaultValue={
-                  !_.isEmpty(appointmentDetails)
-                    ? doctorFacilityList[facilityDoctorIndex].title
-                    : ''
-                }
+                label={selectedDoctorFacility === 1 ? 'Doctor*' : 'Facility*'}
+                defaultValue={''}
                 maxHeight={300}
                 list={doctorFacilityList}
                 className="mt-2 w-[95%]"
@@ -334,9 +331,7 @@ export function AddEditAppointmentScreen() {
 
           <View className="mt-2 w-full">
             <PtsDateTimePicker
-              currentData={
-                appointmentDetails.date ? appointmentDetails.date : new Date()
-              }
+              currentData={selectedDate}
               onSelection={onSelection}
             />
           </View>
@@ -360,7 +355,11 @@ export function AddEditAppointmentScreen() {
           <View className="mt-5 flex-row justify-center">
             <Button
               className="bg-[#287CFA]"
-              title={_.isEmpty(appointmentDetails) ? 'Save' : 'Update'}
+              title={
+                _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+                  ? 'Save'
+                  : 'Update'
+              }
               leadingIcon="save"
               variant="default"
               onPress={handleSubmit(addEditAppointment)}

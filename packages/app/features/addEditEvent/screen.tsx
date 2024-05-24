@@ -58,7 +58,10 @@ export function AddEditEventScreen() {
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const [isLoading, setLoading] = useState(false)
   let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}
-  console.log('eventDetails', JSON.stringify(eventDetails))
+  let isFromCreateSimilar = item.isFromCreateSimilar
+    ? item.isFromCreateSimilar
+    : 'false'
+  // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: any) => {
     selectedDate = date
   }
@@ -73,6 +76,9 @@ export function AddEditEventScreen() {
     },
     resolver: zodResolver(schema)
   })
+  if (!_.isEmpty(eventDetails) && !isLoading) {
+    selectedDate = eventDetails.date ? eventDetails.date : new Date()
+  }
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
@@ -125,11 +131,10 @@ export function AddEditEventScreen() {
           id: memberData.member ? memberData.member : ''
         },
         location: selectedAddress,
-        contactList: [],
-        reminderList: []
+        contactList: []
       }
     }
-    if (_.isEmpty(eventDetails)) {
+    if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_EVENT}`
     } else {
       url = `${BASE_URL}${UPDATE_EVENT}`
@@ -159,14 +164,17 @@ export function AddEditEventScreen() {
     <View className="flex-1">
       <Stack.Screen
         options={{
-          title: _.isEmpty(eventDetails) ? 'Add Event' : 'Edit Event Details'
+          title:
+            _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+              ? 'Add Event'
+              : 'Edit Event Details'
         }}
       />
       <PtsLoader loading={isLoading} />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">
           <PtsDateTimePicker
-            currentData={eventDetails.date ? eventDetails.date : new Date()}
+            currentData={selectedDate}
             onSelection={onSelection}
           />
         </View>
