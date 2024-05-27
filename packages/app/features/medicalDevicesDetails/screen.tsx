@@ -24,7 +24,8 @@ import {
   DELETE_MEDICAL_DEVICE_REMINDER,
   CREATE_MEDICAL_DEVICE_REMINDER,
   UPDATE_MEDICAL_DEVICE_REMINDER,
-  UPDATE_MEDICAL_DEVICE
+  UPDATE_MEDICAL_DEVICE,
+  CREATE_MEDICAL_DEVICE
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { Location } from 'app/ui/location'
@@ -46,6 +47,7 @@ export function MedicalDevicesDetailsScreen() {
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
+  const [isCreateSimilar, setIsCreateSimilar] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
   const [reminderData, setReminderData] = useState({})
   const [remindersList, setRemindersList] = useState([])
@@ -275,11 +277,13 @@ export function MedicalDevicesDetailsScreen() {
   async function createUpdateMedicalDevice(object: any) {
     console.log('in createUpdateMedicalDevice', JSON.stringify(object))
     setLoading(true)
-    let url = `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
+    let url = ''
+    url = !isCreateSimilar
+      ? `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
+      : `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
     let dataObject: any = {
       header: header,
       purchase: {
-        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : '',
         date: object.date ? object.date : '',
         description: object.description ? object.description : '',
         type: object.selectedType ? object.selectedType : '',
@@ -291,6 +295,11 @@ export function MedicalDevicesDetailsScreen() {
           id: object.doctorId ? object.doctorId : ''
         }
       }
+    }
+    if (!isCreateSimilar) {
+      dataObject.purchase.id = medicalDevicesDetails.id
+        ? medicalDevicesDetails.id
+        : ''
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -508,31 +517,39 @@ export function MedicalDevicesDetailsScreen() {
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+            <View style={{ justifyContent: 'flex-end' }} className="flex-row">
+              {getUserPermission(medicalDevicePrivileges).createPermission ? (
+                <Button
+                  className="w-[50%]"
+                  title="Create Similar"
+                  variant="border"
+                  onPress={() => {
+                    setIsCreateSimilar(true)
+                    setIsAddDevice(true)
+                  }}
+                />
+              ) : (
+                <View />
+              )}
+              {getUserPermission(medicalDevicePrivileges).updatePermission ? (
+                <Button
+                  className="ml-[5px] w-[30%]"
+                  title="Edit"
+                  variant="border"
+                  onPress={() => {
+                    setIsCreateSimilar(false)
+                    setIsAddDevice(true)
+                  }}
+                />
+              ) : (
+                <View />
+              )}
+            </View>
             <View className="w-full">
               <View className="flex-row">
                 <Typography className=" font-400 w-[80%] text-[15px] text-[#86939e]">
                   {medicalDevice}
                 </Typography>
-                {getUserPermission(medicalDevicePrivileges).updatePermission ? (
-                  <Button
-                    className=""
-                    title="Edit"
-                    variant="border"
-                    onPress={() => {
-                      // router.push(
-                      //   formatUrl('/circles/addEditIncident', {
-                      //     memberData: JSON.stringify(memberData),
-                      //     medicalDevicesDetails: JSON.stringify(
-                      //       medicalDevicesDetails
-                      //     )
-                      //   })
-                      // )
-                      setIsAddDevice(true)
-                    }}
-                  />
-                ) : (
-                  <View />
-                )}
               </View>
               {getDetailsView('Date:', medicalDeviceDate)}
               {getDetailsView('Purchase Type:', type)}

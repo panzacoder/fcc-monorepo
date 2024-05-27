@@ -18,33 +18,35 @@ export default function Root() {
                 backgroundColor: 'transparent'
               }}
               screenOptions={{
-                header: TabsHeader,
-                tabBarShowLabel: false
+                //we hide header from here and will show where Tab Bar Menu is required
+                // header: TabsHeader,
+                // tabBarShowLabel: false
+                headerShown: false
               }}
             >
               <Tabs.Screen
                 name="home"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="home" size={size} color={color} />
-              //   ),
-              // }}
+                // options={{
+                //   tabBarIcon: ({ color, size }) => (
+                //     <Feather name="home" size={size} color={color} />
+                //   ),
+                // }}
               />
               <Tabs.Screen
                 name="circles"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="circle" size={size} color={color} />
-              //   ),
-              // }}
+                // options={{
+                //   tabBarIcon: ({ color, size }) => (
+                //     <Feather name="circle" size={size} color={color} />
+                //   ),
+                // }}
               />
               <Tabs.Screen
                 name="planner"
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Feather name="calendar" size={size} color={color} />
-              //   ),
-              // }}
+                // options={{
+                //   tabBarIcon: ({ color, size }) => (
+                //     <Feather name="calendar" size={size} color={color} />
+                //   ),
+                // }}
               />
             </Tabs>
           </View>

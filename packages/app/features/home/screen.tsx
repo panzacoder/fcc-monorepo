@@ -10,20 +10,16 @@ import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
-import { formatUrl } from 'app/utils/format-url'
 import { CardView } from 'app/ui/cardview'
-import { useRouter } from 'solito/navigation'
 import messaging from '@react-native-firebase/messaging'
-import firebase from '@react-native-firebase/app'
-
+import { TabsHeader } from 'app/ui/tabs-header'
 export function HomeScreen() {
-  const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-  const requestUserPermission = async () => {
+  const requestUserPermission = async () => { 
     const authStatus = await messaging().requestPermission()
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -34,7 +30,6 @@ export function HomeScreen() {
     }
   }
   useEffect(() => {
-
     //this below code is giving error as we have installed firebase libraries in the expo directory.
 
     // if (requestUserPermission()) {
@@ -71,6 +66,7 @@ export function HomeScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="">
+        <TabsHeader />
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
@@ -80,16 +76,6 @@ export function HomeScreen() {
               {user.memberName ? user.memberName : ''}
             </Typography>
           </View>
-        </View>
-        <View>
-          <Pressable
-            className="absolute right-[20]"
-            onPress={() => {
-              router.push(formatUrl('/profile', {}))
-            }}
-          >
-            <Feather name={'user'} size={20} color={'black'} />
-          </Pressable>
         </View>
         {isDataReceived ? (
           <View
