@@ -61,6 +61,9 @@ export const AddEditMedicalDevice = ({
               ) {
                 selectedPrescriberIndex = index + 1
                 prescribedBy = data.doctorName
+                reset({
+                  prescriberIndex: selectedPrescriberIndex
+                })
               }
             }
             return {
