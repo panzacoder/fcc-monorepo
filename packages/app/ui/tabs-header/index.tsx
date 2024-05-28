@@ -61,6 +61,12 @@ export function TabsHeader() {
             } else if (value === 'Logout') {
               setIsShowMenu(false)
               logout()
+            } else if (value === 'FAQ') {
+              router.push('/faq')
+            } else if (value === 'About Us') {
+              router.push('/aboutUs')
+            } else if (value === 'Refer A Friend') {
+              router.push('/referFriend')
             }
           }}
           className={itemStyle}
