@@ -18,8 +18,9 @@ export function HomeScreen() {
   const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
+  const [isShowPDFModal, setIsShowPDFModal] = useState(false)
   const [memberList, setMemberList] = useState([])
-  const requestUserPermission = async () => { 
+  const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission()
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -61,12 +62,39 @@ export function HomeScreen() {
     }
     getMemberDetails()
   }, [])
-
+  async function helpClicked() {
+    // console.log('helpClicked')
+    setIsShowPDFModal(true)
+  }
+  const showPdfModal = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: 'white'
+        }}
+        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
+      >
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-[85%] self-center text-center font-bold text-white">{``}</Typography>
+          <View className="mr-[30] flex-row justify-end self-center">
+            <Pressable
+              className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
+              onPress={() => {
+                setIsShowPDFModal(false)
+              }}
+            >
+              <Feather name={'x'} size={25} className="color-primary" />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    )
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="">
-        <TabsHeader />
+        <TabsHeader helpClicked={helpClicked} />
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
@@ -108,6 +136,11 @@ export function HomeScreen() {
           <View />
         )}
       </View>
+      {/* {isShowPDFModal ? (
+        <View className="absolute top-[50] self-center">{showPdfModal()}</View>
+      ) : (
+        <View />
+      )} */}
     </View>
   )
 }

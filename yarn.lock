@@ -4490,7 +4490,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/normalize-color@npm:^2.0.0, @react-native/normalize-color@npm:^2.1.0":
+"@react-native/normalize-color@npm:*, @react-native/normalize-color@npm:^2.0.0, @react-native/normalize-color@npm:^2.1.0":
   version: 2.1.0
   resolution: "@react-native/normalize-color@npm:2.1.0"
   checksum: 10/a72b98538e6b7e265fb0669b8767d5f788777fb1a0ac1df7b0c82d8b3a804c8122aa7b819688c5e36fcf90b5ba93050b0070e29d3f0d70ab9530c2abd2bb9f9e
@@ -8030,6 +8030,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base-64@npm:0.1.0":
+  version: 0.1.0
+  resolution: "base-64@npm:0.1.0"
+  checksum: 10/5a42938f82372ab5392cbacc85a5a78115cbbd9dbef9f7540fa47d78763a3a8bd7d598475f0d92341f66285afd377509851a9bb5c67bbecb89686e9255d5b3eb
+  languageName: node
+  linkType: hard
+
 "base64-js@npm:^1.2.3, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -9393,6 +9400,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crypto-js@npm:4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: 10/c7bcc56a6e01c3c397e95aa4a74e4241321f04677f9a618a8f48a63b5781617248afb9adb0629824792e7ec20ca0d4241a49b6b2938ae6f973ec4efc5c53c924
+  languageName: node
+  linkType: hard
+
 "crypto-random-string@npm:^1.0.0":
   version: 1.0.0
   resolution: "crypto-random-string@npm:1.0.0"
@@ -9789,6 +9803,17 @@ __metadata:
   version: 2.0.0
   resolution: "depd@npm:2.0.0"
   checksum: 10/c0c8ff36079ce5ada64f46cc9d6fd47ebcf38241105b6e0c98f412e8ad91f084bcf906ff644cc3a4bd876ca27a62accb8b0fff72ea6ed1a414b89d8506f4a5ca
+  languageName: node
+  linkType: hard
+
+"deprecated-react-native-prop-types@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "deprecated-react-native-prop-types@npm:2.3.0"
+  dependencies:
+    "@react-native/normalize-color": "npm:*"
+    invariant: "npm:*"
+    prop-types: "npm:*"
+  checksum: 10/5abbad5b6d6830ca92151167f42611256ada1e8991b5066ed3659f3bbe909ae87949f3e7f075f1b685256138cad81423222220f4c6d5740376db19cb9f793312
   languageName: node
   linkType: hard
 
@@ -11661,9 +11686,11 @@ __metadata:
     eslint: "npm:^8.57.0"
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
+    react-native-blob-util: "npm:^0.19.9"
     react-native-calendar-picker: "npm:^8.0.2"
     react-native-calendars: "npm:^1.1304.1"
     react-native-iap: "npm:10.1.3"
+    react-native-pdf: "npm:^6.7.5"
     redux-devtools-extension: "npm:^2.13.9"
     turbo: "npm:^1.13.0"
     typescript: "npm:^5.4.3"
@@ -13086,7 +13113,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:2.2.4, invariant@npm:^2.2.2, invariant@npm:^2.2.4":
+"invariant@npm:*, invariant@npm:2.2.4, invariant@npm:^2.2.2, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -17316,16 +17343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:15.5.8":
-  version: 15.5.8
-  resolution: "prop-types@npm:15.5.8"
-  dependencies:
-    fbjs: "npm:^0.8.9"
-  checksum: 10/f4bb1267aa1d2bbaab30669d6729827a59c66709c7dd89638409e2ee30a974e7472e5e947e313a51e8732a5a74dadbb4815a409b449d47e3e808d925a3f6e85a
-  languageName: node
-  linkType: hard
-
-"prop-types@npm:15.8.1, prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:*, prop-types@npm:15.8.1, prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -17333,6 +17351,15 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.13.1"
   checksum: 10/7d959caec002bc964c86cdc461ec93108b27337dabe6192fb97d69e16a0c799a03462713868b40749bfc1caf5f57ef80ac3e4ffad3effa636ee667582a75e2c0
+  languageName: node
+  linkType: hard
+
+"prop-types@npm:15.5.8":
+  version: 15.5.8
+  resolution: "prop-types@npm:15.5.8"
+  dependencies:
+    fbjs: "npm:^0.8.9"
+  checksum: 10/f4bb1267aa1d2bbaab30669d6729827a59c66709c7dd89638409e2ee30a974e7472e5e947e313a51e8732a5a74dadbb4815a409b449d47e3e808d925a3f6e85a
   languageName: node
   linkType: hard
 
@@ -17775,6 +17802,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-blob-util@npm:^0.19.9":
+  version: 0.19.9
+  resolution: "react-native-blob-util@npm:0.19.9"
+  dependencies:
+    base-64: "npm:0.1.0"
+    glob: "npm:^10.3.10"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/b2e412cec8d620d5b42ccc4a8401a71ddb85623bfc9731111ebbc880dbd96d2fa0469b318249cc20887a2a142a38d2457c716c91ef6289d44f3ee37068566291
+  languageName: node
+  linkType: hard
+
 "react-native-calendar-picker@npm:^8.0.2":
   version: 8.0.2
   resolution: "react-native-calendar-picker@npm:8.0.2"
@@ -17884,6 +17924,20 @@ __metadata:
     react: ">=16.13.1"
     react-native: ">=0.65.1"
   checksum: 10/d83541de103aa9788919dc642cbb61a58037c2b423c3ebe6d82dfd1e74dc53ca1b95d59f852cd3b954d04963ddcdb856903b24cb1b358f596727725497c3edcb
+  languageName: node
+  linkType: hard
+
+"react-native-pdf@npm:^6.7.5":
+  version: 6.7.5
+  resolution: "react-native-pdf@npm:6.7.5"
+  dependencies:
+    crypto-js: "npm:4.2.0"
+    deprecated-react-native-prop-types: "npm:^2.3.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-blob-util: ">=0.13.7"
+  checksum: 10/b7201680154115d3216030744c4b8f45792fbcd5922d57f4b9908797e4169e63bba6c8bc853113ac3f8b8a3b4aa73d9544e82d9f477ed3ce1558b2ce32ea5c6c
   languageName: node
   linkType: hard
 

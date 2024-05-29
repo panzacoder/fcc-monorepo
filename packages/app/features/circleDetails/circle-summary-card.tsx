@@ -16,10 +16,33 @@ cssInterop(LinearGradient, {
 export function CircleSummaryCard({ memberData, userDetails }) {
   const router = useRouter()
   const [isSeeMore, setSeeMore] = useState(true)
+  const [isShowMenu, setIsShowMenu] = useState(false)
 
   const fullName = userDetails.firstName + ' ' + userDetails.lastName
-
-  function buttonPressed() {}
+  let itemStyle = 'w-full flex-row self-center bg-white px-2 py-1'
+  function getMenuView(value: string, icon: any) {
+    return (
+      <View>
+        <Pressable
+          onPress={() => {
+            if (value === 'Member Profile') {
+              router.push(
+                formatUrl('/memberProfile', {
+                  memberData: JSON.stringify(memberData),
+                  userDetails: JSON.stringify(userDetails)
+                })
+              )
+            }
+          }}
+          className={itemStyle}
+        >
+          <Feather name={icon} size={20} className="mr-2" color={'gray'} />
+          <Typography className="font-400">{value}</Typography>
+        </Pressable>
+        <View className="h-[0.5px] w-full bg-gray-400" />
+      </View>
+    )
+  }
   return (
     <LinearGradient
       colors={['#103264', '#113263', '#319D9D']}
@@ -34,10 +57,22 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <Pressable className="" onPress={() => {}}>
+        <Pressable
+          className=""
+          onPress={() => {
+            setIsShowMenu(!isShowMenu)
+          }}
+        >
           <Feather name={'menu'} size={20} color={'#5ACC6C'} />
         </Pressable>
       </View>
+      {isShowMenu ? (
+        <View className="absolute right-5 top-10 w-[45%] border-[1px] border-gray-400 bg-white">
+          {getMenuView('Member Profile', 'user')}
+        </View>
+      ) : (
+        <View />
+      )}
       <Pressable
         onPress={() => {
           router.push(
