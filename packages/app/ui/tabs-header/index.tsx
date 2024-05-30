@@ -21,7 +21,7 @@ export type TabsHeaderProps = {
 }
 
 // export function TabsHeader()
-export const TabsHeader = ({ helpClicked }) => {
+export const TabsHeader = ({}) => {
   const router = useRouter()
   const [isShowMenu, setIsShowMenu] = useState(false)
   const [isLoading, setLoading] = useState(false)
@@ -69,8 +69,7 @@ export const TabsHeader = ({ helpClicked }) => {
             } else if (value === 'Refer A Friend') {
               router.push('/referFriend')
             } else if (value === 'Help') {
-              setIsShowMenu(false)
-              helpClicked()
+              router.push('/help')
             }
           }}
           className={itemStyle}
