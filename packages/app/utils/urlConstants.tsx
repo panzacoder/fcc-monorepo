@@ -174,4 +174,9 @@ export const REFER_FRIEND = 'referralms/referFriend'
 export const GET_MEMBER_PROFILE = 'memberms/getMemberDetails'
 export const DELETE_AUTHORIZED_CAREGIVER =
   'memberms/deleteMemberForAuthorisedCaregiver'
+export const DELETE_MEMBER = 'memberms/deleteMember'
 export const DELETE_CAREGIVER_CIRCLE = 'memberms/deleteCaregiver'
+export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER =
+  'memberms/updateMemberForAuthorisedCaregiver'
+export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS =
+  'memberms/updateAddressForAuthorisedCaregiver'

@@ -677,7 +677,7 @@ export function ProfileScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.back()
+            router.replace('/home')
           }}
         />
         <Typography className="ml-[5px] flex-1 text-[18px] font-bold">
