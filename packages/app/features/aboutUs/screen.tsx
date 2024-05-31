@@ -58,7 +58,7 @@ export function AboutUsScreen() {
             {'Powered By'}
           </Typography>
           <Typography className=" mt-2 text-center text-[16px] font-bold text-[#ef6603]">
-            {'Proto Technology Solutions'}
+            {'Proto Technology Solutions Pvt Ltd'}
           </Typography>
           <Image
             className="self-center"
