@@ -419,18 +419,20 @@ export function MemberProfileScreen() {
         />
         <View className="my-5 flex-row self-center pb-5 ">
           <Button
-            className="bg-[#066f72]"
-            title={'Save'}
-            variant="default"
-            onPress={handleSubmit(updateProfile)}
-          />
-          <Button
-            className=" ml-5 bg-[#86939e]"
+            className=" bg-[#86939e]"
             title={'Cancel'}
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               setIsUpdateProfile(false)
             }}
+          />
+          <Button
+            className="ml-5 bg-[#287CFA]"
+            title={'Save'}
+            variant="default"
+            leadingIcon="save"
+            onPress={handleSubmit(updateProfile)}
           />
         </View>
       </View>
@@ -455,19 +457,21 @@ export function MemberProfileScreen() {
         />
         <View className="my-2 mb-5 flex-row self-center ">
           <Button
-            className="bg-[#066f72]"
-            title={'Save'}
-            variant="default"
-            onPress={() => {
-              updateAddress()
-            }}
-          />
-          <Button
-            className=" ml-5 bg-[#86939e]"
+            className="bg-[#86939e]"
             title={'Cancel'}
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               setIsUpdateAddress(false)
+            }}
+          />
+          <Button
+            className="ml-5 bg-[#287CFA]"
+            title={'Save'}
+            variant="default"
+            leadingIcon="save"
+            onPress={() => {
+              updateAddress()
             }}
           />
         </View>

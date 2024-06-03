@@ -555,19 +555,21 @@ export function ProfileScreen() {
         />
         <View className="my-2 mb-5 flex-row self-center ">
           <Button
-            className="bg-[#066f72]"
-            title={'Save'}
+            className="bg-[#86939e]"
+            title={'Cancel'}
             variant="default"
+            leadingIcon="x"
             onPress={() => {
-              updateAddress()
+              setIsUpdateAddress(false)
             }}
           />
           <Button
-            className=" ml-5 bg-[#86939e]"
-            title={'Cancel'}
+            className="ml-5 bg-[#066f72]"
+            title={'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={() => {
-              setIsUpdateAddress(false)
+              updateAddress()
             }}
           />
         </View>
@@ -608,19 +610,22 @@ export function ProfileScreen() {
           autoCapitalize="none"
         />
         <View className="my-5 flex-row self-center pb-5 ">
+         
           <Button
-            className="bg-[#066f72]"
-            title={'Save'}
-            variant="default"
-            onPress={handleSubmit(updateProfile)}
-          />
-          <Button
-            className=" ml-5 bg-[#86939e]"
+            className="bg-[#86939e]"
             title={'Cancel'}
             variant="default"
+            leadingIcon="x"
             onPress={() => {
               setIsUpdateProfile(false)
             }}
+          />
+          <Button
+            className="ml-5 bg-[#066f72]"
+            title={'Save'}
+            variant="default"
+            leadingIcon="save"
+            onPress={handleSubmit(updateProfile)}
           />
         </View>
       </View>
@@ -960,7 +965,7 @@ export function ProfileScreen() {
             )}
             {orderList.length > 0 ? (
               <View>
-                <View className="bg-primary flex-row rounded-tl-[5px] rounded-tr-[5px]" >
+                <View className="bg-primary flex-row rounded-tl-[5px] rounded-tr-[5px]">
                   <Typography className=" w-[90%] py-2 text-center font-bold text-white">
                     {'Order History'}
                   </Typography>
@@ -996,6 +1001,7 @@ export function ProfileScreen() {
               <Button
                 className="my-2 w-[40%] self-center bg-[#ef6603]"
                 title={'Save'}
+                leadingIcon="save"
                 variant="default"
                 onPress={handleSubmit2(saveSponsorCode)}
               />

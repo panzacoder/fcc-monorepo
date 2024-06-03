@@ -73,6 +73,8 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
                   // console.log('selectedTime', selectedTime)
                   // console.log('selectedDate', selectedDate)
                   onSelection(date)
+                } else {
+                  cancelClicked()
                 }
               }}
             />

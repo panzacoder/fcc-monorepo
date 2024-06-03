@@ -281,19 +281,21 @@ export const AddEditPrescription = ({
           placeholder={'Notes'}
           autoCapitalize="none"
         />
-
-        <View className="mb-10 mt-2 flex flex-row justify-end gap-2">
+        <View className="my-2 mb-5 flex-row justify-center">
           <Button
-            className=""
-            title="Cancel"
-            variant="outline-destructive"
+            className="bg-[#86939e]"
+            title={'Cancel'}
+            leadingIcon="x"
+            variant="default"
             onPress={() => {
               cancelClicked()
             }}
           />
           <Button
-            className="flex-1"
+            className="ml-5 bg-[#287CFA]"
             title={'Save'}
+            leadingIcon="save"
+            variant="default"
             onPress={handleSubmit(callCreateUpdatePrescription)}
           />
         </View>

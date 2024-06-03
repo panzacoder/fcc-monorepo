@@ -105,8 +105,9 @@ export function AddEditAppointmentScreen() {
                 }
               }
             )
+          let list = data.data ? data.data : []
           setDoctorFacilityList(doctorFacilities)
-          setDoctorFacilityListFull(data.data ? data.data : [])
+          setDoctorFacilityListFull(list)
           setIsDataReceived(true)
           let facilityDoctorLocationId = -1
           if (
@@ -121,9 +122,12 @@ export function AddEditAppointmentScreen() {
             facilityDoctorLocationId = appointmentDetails.facilityLocation.id
           }
 
-          doctorFacilityListFull.map(async (data: any, index: any) => {
+          list.map(async (data: any, index: any) => {
             if (data.locationId === facilityDoctorLocationId) {
               facilityDoctorIndex = index + 1
+              reset({
+                doctoFacilityIndex: index + 1
+              })
             }
           })
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
@@ -214,7 +218,7 @@ export function AddEditAppointmentScreen() {
             apptDetails = data.data.appointment ? data.data.appointment : {}
           }
 
-          router.push(
+          router.replace(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
               memberData: JSON.stringify(memberData)
@@ -230,7 +234,7 @@ export function AddEditAppointmentScreen() {
       })
   }
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       description:
         !_.isEmpty(appointmentDetails) && appointmentDetails.description
@@ -258,7 +262,7 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: any) => {
-    // console.log('onSelection', '' + date)
+    console.log('onSelection', '' + date)
     selectedDate = date
   }
   const onSelectionPurpose = (data: any) => {
@@ -354,11 +358,20 @@ export function AddEditAppointmentScreen() {
           </View>
           <View className="mt-5 flex-row justify-center">
             <Button
-              className="bg-[#287CFA]"
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
               title={
                 _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
-                  ? 'Save'
-                  : 'Update'
+                  ? 'Create'
+                  : 'Save'
               }
               leadingIcon="save"
               variant="default"

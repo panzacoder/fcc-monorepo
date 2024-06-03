@@ -62,6 +62,7 @@ export const AddEditReminder = ({
           <Button
             className="bg-[#86939e]"
             title="Cancel"
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               cancelClicked()
@@ -69,8 +70,9 @@ export const AddEditReminder = ({
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(reminderData) ? 'Save' : 'Update'}
+            title={_.isEmpty(reminderData) ? 'Create' : 'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={handleSubmit(createUpdateReminderCall)}
           />
         </View>

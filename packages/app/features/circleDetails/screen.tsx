@@ -220,37 +220,46 @@ export function CircleDetailsScreen() {
               <Typography className="ml-5 flex rounded text-[18px] font-bold text-black">
                 {'Events'}
               </Typography>
-              <View className="flex-row">
-                {memberData.upcomingEvent ? (
-                  <View className="flex-row">
-                    <Typography className=" ml-5 flex w-[70%] rounded text-[14px] text-black">
-                      {memberData.upcomingEvent.title
-                        ? memberData.upcomingEvent.title
-                        : ''}
-                    </Typography>
-                    {memberData.upcomingEvent.upcomingCount > 0 ? (
-                      <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                        <Typography className="self-center text-center font-bold text-white">
-                          {memberData.upcomingEvent.upcomingCount}
-                        </Typography>
-                      </View>
-                    ) : (
-                      <View className="w-[10%]" />
-                    )}
-
-                    <View />
-                  </View>
-                ) : (
-                  <View className="flex-row">
-                    <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
-                      {'No upcoming events'}
-                    </Typography>
-                  </View>
-                )}
-                <View className=" ml-2">
-                  <Feather name={'chevron-right'} size={20} color={'black'} />
+              {memberData.upcomingEvent ? (
+                <View className="flex-row">
+                  <Typography className=" ml-5 flex w-[70%] rounded text-[14px] text-black">
+                    {memberData.upcomingEvent.title
+                      ? memberData.upcomingEvent.title
+                      : ''}
+                  </Typography>
+                  {memberData.upcomingEvent.upcomingCount > 0 ? (
+                    <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
+                      <Typography className="self-center text-center font-bold text-white">
+                        {memberData.upcomingEvent.upcomingCount}
+                      </Typography>
+                    </View>
+                  ) : (
+                    <View className="w-[10%]" />
+                  )}
+                  <Pressable
+                    className=" ml-2"
+                    onPress={() => {
+                      router.push(
+                        formatUrl('/circles/eventsList', {
+                          memberData: JSON.stringify(memberData)
+                        })
+                      )
+                    }}
+                  >
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </Pressable>
+                  <View />
                 </View>
-              </View>
+              ) : (
+                <View className="flex-row">
+                  <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
+                    {'No upcoming events'}
+                  </Typography>
+                  <View className=" ml-2">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
+                </View>
+              )}
             </View>
           </Pressable>
         </View>
