@@ -56,6 +56,16 @@ export function CaregiversListScreen() {
           let list = data.data.familyMemberList
             ? data.data.familyMemberList
             : []
+          list.sort(function (a: any, b: any) {
+            if (a.memberStatus < b.memberStatus) {
+              return -1
+            }
+            if (a.memberStatus > b.memberStatus) {
+              return 1
+            }
+            return 0
+          })
+
           getFilteredList(list, currentFilter)
           setCaregiversListFull(list)
           setIsDataReceived(true)
@@ -143,38 +153,43 @@ export function CaregiversListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="flex-row ">
-          <TouchableOpacity
-            onPress={() => {
-              setIsShowFilter(!isShowFilter)
-            }}
-            className="w-[85%] flex-row"
-          >
-            <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-              {currentFilter}
-            </Typography>
-            <Feather
-              className="ml-2 mt-6"
-              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-              size={25}
-              color={'black'}
-            />
-          </TouchableOpacity>
-          {getUserPermission(caregiverPrivileges).createPermission ? (
-            <View className=" mt-[20] self-center">
-              <TouchableOpacity
-                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-                onPress={() => {
-                  setIsAddCaregiver(true)
-                }}
-              >
-                <Feather name={'plus'} size={25} color={COLORS.primary} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View />
-          )}
-        </View>
+        {!isAddCaregiver ? (
+          <View className="flex-row ">
+            <TouchableOpacity
+              onPress={() => {
+                setIsShowFilter(!isShowFilter)
+              }}
+              className="w-[85%] flex-row"
+            >
+              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                {currentFilter}
+              </Typography>
+              <Feather
+                className="ml-2 mt-6"
+                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                size={25}
+                color={'black'}
+              />
+            </TouchableOpacity>
+            {getUserPermission(caregiverPrivileges).createPermission ? (
+              <View className=" mt-[20] self-center">
+                <TouchableOpacity
+                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                  onPress={() => {
+                    setIsAddCaregiver(true)
+                  }}
+                >
+                  <Feather name={'plus'} size={25} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+        ) : (
+          <View />
+        )}
+
         {isShowFilter ? (
           <View className="ml-5 w-[40%]">
             <Pressable

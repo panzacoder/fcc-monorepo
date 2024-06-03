@@ -247,7 +247,8 @@ export function AddEditIncidentScreen() {
         <View className="my-2 mb-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
-            title="Cancel"
+            title={'Cancel'}
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               router.back()

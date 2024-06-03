@@ -227,7 +227,6 @@ export const AddEditCaregiver = ({
                 list={profileList}
                 className="ml-2 mt-2 w-[85%]"
                 defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-
               />
               <Feather
                 onPress={() => {
@@ -336,13 +335,15 @@ export const AddEditCaregiver = ({
             className="bg-[#86939e]"
             title="Cancel"
             variant="default"
+            leadingIcon="x"
             onPress={() => {
               cancelClicked()
             }}
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(caregiverDetails) ? 'Save' : 'Update'}
+            leadingIcon="save"
+            title={_.isEmpty(caregiverDetails) ? 'Create' : 'Save'}
             variant="default"
             onPress={handleSubmit(callCreateUpdateDevice)}
           />

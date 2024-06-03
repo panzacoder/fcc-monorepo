@@ -737,7 +737,7 @@ export function AppointmentDetailsScreen() {
                 )}
               </View>
               <View className=" w-full flex-row items-center">
-                <View className="mt-2 w-[90%] flex-row">
+                <View className="mt-2 w-full flex-row">
                   <Typography className="font-400 max-w-[65%] text-[15px] text-[#86939e]">
                     {doctorFacilityName}
                   </Typography>

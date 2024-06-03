@@ -180,43 +180,47 @@ export function MedicalDevicesListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="flex-row ">
-          <View className="w-[70%]" />
-          {getUserPermission(medicalDevicesPrivileges).createPermission ? (
-            <View className=" mt-[20] self-center">
-              <TouchableOpacity
-                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+        {!isAddDevice ? (
+          <View className="flex-row ">
+            <View className="w-[70%]" />
+            {getUserPermission(medicalDevicesPrivileges).createPermission ? (
+              <View className=" mt-[20] self-center">
+                <TouchableOpacity
+                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                  onPress={() => {
+                    // router.push(
+                    //   formatUrl('/circles/addEditDoctor', {
+                    //     memberData: JSON.stringify(memberData)
+                    //   })
+                    // )
+                    setIsAddDevice(true)
+                  }}
+                >
+                  <Feather name={'plus'} size={25} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View />
+            )}
+            <View className="mt-5 self-center">
+              <Pressable
                 onPress={() => {
-                  // router.push(
-                  //   formatUrl('/circles/addEditDoctor', {
-                  //     memberData: JSON.stringify(memberData)
-                  //   })
-                  // )
-                  setIsAddDevice(true)
+                  setIsFilter(!isFilter)
                 }}
+                className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
               >
-                <Feather name={'plus'} size={25} color={COLORS.primary} />
-              </TouchableOpacity>
+                <Feather
+                  className=""
+                  name={'filter'}
+                  size={25}
+                  color={COLORS.primary}
+                />
+              </Pressable>
             </View>
-          ) : (
-            <View />
-          )}
-          <View className="mt-5 self-center">
-            <Pressable
-              onPress={() => {
-                setIsFilter(!isFilter)
-              }}
-              className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
-            >
-              <Feather
-                className=""
-                name={'filter'}
-                size={25}
-                color={COLORS.primary}
-              />
-            </Pressable>
           </View>
-        </View>
+        ) : (
+          <View />
+        )}
       </View>
       {isFilter ? (
         <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">

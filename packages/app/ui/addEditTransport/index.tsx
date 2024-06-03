@@ -54,7 +54,7 @@ export const AddEditTransport = ({
     selectedDate = new Date(transportData.date)
   }
   // console.log('transportData', JSON.stringify(transportData))
- 
+
   useEffect(() => {
     async function getMemberList() {
       setLoading(true)
@@ -408,6 +408,7 @@ export const AddEditTransport = ({
             className="bg-[#86939e]"
             title="Cancel"
             variant="default"
+            leadingIcon="x"
             onPress={() => {
               cancelClicked()
             }}
@@ -416,6 +417,7 @@ export const AddEditTransport = ({
             className="ml-5"
             title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={handleSubmit(createUpdateTransport)}
           />
         </View>

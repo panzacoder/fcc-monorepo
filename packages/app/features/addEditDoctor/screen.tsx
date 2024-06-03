@@ -321,26 +321,6 @@ export function AddEditDoctorScreen() {
                   {isActive ? 'Active' : 'InActive'}
                 </Typography>
               </View>
-              <View className="flex-row">
-                <Button
-                  className=""
-                  title="Cancel"
-                  variant="link"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className=""
-                  title={_.isEmpty(doctorDetails) ? 'Save' : 'Update'}
-                  variant="default"
-                  onPress={
-                    _.isEmpty(doctorDetails)
-                      ? handleSubmit(createDoctor)
-                      : handleSubmit(updateDoctor)
-                  }
-                />
-              </View>
             </View>
             <View className="mt-2 w-full">
               <View className="w-full flex-row gap-2">
@@ -416,6 +396,28 @@ export function AddEditDoctorScreen() {
                   placeholder={'Website'}
                   className="w-full"
                   autoCapitalize="none"
+                />
+              </View>
+              <View className="my-2 flex-row self-center">
+                <Button
+                  className="bg-[#86939e]"
+                  title={'Cancel'}
+                  leadingIcon="x"
+                  variant="default"
+                  onPress={() => {
+                    router.back()
+                  }}
+                />
+                <Button
+                  className="ml-2"
+                  leadingIcon="save"
+                  title={_.isEmpty(doctorDetails) ? 'Create' : 'Save'}
+                  variant="default"
+                  onPress={
+                    _.isEmpty(doctorDetails)
+                      ? handleSubmit(createDoctor)
+                      : handleSubmit(updateDoctor)
+                  }
                 />
               </View>
             </View>
@@ -500,7 +502,6 @@ export function AddEditDoctorScreen() {
           ) : (
             <View />
           )}
-         
         </ScrollView>
       </View>
     </View>

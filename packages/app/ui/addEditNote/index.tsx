@@ -139,6 +139,7 @@ export const AddEditNote = ({
           <Button
             className="bg-[#86939e]"
             title="Cancel"
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               cancelClicked()
@@ -146,8 +147,9 @@ export const AddEditNote = ({
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(noteData) ? 'Save' : 'Update'}
+            title={_.isEmpty(noteData) ? 'Create' : 'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={handleSubmit(callCreateUpdateNote)}
           />
         </View>

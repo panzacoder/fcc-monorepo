@@ -1,6 +1,5 @@
 import { View, Alert } from 'react-native'
 import { useState, useEffect, useCallback } from 'react'
-import { Typography } from 'app/ui/typography'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import store from 'app/redux/store'
@@ -70,6 +69,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
                 stateIndex = index + 1
+                reset({
+                  state: stateIndex
+                })
               }
             })
             let timeZoneName = locationData.address.timezone.name
@@ -78,6 +80,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === timeZoneName) {
                 timeZoneIndex = index + 1
+                reset({
+                  timeZone: timeZoneIndex
+                })
               }
             })
           }
@@ -114,6 +119,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
           countryIndex = index + 1
+          reset({
+            country: countryIndex
+          })
           setIsRender(!isRender)
         }
       })
