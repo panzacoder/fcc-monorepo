@@ -7,6 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
+import * as Clipboard from 'expo-clipboard'
 import moment from 'moment'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -671,6 +672,9 @@ export function AppointmentDetailsScreen() {
                 Linking.openURL(`mailto:${value}`)
               } else if (title === 'Website:' && value !== '') {
                 Linking.openURL(`http://${getWebsite(value)}`)
+              } else {
+                Clipboard.setStringAsync(appointmentDetails.websiteUser)
+                Alert.alert('', 'Username copied to clipboard')
               }
             }}
             className="ml-[-10px]"

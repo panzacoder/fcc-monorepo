@@ -22,7 +22,6 @@
       "bundleIdentifier": "app.familycarecircle.fcc"
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
       "package": "app.familycarecircle.fcc"
     },
     "extra": {

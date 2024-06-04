@@ -11166,6 +11166,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-clipboard@npm:~5.0.1":
+  version: 5.0.1
+  resolution: "expo-clipboard@npm:5.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/d3ac75dddcc4c453ae6268ccc63814b333fb81ea4b565c0a02baae1b422dc9c1da581412aa166cf6e1fe82e1660cd0d698f7a11209b5daf013df61a4d60652cc
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~15.4.0, expo-constants@npm:~15.4.3":
   version: 15.4.5
   resolution: "expo-constants@npm:15.4.5"
@@ -11684,6 +11693,7 @@ __metadata:
     "@types/react-native__assets": "npm:^1"
     chromatic: "npm:^11.0.0"
     eslint: "npm:^8.57.0"
+    expo-clipboard: "npm:~5.0.1"
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
     react-native-blob-util: "npm:^0.19.9"

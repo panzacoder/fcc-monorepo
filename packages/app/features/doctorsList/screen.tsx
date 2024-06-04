@@ -179,27 +179,34 @@ export function DoctorsListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-2 flex-row">
-                <Typography className="text-primary font-400 ml-5 w-[45%]">
-                  {data.doctorName ? data.doctorName : ''}
-                </Typography>
+              <View className="w-[95%] flex-row">
+                <View>
+                  <View className="my-2 flex-row">
+                    <Typography className="text-primary font-400 ml-5 w-[45%]">
+                      {data.doctorName ? data.doctorName : ''}
+                    </Typography>
 
-                <Typography className="ml-5 mr-5 w-[40%] text-right">
-                  {data.specialist ? data.specialist : ''}
-                </Typography>
-              </View>
-              <View className="flex-row">
-                <View className="w-[70%]">
-                  <Typography className="ml-5 ">
-                    {data.locations ? data.locations : ''}
-                  </Typography>
+                    <Typography className="ml-5 mr-5 w-[40%] text-right">
+                      {data.specialist ? data.specialist : ''}
+                    </Typography>
+                  </View>
+                  <View className="flex-row">
+                    <View className="w-[70%]">
+                      <Typography className="ml-5 ">
+                        {data.locations ? data.locations : ''}
+                      </Typography>
+                    </View>
+                    <View className="self-center text-center">
+                      <Typography
+                        className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
+                      >
+                        {data.status ? data.status : ''}
+                      </Typography>
+                    </View>
+                  </View>
                 </View>
-                <View className="self-center text-center">
-                  <Typography
-                    className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
-                  >
-                    {data.status ? data.status : ''}
-                  </Typography>
+                <View className=" ml-[-10] self-center">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
               </View>
             </TouchableOpacity>

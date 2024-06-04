@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
 const schema = z.object({
   title: z.string().min(1, { message: 'Note title is required' }),
-  noteDetails: z.string().min(1, { message: 'Note details is required' }),
+  note: z.string().min(1, { message: 'Note details is required' }),
   occurrence: z.number().min(0, { message: 'Occurrence is required' })
 })
 export type Schema = z.infer<typeof schema>
@@ -48,11 +48,11 @@ export const AddEditNote = ({
         !_.isEmpty(noteData) && noteData.shortDescription
           ? noteData.shortDescription
           : '',
-      noteDetails: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
+      note: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
       occurrence:
         component === 'Appointment' || component === 'Medical Device'
           ? occuranceIndex
-          : 0
+          : 1
     },
     resolver: zodResolver(schema)
   })
@@ -87,9 +87,10 @@ export const AddEditNote = ({
             ? occuranceList[formData.occurrence - 1]?.title
             : ''
           : ''
-    createUpdateNote(occurance, formData.noteDetails, formData.title, noteData)
+    createUpdateNote(occurance, formData.note, formData.title, noteData)
   }
   async function setOccuranceChange(value: any) {
+    console.log('value', JSON.stringify(value))
     if (value === null) {
       reset({
         occurrence: -1
@@ -105,6 +106,15 @@ export const AddEditNote = ({
             control={control}
             name="title"
             placeholder={'Title*'}
+            className="w-[95%] bg-white"
+            autoCapitalize="none"
+          />
+        </View>
+        <View className="w-full flex-row justify-center gap-2">
+          <ControlledTextField
+            control={control}
+            name="note"
+            placeholder={'Enter note details*'}
             className="w-[95%] bg-white"
             autoCapitalize="none"
           />
@@ -126,15 +136,6 @@ export const AddEditNote = ({
           <View />
         )}
 
-        <View className="my-2 w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="noteDetails"
-            placeholder={'Enter note details*'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
         <View className="mt-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"

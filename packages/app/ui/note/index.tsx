@@ -89,18 +89,18 @@ export const Note = ({
         </Typography>
       </View>
       <View className="my-2 h-[1px] w-full bg-[#86939e]" />
-      <View>
-        <Typography className=" font-400 ml-2 text-[10px] text-[#1A1A1A]">
+      <View className="flex-row">
+        <Typography className="font-400 ml-2 w-[65%] text-[10px] text-[#1A1A1A]">
           {noteData.createdByName
             ? 'Created by ' + noteData.createdByName + ' on ' + creationDate
             : ''}
         </Typography>
+        <Typography className="font-400 mr-5 text-right text-[10px] text-[#1A1A1A]">
+          {noteData.occurance && noteData.occurance.occurance
+            ? noteData.occurance.occurance
+            : ''}
+        </Typography>
       </View>
-      <Typography className="font-400 mr-5 mt-[-10] text-right text-[10px] text-[#1A1A1A]">
-        {noteData.occurance && noteData.occurance.occurance
-          ? noteData.occurance.occurance
-          : ''}
-      </Typography>
     </View>
   )
 }
