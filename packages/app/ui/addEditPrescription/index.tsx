@@ -79,21 +79,15 @@ export const AddEditPrescription = ({
     id: number
     type: string
   }
-  // const typesList = staticData.medicineTypeList.map((data: any, index: any) => {
-  //   if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
-  //     if (prescriptionDetails.type.type === data.type) {
-  //       selectedTypeIndex = index + 1
-  //     }
-  //   }
-  //   return {
-  //     title: data.type,
-  //     id: index + 1
-  //   }
-  // })
   //dropdown is not working for 0 as id, so we started id from 1
   let typesList: Array<{ id: number; title: string }> =
     staticData.medicineTypeList.map(
       ({ type, id }: TypeResponse, index: any) => {
+        if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
+          if (prescriptionDetails.type.type === type) {
+            selectedTypeIndex = index + 1
+          }
+        }
         return {
           id: index + 1,
           title: type

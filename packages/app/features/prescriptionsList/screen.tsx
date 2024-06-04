@@ -508,42 +508,52 @@ export function PrescriptionsListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-1 flex-row">
-                <Typography className="text-primary font-400 ml-5 w-[40%]">
-                  {data.type ? data.type : ''}
-                </Typography>
+              <View className="w-[95%] flex-row">
+                <View>
+                  <View className="my-1 flex-row">
+                    <Typography className="text-primary font-400 ml-5 w-[40%]">
+                      {data.type ? data.type : ''}
+                    </Typography>
 
-                <Typography className="ml-5 mr-5 w-[45%] text-right">
-                  {data.name ? data.name : ''}
-                </Typography>
-              </View>
-              {data.doctorname || data.pharmacy ? (
-                <View className="flex-row">
-                  <Typography className="text-primary font-400 ml-5 w-[40%]">
-                    {data.doctorname ? data.doctorname : ''}
-                  </Typography>
+                    <Typography className="ml-5 mr-5 w-[45%] text-right">
+                      {data.name ? data.name : ''}
+                    </Typography>
+                  </View>
+                  {data.doctorname || data.pharmacy ? (
+                    <View className="flex-row">
+                      <Typography className="text-primary font-400 ml-5 w-[40%]">
+                        {data.doctorname ? data.doctorname : ''}
+                      </Typography>
 
-                  <Typography className="ml-5 mr-5 w-[45%] text-right">
-                    {data.pharmacy ? data.pharmacy : ''}
-                  </Typography>
+                      <Typography className="ml-5 mr-5 w-[45%] text-right">
+                        {data.pharmacy ? data.pharmacy : ''}
+                      </Typography>
+                    </View>
+                  ) : (
+                    <View />
+                  )}
+
+                  <View className="flex-row">
+                    <View className="w-[95%] flex-row">
+                      <Typography className="ml-5 text-[#4DA529]">
+                        {data.startDate
+                          ? getFullDateForCalendar(
+                              data.startDate,
+                              'MMM DD, YYYY'
+                            )
+                          : ''}
+                      </Typography>
+                      <Typography className="text-[#ef6603]">
+                        {data.endDate
+                          ? ' - ' +
+                            getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
+                          : ''}
+                      </Typography>
+                    </View>
+                  </View>
                 </View>
-              ) : (
-                <View />
-              )}
-
-              <View className="flex-row">
-                <View className="w-[95%] flex-row">
-                  <Typography className="ml-5 text-[#4DA529]">
-                    {data.startDate
-                      ? getFullDateForCalendar(data.startDate, 'MMM DD, YYYY')
-                      : ''}
-                  </Typography>
-                  <Typography className="text-[#ef6603]">
-                    {data.endDate
-                      ? ' - ' +
-                        getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
-                      : ''}
-                  </Typography>
+                <View className=" ml-[-10] self-center">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
               </View>
             </TouchableOpacity>

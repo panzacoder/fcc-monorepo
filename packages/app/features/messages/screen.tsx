@@ -300,7 +300,7 @@ export function MessagesScreen() {
         <View />
       )}
       {messagesList.length > 0 ? (
-        <ScrollView className="m-2 mx-5 w-[95%] self-center">
+        <ScrollView className="m-2 mx-5 w-full self-center">
           {messagesList.map((data: any, index: number) => {
             return (
               <Pressable
@@ -316,57 +316,64 @@ export function MessagesScreen() {
                 key={index}
                 className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
               >
-                <View className="my-2 flex-row">
-                  <Typography className="text-primary font-400 ml-5 mr-5 w-[60%] max-w-[60%] text-[16px]">
-                    {data.subject ? data.subject : ''}
-                  </Typography>
-                  <View className="">
-                    <Typography className="text-black">
-                      {data.type && data.type.type ? data.type.type : ''}
-                    </Typography>
-                  </View>
-                </View>
-                <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-full text-black">
-                    {data.updatedOn
-                      ? formatTimeToUserLocalTime(data.updatedOn)
-                      : ''}
-                  </Typography>
-                </View>
-                <View className="w-[30%]">
-                  {data.unreadMessageCount > 0 ? (
+                <View className="w-[90%] flex-row">
+                  <View>
+                    <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[60%] max-w-[60%] text-[16px]">
+                        {data.subject ? data.subject : ''}
+                      </Typography>
+                      <View className="">
+                        <Typography className="text-black">
+                          {data.type && data.type.type ? data.type.type : ''}
+                        </Typography>
+                      </View>
+                    </View>
                     <View className="flex-row">
-                      <Feather
-                        className="ml-5 mt-1"
-                        name={'message-circle'}
-                        size={25}
-                        color={'green'}
-                      />
-
-                      <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                        {data.unreadMessageCount}
+                      <Typography className="font-400 ml-5 w-full text-black">
+                        {data.updatedOn
+                          ? formatTimeToUserLocalTime(data.updatedOn)
+                          : ''}
                       </Typography>
                     </View>
-                  ) : (
-                    <View />
-                  )}
-                </View>
-                <ScrollView
-                  horizontal={true}
-                  className="w-[95%] max-w-[95%] flex-row"
-                >
-                  {data.participantDetailsList.map(
-                    (data: any, index: number) => {
-                      return (
-                        <View key={index} className="ml-2">
-                          <PtsNameInitials
-                            fullName={data.name ? data.name : ''}
+                    <View className="w-[30%]">
+                      {data.unreadMessageCount > 0 ? (
+                        <View className="flex-row">
+                          <Feather
+                            className="ml-5 mt-1"
+                            name={'message-circle'}
+                            size={25}
+                            color={'green'}
                           />
+
+                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                            {data.unreadMessageCount}
+                          </Typography>
                         </View>
-                      )
-                    }
-                  )}
-                </ScrollView>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                    <ScrollView
+                      horizontal={true}
+                      className="w-[95%] max-w-[95%] flex-row"
+                    >
+                      {data.participantDetailsList.map(
+                        (data: any, index: number) => {
+                          return (
+                            <View key={index} className="ml-2">
+                              <PtsNameInitials
+                                fullName={data.name ? data.name : ''}
+                              />
+                            </View>
+                          )
+                        }
+                      )}
+                    </ScrollView>
+                  </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
+                </View>
               </Pressable>
             )
           })}

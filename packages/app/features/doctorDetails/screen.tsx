@@ -1,7 +1,7 @@
 'use client'
-
+import * as React from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Linking, Pressable } from 'react-native'
+import { View, Alert, Linking, Pressable, Platform } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -12,6 +12,7 @@ import {
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
+import * as Clipboard from 'expo-clipboard'
 import {
   BASE_URL,
   GET_DOCTOR_DETAILS,
@@ -33,6 +34,7 @@ export function DoctorDetailsScreen() {
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
   const [isLoading, setLoading] = useState(false)
+  const [copiedText, setCopiedText] = React.useState('')
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const [doctorDetails, setDoctorDetails] = useState({}) as any
@@ -86,6 +88,10 @@ export function DoctorDetailsScreen() {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
   }
+  const copyToClipboard = async (text: any) => {
+    Clipboard.setStringAsync(text)
+    Alert.alert('', 'Username copied to clipboard')
+  }
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
   function getDetailsView(
@@ -119,6 +125,8 @@ export function DoctorDetailsScreen() {
                 Linking.openURL(`mailto:${value}`)
               } else if (title === 'Website:' && value !== '') {
                 Linking.openURL(`http://${getWebsite(value)}`)
+              } else {
+                copyToClipboard(doctorDetails.websiteuser)
               }
             }}
             className=""

@@ -519,107 +519,114 @@ export function AppointmentsListScreen() {
                 key={index}
                 className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
               >
-                <View className=" flex-row">
-                  <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-black">
-                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
-                  </Typography>
-                  <View className="">
-                    <Typography className="font-bold text-black">
-                      {data.status ? data.status : ''}
-                    </Typography>
-                  </View>
-                </View>
-                <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-[55%] text-black">
-                    {data.purpose ? data.purpose : ''}
-                  </Typography>
-                  {data.markCompleteCancel ? (
-                    <Typography className="font-400 ml-5 w-[40%] text-[#FF0000]">
-                      {'Mark Complete/Cancel'}
-                    </Typography>
-                  ) : (
-                    <View />
-                  )}
-                </View>
-                <View className="flex-row">
-                  <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
-                    {data.appointment ? data.appointment : ''}
-                  </Typography>
-                  <Typography className="font-400 ml-[10px] text-black">
-                    {data.type.toLowerCase() === 'doctor appointment'
-                      ? 'Doctor'
-                      : 'Facility'}
-                  </Typography>
-                </View>
-                {data.hasNotes ||
-                data.hasReminders ||
-                data.hasTransportation ? (
-                  <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                ) : (
-                  <View />
-                )}
-
-                <View className="ml-5 flex-row self-center">
-                  <View className="w-[30%]">
-                    {data.hasNotes ? (
-                      <View className="flex-row">
-                        <Feather
-                          className="ml-5 mt-1"
-                          name={'message-circle'}
-                          size={25}
-                          color={'green'}
-                        />
-                        {data.unreadMessageCount > 0 ? (
-                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                            {data.unreadMessageCount}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
+                <View className="w-[97%] flex-row">
+                  <View>
+                    <View className=" flex-row">
+                      <Typography className="font-400 ml-3 w-[75%] max-w-[75%] text-black">
+                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                      </Typography>
+                      <View className="">
+                        <Typography className="font-bold text-black">
+                          {data.status ? data.status : ''}
+                        </Typography>
                       </View>
-                    ) : (
-                      <View />
-                    )}
-                  </View>
-                  <View className="w-[30%]">
-                    {data.hasReminders ? (
-                      <View className="flex-row">
-                        <Feather
-                          className="ml-5 mt-1"
-                          name={'clock'}
-                          size={25}
-                          color={'red'}
-                        />
-                        {data.activeReminderCount > 0 ? (
-                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                            {data.activeReminderCount}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                    ) : (
-                      <View />
-                    )}
-                  </View>
-                  {data.hasTransportation ? (
-                    <View className="w-[30%]">
-                      <Feather
-                        className="ml-5 mt-1"
-                        name={'truck'}
-                        size={25}
-                        color={
-                          data.transportationStatus === 'Requested'
-                            ? '#cf8442'
-                            : data.transportationStatus === 'Rejected'
-                              ? 'red'
-                              : 'black'
-                        }
-                      />
                     </View>
-                  ) : (
-                    <View />
-                  )}
+                    <View className="flex-row">
+                      <Typography className="font-400 ml-3 w-[55%] text-black">
+                        {data.purpose ? data.purpose : ''}
+                      </Typography>
+                      {data.markCompleteCancel ? (
+                        <Typography className="font-400 ml-3 w-[40%] text-[#FF0000]">
+                          {'Mark Complete/Cancel'}
+                        </Typography>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                    <View className="flex-row">
+                      <Typography className="text-primary font-400 ml-3 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                        {data.appointment ? data.appointment : ''}
+                      </Typography>
+                      <Typography className="font-400 ml-[10px] text-black">
+                        {data.type.toLowerCase() === 'doctor appointment'
+                          ? 'Doctor'
+                          : 'Facility'}
+                      </Typography>
+                    </View>
+                    {data.hasNotes ||
+                    data.hasReminders ||
+                    data.hasTransportation ? (
+                      <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                    ) : (
+                      <View />
+                    )}
+
+                    <View className="ml-5 flex-row self-center">
+                      <View className="w-[30%]">
+                        {data.hasNotes ? (
+                          <View className="flex-row">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'message-circle'}
+                              size={25}
+                              color={'green'}
+                            />
+                            {data.unreadMessageCount > 0 ? (
+                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                {data.unreadMessageCount}
+                              </Typography>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                      <View className="w-[30%]">
+                        {data.hasReminders ? (
+                          <View className="flex-row">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'clock'}
+                              size={25}
+                              color={'red'}
+                            />
+                            {data.activeReminderCount > 0 ? (
+                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                {data.activeReminderCount}
+                              </Typography>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                      {data.hasTransportation ? (
+                        <View className="w-[30%]">
+                          <Feather
+                            className="ml-5 mt-1"
+                            name={'truck'}
+                            size={25}
+                            color={
+                              data.transportationStatus === 'Requested'
+                                ? '#cf8442'
+                                : data.transportationStatus === 'Rejected'
+                                  ? 'red'
+                                  : 'black'
+                            }
+                          />
+                        </View>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                  </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
                 </View>
               </Pressable>
             )

@@ -90,9 +90,7 @@ export function HomeScreen() {
                   {'6 Appointments, 2 Events'}
                 </Typography>
               </View>
-              <Pressable className="absolute right-[20]" onPress={() => {}}>
-                <Feather name={'settings'} size={20} color={'black'} />
-              </Pressable>
+
             </View>
             <ScrollView persistentScrollbar={true} className="m-2 flex-1">
               {memberList.map((data: any, index: number) => {

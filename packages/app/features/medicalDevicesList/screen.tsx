@@ -293,71 +293,78 @@ export function MedicalDevicesListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-2 flex-row">
-                <Typography className="text-primary font-400 ml-5 w-[40%]">
-                  {data.type ? data.type : ''}
-                </Typography>
+              <View className="w-[95%] flex-row">
+                <View>
+                  <View className="my-2 flex-row">
+                    <Typography className="text-primary font-400 ml-5 w-[40%]">
+                      {data.type ? data.type : ''}
+                    </Typography>
 
-                <Typography className="ml-5 mr-5 w-[45%] text-right">
-                  {data.doctor ? data.doctor : ''}
-                </Typography>
-              </View>
+                    <Typography className="ml-5 mr-5 w-[45%] text-right">
+                      {data.doctor ? data.doctor : ''}
+                    </Typography>
+                  </View>
 
-              <View className="flex-row">
-                <View className="w-[95%] flex-row">
-                  <Typography className="ml-5 text-black">
-                    {data.date ? convertTimeToUserLocalTime(data.date) : ''}
-                  </Typography>
-                </View>
-              </View>
-              {data.hasNotes || data.hasReminders ? (
-                <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-              ) : (
-                <View />
-              )}
+                  <View className="flex-row">
+                    <View className="w-[95%] flex-row">
+                      <Typography className="ml-5 text-black">
+                        {data.date ? convertTimeToUserLocalTime(data.date) : ''}
+                      </Typography>
+                    </View>
+                  </View>
+                  {data.hasNotes || data.hasReminders ? (
+                    <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                  ) : (
+                    <View />
+                  )}
 
-              <View className="ml-5 flex-row self-center">
-                <View className="w-[30%]">
-                  {data.hasNotes ? (
-                    <View className="flex-row">
-                      <Feather
-                        className="ml-5 mt-1"
-                        name={'message-circle'}
-                        size={25}
-                        color={'green'}
-                      />
-                      {data.unreadMessageCount > 0 ? (
-                        <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                          {data.unreadMessageCount}
-                        </Typography>
+                  <View className="ml-5 flex-row self-center">
+                    <View className="w-[30%]">
+                      {data.hasNotes ? (
+                        <View className="flex-row">
+                          <Feather
+                            className="ml-5 mt-1"
+                            name={'message-circle'}
+                            size={25}
+                            color={'green'}
+                          />
+                          {data.unreadMessageCount > 0 ? (
+                            <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                              {data.unreadMessageCount}
+                            </Typography>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
                       ) : (
                         <View />
                       )}
                     </View>
-                  ) : (
-                    <View />
-                  )}
-                </View>
-                <View className="w-[30%]">
-                  {data.hasReminders ? (
-                    <View className="flex-row">
-                      <Feather
-                        className="ml-5 mt-1"
-                        name={'clock'}
-                        size={25}
-                        color={'red'}
-                      />
-                      {data.activeReminderCount > 0 ? (
-                        <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                          {data.activeReminderCount}
-                        </Typography>
+                    <View className="w-[30%]">
+                      {data.hasReminders ? (
+                        <View className="flex-row">
+                          <Feather
+                            className="ml-5 mt-1"
+                            name={'clock'}
+                            size={25}
+                            color={'red'}
+                          />
+                          {data.activeReminderCount > 0 ? (
+                            <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                              {data.activeReminderCount}
+                            </Typography>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
                       ) : (
                         <View />
                       )}
                     </View>
-                  ) : (
-                    <View />
-                  )}
+                  </View>
+                </View>
+                <View className=" ml-[-10] self-center">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
               </View>
             </TouchableOpacity>
