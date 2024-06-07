@@ -122,6 +122,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           reset({
             country: countryIndex
           })
+          console.log('countryName index', '' + countryIndex)
           setIsRender(!isRender)
         }
       })
@@ -171,15 +172,16 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       }
     })
   async function setSelectedCountryChange(value: any) {
+    let countryId = ''
     if (value) {
       setAddressObject(staticData.countryList[value.id - 1], 4)
-    }
-
-    let countryId =
-      value && staticData.countryList[value.id - 1]?.id
+      countryId = staticData.countryList[value.id - 1].id
         ? staticData.countryList[value.id - 1].id
         : 101
-    await getStates(countryId)
+      await getStates(countryId)
+    } else {
+      setStateslist([])
+    }
   }
   async function setSelectedStateChange(value: any) {
     if (value) {
@@ -204,7 +206,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               control={control}
               name="locationName"
               placeholder={'Location Name'}
-              className="w-[95%] bg-white"
+              className="w-full bg-white"
               autoCapitalize="none"
               onChangeText={(text) => {
                 // console.log('text', text)
@@ -221,7 +223,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="line"
             placeholder={'Address'}
-            className="w-[95%] bg-white"
+            className="w-full bg-white"
             autoCapitalize="none"
             onChangeText={(text) => {
               // console.log('text', text)
@@ -229,7 +231,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             }}
           />
         </View>
-        <View className=" w-[95%] self-center">
+        <View className=" w-full self-center">
           <ControlledDropdown
             control={control}
             name="country"
@@ -244,7 +246,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             onChangeValue={setSelectedCountryChange}
           />
         </View>
-        <View className="my-2 w-[95%] self-center">
+        <View className="my-2 w-full self-center">
           <ControlledDropdown
             control={control}
             name="state"
@@ -265,7 +267,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="city"
             placeholder={'City'}
-            className="w-[95%] bg-white"
+            className="w-full bg-white"
             autoCapitalize="none"
             onChangeText={(text) => {
               // console.log('text', text)
@@ -278,7 +280,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="postalCode"
             placeholder={'Postal Code'}
-            className="w-[95%] bg-white"
+            className="w-full bg-white"
             autoCapitalize="none"
             onChangeText={(text) => {
               // console.log('text', text)
@@ -287,7 +289,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           />
         </View>
         {component === 'Profile' ? (
-          <View className="w-[95%] self-center">
+          <View className="w-full self-center">
             <ControlledDropdown
               control={control}
               name="timeZone"

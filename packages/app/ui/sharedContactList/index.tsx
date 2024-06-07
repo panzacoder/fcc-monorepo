@@ -1,4 +1,4 @@
-import { View, ScrollView, Pressable } from 'react-native'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
@@ -13,14 +13,14 @@ export const SharedContactList = ({
       <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
         <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Shared Contacts`}</Typography>
         <View className="mr-[30] flex-row justify-end self-center">
-          <Pressable
+          <TouchableOpacity
             className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
             onPress={() => {
               cancelClicked()
             }}
           >
             <Feather name={'x'} size={25} className="color-primary" />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView className="">
@@ -41,7 +41,7 @@ export const SharedContactList = ({
                 </Typography>
               </View>
               <View className="my-2 mt-3 flex-row self-center">
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
                     acceptRejectClicked(data, true)
                   }}
@@ -50,8 +50,8 @@ export const SharedContactList = ({
                   <Typography className="text-center font-bold text-white">
                     {'Accept'}
                   </Typography>
-                </Pressable>
-                <Pressable
+                </TouchableOpacity>
+                <TouchableOpacity
                   onPress={() => {
                     acceptRejectClicked(data, true)
                   }}
@@ -60,7 +60,7 @@ export const SharedContactList = ({
                   <Typography className="text-center font-bold text-white">
                     {'Reject'}
                   </Typography>
-                </Pressable>
+                </TouchableOpacity>
               </View>
             </View>
           )

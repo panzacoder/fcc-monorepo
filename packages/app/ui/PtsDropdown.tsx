@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import React, { useMemo, useState } from 'react'
 import { cn } from './utils'
 import {
@@ -70,7 +70,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
       {label && (
         <Text className="text-muted-foreground px-1 text-sm">{label}</Text>
       )}
-      <Pressable
+      <TouchableOpacity
         className={cn(
           'web:pr-3 native:pr-0 h-14 rounded-lg border-[1px] border-gray-400 pl-4',
           isFocus && 'border-primary',
@@ -107,7 +107,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           }}
           InputComponent={DropdownInput}
         />
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 })

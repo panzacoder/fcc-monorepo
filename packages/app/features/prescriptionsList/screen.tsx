@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -320,7 +320,7 @@ export function PrescriptionsListScreen() {
         {!isAddPrescription ? (
           <View className="w-full flex-row">
             <View className="min-w-[75%]">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowFilter(!isShowFilter)
                 }}
@@ -335,7 +335,7 @@ export function PrescriptionsListScreen() {
                   size={25}
                   color={'black'}
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             {getUserPermission(prescriptionPrivileges).createPermission ? (
               <View className=" mt-[20] self-center">
@@ -357,7 +357,7 @@ export function PrescriptionsListScreen() {
               <View />
             )}
             <View className="mt-5 self-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowFilter(false)
                   setIsFilter(!isFilter)
@@ -370,7 +370,7 @@ export function PrescriptionsListScreen() {
                   size={25}
                   color={COLORS.primary}
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         ) : (
@@ -452,7 +452,7 @@ export function PrescriptionsListScreen() {
       )}
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Active')
@@ -461,8 +461,8 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Active'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'NotTaking' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('NotTaking')
@@ -471,8 +471,8 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Not Taking'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -481,7 +481,7 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />

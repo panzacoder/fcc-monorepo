@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -70,7 +70,7 @@ export function MedicalDevicesDetailsScreen() {
       : {}
   // console.log('medicalDevicesDetails', JSON.stringify(medicalDevicesDetails))
   const getMedicalDevicesDetails = useCallback(
-    async (isFromCreateThread: any) => {
+    async (isFromCreateThread: any, noteData: any) => {
       setLoading(true)
       let url = `${BASE_URL}${GET_MEDICAL_DEVICE_DETAILS}`
       let dataObject = {
@@ -127,7 +127,7 @@ export function MedicalDevicesDetailsScreen() {
 
   useEffect(() => {
     if (!isAddNote) {
-      getMedicalDevicesDetails(false)
+      getMedicalDevicesDetails(false, noteData)
     }
   }, [])
   let medicalDeviceDate = '',
@@ -258,7 +258,7 @@ export function MedicalDevicesDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsAddNote(false)
-          getMedicalDevicesDetails(false)
+          getMedicalDevicesDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -334,7 +334,7 @@ export function MedicalDevicesDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getMedicalDevicesDetails(false)
+          getMedicalDevicesDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -357,10 +357,10 @@ export function MedicalDevicesDetailsScreen() {
         })
       )
     } else {
-      getThreadParticipants()
+      getThreadParticipants(noteData)
     }
   }
-  async function getThreadParticipants() {
+  async function getThreadParticipants(noteData: any) {
     setLoading(true)
     let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
@@ -384,6 +384,7 @@ export function MedicalDevicesDetailsScreen() {
             return object
           })
           setParticipantsList(list)
+          setNoteData(noteData)
           setIsMessageThread(true)
         } else {
           Alert.alert('', data.message)
@@ -431,7 +432,7 @@ export function MedicalDevicesDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getMedicalDevicesDetails(true)
+          getMedicalDevicesDetails(true, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -568,7 +569,7 @@ export function MedicalDevicesDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowNotes(!isShowNotes)
                 }}
@@ -588,7 +589,7 @@ export function MedicalDevicesDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
@@ -628,7 +629,7 @@ export function MedicalDevicesDetailsScreen() {
           </View>
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowReminder(!isShowReminder)
                 }}
@@ -650,7 +651,7 @@ export function MedicalDevicesDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {moment(
                 medicalDevicesDetails.date ? medicalDevicesDetails.date : ''
               )

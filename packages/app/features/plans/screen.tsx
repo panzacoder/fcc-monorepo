@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, ScrollView, Pressable } from 'react-native'
+import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -415,14 +415,14 @@ export function PlansScreen() {
         <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
           <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Saved Cards`}</Typography>
           <View className="mr-[30] flex-row justify-end self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsShowCardModal(false)
               }}
             >
               <Feather name={'x'} size={25} className="color-primary" />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
         <View className="m-2 flex-row">
@@ -474,14 +474,14 @@ export function PlansScreen() {
                       </View>
                     </View>
                     <View className="flex-row self-center">
-                      <Button
+                      {/* <Button
                         className={`mb-5 mt-2 w-[40%] self-center bg-[#c43416]`}
                         title={'Delete Card'}
                         variant="default"
                         onPress={() => {
                           deleteCard(data)
                         }}
-                      />
+                      /> */}
                       <Button
                         className={`mb-5 ml-5 mt-2 self-center ${isFromUpgradePlan ? 'w-[40%]' : 'w-[40%]'} bg-[#ef6603]`}
                         title={'Pay with card'}
@@ -520,7 +520,7 @@ export function PlansScreen() {
         <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
           <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Add New Card`}</Typography>
           <View className="mr-[30] flex-row justify-end self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsAddCardModal(false)
@@ -528,7 +528,7 @@ export function PlansScreen() {
               }}
             >
               <Feather name={'x'} size={25} className="color-primary" />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
         <View className="my-2 mb-10 w-[95%] self-center ">
@@ -631,13 +631,13 @@ export function PlansScreen() {
       ) : (
         <View />
       )}
-      {isAddCard ? (
+      {/* {isAddCard ? (
         <View className="absolute top-[100] self-center">
           {showAddCardModal()}
         </View>
       ) : (
         <View />
-      )}
+      )} */}
     </View>
   )
 }

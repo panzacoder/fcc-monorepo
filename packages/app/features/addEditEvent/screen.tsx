@@ -120,7 +120,6 @@ export function AddEditEventScreen() {
   async function addEditEvent(formData: Schema) {
     setLoading(true)
     let url = ''
-
     let dataObject: any = {
       header: header,
       event: {
@@ -136,6 +135,7 @@ export function AddEditEventScreen() {
     }
     if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_EVENT}`
+      dataObject.event.location.address.id = ''
     } else {
       url = `${BASE_URL}${UPDATE_EVENT}`
       dataObject.event.id = eventDetails.id

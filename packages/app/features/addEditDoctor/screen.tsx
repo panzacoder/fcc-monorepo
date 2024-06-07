@@ -1,18 +1,14 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  CREATE_DOCTOR,
-  UPDATE_DOCTOR,
-  GET_STATES_AND_TIMEZONES
-} from 'app/utils/urlConstants'
+import { LocationDetails } from 'app/ui/locationDetails'
+import { BASE_URL, CREATE_DOCTOR, UPDATE_DOCTOR } from 'app/utils/urlConstants'
 import { Stack } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
@@ -22,34 +18,52 @@ import { useParams } from 'solito/navigation'
 import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
 import { formatUrl } from 'app/utils/format-url'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+let selectedAddress: any = {
+  shortDescription: '',
+  nickName: '',
+  address: {
+    id: '',
+    line: '',
+    city: '',
+    zipCode: '',
+    state: {
+      name: '',
+      code: '',
+      namecode: '',
+      description: '',
+      snum: '',
+      id: '',
+      country: {
+        name: '',
+        code: '',
+        namecode: '',
+        isoCode: '',
+        description: '',
+        id: ''
+      }
+    }
+  }
+}
 const schema = z.object({
   firstName: z.string(),
-  phone: z.string(),
   website: z.string(),
   username: z.string(),
   portalWebsite: z.string(),
   lastName: z.string().min(1, { message: 'Last name is required' }),
-  specialization: z.number().min(0, { message: 'Specialization is required' }),
-  locationDesc: z
-    .string()
-    .min(1, { message: 'Location description is required' }),
-  locationShortName: z
-    .string()
-    .min(1, { message: 'Location short name is required' }),
-  address: z.string(),
-  city: z.string(),
-  postalCode: z.string(),
-  locationPhone: z.string(),
-  fax: z.string(),
-  state: z.number().min(0, { message: 'State is required' }),
-  // state: z.number(),
-  country: z.number().min(0, { message: 'Country is required' })
+  specialization: z.number().min(0, { message: 'Specialization is required' })
+})
+const phoneSchema = z.object({
+  phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let statesListFull = []
 let isDoctorActive = true
+let doctorPhone = ''
 export function AddEditDoctorScreen() {
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData as any
@@ -65,6 +79,9 @@ export function AddEditDoctorScreen() {
       doctorDetails.status.status.toLowerCase() === 'inactive'
     ) {
       isDoctorActive = false
+    }
+    if (doctorDetails.phone) {
+      doctorPhone = doctorDetails.phone
     }
   }
   const specializationList: Array<{ id: number; title: string }> =
@@ -88,8 +105,45 @@ export function AddEditDoctorScreen() {
     })
     return specializationIndex
   }
+  async function setAddressObject(value: any, index: any) {
+    if (value) {
+      if (index === 0) {
+        selectedAddress.shortDescription = value
+        selectedAddress.nickName = value
+      }
+      if (index === 1) {
+        selectedAddress.address.line = value
+      }
+      if (index === 2) {
+        selectedAddress.address.city = value
+      }
+      if (index === 3) {
+        selectedAddress.address.zipCode = value
+      }
+      if (index === 4) {
+        selectedAddress.address.state.country.id = value.id
+        selectedAddress.address.state.country.name = value.name
+        selectedAddress.address.state.country.code = value.code
+        selectedAddress.address.state.country.namecode = value.namecode
+        selectedAddress.address.state.country.snum = value.snum
+        selectedAddress.address.state.country.description = value.description
+      }
+      if (index === 5) {
+        selectedAddress.address.state.id = value.id
+        selectedAddress.address.state.name = value.name
+        selectedAddress.address.state.code = value.code
+        selectedAddress.address.state.namecode = value.namecode
+        selectedAddress.address.state.snum = value.snum
+        selectedAddress.address.state.description = value.description
+      }
+      if (index === 6) {
+        selectedAddress = value
+      }
+    }
 
-  const { control, handleSubmit } = useForm({
+    // console.log('selectedAddress', JSON.stringify(selectedAddress))
+  }
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName:
         doctorDetails && doctorDetails.firstName ? doctorDetails.firstName : '',
@@ -98,7 +152,6 @@ export function AddEditDoctorScreen() {
       specialization: doctorDetails.specialist
         ? getSpecializationIndex(doctorDetails.specialist)
         : -1,
-      phone: doctorDetails && doctorDetails.phone ? doctorDetails.phone : '',
       website:
         doctorDetails && doctorDetails.website ? doctorDetails.website : '',
       username:
@@ -106,22 +159,21 @@ export function AddEditDoctorScreen() {
           ? doctorDetails.websiteuser
           : '',
       portalWebsite:
-        doctorDetails && doctorDetails.website ? doctorDetails.website : '',
-      locationDesc: _.isEmpty(doctorDetails) ? '' : 'default',
-      locationShortName: _.isEmpty(doctorDetails) ? '' : 'default',
-      address: '',
-      city: '',
-      postalCode: '',
-      locationPhone: '',
-      fax: '',
-      country: _.isEmpty(doctorDetails) ? -1 : 0,
-      state: _.isEmpty(doctorDetails) ? -1 : 0
+        doctorDetails && doctorDetails.website ? doctorDetails.website : ''
     },
     resolver: zodResolver(schema)
   })
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      phone:
+        doctorDetails && doctorDetails.phone
+          ? convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone)
+          : ''
+    },
+    resolver: zodResolver(phoneSchema)
+  })
   const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(isDoctorActive ? true : false)
-  const [statesList, setStateslist] = useState([]) as any
 
   type SpecializationResponse = {
     id: number
@@ -141,7 +193,7 @@ export function AddEditDoctorScreen() {
         salutation: 'Dr',
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        phone: doctorPhone,
         website: formData.website,
         websiteuser: formData.username,
         specialist: findSpecializationFromId(formData.specialization),
@@ -176,24 +228,7 @@ export function AddEditDoctorScreen() {
   async function createDoctor(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state - 1]
-    let countryObject: object = staticData.countryList[formData.country - 1]
-    let addressObject: any = {
-      shortDescription: formData.locationDesc,
-      nickName: formData.locationShortName,
-      fax: formData.fax,
-      website: formData.website,
-      phone: formData.phone,
-      address: {
-        id: '',
-        line: formData.address,
-        city: formData.city,
-        zipCode: formData.postalCode,
-        state: stateObject
-      }
-    }
-    addressObject.address.state.country = countryObject
-    locationList.push(addressObject)
+    locationList.push(selectedAddress)
     let url = `${BASE_URL}${CREATE_DOCTOR}`
     let dataObject = {
       header: header,
@@ -205,7 +240,7 @@ export function AddEditDoctorScreen() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: '',
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(doctorPhone),
         website: formData.website,
         websiteuser: formData.username,
         specialist: findSpecializationFromId(formData.specialization),
@@ -235,59 +270,7 @@ export function AddEditDoctorScreen() {
     id: number
     name: string
   }
-  const countryList: Array<{ id: number; title: string }> =
-    staticData.countryList.map(({ name, id }: Response, index: any) => {
-      return {
-        title: name,
-        id: index + 1
-      }
-    })
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        // console.log('data', data)
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // set available states
-          let statesList: Array<{ id: number; title: string }> =
-            data.data.stateList.map(({ name, id }: Response, index: any) => {
-              return {
-                title: name,
-                id: index + 1
-              }
-            })
-          setStateslist(statesList)
-          statesListFull = data.data.stateList ? data.data.stateList : []
-          // console.log('setStateslistFull', JSON.stringify(statesListFull))
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }, [])
 
-  async function setSelectedCountryChange(value: any) {
-    let countryId =
-      value && staticData.countryList[value.id]?.id
-        ? staticData.countryList[value.id].id
-        : 101
-    await getStates(countryId)
-  }
-  // async function setSelectedStateChange(value: any) {
-  //   console.log('setSelectedStateChange value', '' + value)
-  //   console.log('statesListFull', JSON.stringify(statesListFull))
-  // }
   return (
     <View className="flex-1">
       <Stack.Screen
@@ -304,7 +287,7 @@ export function AddEditDoctorScreen() {
                 <ToggleSwitch
                   isOn={isActive}
                   onColor="#2884F9"
-                  offColor="#2884F9"
+                  offColor="#ffcccb"
                   size="medium"
                   onToggle={(isOn) => {
                     if (isOn) {
@@ -361,11 +344,18 @@ export function AddEditDoctorScreen() {
               </View>
               <View className="flex w-full gap-2">
                 <ControlledTextField
-                  control={control}
+                  control={control1}
                   name="phone"
                   placeholder={'Phone'}
                   className="w-full"
-                  autoCapitalize="none"
+                  keyboard="number-pad"
+                  onChangeText={(value) => {
+                    doctorPhone =
+                      convertPhoneNumberToUsaPhoneNumberFormat(value)
+                    reset1({
+                      phone: doctorPhone
+                    })
+                  }}
                 />
                 <ControlledTextField
                   control={control}
@@ -398,110 +388,47 @@ export function AddEditDoctorScreen() {
                   autoCapitalize="none"
                 />
               </View>
-              <View className="my-2 flex-row self-center">
-                <Button
-                  className="bg-[#86939e]"
-                  title={'Cancel'}
-                  leadingIcon="x"
-                  variant="default"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className="ml-2"
-                  leadingIcon="save"
-                  title={_.isEmpty(doctorDetails) ? 'Create' : 'Save'}
-                  variant="default"
-                  onPress={
-                    _.isEmpty(doctorDetails)
-                      ? handleSubmit(createDoctor)
-                      : handleSubmit(updateDoctor)
-                  }
-                />
-              </View>
             </View>
           </View>
           {_.isEmpty(doctorDetails) ? (
             <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
               <View className="mt-2">
-                <View className="mb-2 flex-row items-center">
+                <View className=" flex-row items-center">
                   <Typography className="w-[20%]">{'Location'}</Typography>
-                  <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+                  <View className="bg-primary ml-2 h-[1px] w-[75%]" />
                 </View>
-                <View className=" w-full">
-                  <View className="flex w-full gap-2">
-                    <ControlledTextField
-                      control={control}
-                      name="locationDesc"
-                      placeholder={'Location Description*'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="locationShortName"
-                      placeholder="Short Name*"
-                      className="w-full"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="address"
-                      placeholder="Address"
-                      className="w-full"
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="country"
-                      label="Country*"
-                      maxHeight={300}
-                      list={countryList}
-                      onChangeValue={setSelectedCountryChange}
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="state"
-                      label="State*"
-                      maxHeight={300}
-                      list={statesList}
-                      // onChangeValue={setSelectedStateChange}
-                    />
-                    <View className="w-full flex-row gap-2">
-                      <ControlledTextField
-                        control={control}
-                        name="city"
-                        placeholder={'City'}
-                        className="w-[50%]"
-                        autoCapitalize="none"
-                      />
-                      <ControlledTextField
-                        control={control}
-                        name="postalCode"
-                        placeholder="Postal Code"
-                        className="w-[48%]"
-                      />
-                    </View>
-                    <ControlledTextField
-                      control={control}
-                      name="locationPhone"
-                      placeholder={'Phone'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="fax"
-                      placeholder={'Fax'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                  </View>
-                </View>
+                <LocationDetails
+                  component={'AddEditDoctor'}
+                  data={{}}
+                  setAddressObject={setAddressObject}
+                />
               </View>
             </View>
           ) : (
             <View />
           )}
+          <View className="my-2 flex-row self-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-2"
+              leadingIcon="save"
+              title={_.isEmpty(doctorDetails) ? 'Create' : 'Save'}
+              variant="default"
+              onPress={
+                _.isEmpty(doctorDetails)
+                  ? handleSubmit(createDoctor)
+                  : handleSubmit(updateDoctor)
+              }
+            />
+          </View>
         </ScrollView>
       </View>
     </View>

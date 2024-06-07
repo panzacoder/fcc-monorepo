@@ -1,4 +1,4 @@
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
@@ -30,57 +30,58 @@ export const Note = ({
         <View className="absolute right-0 flex-row">
           {!noteData.hasMsgThread &&
           getUserPermission(notePrivileges).deletePermission ? (
-            <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  `Are you sure about deleting ${component} Note?`,
+                  'It cannot be recovered once deleted.',
+                  [
+                    {
+                      text: 'Ok',
+                      onPress: () => callDeletNote()
+                    },
+                    { text: 'Cancel', onPress: () => {} }
+                  ]
+                )
+              }}
+              className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+            >
               <Feather
                 className="self-center"
-                onPress={() => {
-                  Alert.alert(
-                    `Are you sure about deleting ${component} Note?`,
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => callDeletNote()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
                 name={'trash'}
                 size={15}
                 color={'white'}
               />
-            </Pressable>
+            </TouchableOpacity>
           ) : (
             <View />
           )}
           {getUserPermission(notePrivileges).updatePermission ? (
-            <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
-              <Feather
-                className=""
-                onPress={() => {
-                  editNote(noteData)
-                }}
-                name={'edit-2'}
-                size={15}
-                color={'white'}
-              />
-            </Pressable>
+            <TouchableOpacity
+              onPress={() => {
+                editNote(noteData)
+              }}
+              className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+            >
+              <Feather className="" name={'edit-2'} size={15} color={'white'} />
+            </TouchableOpacity>
           ) : (
             <View />
           )}
 
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          <TouchableOpacity
+            onPress={() => {
+              messageThreadClicked(noteData)
+            }}
+            className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+          >
             <Feather
               className=""
-              onPress={() => {
-                messageThreadClicked(noteData)
-              }}
               name={noteData.hasMsgThread ? 'message-circle' : 'plus-square'}
               size={15}
               color={'white'}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       <View>
@@ -90,7 +91,9 @@ export const Note = ({
       </View>
       <View className="my-2 h-[1px] w-full bg-[#86939e]" />
       <View className="flex-row">
-        <Typography className="font-400 ml-2 w-[65%] text-[10px] text-[#1A1A1A]">
+        <Typography
+          className={`font-400 ml-2 text-[9px] text-[#1A1A1A] ${noteData.occurance && noteData.occurance.occurance ? 'w-[65%]' : 'w-full'}`}
+        >
           {noteData.createdByName
             ? 'Created by ' + noteData.createdByName + ' on ' + creationDate
             : ''}

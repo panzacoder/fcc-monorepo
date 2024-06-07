@@ -1,6 +1,12 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Pressable, Linking } from 'react-native'
+import {
+  View,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+  Linking
+} from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'solito/navigation'
 import { Feather } from 'app/ui/icons'
@@ -600,7 +606,7 @@ export function ProfileScreen() {
           name="phone"
           placeholder={'Phone'}
           className="w-[95%] self-center"
-          autoCapitalize="none"
+          keyboard="number-pad"
         />
         <ControlledTextField
           name="email"
@@ -610,7 +616,6 @@ export function ProfileScreen() {
           autoCapitalize="none"
         />
         <View className="my-5 flex-row self-center pb-5 ">
-         
           <Button
             className="bg-[#86939e]"
             title={'Cancel'}
@@ -696,7 +701,7 @@ export function ProfileScreen() {
               <Typography className="ml-2 w-[85%] self-center font-bold">
                 {'User Profile'}
               </Typography>
-              <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+              <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
                 <Feather
                   className=""
                   onPress={() => {
@@ -706,7 +711,7 @@ export function ProfileScreen() {
                   size={15}
                   color={'white'}
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             {getDetailsView(
               'Name',
@@ -762,7 +767,7 @@ export function ProfileScreen() {
               <Typography className="ml-2 w-[85%] self-center font-bold">
                 {'Address'}
               </Typography>
-              <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+              <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
                 <Feather
                   className=""
                   onPress={() => {
@@ -772,7 +777,7 @@ export function ProfileScreen() {
                   size={15}
                   color={'white'}
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             {getDetailsView(
               'Address',

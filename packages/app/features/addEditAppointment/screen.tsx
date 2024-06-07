@@ -5,6 +5,7 @@ import { Alert, View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
+import { useRouter } from 'expo-router'
 import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -20,7 +21,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+// import { useRouter } from 'solito/navigation'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
@@ -217,8 +218,8 @@ export function AddEditAppointmentScreen() {
           } else {
             apptDetails = data.data.appointment ? data.data.appointment : {}
           }
-
-          router.replace(
+          router.dismiss(1)
+          router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
               memberData: JSON.stringify(memberData)

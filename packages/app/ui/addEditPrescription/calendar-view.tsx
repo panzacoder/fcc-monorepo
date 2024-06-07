@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native'
+import { TouchableOpacity, Text, View } from 'react-native'
 import CalendarPicker, {
   CalendarPickerProps
 } from 'react-native-calendar-picker'
@@ -63,7 +63,7 @@ export function CalendarViewInput({
       {label && (
         <Text className="text-muted-foreground } px-1 text-sm">{label}</Text>
       )}
-      <Pressable
+      <TouchableOpacity
         onPress={onPress}
         className="flex w-full flex-row rounded-lg border border-gray-400 px-4 py-3"
       >
@@ -72,7 +72,7 @@ export function CalendarViewInput({
         >
           {value}
         </Typography>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }

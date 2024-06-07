@@ -1,4 +1,4 @@
-import { View, Pressable } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -23,14 +23,14 @@ export const CaregiverProfileInfo = ({ cancelClicked }) => {
             {'Profile Information'}
           </Typography>
           <View className="flex-row justify-end self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
               onPress={() => {
                 cancelClicked()
               }}
             >
               <Feather name={'x'} size={25} className="color-[#066f72]" />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
         <ScrollView className="max-h-[87%]">

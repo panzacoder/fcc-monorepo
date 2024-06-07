@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -203,7 +203,7 @@ export const Transportation = ({
           </Typography>
         </View>
         <View className="flex-row">
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
             <Feather
               className="self-center"
               onPress={() => {
@@ -223,8 +223,8 @@ export const Transportation = ({
               size={15}
               color={'white'}
             />
-          </Pressable>
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          </TouchableOpacity>
+          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
             <Feather
               className="self-center"
               onPress={() => {
@@ -234,7 +234,7 @@ export const Transportation = ({
               size={15}
               color={'white'}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -245,7 +245,7 @@ export const Transportation = ({
       {getDetailsView('Address', address, false, '')}
       <View className="f-full ml-2 flex-row">
         <Typography className="w-[85%]">{'Reminder'}</Typography>
-        <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+        <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
           <Feather
             className="self-center"
             onPress={() => {
@@ -255,7 +255,7 @@ export const Transportation = ({
             size={15}
             color={'white'}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {isAddReminder ? (
         <View className="">

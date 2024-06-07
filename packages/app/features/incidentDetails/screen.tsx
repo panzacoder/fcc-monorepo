@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable, ScrollView } from 'react-native'
+import { View, Alert, TouchableOpacity, ScrollView } from 'react-native'
 // import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -54,56 +54,59 @@ export function IncidentDetailsScreen() {
       ? JSON.parse(item.incidentDetails)
       : {}
   // console.log('incidentDetails', JSON.stringify(incidentDetails))
-  const getIncidentDetails = useCallback(async (isFromCreateThread: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_INCIDENT_DETAILS}`
-    let dataObject = {
-      header: header,
-      incident: {
-        id: incidentData.id ? incidentData.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('data', JSON.stringify(data.data))
-          if (data.data.domainObjectPrivileges) {
-            incidentPrivileges = data.data.domainObjectPrivileges.Incident
-              ? data.data.domainObjectPrivileges.Incident
-              : {}
-            notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
-              ? data.data.domainObjectPrivileges.INCIDENTNOTE
-              : {}
-          }
-
-          setIncidentDetails(data.data.incident ? data.data.incident : {})
-          if (data.data.incident.noteList) {
-            setNotesList(data.data.incident.noteList)
-          }
-          setIsRender(!isRender)
-          if (isFromCreateThread) {
-            router.push(
-              formatUrl('/circles/noteMessage', {
-                component: 'Incident',
-                memberData: JSON.stringify(memberData),
-                noteData: JSON.stringify(noteData)
-              })
-            )
-          }
-        } else {
-          Alert.alert('', data.message)
+  const getIncidentDetails = useCallback(
+    async (isFromCreateThread: any, noteData: any) => {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_INCIDENT_DETAILS}`
+      let dataObject = {
+        header: header,
+        incident: {
+          id: incidentData.id ? incidentData.id : ''
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
+      }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            // console.log('data', JSON.stringify(data.data))
+            if (data.data.domainObjectPrivileges) {
+              incidentPrivileges = data.data.domainObjectPrivileges.Incident
+                ? data.data.domainObjectPrivileges.Incident
+                : {}
+              notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
+                ? data.data.domainObjectPrivileges.INCIDENTNOTE
+                : {}
+            }
+
+            setIncidentDetails(data.data.incident ? data.data.incident : {})
+            if (data.data.incident.noteList) {
+              setNotesList(data.data.incident.noteList)
+            }
+            setIsRender(!isRender)
+            if (isFromCreateThread) {
+              router.push(
+                formatUrl('/circles/noteMessage', {
+                  component: 'Incident',
+                  memberData: JSON.stringify(memberData),
+                  noteData: JSON.stringify(noteData)
+                })
+              )
+            }
+          } else {
+            Alert.alert('', data.message)
+          }
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    },
+    []
+  )
 
   useEffect(() => {
     if (!isAddNote) {
-      getIncidentDetails(false)
+      getIncidentDetails(false, noteData)
     }
   }, [])
   let incidentDate = '',
@@ -172,7 +175,7 @@ export function IncidentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsAddNote(false)
-          getIncidentDetails(false)
+          getIncidentDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -205,7 +208,7 @@ export function IncidentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getIncidentDetails(false)
+          getIncidentDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -216,7 +219,7 @@ export function IncidentDetailsScreen() {
       })
   }
   const messageThreadClicked = (noteData: any) => {
-    // console.log('messageThreadClicked', JSON.stringify(noteData))
+    console.log('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
       // console.log('noteData', noteData)
@@ -228,10 +231,10 @@ export function IncidentDetailsScreen() {
         })
       )
     } else {
-      getThreadParticipants()
+      getThreadParticipants(noteData)
     }
   }
-  async function getThreadParticipants() {
+  async function getThreadParticipants(noteData: any) {
     setLoading(true)
     let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
@@ -255,6 +258,7 @@ export function IncidentDetailsScreen() {
             return object
           })
           setParticipantsList(list)
+          setNoteData(noteData)
           setIsMessageThread(true)
         } else {
           Alert.alert('', data.message)
@@ -302,7 +306,7 @@ export function IncidentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getIncidentDetails(true)
+          getIncidentDetails(true, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -413,7 +417,7 @@ export function IncidentDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowNotes(!isShowNotes)
                 }}
@@ -433,7 +437,7 @@ export function IncidentDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""

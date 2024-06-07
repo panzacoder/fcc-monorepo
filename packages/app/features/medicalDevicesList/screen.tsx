@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -203,7 +203,7 @@ export function MedicalDevicesListScreen() {
               <View />
             )}
             <View className="mt-5 self-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsFilter(!isFilter)
                 }}
@@ -215,7 +215,7 @@ export function MedicalDevicesListScreen() {
                   size={25}
                   color={COLORS.primary}
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         ) : (

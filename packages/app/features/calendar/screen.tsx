@@ -1,12 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  Pressable
-} from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
@@ -89,14 +84,14 @@ export function CalendarScreen() {
         <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
           <Typography className=" w-[85%] self-center text-center font-bold text-white">{``}</Typography>
           <View className="mr-[30] flex-row justify-end self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
               onPress={() => {
                 setIsShowAddModal(false)
               }}
             >
               <Feather name={'x'} size={25} className="color-primary" />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
         <View className="my-5 self-center">

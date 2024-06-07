@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -238,7 +238,7 @@ export function EventsListScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="flex-row ">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
@@ -254,10 +254,10 @@ export function EventsListScreen() {
             size={25}
             color={'black'}
           />
-        </Pressable>
+        </TouchableOpacity>
         {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -269,13 +269,13 @@ export function EventsListScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
         )}
         <View className="mt-5 self-center">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsShowFilter(false)
               setIsFilter(!isFilter)
@@ -288,7 +288,7 @@ export function EventsListScreen() {
               size={25}
               color={COLORS.primary}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {isFilter ? (
@@ -346,7 +346,7 @@ export function EventsListScreen() {
       )}
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Upcoming' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Upcoming')
@@ -355,8 +355,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Upcoming'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Open Items' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Open Items')
@@ -365,8 +365,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Open Items'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Completed' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Completed')
@@ -375,8 +375,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Completed'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Cancelled' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Cancelled')
@@ -385,8 +385,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Cancelled'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -395,7 +395,7 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -404,7 +404,7 @@ export function EventsListScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {eventsList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.replace(
                     formatUrl('/circles/eventDetails', {
@@ -419,7 +419,7 @@ export function EventsListScreen() {
                 <View className="w-[90%] flex-row">
                   <View>
                     <View className="my-2 flex-row">
-                      <Typography className="font-400 ml-5 w-[70%] text-black">
+                      <Typography className="font-400 ml-5 w-[75%] text-black">
                         {data.date ? formatTimeToUserLocalTime(data.date) : ''}
                       </Typography>
                       <View className="">
@@ -520,7 +520,7 @@ export function EventsListScreen() {
                     <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

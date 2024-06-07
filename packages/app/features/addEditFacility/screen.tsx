@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Stack } from 'expo-router'
@@ -8,12 +8,16 @@ import { PtsComboBox } from 'app/ui/PtsComboBox'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
+import { LocationDetails } from 'app/ui/locationDetails'
 import { CallPostService } from 'app/utils/fetchServerData'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 import {
   BASE_URL,
   CREATE_FACILITY,
-  UPDATE_FACILITY,
-  GET_STATES_AND_TIMEZONES
+  UPDATE_FACILITY
 } from 'app/utils/urlConstants'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
@@ -24,31 +28,47 @@ import { useParams } from 'solito/navigation'
 import { useRouter } from 'solito/navigation'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
-import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 let selectedType = ''
+let selectedAddress: any = {
+  shortDescription: '',
+  nickName: '',
+  address: {
+    id: '',
+    line: '',
+    city: '',
+    zipCode: '',
+    state: {
+      name: '',
+      code: '',
+      namecode: '',
+      description: '',
+      snum: '',
+      id: '',
+      country: {
+        name: '',
+        code: '',
+        namecode: '',
+        isoCode: '',
+        description: '',
+        id: ''
+      }
+    }
+  }
+}
 const schema = z.object({
   website: z.string(),
   username: z.string(),
   description: z.string(),
   facilityName: z.string().min(1, { message: 'Facility name is required' }),
-  locationDesc: z
-    .string()
-    .min(1, { message: 'Location description is required' }),
-  locationShortName: z
-    .string()
-    .min(1, { message: 'Location short name is required' }),
-  address: z.string(),
-  city: z.string(),
-  postalCode: z.string(),
-  locationPhone: z.string(),
-  fax: z.string(),
-  state: z.number().min(0, { message: 'State is required' }),
-  country: z.number().min(0, { message: 'Country is required' })
+  fax: z.string()
+})
+const phoneSchema = z.object({
+  locationPhone: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let statesListFull = []
 let isThisPharmacy = false
 let isFacilityActive = true
+let locationPhone = ''
 export function AddEditFacilityScreen() {
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
@@ -74,7 +94,6 @@ export function AddEditFacilityScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(isFacilityActive ? true : false)
   const [isPharmacy, setIsPharmacy] = useState(false)
-  const [statesList, setStateslist] = useState([]) as any
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
     return {
       label: data.type
@@ -99,19 +118,16 @@ export function AddEditFacilityScreen() {
         facilityDetails && facilityDetails.websiteuser
           ? facilityDetails.websiteuser
           : '',
-      locationDesc: _.isEmpty(facilityDetails) ? '' : ' ',
-      locationShortName: _.isEmpty(facilityDetails) ? '' : ' ',
-      address: '',
-      city: '',
-      postalCode: '',
-      locationPhone: '',
-      fax: '',
-      country: _.isEmpty(facilityDetails) ? -1 : 0,
-      state: _.isEmpty(facilityDetails) ? -1 : 0
+      fax: ''
     },
     resolver: zodResolver(schema)
   })
-
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      locationPhone: ''
+    },
+    resolver: zodResolver(phoneSchema)
+  })
   async function updateFacility(formData: Schema) {
     if (selectedType === '') {
       Alert.alert('', 'Select Type')
@@ -163,23 +179,10 @@ export function AddEditFacilityScreen() {
     }
     setLoading(true)
     let locationList: object[] = []
-    let stateObject = statesListFull[formData.state - 1]
-    let countryObject: object = staticData.countryList[formData.country - 1]
-    let object: any = {
-      shortDescription: formData.locationDesc,
-      nickName: formData.locationShortName,
-      fax: formData.fax,
-      website: formData.website,
-      address: {
-        id: '',
-        line: formData.address,
-        city: formData.city,
-        zipCode: formData.postalCode,
-        state: stateObject
-      }
-    }
-    object.address.state.country = countryObject
-    locationList.push(object)
+    selectedAddress.fax = formData.fax
+    selectedAddress.website = formData.website
+    selectedAddress.phone = removeAllSpecialCharFromString(locationPhone)
+    locationList.push(selectedAddress)
     let url = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
@@ -210,61 +213,47 @@ export function AddEditFacilityScreen() {
         console.log(error)
       })
   }
-  type Response = {
-    id: number
-    name: string
-  }
-  const countryList: Array<{ id: number; title: string }> =
-    staticData.countryList.map(({ name, id }: Response, index: any) => {
-      return {
-        title: name,
-        id: index + 1
-      }
-    })
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId || 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        console.log('data', data)
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let statesList: Array<{ id: number; title: string }> =
-            data.data.stateList.map(({ name, id }: Response, index: any) => {
-              return {
-                title: name,
-                id: index + 1
-              }
-            })
-          setStateslist(statesList)
-          statesListFull = data.data.stateList ? data.data.stateList : []
-          // console.log('statesList', statesList)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }, [])
-  async function setSelectedCountryChange(value: any) {
-    console.log('value', JSON.stringify(value))
-    let countryId =
-      value && staticData.countryList[value.id - 1]?.id
-        ? staticData.countryList[value.id - 1].id
-        : 101
-    await getStates(countryId)
-  }
   const onSelectionType = (data: any) => {
     selectedType = data
     // console.log('purpose1', purpose)
+  }
+  async function setAddressObject(value: any, index: any) {
+    if (value) {
+      if (index === 0) {
+        selectedAddress.shortDescription = value
+        selectedAddress.nickName = value
+      }
+      if (index === 1) {
+        selectedAddress.address.line = value
+      }
+      if (index === 2) {
+        selectedAddress.address.city = value
+      }
+      if (index === 3) {
+        selectedAddress.address.zipCode = value
+      }
+      if (index === 4) {
+        selectedAddress.address.state.country.id = value.id
+        selectedAddress.address.state.country.name = value.name
+        selectedAddress.address.state.country.code = value.code
+        selectedAddress.address.state.country.namecode = value.namecode
+        selectedAddress.address.state.country.snum = value.snum
+        selectedAddress.address.state.country.description = value.description
+      }
+      if (index === 5) {
+        selectedAddress.address.state.id = value.id
+        selectedAddress.address.state.name = value.name
+        selectedAddress.address.state.code = value.code
+        selectedAddress.address.state.namecode = value.namecode
+        selectedAddress.address.state.snum = value.snum
+        selectedAddress.address.state.description = value.description
+      }
+      if (index === 6) {
+        selectedAddress = value
+      }
+    }
+
+    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   return (
     <View className="flex-1">
@@ -284,7 +273,7 @@ export function AddEditFacilityScreen() {
                 <ToggleSwitch
                   isOn={isActive}
                   onColor="#2884F9"
-                  offColor="#2884F9"
+                  offColor="#ffcccb"
                   size="medium"
                   onToggle={(isOn) => {
                     if (isOn) {
@@ -299,26 +288,6 @@ export function AddEditFacilityScreen() {
                 <Typography className="font-400 ml-2 self-center">
                   {isActive ? 'Active' : 'InActive'}
                 </Typography>
-              </View>
-              <View className=" flex-row">
-                <Button
-                  className=""
-                  title="Cancel"
-                  variant="link"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className=""
-                  title={_.isEmpty(facilityDetails) ? 'Save' : 'Update'}
-                  variant="default"
-                  onPress={
-                    _.isEmpty(facilityDetails)
-                      ? handleSubmit(createFacility)
-                      : handleSubmit(updateFacility)
-                  }
-                />
               </View>
             </View>
             <View className="w-full">
@@ -375,7 +344,7 @@ export function AddEditFacilityScreen() {
                 <ToggleSwitch
                   isOn={isPharmacy}
                   onColor="#2884F9"
-                  offColor="#2884F9"
+                  offColor="#ffcccb"
                   size="medium"
                   onToggle={(isOn) => {
                     isThisPharmacy = !isThisPharmacy
@@ -391,91 +360,73 @@ export function AddEditFacilityScreen() {
           {_.isEmpty(facilityDetails) ? (
             <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
               <View className="">
-                <View className="my-2 flex-row items-center">
+                <View className="flex-row items-center">
                   <Typography className="w-[20%]">{'Location'}</Typography>
-                  <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+                  <View className="bg-primary ml-2 h-[1px] w-[75%]" />
                 </View>
                 <View className=" w-full">
-                  <View className="flex w-full gap-2">
-                    <ControlledTextField
-                      control={control}
-                      name="locationDesc"
-                      placeholder={'Location Name*'}
-                      className="w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="locationShortName"
-                      placeholder="Short Name*"
-                      className="w-full"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="address"
-                      placeholder="Address"
-                      className="w-full"
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="country"
-                      label="Country*"
-                      maxHeight={300}
-                      list={countryList}
-                      onChangeValue={setSelectedCountryChange}
-                    />
-                    <ControlledDropdown
-                      control={control}
-                      name="state"
-                      label="State*"
-                      maxHeight={300}
-                      list={statesList}
-                    />
-                  </View>
-                  <View>
-                    <View className="mt-2 w-full flex-row gap-2">
-                      <ControlledTextField
-                        control={control}
-                        name="city"
-                        placeholder={'City'}
-                        className="w-[48%]"
-                        autoCapitalize="none"
-                      />
-                      <ControlledTextField
-                        control={control}
-                        name="postalCode"
-                        placeholder="Postal Code"
-                        className="w-[48%]"
-                      />
-                    </View>
-                    <ControlledTextField
-                      control={control}
-                      name="locationPhone"
-                      placeholder={'Phone'}
-                      className="mt-2 w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="fax"
-                      placeholder={'Fax'}
-                      className="mt-2 w-full"
-                      autoCapitalize="none"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="website"
-                      placeholder={'Website'}
-                      className="mt-2 w-full"
-                      autoCapitalize="none"
-                    />
-                  </View>
+                  <LocationDetails
+                    component={'AddEditFacility'}
+                    data={{}}
+                    setAddressObject={setAddressObject}
+                  />
+
+                  <ControlledTextField
+                    control={control1}
+                    name="locationPhone"
+                    placeholder={'Phone'}
+                    className="mt-[-5] w-full"
+                    keyboard="number-pad"
+                    onChangeText={(value) => {
+                      locationPhone =
+                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+                      reset1({
+                        locationPhone: locationPhone
+                      })
+                    }}
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="fax"
+                    placeholder={'Fax'}
+                    className="mt-2 w-full"
+                    autoCapitalize="none"
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="website"
+                    placeholder={'Website'}
+                    className="mt-2 w-full"
+                    autoCapitalize="none"
+                  />
                 </View>
               </View>
             </View>
           ) : (
             <View />
           )}
+          <View className="my-2 flex-row self-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-2"
+              leadingIcon="save"
+              title={_.isEmpty(facilityDetails) ? 'Create' : 'Save'}
+              variant="default"
+              onPress={
+                _.isEmpty(facilityDetails)
+                  ? handleSubmit(createFacility)
+                  : handleSubmit(updateFacility)
+              }
+            />
+          </View>
         </ScrollView>
       </View>
     </View>

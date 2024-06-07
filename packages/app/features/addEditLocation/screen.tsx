@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
-import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -31,9 +30,7 @@ import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
 import { consoleData } from 'app/ui/utils'
 const schema = z.object({
-  locationShortName: z
-    .string()
-    .min(1, { message: 'Location short name is required' }),
+  locationName: z.string().min(1, { message: 'Location name is required' }),
   address: z.string(),
   city: z.string(),
   postalCode: z.string(),
@@ -64,6 +61,7 @@ export function AddEditLocationScreen() {
   const [isLoading, setLoading] = useState(false)
   const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
+  const [isRender, setIsRender] = useState(false)
   type Response = {
     id: number
     name: string
@@ -104,6 +102,9 @@ export function AddEditLocationScreen() {
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
                 stateIndex = index + 1
+                reset({
+                  state: stateIndex
+                })
               }
             })
           }
@@ -134,7 +135,10 @@ export function AddEditLocationScreen() {
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
           countryIndex = index + 1
-          consoleData('countryName index', '' + index)
+          consoleData('countryName index', '' + countryIndex)
+          reset({
+            country: countryIndex
+          })
         }
       })
       let countryId = staticData.countryList[countryIndex - 1].id
@@ -144,11 +148,9 @@ export function AddEditLocationScreen() {
     }
     setCountryState()
   }, [])
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      locationShortName: !_.isEmpty(locationDetails)
-        ? locationDetails.nickName
-        : '',
+      locationName: !_.isEmpty(locationDetails) ? locationDetails.nickName : '',
       address: !_.isEmpty(locationDetails) ? locationDetails.address.line : '',
       city: !_.isEmpty(locationDetails) ? locationDetails.address.city : '',
       postalCode: !_.isEmpty(locationDetails)
@@ -166,17 +168,22 @@ export function AddEditLocationScreen() {
         !_.isEmpty(locationDetails) && locationDetails.website
           ? locationDetails.website
           : '',
-      country: !_.isEmpty(locationDetails) ? countryIndex : 96,
+      country: !_.isEmpty(locationDetails) ? countryIndex : 97,
       state: !_.isEmpty(locationDetails) ? stateIndex : -1
     },
     resolver: zodResolver(schema)
   })
   async function setSelectedCountryChange(value: any) {
-    let countryId =
-      value && staticData.countryList[value.id - 1].id
+    let countryId = ''
+    if (value) {
+      countryId = staticData.countryList[value.id - 1].id
         ? staticData.countryList[value.id - 1].id
         : 101
-    await getStates(countryId)
+      await getStates(countryId)
+    } else {
+      setStatesList([])
+      setStatesListFull([])
+    }
   }
   async function deleteLocation() {
     setLoading(true)
@@ -241,8 +248,8 @@ export function AddEditLocationScreen() {
     let dataObject = {} as any
     let addressObject = {
       operation: 'add',
-      shortDescription: formData.locationShortName,
-      nickName: formData.locationShortName,
+      shortDescription: formData.locationName,
+      nickName: formData.locationName,
       fax: formData.fax,
       website: formData.website,
       phone: formData.phone,
@@ -357,36 +364,13 @@ export function AddEditLocationScreen() {
 
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-            <View className="flex-row">
-              <View className="w-[45%] flex-row items-center">
-                <Typography className="font-400 text-[16px]">
-                  {'Add Location'}
-                </Typography>
-              </View>
-              <View className="flex-row">
-                <Button
-                  className=""
-                  title="Cancel"
-                  variant="link"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className=""
-                  title={_.isEmpty(locationDetails) ? 'Save' : 'Update'}
-                  variant="default"
-                  onPress={handleSubmit(addUpdateLocation)}
-                />
-              </View>
-            </View>
-            <View className="my-5 w-full">
+          <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+            <View className="my-2 w-full">
               <View className="flex w-full gap-2">
                 <ControlledTextField
                   control={control}
-                  name="locationShortName"
-                  placeholder="Short Name"
+                  name="locationName"
+                  placeholder="Location Name"
                   className="w-full"
                 />
                 <ControlledTextField
@@ -400,6 +384,11 @@ export function AddEditLocationScreen() {
                   name="country"
                   label="Country"
                   maxHeight={300}
+                  defaultValue={
+                    countryIndex !== -1 && countryList[countryIndex - 1]
+                      ? countryList[countryIndex - 1]?.title
+                      : ''
+                  }
                   list={countryList}
                   onChangeValue={setSelectedCountryChange}
                 />
@@ -407,6 +396,11 @@ export function AddEditLocationScreen() {
                   control={control}
                   name="state"
                   label="State*"
+                  defaultValue={
+                    stateIndex !== -1 && statesList[stateIndex - 1]
+                      ? statesList[stateIndex - 1].title
+                      : ''
+                  }
                   maxHeight={300}
                   list={statesList}
                 />
@@ -430,7 +424,7 @@ export function AddEditLocationScreen() {
                   name="phone"
                   placeholder={'Phone'}
                   className="w-full"
-                  autoCapitalize="none"
+                  keyboard="number-pad"
                 />
                 <ControlledTextField
                   control={control}
@@ -445,6 +439,24 @@ export function AddEditLocationScreen() {
                   placeholder={'Website'}
                   className="w-full"
                   autoCapitalize="none"
+                />
+              </View>
+              <View className="mt-5 flex-row justify-center">
+                <Button
+                  className="bg-[#86939e]"
+                  title="Cancel"
+                  variant="default"
+                  leadingIcon="x"
+                  onPress={() => {
+                    router.back()
+                  }}
+                />
+                <Button
+                  className="ml-5"
+                  title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
+                  variant="default"
+                  leadingIcon="save"
+                  onPress={handleSubmit(addUpdateLocation)}
                 />
               </View>
             </View>

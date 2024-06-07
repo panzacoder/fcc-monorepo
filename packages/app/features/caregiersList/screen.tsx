@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -192,7 +192,7 @@ export function CaregiversListScreen() {
 
         {isShowFilter ? (
           <View className="ml-5 w-[40%]">
-            <Pressable
+            <TouchableOpacity
               className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('All')
@@ -201,8 +201,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
                 {'All'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Accepted' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Accepted')
@@ -211,8 +211,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Accepted'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Requested' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Requested')
@@ -221,8 +221,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Requested'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Rejected' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Rejected')
@@ -231,8 +231,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Rejected'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Not Yet Registered' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Not Yet Registered')
@@ -241,7 +241,7 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Not Yet Registered'}
               </Typography>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />

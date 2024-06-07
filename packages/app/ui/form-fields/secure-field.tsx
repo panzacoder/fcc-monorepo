@@ -1,7 +1,7 @@
 import PtsTextInput, { PtsTextInputProps } from 'app/ui/PtsTextInput'
 import { Feather } from 'app/ui/icons'
 import React, { useState } from 'react'
-import { Pressable, TextInput } from 'react-native'
+import { TouchableOpacity, TextInput } from 'react-native'
 
 export type SecureFieldProps = PtsTextInputProps
 
@@ -16,7 +16,7 @@ export const SecureField = React.forwardRef(function SecureField(
       secureTextEntry={!showText}
       ref={ref}
       trailingSlot={
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setShowText((val) => !val)
           }}
@@ -26,7 +26,7 @@ export const SecureField = React.forwardRef(function SecureField(
             size={20}
             color={'black'}
           />
-        </Pressable>
+        </TouchableOpacity>
       }
       {...props}
     />

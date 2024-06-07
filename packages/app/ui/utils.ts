@@ -35,6 +35,14 @@ export function googleMapOpenUrl(address: string) {
     })
     .catch((err) => console.error('An error occurred', err))
 }
+export const removeAllSpecialCharFromString = (phoneNumber: any) => {
+  let newNumber = String(phoneNumber).replace(
+    /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,
+    ''
+  )
+  newNumber = newNumber.replace(' ', '')
+  return newNumber
+}
 export const convertPhoneNumberToUsaPhoneNumberFormat = (value: any) => {
   if (!value) return value
   const currentValue = value.replace(/[^\d]/g, '')

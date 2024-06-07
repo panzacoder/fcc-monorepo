@@ -159,6 +159,7 @@ export function AddEditIncidentScreen() {
     }
     if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_INCIDENT}`
+      dataObject.incident.location.address.id = ''
     } else {
       url = `${BASE_URL}${UPDATE_INCIDENT}`
       dataObject.incident.id = incidentDetails.id

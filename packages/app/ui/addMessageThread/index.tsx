@@ -20,6 +20,7 @@ export const AddMessageThread = ({
   createMessageThread,
   isUpdateParticipants
 }) => {
+  console.log('noteData', JSON.stringify(noteData))
   const { control, handleSubmit } = useForm({
     defaultValues: {
       subject:
@@ -33,7 +34,7 @@ export const AddMessageThread = ({
     createMessageThread(formData.subject, noteData)
   }
   return (
-    <View className="h-[80%] w-[90%] self-center rounded-[15px] bg-[#dfedcc]">
+    <View className="h-[90%] w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#dfedcc]">
       <Typography className="py-2 text-center font-bold">
         {'New Communication Thread'}
       </Typography>
@@ -79,7 +80,7 @@ export const AddMessageThread = ({
             )
           })}
         </ScrollView>
-        <View className="mb-4 mt-1 flex-row justify-center">
+        <View className="mt-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
             title="Cancel"

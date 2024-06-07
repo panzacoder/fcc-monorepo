@@ -4,7 +4,7 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
@@ -34,7 +34,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <Pressable
+        <TouchableOpacity
           className=""
           onPress={() => {
             router.push(
@@ -46,9 +46,9 @@ export function CircleSummaryCard({ memberData, userDetails }) {
           }}
         >
           <Feather name={'settings'} size={20} color={'white'} />
-        </Pressable>
+        </TouchableOpacity>
       </View>
-      <Pressable
+      <TouchableOpacity
         onPress={() => {
           router.push(
             formatUrl('/circles/calendar', {
@@ -58,11 +58,11 @@ export function CircleSummaryCard({ memberData, userDetails }) {
         }}
       >
         <TodayCard memberData={memberData} userDetails={userDetails} />
-      </Pressable>
+      </TouchableOpacity>
 
       <View className="mx-2 items-center gap-2">
         <View className="flex-row items-center gap-2">
-          <Pressable
+          <TouchableOpacity
             className="flex-row gap-2"
             onPress={() => {
               setSeeMore(!isSeeMore)
@@ -76,7 +76,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             <Typography className="text-white">
               {isSeeMore ? 'See less' : 'See more'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
           <View className="bg-accent-foreground h-[1] flex-1" />
         </View>
         {isSeeMore ? (
