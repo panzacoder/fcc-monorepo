@@ -1,4 +1,4 @@
-import { View, Pressable } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -34,7 +34,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <Pressable
+      <TouchableOpacity
         className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
           router.push(
@@ -141,7 +141,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             )}
           </View>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }

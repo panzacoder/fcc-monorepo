@@ -1,5 +1,5 @@
 import { MotiView } from 'moti'
-import { Pressable, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { Typography } from '../typography'
 import { cn } from '../utils'
 
@@ -37,7 +37,7 @@ export function ManagedSwitch({
           duration: 200
         }}
       />
-      <Pressable
+      <TouchableOpacity
         onPress={() => {
           onValueChange(true)
         }}
@@ -51,8 +51,8 @@ export function ManagedSwitch({
         >
           {onText}
         </Typography>
-      </Pressable>
-      <Pressable
+      </TouchableOpacity>
+      <TouchableOpacity
         onPress={() => {
           onValueChange(false)
         }}
@@ -66,7 +66,7 @@ export function ManagedSwitch({
         >
           {offText}
         </Typography>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }

@@ -1,4 +1,4 @@
-import { View, ScrollView, Pressable, Linking } from 'react-native'
+import { View, ScrollView, TouchableOpacity, Linking } from 'react-native'
 import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
@@ -23,14 +23,14 @@ export const PrivacyPolicy = ({ cancelClicked, acceptClicked, data }) => {
       <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
         <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Privacy Policy`}</Typography>
         <View className="mr-[30] flex-row justify-end self-center">
-          <Pressable
+          <TouchableOpacity
             className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
             onPress={() => {
               cancelClicked()
             }}
           >
             <Feather name={'x'} size={25} className="color-primary" />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       <View className="h-[85%]">

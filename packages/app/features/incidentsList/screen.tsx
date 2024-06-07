@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -140,7 +140,7 @@ export function IncidentsListScreen() {
 
         {getUserPermission(incidentsPrivileges).createPermission ? (
           <View className="mt-5 self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -151,13 +151,13 @@ export function IncidentsListScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
         )}
         <View className="mt-5 self-center">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsFilter(!isFilter)
             }}
@@ -169,7 +169,7 @@ export function IncidentsListScreen() {
               size={25}
               color={COLORS.primary}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {isFilter ? (
@@ -230,7 +230,7 @@ export function IncidentsListScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {incidentsList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.replace(
                     formatUrl('/circles/incidentDetails', {
@@ -298,7 +298,7 @@ export function IncidentsListScreen() {
                     <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

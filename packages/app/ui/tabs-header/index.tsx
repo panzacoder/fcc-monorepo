@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pressable, View, Alert } from 'react-native'
+import { TouchableOpacity, View, Alert } from 'react-native'
 import store from 'app/redux/store'
 import PtsNameInitials from '../PtsNameInitials'
 import { Feather } from '../icons'
@@ -51,7 +51,7 @@ export const TabsHeader = ({}) => {
   function getMenuView(value: string, icon: any) {
     return (
       <View>
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             if (value === 'Profile') {
               router.push(formatUrl('/profile', {}))
@@ -76,7 +76,7 @@ export const TabsHeader = ({}) => {
         >
           <Feather name={icon} size={20} className="mr-2" color={'gray'} />
           <Typography className="font-400">{value}</Typography>
-        </Pressable>
+        </TouchableOpacity>
         <View className="h-[0.5px] w-full bg-gray-400" />
       </View>
     )
@@ -86,7 +86,7 @@ export const TabsHeader = ({}) => {
       <PtsLoader loading={isLoading} />
       <View className="absolute right-0 top-0 w-1/4 flex-row justify-end gap-2">
         <PtsNameInitials className="" fullName={user.memberName} />
-        <Pressable
+        <TouchableOpacity
           className="bg-accent rounded-full p-2"
           onPress={() => {
             setIsShowMenu(!isShowMenu)
@@ -97,7 +97,7 @@ export const TabsHeader = ({}) => {
             size={25}
             className="color-accent-foreground"
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {isShowMenu ? (
         <View className="absolute right-5 top-10 w-[40%] border-[1px] border-gray-400 bg-white">

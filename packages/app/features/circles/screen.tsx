@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { CircleCard } from 'app/ui/circleCard'
@@ -159,14 +159,14 @@ export function CirclesListScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="z-50 mr-[30] mt-[30] flex-row justify-end">
-        <Pressable
+        <TouchableOpacity
           className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
           onPress={() => {
             router.push('/circles/create')
           }}
         >
           <Feather name={'plus'} size={25} className="color-primary" />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {!isHideCirclesView ? (
         <ScrollView className="z-10">

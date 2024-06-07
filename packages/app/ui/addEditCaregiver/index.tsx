@@ -261,7 +261,7 @@ export const AddEditCaregiver = ({
                   name="phone"
                   placeholder={'Phone'}
                   className="mt-2 w-[95%] self-center bg-white"
-                  autoCapitalize="none"
+                  keyboard="number-pad"
                 />
                 <ControlledTextField
                   control={control}

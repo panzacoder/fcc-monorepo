@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -85,7 +85,7 @@ export function DoctorsListScreen() {
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsShowFilter(!isShowFilter)
             }}
@@ -100,7 +100,7 @@ export function DoctorsListScreen() {
               size={25}
               color={'black'}
             />
-          </Pressable>
+          </TouchableOpacity>
           {getUserPermission(doctorPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
@@ -123,7 +123,7 @@ export function DoctorsListScreen() {
       </View>
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Active')
@@ -132,8 +132,8 @@ export function DoctorsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Active'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'InActive' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('InActive')
@@ -142,8 +142,8 @@ export function DoctorsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'InActive'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -152,7 +152,7 @@ export function DoctorsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -164,55 +164,59 @@ export function DoctorsListScreen() {
       ) : (
         <View />
       )}
-      <ScrollView className="m-2 mx-5 w-full self-center">
-        {doctorList.map((data: any, index: number) => {
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                router.replace(
-                  formatUrl('/circles/doctorDetails', {
-                    doctorDetails: JSON.stringify(data),
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
-              }}
-              key={index}
-              className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
-            >
-              <View className="w-[95%] flex-row">
-                <View>
-                  <View className="my-2 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[45%]">
-                      {data.doctorName ? data.doctorName : ''}
-                    </Typography>
+      {isDataReceived ? (
+        <ScrollView className="m-2 mx-5 w-full self-center">
+          {doctorList.map((data: any, index: number) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  router.replace(
+                    formatUrl('/circles/doctorDetails', {
+                      doctorDetails: JSON.stringify(data),
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
+                key={index}
+                className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+              >
+                <View className="w-[95%] flex-row">
+                  <View>
+                    <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 w-[45%]">
+                        {data.doctorName ? data.doctorName : ''}
+                      </Typography>
 
-                    <Typography className="ml-5 mr-5 w-[40%] text-right">
-                      {data.specialist ? data.specialist : ''}
-                    </Typography>
-                  </View>
-                  <View className="flex-row">
-                    <View className="w-[70%]">
-                      <Typography className="ml-5 ">
-                        {data.locations ? data.locations : ''}
+                      <Typography className="ml-5 mr-5 w-[40%] text-right">
+                        {data.specialist ? data.specialist : ''}
                       </Typography>
                     </View>
-                    <View className="self-center text-center">
-                      <Typography
-                        className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
-                      >
-                        {data.status ? data.status : ''}
-                      </Typography>
+                    <View className="flex-row">
+                      <View className="w-[70%]">
+                        <Typography className="ml-5 ">
+                          {data.locations ? data.locations : ''}
+                        </Typography>
+                      </View>
+                      <View className="self-center text-center">
+                        <Typography
+                          className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
+                        >
+                          {data.status ? data.status : ''}
+                        </Typography>
+                      </View>
                     </View>
                   </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
                 </View>
-                <View className=" ml-[-10] self-center">
-                  <Feather name={'chevron-right'} size={20} color={'black'} />
-                </View>
-              </View>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

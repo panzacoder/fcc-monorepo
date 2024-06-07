@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -76,72 +76,75 @@ export function EventDetailsScreen() {
       ? JSON.parse(item.eventDetails)
       : {}
   // console.log('eventDetails', JSON.stringify(eventDetails))
-  const getEventDetails = useCallback(async (isFromCreateThread: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_EVENT_DETAILS}`
-    let dataObject = {
-      header: header,
-      event: {
-        id: eventData.id ? eventData.id : '',
-        member: {
-          id: memberData.member ? memberData.member : ''
+  const getEventDetails = useCallback(
+    async (isFromCreateThread: any, noteData: any) => {
+      setLoading(true)
+      let url = `${BASE_URL}${GET_EVENT_DETAILS}`
+      let dataObject = {
+        header: header,
+        event: {
+          id: eventData.id ? eventData.id : '',
+          member: {
+            id: memberData.member ? memberData.member : ''
+          }
         }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('data', JSON.stringify(data.data))
-          if (data.data.domainObjectPrivileges) {
-            eventPrivileges = data.data.domainObjectPrivileges.Event
-              ? data.data.domainObjectPrivileges.Event
-              : {}
-            notePrivileges = data.data.domainObjectPrivileges.EVENTNOTE
-              ? data.data.domainObjectPrivileges.EVENTNOTE
-              : {}
-            transportationPrivileges = data.data.domainObjectPrivileges
-              .EVENTTRANSPORTATION
-              ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
-              : {}
-          }
+      CallPostService(url, dataObject)
+        .then(async (data: any) => {
+          if (data.status === 'SUCCESS') {
+            // console.log('data', JSON.stringify(data.data))
+            if (data.data.domainObjectPrivileges) {
+              eventPrivileges = data.data.domainObjectPrivileges.Event
+                ? data.data.domainObjectPrivileges.Event
+                : {}
+              notePrivileges = data.data.domainObjectPrivileges.EVENTNOTE
+                ? data.data.domainObjectPrivileges.EVENTNOTE
+                : {}
+              transportationPrivileges = data.data.domainObjectPrivileges
+                .EVENTTRANSPORTATION
+                ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
+                : {}
+            }
 
-          setEventDetails(data.data.event ? data.data.event : {})
-          if (data.data.event.status) {
-            setEventStatus(data.data.event.status.status)
+            setEventDetails(data.data.event ? data.data.event : {})
+            if (data.data.event.status) {
+              setEventStatus(data.data.event.status.status)
+            }
+            if (data.data.event.noteList) {
+              setNotesList(data.data.event.noteList)
+            }
+            if (data.data.event.reminderList) {
+              setRemindersList(data.data.event.reminderList)
+            }
+            if (data.data.event.transportationList) {
+              setTransportationList(data.data.event.transportationList)
+            }
+            setIsRender(!isRender)
+            if (isFromCreateThread) {
+              router.push(
+                formatUrl('/circles/noteMessage', {
+                  component: 'Event',
+                  memberData: JSON.stringify(memberData),
+                  noteData: JSON.stringify(noteData)
+                })
+              )
+            }
+          } else {
+            Alert.alert('', data.message)
           }
-          if (data.data.event.noteList) {
-            setNotesList(data.data.event.noteList)
-          }
-          if (data.data.event.reminderList) {
-            setRemindersList(data.data.event.reminderList)
-          }
-          if (data.data.event.transportationList) {
-            setTransportationList(data.data.event.transportationList)
-          }
-          setIsRender(!isRender)
-          if (isFromCreateThread) {
-            router.push(
-              formatUrl('/circles/noteMessage', {
-                component: 'Event',
-                memberData: JSON.stringify(memberData),
-                noteData: JSON.stringify(noteData)
-              })
-            )
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log('error', error)
+        })
+    },
+    []
+  )
 
   useEffect(() => {
     if (!isAddNote) {
-      getEventDetails(false)
+      getEventDetails(false, noteData)
     }
   }, [])
   let eventDate = '',
@@ -207,7 +210,7 @@ export function EventDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsAddNote(false)
-          getEventDetails(false)
+          getEventDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -241,7 +244,7 @@ export function EventDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getEventDetails(false)
+          getEventDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -262,10 +265,10 @@ export function EventDetailsScreen() {
         })
       )
     } else {
-      getThreadParticipants()
+      getThreadParticipants(noteData)
     }
   }
-  async function getThreadParticipants() {
+  async function getThreadParticipants(noteData: any) {
     setLoading(true)
     let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
     let dataObject = {
@@ -289,6 +292,7 @@ export function EventDetailsScreen() {
             return object
           })
           setParticipantsList(list)
+          setNoteData(noteData)
           setIsMessageThread(true)
         } else {
           Alert.alert('', data.message)
@@ -336,7 +340,7 @@ export function EventDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getEventDetails(true)
+          getEventDetails(true, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -433,7 +437,7 @@ export function EventDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           cancelClicked()
-          getEventDetails(false)
+          getEventDetails(false, noteData)
           setIsRender(!isRender)
           setIsShowTransportation(true)
         } else {
@@ -512,7 +516,7 @@ export function EventDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getEventDetails(false)
+          getEventDetails(false, noteData)
           setIsShowTransportation(true)
           if (count !== 0) {
             Alert.alert('', data.message)
@@ -546,7 +550,7 @@ export function EventDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getEventDetails(false)
+          getEventDetails(false, noteData)
         } else {
           Alert.alert('', data.message)
         }
@@ -665,7 +669,7 @@ export function EventDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowNotes(!isShowNotes)
                 }}
@@ -685,7 +689,7 @@ export function EventDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
@@ -726,7 +730,7 @@ export function EventDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowReminder(!isShowReminder)
                 }}
@@ -748,7 +752,7 @@ export function EventDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {moment(eventDetails.date ? eventDetails.date : '')
                 .utc()
                 .isAfter(moment().utc()) ? (
@@ -788,7 +792,7 @@ export function EventDetailsScreen() {
 
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowTransportation(!isShowTransportation)
                 }}
@@ -810,7 +814,7 @@ export function EventDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               {moment(eventDetails.date ? eventDetails.date : '')
                 .utc()
                 .isAfter(moment().utc()) &&

@@ -1,4 +1,4 @@
-import { View, ScrollView, Pressable } from 'react-native'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import { useState, useEffect } from 'react'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -156,7 +156,7 @@ export const ExpandableCalendarView = ({
         <Typography className="ml-1 w-[95%] p-2 font-bold text-gray-400">
           {`${days[moment(data.date).day()]}, ${getFullDateForCalendar(data.date, 'MMM DD')}`}
         </Typography>
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             itemPressed(data)
           }}
@@ -182,7 +182,7 @@ export const ExpandableCalendarView = ({
               {data.status ? data.status : ''}
             </Typography>
           </View>
-        </Pressable>
+        </TouchableOpacity>
         <View className="mt-2 h-[0.5px] w-full self-center bg-gray-400" />
       </View>
     )

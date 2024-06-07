@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Linking, Pressable } from 'react-native'
+import { View, Alert, ScrollView, Linking, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
@@ -408,7 +408,7 @@ export function MemberProfileScreen() {
           name="phone"
           placeholder={'Phone'}
           className="w-[95%] self-center"
-          autoCapitalize="none"
+          keyboard='number-pad'
         />
         <ControlledTextField
           name="email"
@@ -503,7 +503,7 @@ export function MemberProfileScreen() {
                 {'Member Profile Details'}
               </Typography>
               {memberData.role === 'AuthorizedCaregiver' ? (
-                <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+                <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
                   <Feather
                     className=""
                     onPress={() => {
@@ -513,7 +513,7 @@ export function MemberProfileScreen() {
                     size={15}
                     color={'white'}
                   />
-                </Pressable>
+                </TouchableOpacity>
               ) : (
                 <View />
               )}
@@ -601,7 +601,7 @@ export function MemberProfileScreen() {
                 {'Address'}
               </Typography>
               {memberData.role === 'AuthorizedCaregiver' ? (
-                <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+                <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
                   <Feather
                     className=""
                     onPress={() => {
@@ -611,7 +611,7 @@ export function MemberProfileScreen() {
                     size={15}
                     color={'white'}
                   />
-                </Pressable>
+                </TouchableOpacity>
               ) : (
                 <View />
               )}

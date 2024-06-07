@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Alert, View, Pressable } from 'react-native'
+import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -64,7 +64,7 @@ export function CircleDetailsScreen() {
       <PtsLoader loading={isLoading} />
       <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
       <ScrollView className=" flex-1">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             router.push(
               formatUrl('/circles/messages', {
@@ -76,25 +76,22 @@ export function CircleDetailsScreen() {
         >
           <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
           <View className="py-5">
-            <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
-              {'Messages'}
-            </Typography>
-            {memberData.unreadMessages &&
-            memberData.unreadMessages.length > 0 ? (
-              <View className="flex-row">
+            <View className="w-full flex-row">
+              <Typography className=" ml-2 flex w-[75%] rounded text-[18px] font-bold text-black">
+                {'Messages'}
+              </Typography>
+              <View className="w-[35%] self-center" />
+              {memberData.unreadMessages &&
+              memberData.unreadMessages.length > 0 ? (
                 <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
                   <Typography className="self-center text-center font-bold text-white">
                     {memberData.unreadMessages.length}
                   </Typography>
                 </View>
-              </View>
-            ) : (
-              <View className="flex-row">
-                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
-                  {'No new messages'}
-                </Typography>
-              </View>
-            )}
+              ) : (
+                <View />
+              )}
+            </View>
           </View>
           <View
             style={{ position: 'absolute', right: 5 }}
@@ -102,8 +99,8 @@ export function CircleDetailsScreen() {
           >
             <Feather name={'chevron-right'} size={20} color={'black'} />
           </View>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             router.push(
               formatUrl('/circles/appointmentsList', {
@@ -142,9 +139,9 @@ export function CircleDetailsScreen() {
           >
             <Feather name={'chevron-right'} size={20} color={'black'} />
           </View>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             router.push(
               formatUrl('/circles/incidentsList', {
@@ -192,8 +189,8 @@ export function CircleDetailsScreen() {
           >
             <Feather name={'chevron-right'} size={20} color={'black'} />
           </View>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             router.push(
               formatUrl('/circles/eventsList', {
@@ -241,7 +238,7 @@ export function CircleDetailsScreen() {
           >
             <Feather name={'chevron-right'} size={20} color={'black'} />
           </View>
-        </Pressable>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   )

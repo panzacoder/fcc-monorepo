@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   View,
   Alert,
-  Pressable,
+  TouchableOpacity,
   SafeAreaView,
   TextInput,
   ScrollView
@@ -290,7 +290,7 @@ export function NoteMessageScreen() {
           {participantsList.map((data: any, index: number) => {
             return (
               <View key={index} className="ml-2">
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
                     // console.log('fullName', data.participantName)
                     if (data.participantName) {
@@ -301,7 +301,7 @@ export function NoteMessageScreen() {
                   <PtsNameInitials
                     fullName={data.participantName ? data.participantName : ''}
                   />
-                </Pressable>
+                </TouchableOpacity>
               </View>
             )
           })}
@@ -384,7 +384,7 @@ export function NoteMessageScreen() {
           />
         </View>
         <View className="ml-2 self-center">
-          <Pressable
+          <TouchableOpacity
             className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
             onPress={() => {}}
           >
@@ -397,7 +397,7 @@ export function NoteMessageScreen() {
                 updateMessageThread()
               }}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {/* </View> */}

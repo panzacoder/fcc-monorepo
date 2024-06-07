@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Pressable, Alert } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -85,7 +85,7 @@ export function FacilitiesListScreen() {
       <View className="">
         <PtsLoader loading={isLoading} />
         <View className="flex-row ">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsShowFilter(!isShowFilter)
             }}
@@ -100,10 +100,10 @@ export function FacilitiesListScreen() {
               size={25}
               color={'black'}
             />
-          </Pressable>
+          </TouchableOpacity>
           {getUserPermission(facilityPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
-              <Pressable
+              <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                 onPress={() => {
                   router.push(
@@ -114,7 +114,7 @@ export function FacilitiesListScreen() {
                 }}
               >
                 <Feather name={'plus'} size={25} color={COLORS.primary} />
-              </Pressable>
+              </TouchableOpacity>
             </View>
           ) : (
             <View />
@@ -123,7 +123,7 @@ export function FacilitiesListScreen() {
       </View>
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Active')
@@ -132,8 +132,8 @@ export function FacilitiesListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Active'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'InActive' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('InActive')
@@ -142,8 +142,8 @@ export function FacilitiesListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'InActive'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -152,7 +152,7 @@ export function FacilitiesListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -167,7 +167,7 @@ export function FacilitiesListScreen() {
       <ScrollView className="m-2 w-full self-center">
         {facilityList.map((data: any, index: number) => {
           return (
-            <Pressable
+            <TouchableOpacity
               onPress={() => {
                 router.push(
                   formatUrl('/circles/facilityDetails', {
@@ -209,7 +209,7 @@ export function FacilitiesListScreen() {
                   <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
               </View>
-            </Pressable>
+            </TouchableOpacity>
           )
         })}
       </ScrollView>

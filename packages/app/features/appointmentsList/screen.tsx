@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -164,6 +164,7 @@ export function AppointmentsListScreen() {
         console.log('error', error)
       })
   }, [])
+
   useEffect(() => {
     getDoctorFacilities()
     getAppointmentDetails()
@@ -297,7 +298,7 @@ export function AppointmentsListScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="flex-row ">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
@@ -313,10 +314,10 @@ export function AppointmentsListScreen() {
             size={25}
             color={'black'}
           />
-        </Pressable>
+        </TouchableOpacity>
         {getUserPermission(appointmentPrivileges).createPermission ? (
           <View className=" mt-[20] self-center">
-            <Pressable
+            <TouchableOpacity
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -329,12 +330,12 @@ export function AppointmentsListScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
         )}
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsShowFilter(false)
             setIsFilter(!isFilter)
@@ -347,7 +348,7 @@ export function AppointmentsListScreen() {
             size={25}
             color={COLORS.primary}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {isFilter ? (
         <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -507,7 +508,7 @@ export function AppointmentsListScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {appointmentsList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.replace(
                     formatUrl('/circles/appointmentDetails', {
@@ -628,7 +629,7 @@ export function AppointmentsListScreen() {
                     <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

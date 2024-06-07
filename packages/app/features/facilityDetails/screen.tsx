@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -84,6 +84,9 @@ export function FacilityDetailsScreen() {
     }
     getfacilityDetails()
   }, [])
+  async function deleteFacilityLocation(locationData: any) {
+    console.log('deleteFacilityLocation', JSON.stringify(locationData))
+  }
   async function deleteFacility() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_FACILITY}`
@@ -211,7 +214,7 @@ export function FacilityDetailsScreen() {
 
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowLocations(!isShowLocations)
                 }}
@@ -233,7 +236,7 @@ export function FacilityDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               <Button
                 className=""
                 title="Add Location"
@@ -256,7 +259,7 @@ export function FacilityDetailsScreen() {
                   data.doctorFacilityId = facilityInfo.id
                   return (
                     <View key={index}>
-                      <Location data={data}></Location>
+                      <Location data={data} />
                     </View>
                   )
                 })}
@@ -268,7 +271,7 @@ export function FacilityDetailsScreen() {
 
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowAppointments(!isShowAppointments)
                 }}
@@ -290,7 +293,7 @@ export function FacilityDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               <Button
                 className=""
                 title="Add Appointment"
@@ -309,7 +312,7 @@ export function FacilityDetailsScreen() {
               <ScrollView className="h-[60%] flex-1">
                 {appointmentList.map((data: any, index: number) => {
                   return (
-                    <Pressable
+                    <TouchableOpacity
                       onPress={() => {
                         router.replace(
                           formatUrl('/circles/appointmentDetails', {
@@ -425,7 +428,7 @@ export function FacilityDetailsScreen() {
                           <View />
                         )}
                       </View>
-                    </Pressable>
+                    </TouchableOpacity>
                   )
                 })}
               </ScrollView>
