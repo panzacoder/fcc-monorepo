@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
+import type { Metadata, Viewport } from 'next'
+
 import 'raf/polyfill'
 import 'setimmediate'
 import 'app/config/tailwind/global.css'
