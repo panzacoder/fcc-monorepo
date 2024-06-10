@@ -20,7 +20,8 @@ export type TabsHeaderProps = {
   }
 }
 
-export function TabsHeader() {
+// export function TabsHeader()
+export const TabsHeader = ({ helpClicked }) => {
   const router = useRouter()
   const [isShowMenu, setIsShowMenu] = useState(false)
   const [isLoading, setLoading] = useState(false)
@@ -61,6 +62,15 @@ export function TabsHeader() {
             } else if (value === 'Logout') {
               setIsShowMenu(false)
               logout()
+            } else if (value === 'FAQ') {
+              router.push('/faq')
+            } else if (value === 'About Us') {
+              router.push('/aboutUs')
+            } else if (value === 'Refer A Friend') {
+              router.push('/referFriend')
+            } else if (value === 'Help') {
+              setIsShowMenu(false)
+              helpClicked()
             }
           }}
           className={itemStyle}

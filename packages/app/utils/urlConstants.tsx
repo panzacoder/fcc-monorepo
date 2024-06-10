@@ -170,3 +170,8 @@ export const UPDATE_SPONSOR_CODE = 'memberms/updateSponsorCode'
 export const GET_CARD_LIST = 'cardms/getlist'
 export const ADD_CARD = 'cardms/createCard'
 export const DELETE_CARD = 'cardms/detachCard'
+export const REFER_FRIEND = 'referralms/referFriend'
+export const GET_MEMBER_PROFILE = 'memberms/getMemberDetails'
+export const DELETE_AUTHORIZED_CAREGIVER =
+  'memberms/deleteMemberForAuthorisedCaregiver'
+export const DELETE_CAREGIVER_CIRCLE = 'memberms/deleteCaregiver'
