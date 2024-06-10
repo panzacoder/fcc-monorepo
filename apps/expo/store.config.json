@@ -1,0 +1,57 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Family Care Circle",
+        "subtitle": "Tackle the chaos of caregiving.",
+        "description": "",
+        "keywords": [
+          "Family Care",
+          "Home Care", 
+          "Caregiving", 
+          "Family", 
+          "Home", 
+          "Care",
+          "Health",
+          "Wellness",
+          "Senior Care",
+          "Elder Care",
+          "Senior Living",
+          "Elderly",
+          "Aging",
+          "Aging in Place",
+          "Aging Parents",
+          "Caregiver",
+          "Caregiver Support",
+          "Caregiver Resources",
+          "Caregiver Tools",
+          "Caregiver App",
+          "Caregiver Technology",
+          "Caregiver Solutions",
+          "Caregiver Services",
+          "Caregiver Help",
+          "Caregiver Assistance",
+          "Caregiver Advice",
+          "Caregiver Tips",
+          "Caregiver Training",
+          "Caregiver Education",
+          "Caregiver Community",
+          "Caregiver Network",
+          "Caregiver Forum",
+          "Caregiver Stories",
+          "Caregiver Recommendations",
+          "Caregiver Suggestions",
+          "Caregiver Ideas",
+          "Caregiver Inspiration",
+          "Caregiver Motivation",
+          "Caregiver Encouragement",
+          "Caregiver Empowerment"
+        ],
+        "marketingUrl": "https://familycarecircle.app",
+        "supportUrl": "https://familycarecircle.app/support",
+        "privacyPolicyUrl": "https://familycarecircle.app/privacy"
+      }
+    }
+  }
+}
