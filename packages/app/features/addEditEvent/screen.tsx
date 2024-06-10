@@ -189,6 +189,7 @@ export function AddEditEventScreen() {
           />
         </View>
         <LocationDetails
+          component={'AddEditEvent'}
           data={
             !_.isEmpty(eventDetails) && eventDetails.location
               ? eventDetails.location

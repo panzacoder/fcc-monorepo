@@ -18,14 +18,18 @@ const schema = z.object({
   city: z.string(),
   postalCode: z.string(),
   state: z.number().min(0, { message: 'State is required' }),
-  country: z.number().min(0, { message: 'Country is required' })
+  country: z.number().min(0, { message: 'Country is required' }),
+  timeZone: z.number().min(0, { message: 'Timezone is required' })
 })
 export type Schema = z.infer<typeof schema>
 let statesListFull = []
+let timeZoneListFull = []
 let countryIndex = -1
 let stateIndex = -1
-export const LocationDetails = ({ data, setAddressObject }) => {
+let timeZoneIndex = -1
+export const LocationDetails = ({ component, data, setAddressObject }) => {
   const [statesList, setStateslist] = useState([]) as any
+  const [timezonesList, setTimezonesList] = useState([]) as any
   const [isRender, setIsRender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
 
@@ -46,8 +50,19 @@ export const LocationDetails = ({ data, setAddressObject }) => {
                 id: index + 1
               }
             })
+          let timeZoneList: Array<{ id: number; title: string }> =
+            data.data.timeZoneList.map(({ name, id }: Response, index: any) => {
+              return {
+                title: name,
+                id: index + 1
+              }
+            })
           setStateslist(statesList)
+          setTimezonesList(timeZoneList)
           statesListFull = data.data.stateList ? data.data.stateList : []
+          timeZoneListFull = data.data.timeZoneList
+            ? data.data.timeZoneList
+            : []
           if (!_.isEmpty(locationData)) {
             let stateName = locationData.address.state.name
               ? locationData.address.state.name
@@ -55,6 +70,14 @@ export const LocationDetails = ({ data, setAddressObject }) => {
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
                 stateIndex = index + 1
+              }
+            })
+            let timeZoneName = locationData.address.timezone.name
+              ? locationData.address.timezone.name
+              : ''
+            data.data.timeZoneList.map((data: any, index: any) => {
+              if (data.name === timeZoneName) {
+                timeZoneIndex = index + 1
               }
             })
           }
@@ -96,8 +119,8 @@ export const LocationDetails = ({ data, setAddressObject }) => {
   }, [])
   const staticData: any = store.getState().staticDataState.staticData
   let locationData = data ? data : {}
-  console.log('locationData', JSON.stringify(locationData))
-  const { control, handleSubmit } = useForm({
+  // console.log('locationData', JSON.stringify(locationData))
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
         !_.isEmpty(locationData) && locationData.nickName
@@ -116,7 +139,8 @@ export const LocationDetails = ({ data, setAddressObject }) => {
           ? locationData.address.zipCode
           : '',
       country: !_.isEmpty(locationData) ? countryIndex : 97,
-      state: !_.isEmpty(locationData) ? stateIndex : -1
+      state: !_.isEmpty(locationData) ? stateIndex : -1,
+      timeZone: !_.isEmpty(locationData) ? timeZoneIndex : -1
     },
     resolver: zodResolver(schema)
   })
@@ -143,28 +167,40 @@ export const LocationDetails = ({ data, setAddressObject }) => {
     await getStates(countryId)
   }
   async function setSelectedStateChange(value: any) {
-    console.log('value', JSON.stringify(value))
-    setAddressObject(statesListFull[value], 5)
+    if (value) {
+      setAddressObject(statesListFull[value.id - 1], 5)
+    }
+  }
+  async function setSelectedTimeZoneChange(value: any) {
+    // console.log('value', JSON.stringify(value))
+    if (value) {
+      setAddressObject(timeZoneListFull[value.id - 1], 7)
+    }
   }
   return (
     <View className="w-full self-center py-2">
       <View className="w-full">
-        <Typography className="font-400 ml-[10px] text-[#1A1A1A]">
+        {/* <Typography className="font-400 ml-[10px] text-[#1A1A1A]">
           {'Location'}
-        </Typography>
-        <View className="mt-2 w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="locationName"
-            placeholder={'Location Name'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-            onChangeText={(text) => {
-              // console.log('text', text)
-              setAddressObject(text, 0)
-            }}
-          />
-        </View>
+        </Typography> */}
+        {component !== 'Profile' ? (
+          <View className="mt-2 w-full flex-row justify-center">
+            <ControlledTextField
+              control={control}
+              name="locationName"
+              placeholder={'Location Name'}
+              className="w-[95%] bg-white"
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                // console.log('text', text)
+                setAddressObject(text, 0)
+              }}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
+
         <View className="my-2 w-full flex-row justify-center">
           <ControlledTextField
             control={control}
@@ -235,6 +271,23 @@ export const LocationDetails = ({ data, setAddressObject }) => {
             }}
           />
         </View>
+        {isDataReceived && component === 'Profile' ? (
+          <View className="w-[95%] self-center">
+            <ControlledDropdown
+              control={control}
+              name="timeZone"
+              label="Timezone*"
+              defaultValue={
+                timeZoneIndex !== -1 ? timezonesList[timeZoneIndex].title : ''
+              }
+              maxHeight={300}
+              list={timezonesList}
+              onChangeValue={setSelectedTimeZoneChange}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
     </View>
   )

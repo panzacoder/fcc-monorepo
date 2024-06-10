@@ -500,119 +500,114 @@ export function ConsolidatedViewScreen() {
   })
   const weekView = weekDayList.map((data: any, index: any) => {
     return (
-      <View key={index} className="flex-1 justify-center">
-        <View className="my-2 flex-row items-center justify-center">
-          {/* <Typography className="h-full self-center font-bold">
-            {data}
-          </Typography> */}
-          <View className="w-full flex-row items-center self-center">
-            {index === 0 ? (
-              <ScrollView className="w-full ">
-                <Typography className="font-bold">{data}</Typography>
-                {listDayOne.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+      <View key={index} className="">
+        <View className="my-4 flex-row ">
+          {index === 0 ? (
+            <ScrollView className="w-full ">
+              <Typography className=" font-bold">{data}</Typography>
+              {listDayOne.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
 
-            {index === 1 ? (
-              <ScrollView className="w-full">
-                <Typography className="font-bold">{data}</Typography>
-                {listDayTwo.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+          {index === 1 ? (
+            <ScrollView className="w-full flex-1">
+              <Typography className="font-bold">{data}</Typography>
 
-            {index === 2 ? (
-              <ScrollView className="w-full">
-                <Typography className="font-bold">{data}</Typography>
-                {listDayThree.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+              {listDayTwo.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
 
-            {index === 3 ? (
-              <ScrollView className="w-full">
-                <Typography className=" font-bold">{data}</Typography>
-                {listDayFour.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+          {index === 2 ? (
+            <ScrollView className="w-full">
+              <Typography className="font-bold">{data}</Typography>
+              {listDayThree.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
 
-            {index === 4 ? (
-              <ScrollView className="w-full">
-                <Typography className="font-bold">{data}</Typography>
-                {listDayFive.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+          {index === 3 ? (
+            <ScrollView className="w-full">
+              <Typography className=" font-bold">{data}</Typography>
+              {listDayFour.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
 
-            {index === 5 ? (
-              <ScrollView className="w-full">
-                <Typography className="font-bold">{data}</Typography>
-                {listDaySix.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
+          {index === 4 ? (
+            <ScrollView className="w-full">
+              <Typography className="font-bold">{data}</Typography>
+              {listDayFive.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
 
-            {index === 6 ? (
-              <ScrollView className="w-full">
-                <Typography className="font-bold">{data}</Typography>
-                {listDaySeven.map((data: any, index: number) => {
-                  return (
-                    <View key={index} className="">
-                      {getCard(data, index)}
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            ) : (
-              <View />
-            )}
-          </View>
+          {index === 5 ? (
+            <ScrollView className="w-full">
+              <Typography className="font-bold">{data}</Typography>
+              {listDaySix.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
+
+          {index === 6 ? (
+            <ScrollView className="w-full">
+              <Typography className="font-bold">{data}</Typography>
+              {listDaySeven.map((data: any, index: number) => {
+                return (
+                  <View key={index} className="">
+                    {getCard(data, index)}
+                  </View>
+                )
+              })}
+            </ScrollView>
+          ) : (
+            <View />
+          )}
         </View>
-        {/* <View className="absolute left-[50px] h-full w-[1px] bg-black" /> */}
         <View className="h-[1px] w-full bg-black" />
       </View>
     )
@@ -803,9 +798,11 @@ export function ConsolidatedViewScreen() {
           {isWeekView ? weekView : <View />}
         </ScrollView>
       ) : (
-        <View className="flex-1 justify-center self-center">
+        <View className="flex-1 ">
           {isDataReceived && isDayView ? (
-            <Typography className="text-lg font-bold">{'No Data'}</Typography>
+            <Typography className="mt-[50] text-center text-lg font-bold ">
+              {'No Data'}
+            </Typography>
           ) : isWeekView ? (
             weekView
           ) : (

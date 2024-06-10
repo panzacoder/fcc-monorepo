@@ -10,15 +10,38 @@ import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
+import { formatUrl } from 'app/utils/format-url'
 import { CardView } from 'app/ui/cardview'
+import { useRouter } from 'solito/navigation'
+import messaging from '@react-native-firebase/messaging'
+import firebase from '@react-native-firebase/app'
 
 export function HomeScreen() {
+  const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission()
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus)
+    }
+  }
   useEffect(() => {
+
+    //this below code is giving error as we have installed firebase libraries in the expo directory.
+
+    // if (requestUserPermission()) {
+    //   messaging()
+    //     .getToken()
+    //     .then((token) => console.log('token', token))
+    // }
     async function getMemberDetails() {
       setLoading(true)
       let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
@@ -57,6 +80,16 @@ export function HomeScreen() {
               {user.memberName ? user.memberName : ''}
             </Typography>
           </View>
+        </View>
+        <View>
+          <Pressable
+            className="absolute right-[20]"
+            onPress={() => {
+              router.push(formatUrl('/profile', {}))
+            }}
+          >
+            <Feather name={'user'} size={20} color={'black'} />
+          </Pressable>
         </View>
         {isDataReceived ? (
           <View

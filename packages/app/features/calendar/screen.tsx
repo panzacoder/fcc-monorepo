@@ -5,8 +5,6 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  Modal,
-  ScrollView,
   Pressable
 } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -35,10 +33,6 @@ export function CalendarScreen() {
   let memberData = JSON.parse(item.memberData)
   let currentMonth = String(moment().format('MMM')).toUpperCase()
   let currentYear = String(moment().format('YYYY')).toUpperCase()
-  const [currentCalendarMonthShown, setCurrentCalendarMonthShown] =
-    useState(currentMonth)
-  const [currentCalendarYearShown, setCurrentCalendarYearShown] =
-    useState(currentYear)
   const getCalenderItemsFromServer = useCallback(
     async (currentMonth: any, currentYear: any) => {
       setLoading(true)
@@ -82,7 +76,7 @@ export function CalendarScreen() {
     // console.log('in handleCurrentMonthChange', JSON.parse(currentMonth))
     let changedMonth = moment(currentMonth.dateString).format('MMM')
     let changedYear = moment(currentMonth.dateString).format('YYYY')
-    getCalenderItemsFromServer(changedMonth, changedYear)
+    await getCalenderItemsFromServer(changedMonth, changedYear)
   }
   const showAddModal = () => {
     return (
@@ -179,8 +173,7 @@ export function CalendarScreen() {
         <ExpandableCalendarView
           memberData={memberData}
           calenderEvents={calenderEvents}
-          handleChange={handleCurrentMonthChange} 
-          isShowAddModal={isShowAddModal}
+          handleChange={handleCurrentMonthChange}
         />
       ) : (
         <View />

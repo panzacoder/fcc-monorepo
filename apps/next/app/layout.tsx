@@ -1,4 +1,4 @@
-/** @jsxImportSource react */
+import type { Metadata, Viewport } from 'next'
 
 import type { Metadata, Viewport } from 'next'
 

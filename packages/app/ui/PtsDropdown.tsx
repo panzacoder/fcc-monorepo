@@ -64,7 +64,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
 
   const valueObject = dataSet.find((item) => item.id === value)
 
-  console.log('value', value)
+  // console.log('value', value)
   return (
     <View className="flex">
       {label && (
