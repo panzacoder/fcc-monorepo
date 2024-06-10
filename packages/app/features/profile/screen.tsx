@@ -6,6 +6,7 @@ import { useRouter } from 'solito/navigation'
 import { Feather } from 'app/ui/icons'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatUrl } from 'app/utils/format-url'
+import moment from 'moment'
 import PtsLoader from 'app/ui/PtsLoader'
 import {
   BASE_URL,
@@ -16,7 +17,8 @@ import {
   DELETE_ACCOUNT,
   CHECK_VALID_CREDENTIAL,
   UPDATE_PROFILE,
-  UPDATE_MEMBER_ADDRESS
+  UPDATE_MEMBER_ADDRESS,
+  UPDATE_SPONSOR_CODE
 } from 'app/utils/urlConstants'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -37,6 +39,9 @@ import { LocationDetails } from 'app/ui/locationDetails'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
+const sponsorSchema = z.object({
+  sponsorCode: z.string().min(1, { message: 'Sponsor code is required' })
+})
 const profileSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
@@ -44,6 +49,7 @@ const profileSchema = z.object({
   phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
+export type SponsorSchema = z.infer<typeof sponsorSchema>
 export type ProfileSchema = z.infer<typeof profileSchema>
 let selectedAddress: any = {
   shortDescription: '',
@@ -74,6 +80,7 @@ let selectedAddress: any = {
     }
   }
 }
+let isShowRenewButton = false
 export function ProfileScreen() {
   const header = store.getState().headerState.header
   const userProfile = store.getState().userProfileState.header
@@ -86,6 +93,7 @@ export function ProfileScreen() {
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
   const [isAutoSubscription, setIsAutoSubscription] = useState(false)
   const [isSubscribedUser, setISubscribedUser] = useState(false)
+  const [isShowAlerts, setIsShowAlerts] = useState(false)
   const [appuserDetails, setAppuserDetails] = useState({}) as any
   const [userSubscription, setUserSubscription] = useState({}) as any
   const [memberDetails, setMemberDetails] = useState({}) as any
@@ -106,6 +114,16 @@ export function ProfileScreen() {
     },
     resolver: zodResolver(schema)
   })
+  const {
+    handleSubmit: handleSubmit2,
+    control: control2,
+    reset: reset1
+  } = useForm({
+    defaultValues: {
+      sponsorCode: ''
+    },
+    resolver: zodResolver(sponsorSchema)
+  })
   const getUserProfile = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_USER_PROFILE}`
@@ -122,13 +140,80 @@ export function ProfileScreen() {
           setUserSubscription(
             data.data.userSubscription ? data.data.userSubscription : {}
           )
+          // console.log(
+          //   'data.data.userSubscription',
+          //   JSON.stringify(data.data.userSubscription)
+          // )
           let isSubscribedUser = data.data.userSubscription
-            ? data.data.userSubscription.status !== 'Active'
+            ? data.data.userSubscription.status.toLowerCase() !== 'active'
               ? false
               : true
             : false
           setISubscribedUser(isSubscribedUser)
           setIsDataReceived(true)
+          if (!isShowAlerts) {
+            if (
+              data.data.expiringSubscription &&
+              userSubscription.status.toLowerCase() === 'active'
+            ) {
+              isShowRenewButton = true
+              // console.log('expiringSubscription../', JSON.stringify(data.data))
+              Alert.alert(
+                '',
+                `Your subscription will expire on ${moment(
+                  data.data.subscriptionEndDate
+                ).format(
+                  'DD-MMM-YYYY'
+                )}. Please renew to use ad-free services.`,
+                [
+                  {
+                    text: 'Renew',
+                    onPress: () => {
+                      if (data.data.userSubscription) {
+                        if (data.data.userSubscription.plan) {
+                          if (
+                            String(
+                              data.data.userSubscription.source
+                            ).toLowerCase() === 'Stripe'.toLowerCase()
+                          ) {
+                            let plan = data.data.userSubscription.plan
+                            router.push(
+                              formatUrl('/plans', {
+                                planDetails: JSON.stringify(plan),
+                                isRenewPlan: 'true',
+                                isFromUpgradePlan: 'false'
+                              })
+                            )
+                          }
+                        }
+                      }
+                    }
+                  },
+                  { text: 'Cancel' }
+                ]
+              )
+            }
+            if (data.data.expiredSubscription) {
+              Alert.alert(
+                '',
+                `Your Subscription has expired. Please Renew it to continue Ad free experience.`,
+                [
+                  {
+                    text: 'Subscribe',
+                    onPress: () => {
+                      router.push(
+                        formatUrl('/plans', {
+                          isFromUpgradePlan: 'false'
+                        })
+                      )
+                    }
+                  },
+                  { text: 'Cancel' }
+                ]
+              )
+            }
+          }
+          setIsShowAlerts(true)
           reset({
             firstName: appUser.firstName ? appUser.firstName : '',
             lastName: appUser.lastName ? appUser.lastName : '',
@@ -170,7 +255,24 @@ export function ProfileScreen() {
       })
   }
   async function upgradeButtonClicked() {
-    console.log('upgradeButtonClicked')
+    // console.log('upgradeButtonClicked')
+    router.push(
+      formatUrl('/plans', {
+        planDetails: JSON.stringify(userSubscription),
+        isRenewPlan: 'false',
+        isFromUpgradePlan: 'true'
+      })
+    )
+  }
+  async function renewButtonClicked() {
+    // console.log('renewButtonClicked')
+    router.push(
+      formatUrl('/plans', {
+        planDetails: JSON.stringify(userSubscription),
+        isRenewPlan: 'true',
+        isFromUpgradePlan: 'false'
+      })
+    )
   }
   async function updateAddress() {
     setLoading(true)
@@ -242,6 +344,34 @@ export function ProfileScreen() {
           setLoading(false)
           Alert.alert('', data.message)
         }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }
+  async function saveSponsorCode(formData: SponsorSchema) {
+    // console.log('formData', formData.sponsorCode)
+    setLoading(true)
+    let url = `${BASE_URL}${UPDATE_SPONSOR_CODE}`
+    let dataObject = {
+      header: header,
+      appuserVo: {
+        sponsorCode: formData.sponsorCode,
+        email: memberDetails.email ? memberDetails.email : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          reset1({
+            sponsorCode: ''
+          })
+          getUserProfile()
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
       })
       .catch((error) => {
         setLoading(false)
@@ -334,10 +464,10 @@ export function ProfileScreen() {
         >
           <Typography className=" w-[5%] text-center">{index + 1}</Typography>
           <Typography className=" w-[20%] text-center">{planName}</Typography>
-          <Typography className=" w-[25%] text-center">
+          <Typography className=" w-[30%] text-center">
             {getFullDateForCalendar(data.date, 'DD-MMM-YYYY')}
           </Typography>
-          <Typography className=" w-[20%] text-center">
+          <Typography className=" w-[15%] text-center">
             {data.price ? `${'$'}${data.price}` : ''}
           </Typography>
           <Typography className=" w-[25%] text-center">
@@ -355,10 +485,10 @@ export function ProfileScreen() {
           <Typography className="w-[20%] text-center font-bold">
             {'Order'}
           </Typography>
-          <Typography className="w-[25%] text-center font-bold">
+          <Typography className="w-[30%] text-center font-bold">
             {'Date'}
           </Typography>
-          <Typography className="w-[20%] text-center font-bold">
+          <Typography className="w-[15%] text-center font-bold">
             {'Price'}
           </Typography>
           <Typography className="w-[25%] text-center font-bold">
@@ -601,7 +731,7 @@ export function ProfileScreen() {
               </View>
             </View>
             <Button
-              className="my-2 w-[50%] self-center"
+              className="my-2 w-[50%] self-center bg-[#c43416]"
               title={'Delete Account'}
               variant="default"
               onPress={() => {
@@ -671,7 +801,7 @@ export function ProfileScreen() {
                 </View>
                 {!_.isEmpty(userSubscription) ? (
                   <View className="mt-1 rounded-[5px] border-[1px] border-gray-400 py-1">
-                    <Typography className="mx-2 py-1 text-center font-bold text-black">
+                    <Typography className="mx-2 py-1 font-bold text-black">
                       {'Plan Details'}
                     </Typography>
                     {getDetailsView(
@@ -727,12 +857,24 @@ export function ProfileScreen() {
                   title={'Purchase Plan'}
                   variant="default"
                   onPress={() => {
-                    router.push('/plans')
+                    router.push(
+                      formatUrl('/plans', {
+                        isFromUpgradePlan: 'false'
+                      })
+                    )
                   }}
                 />
               </View>
             ) : (
               <View>
+                {getDetailsView(
+                  'Plan Name',
+                  userSubscription.plan ? userSubscription.plan.description : ''
+                )}
+                {getDetailsView(
+                  'Price',
+                  `$${userSubscription.plan ? userSubscription.plan.price : ''}`
+                )}
                 {getDetailsView(
                   'Start Date',
                   getFullDateForCalendar(
@@ -747,14 +889,15 @@ export function ProfileScreen() {
                     'DD-MMM-YYYY'
                   )
                 )}
+
                 {getDetailsView(
-                  'Plan Name',
-                  userSubscription.plan ? userSubscription.plan.description : ''
+                  'Status',
+                  userSubscription.status
+                    ? userSubscription.status.charAt(0).toUpperCase() +
+                        userSubscription.status.slice(1)
+                    : ''
                 )}
-                {getDetailsView(
-                  'Price',
-                  `$${userSubscription.plan ? userSubscription.plan.price : ''}`
-                )}
+
                 {isStripe ? (
                   <View className="flex-row">
                     <Typography className="mx-2 mr-3 py-1 text-center font-bold text-black">
@@ -776,21 +919,36 @@ export function ProfileScreen() {
                 ) : (
                   <View />
                 )}
-                <View className="flex-row self-center">
-                  {showUpgradeButton ? (
-                    <Button
-                      className="my-2 w-[50%] self-center bg-[#ef6603]"
-                      title={'Upgrade Plan'}
-                      variant="default"
-                      onPress={() => {
-                        upgradeButtonClicked()
-                      }}
-                    />
-                  ) : (
-                    <View />
-                  )}
+                <View className="self-center">
+                  <View className="flex-row self-center">
+                    {showUpgradeButton ? (
+                      <Button
+                        className="my-2 w-[50%] self-center bg-[#ef6603]"
+                        title={'Upgrade Plan'}
+                        variant="default"
+                        onPress={() => {
+                          upgradeButtonClicked()
+                        }}
+                      />
+                    ) : (
+                      <View />
+                    )}
+                    {isShowRenewButton ? (
+                      <Button
+                        className="my-2 ml-5 w-[40%] self-center bg-[#ef6603]"
+                        title={'Renew Plan'}
+                        variant="default"
+                        onPress={() => {
+                          renewButtonClicked()
+                        }}
+                      />
+                    ) : (
+                      <View />
+                    )}
+                  </View>
+
                   <Button
-                    className="my-2 ml-5 w-[50%] self-center bg-[#ef6603]"
+                    className="my-2 w-[50%] self-center bg-[#c43416]"
                     title={'Cancel Subscription'}
                     variant="default"
                     onPress={() => {
@@ -802,7 +960,7 @@ export function ProfileScreen() {
             )}
             {orderList.length > 0 ? (
               <View>
-                <View className="bg-primary flex-row">
+                <View className="bg-primary flex-row rounded-tl-[5px] rounded-tr-[5px]" >
                   <Typography className=" w-[90%] py-2 text-center font-bold text-white">
                     {'Order History'}
                   </Typography>
@@ -822,6 +980,28 @@ export function ProfileScreen() {
               <View />
             )}
           </View>
+          <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-2">
+            <View className="flex-row">
+              <Typography className="ml-2 w-[85%] self-center font-bold">
+                {'Sponsorship Details'}
+              </Typography>
+            </View>
+            <View className="ml-2">
+              <ControlledTextField
+                control={control2}
+                name="sponsorCode"
+                placeholder={'Sponsor Code*'}
+                className="w-[95%] bg-white"
+              />
+              <Button
+                className="my-2 w-[40%] self-center bg-[#ef6603]"
+                title={'Save'}
+                variant="default"
+                onPress={handleSubmit2(saveSponsorCode)}
+              />
+            </View>
+          </View>
+
           {isShowDeleteModal ? (
             <View className="absolute top-[100] w-[95%] flex-1 self-center">
               {showDeleteModal()}

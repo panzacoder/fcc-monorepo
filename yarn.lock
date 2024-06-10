@@ -5815,6 +5815,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stripe/stripe-react-native@npm:0.28.0":
+  version: 0.28.0
+  resolution: "@stripe/stripe-react-native@npm:0.28.0"
+  peerDependencies:
+    expo: ">=46.0.9"
+    react: "*"
+    react-native: "*"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 10/af169b1a623b81fc33ff98c0df5d48030e46771cc0135a98ab949ec5f3593caa2ab82373641368cfc3eb79b14972d97ec90a408b3318e2123045792d2d34ce99
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.4.2":
   version: 1.4.2
   resolution: "@swc/core-darwin-arm64@npm:1.4.2"
@@ -11639,6 +11653,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fcc-monorepo@workspace:."
   dependencies:
+    "@stripe/stripe-react-native": "npm:0.28.0"
     "@types/react": "npm:^18.2.67"
     "@types/react-native-calendar-picker": "npm:^8"
     "@types/react-native__assets": "npm:^1"
@@ -11648,6 +11663,7 @@ __metadata:
     prettier-plugin-tailwindcss: "npm:^0.5.12"
     react-native-calendar-picker: "npm:^8.0.2"
     react-native-calendars: "npm:^1.1304.1"
+    react-native-iap: "npm:10.1.3"
     redux-devtools-extension: "npm:^2.13.9"
     turbo: "npm:^1.13.0"
     typescript: "npm:^5.4.3"
@@ -17858,6 +17874,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/0a86209d515febf6da489c210f8983ded4a8d6e87dc94bca55f8afab657ec096797b21954b7599f6e05e1238634d770b5462266f3f4018363e4eb73496f2147a
+  languageName: node
+  linkType: hard
+
+"react-native-iap@npm:10.1.3":
+  version: 10.1.3
+  resolution: "react-native-iap@npm:10.1.3"
+  peerDependencies:
+    react: ">=16.13.1"
+    react-native: ">=0.65.1"
+  checksum: 10/d83541de103aa9788919dc642cbb61a58037c2b423c3ebe6d82dfd1e74dc53ca1b95d59f852cd3b954d04963ddcdb856903b24cb1b358f596727725497c3edcb
   languageName: node
   linkType: hard
 

@@ -691,19 +691,34 @@ export function AppointmentDetailsScreen() {
         <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
           <ScrollView persistentScrollbar={true} className="flex-1">
             <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-              <View className=" w-full flex-row items-center">
-                <View className="w-[80%] flex-row">
-                  <Typography className=" font-400 max-w-[50%] text-[15px] text-[#86939e]">
-                    {doctorFacilityName}
-                  </Typography>
-                  <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
-                  <Typography className="font-400 text-primary ml-2 max-w-[60%] text-[15px]">
-                    {specialist}
-                  </Typography>
-                </View>
+              <View style={{ justifyContent: 'flex-end' }} className="flex-row">
+                {getUserPermission(appointmentPrivileges).createPermission ? (
+                  <Button
+                    className="w-[50%]"
+                    title="Create Similar"
+                    variant="border"
+                    onPress={() => {
+                      router.push(
+                        formatUrl('/circles/addEditAppointment', {
+                          memberData: JSON.stringify(memberData),
+                          appointmentDetails:
+                            JSON.stringify(appointmentDetails),
+                          component:
+                            appointmentDetails.type.type ===
+                            'Doctor Appointment'
+                              ? 'Doctor'
+                              : 'Facility',
+                          isFromCreateSimilar: 'true'
+                        })
+                      )
+                    }}
+                  />
+                ) : (
+                  <View />
+                )}
                 {getUserPermission(appointmentPrivileges).updatePermission ? (
                   <Button
-                    className=""
+                    className="ml-[5px] w-[30%]"
                     title="Edit"
                     variant="border"
                     onPress={() => {
@@ -720,6 +735,17 @@ export function AppointmentDetailsScreen() {
                 ) : (
                   <View />
                 )}
+              </View>
+              <View className=" w-full flex-row items-center">
+                <View className="mt-2 w-[90%] flex-row">
+                  <Typography className="font-400 max-w-[65%] text-[15px] text-[#86939e]">
+                    {doctorFacilityName}
+                  </Typography>
+                  <View className="ml-2 h-[25] w-[2px] bg-[#86939e] " />
+                  <Typography className="font-400 text-primary ml-2 max-w-[30%] text-[15px] ">
+                    {specialist}
+                  </Typography>
+                </View>
               </View>
               {phone !== '' ? (
                 getDetailsView('Phone:', phone, true, 'phone')

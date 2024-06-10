@@ -63,6 +63,9 @@ export function AddEditIncidentScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   const item = useParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let isFromCreateSimilar = item.isFromCreateSimilar
+    ? item.isFromCreateSimilar
+    : 'false'
   const [isLoading, setLoading] = useState(false)
   let incidentDetails = item.incidentDetails
     ? JSON.parse(item.incidentDetails)
@@ -70,8 +73,9 @@ export function AddEditIncidentScreen() {
   // console.log('incidentDetails', JSON.stringify(incidentDetails))
   const onSelection = (date: any) => {
     selectedDate = date
+    console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  if (!_.isEmpty(incidentDetails)) {
+  if (!_.isEmpty(incidentDetails) && !isLoading) {
     incidentType = incidentDetails.type ? incidentDetails.type : ''
     selectedDate = incidentDetails.date ? incidentDetails.date : new Date()
   }
@@ -130,7 +134,9 @@ export function AddEditIncidentScreen() {
       if (index === 6) {
         selectedAddress = value
       }
-      console.log('selectedAddress', JSON.stringify(selectedAddress))
+      console.log('value', JSON.stringify(value))
+      console.log('index', JSON.stringify(index))
+      console.log('selectedAddress1', JSON.stringify(selectedAddress))
     }
   }
   async function addEditIncident(formData: Schema) {
@@ -148,11 +154,10 @@ export function AddEditIncidentScreen() {
           id: memberData.member ? memberData.member : ''
         },
         location: selectedAddress,
-        contactList: [],
-        reminderList: []
+        contactList: []
       }
     }
-    if (_.isEmpty(incidentDetails)) {
+    if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_INCIDENT}`
     } else {
       url = `${BASE_URL}${UPDATE_INCIDENT}`
@@ -190,18 +195,17 @@ export function AddEditIncidentScreen() {
     <View className="flex-1">
       <Stack.Screen
         options={{
-          title: _.isEmpty(incidentDetails)
-            ? 'Add Incident'
-            : 'Edit Incident Details'
+          title:
+            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+              ? 'Add Incident'
+              : 'Edit Incident Details'
         }}
       />
       <PtsLoader loading={isLoading} />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">
           <PtsDateTimePicker
-            currentData={
-              incidentDetails.date ? incidentDetails.date : new Date()
-            }
+            currentData={selectedDate}
             onSelection={onSelection}
           />
         </View>
