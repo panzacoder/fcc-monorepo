@@ -5,6 +5,7 @@ export const BASE_URL =
   'https://45.79.147.166:8000/fccApi/2.0/'
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
+export const USER_LOGOUT = 'userms/logout'
 export const CREATE_ACCOUNT = 'regms/create'
 export const FORGOT_PASSWORD = 'userms/forgetPassword'
 export const RESET_PASSWORD = 'userms/resetPassword'
