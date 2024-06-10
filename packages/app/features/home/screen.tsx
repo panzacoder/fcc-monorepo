@@ -11,7 +11,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
 import { consoleData } from 'app/ui/utils'
 import { CardView } from 'app/ui/cardview'
-import messaging from '@react-native-firebase/messaging'
+// import messaging from '@react-native-firebase/messaging'
 import { TabsHeader } from 'app/ui/tabs-header'
 export function HomeScreen() {
   const header = store.getState().headerState.header
@@ -19,16 +19,16 @@ export function HomeScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-  const requestUserPermission = async () => { 
-    const authStatus = await messaging().requestPermission()
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
-
-    if (enabled) {
-      console.log('Authorization status:', authStatus)
-    }
-  }
+  // const requestUserPermission = async () => {
+  //   const authStatus = await messaging().requestPermission()
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL
+  //
+  //   if (enabled) {
+  //     console.log('Authorization status:', authStatus)
+  //   }
+  // }
   useEffect(() => {
     //this below code is giving error as we have installed firebase libraries in the expo directory.
 
