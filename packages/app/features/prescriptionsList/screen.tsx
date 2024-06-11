@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -56,7 +56,7 @@ export function PrescriptionsListScreen() {
   const header = store.getState().headerState.header
   const item = useParams<any>()
   const router = useRouter()
-  
+
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const staticData: any = store.getState().staticDataState.staticData
@@ -317,61 +317,65 @@ export function PrescriptionsListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="w-full flex-row">
-          <View className="min-w-[75%]">
-            <Pressable
-              onPress={() => {
-                setIsShowFilter(!isShowFilter)
-              }}
-              className=" flex-row"
-            >
-              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-                {currentFilter}
-              </Typography>
-              <Feather
-                className="ml-2 mt-6"
-                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-                size={25}
-                color={'black'}
-              />
-            </Pressable>
-          </View>
-          {getUserPermission(prescriptionPrivileges).createPermission ? (
-            <View className=" mt-[20] self-center">
+        {!isAddPrescription ? (
+          <View className="w-full flex-row">
+            <View className="min-w-[75%]">
               <TouchableOpacity
-                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                 onPress={() => {
-                  // router.push(
-                  //   formatUrl('/circles/addEditDoctor', {
-                  //     memberData: JSON.stringify(memberData)
-                  //   })
-                  // )
-                  setIsAddPrescription(true)
+                  setIsShowFilter(!isShowFilter)
                 }}
+                className=" flex-row"
               >
-                <Feather name={'plus'} size={25} color={COLORS.primary} />
+                <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                  {currentFilter}
+                </Typography>
+                <Feather
+                  className="ml-2 mt-6"
+                  name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                  size={25}
+                  color={'black'}
+                />
               </TouchableOpacity>
             </View>
-          ) : (
-            <View />
-          )}
-          <View className="mt-5 self-center">
-            <Pressable
-              onPress={() => {
-                setIsShowFilter(false)
-                setIsFilter(!isFilter)
-              }}
-              className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
-            >
-              <Feather
-                className=""
-                name={'filter'}
-                size={25}
-                color={COLORS.primary}
-              />
-            </Pressable>
+            {getUserPermission(prescriptionPrivileges).createPermission ? (
+              <View className=" mt-[20] self-center">
+                <TouchableOpacity
+                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                  onPress={() => {
+                    // router.push(
+                    //   formatUrl('/circles/addEditDoctor', {
+                    //     memberData: JSON.stringify(memberData)
+                    //   })
+                    // )
+                    setIsAddPrescription(true)
+                  }}
+                >
+                  <Feather name={'plus'} size={25} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View />
+            )}
+            <View className="mt-5 self-center">
+              <TouchableOpacity
+                onPress={() => {
+                  setIsShowFilter(false)
+                  setIsFilter(!isFilter)
+                }}
+                className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+              >
+                <Feather
+                  className=""
+                  name={'filter'}
+                  size={25}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        ) : (
+          <View />
+        )}
       </View>
       {isFilter ? (
         <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -448,7 +452,7 @@ export function PrescriptionsListScreen() {
       )}
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Active' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Active')
@@ -457,8 +461,8 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Active'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'NotTaking' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('NotTaking')
@@ -467,8 +471,8 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Not Taking'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -477,7 +481,7 @@ export function PrescriptionsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -504,42 +508,52 @@ export function PrescriptionsListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-1 flex-row">
-                <Typography className="text-primary font-400 ml-5 w-[40%]">
-                  {data.type ? data.type : ''}
-                </Typography>
+              <View className="w-[95%] flex-row">
+                <View>
+                  <View className="my-1 flex-row">
+                    <Typography className="text-primary font-400 ml-5 w-[40%]">
+                      {data.type ? data.type : ''}
+                    </Typography>
 
-                <Typography className="ml-5 mr-5 w-[45%] text-right">
-                  {data.name ? data.name : ''}
-                </Typography>
-              </View>
-              {data.doctorname || data.pharmacy ? (
-                <View className="flex-row">
-                  <Typography className="text-primary font-400 ml-5 w-[40%]">
-                    {data.doctorname ? data.doctorname : ''}
-                  </Typography>
+                    <Typography className="ml-5 mr-5 w-[45%] text-right">
+                      {data.name ? data.name : ''}
+                    </Typography>
+                  </View>
+                  {data.doctorname || data.pharmacy ? (
+                    <View className="flex-row">
+                      <Typography className="text-primary font-400 ml-5 w-[40%]">
+                        {data.doctorname ? data.doctorname : ''}
+                      </Typography>
 
-                  <Typography className="ml-5 mr-5 w-[45%] text-right">
-                    {data.pharmacy ? data.pharmacy : ''}
-                  </Typography>
+                      <Typography className="ml-5 mr-5 w-[45%] text-right">
+                        {data.pharmacy ? data.pharmacy : ''}
+                      </Typography>
+                    </View>
+                  ) : (
+                    <View />
+                  )}
+
+                  <View className="flex-row">
+                    <View className="w-[95%] flex-row">
+                      <Typography className="ml-5 text-[#4DA529]">
+                        {data.startDate
+                          ? getFullDateForCalendar(
+                              data.startDate,
+                              'MMM DD, YYYY'
+                            )
+                          : ''}
+                      </Typography>
+                      <Typography className="text-[#ef6603]">
+                        {data.endDate
+                          ? ' - ' +
+                            getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
+                          : ''}
+                      </Typography>
+                    </View>
+                  </View>
                 </View>
-              ) : (
-                <View />
-              )}
-
-              <View className="flex-row">
-                <View className="w-[95%] flex-row">
-                  <Typography className="ml-5 text-[#4DA529]">
-                    {data.startDate
-                      ? getFullDateForCalendar(data.startDate, 'MMM DD, YYYY')
-                      : ''}
-                  </Typography>
-                  <Typography className="text-[#ef6603]">
-                    {data.endDate
-                      ? ' - ' +
-                        getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
-                      : ''}
-                  </Typography>
+                <View className=" ml-[-10] self-center">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
               </View>
             </TouchableOpacity>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -238,7 +238,7 @@ export function EventsListScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="flex-row ">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
@@ -254,10 +254,10 @@ export function EventsListScreen() {
             size={25}
             color={'black'}
           />
-        </Pressable>
+        </TouchableOpacity>
         {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -269,13 +269,13 @@ export function EventsListScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
         )}
         <View className="mt-5 self-center">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsShowFilter(false)
               setIsFilter(!isFilter)
@@ -288,7 +288,7 @@ export function EventsListScreen() {
               size={25}
               color={COLORS.primary}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {isFilter ? (
@@ -346,7 +346,7 @@ export function EventsListScreen() {
       )}
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'Upcoming' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Upcoming')
@@ -355,8 +355,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'Upcoming'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Open Items' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Open Items')
@@ -365,8 +365,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Open Items'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Completed' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Completed')
@@ -375,8 +375,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Completed'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Cancelled' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Cancelled')
@@ -385,8 +385,8 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Cancelled'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -395,7 +395,7 @@ export function EventsListScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -404,7 +404,7 @@ export function EventsListScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {eventsList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.replace(
                     formatUrl('/circles/eventDetails', {
@@ -416,104 +416,111 @@ export function EventsListScreen() {
                 key={index}
                 className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
               >
-                <View className="my-2 flex-row">
-                  <Typography className="font-400 ml-5 w-[70%] text-black">
-                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
-                  </Typography>
-                  <View className="">
-                    <Typography className="font-bold text-black">
-                      {data.status ? data.status : ''}
-                    </Typography>
-                  </View>
-                </View>
-                <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-full text-black">
-                    {data.location ? data.location : ''}
-                  </Typography>
-                </View>
-                <View className="flex-row">
-                  <Typography className="text-primary font-400 ml-5 w-[55%] max-w-[55%] text-[16px]">
-                    {data.title ? data.title : ''}
-                  </Typography>
-                  {data.markCompleteCancel ? (
-                    <Typography className="font-400 ml-5 w-[40%] text-[#FF0000]">
-                      {'Mark Complete/Cancel'}
-                    </Typography>
-                  ) : (
-                    <View />
-                  )}
-                </View>
-                {data.hasNotes ||
-                data.hasReminders ||
-                data.hasTransportation ? (
-                  <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                ) : (
-                  <View />
-                )}
-
-                <View className="ml-5 flex-row self-center">
-                  <View className="w-[30%]">
-                    {data.hasNotes ? (
-                      <View className="flex-row">
-                        <Feather
-                          className="ml-5 mt-1"
-                          name={'message-circle'}
-                          size={25}
-                          color={'green'}
-                        />
-                        {data.unreadMessageCount > 0 ? (
-                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                            {data.unreadMessageCount}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
+                <View className="w-[90%] flex-row">
+                  <View>
+                    <View className="my-2 flex-row">
+                      <Typography className="font-400 ml-5 w-[75%] text-black">
+                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                      </Typography>
+                      <View className="">
+                        <Typography className="font-bold text-black">
+                          {data.status ? data.status : ''}
+                        </Typography>
                       </View>
-                    ) : (
-                      <View />
-                    )}
-                  </View>
-                  <View className="w-[30%]">
-                    {data.hasReminders ? (
-                      <View className="flex-row">
-                        <Feather
-                          className="ml-5 mt-1"
-                          name={'clock'}
-                          size={25}
-                          color={'red'}
-                        />
-                        {data.activeReminderCount > 0 ? (
-                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                            {data.activeReminderCount}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                    ) : (
-                      <View />
-                    )}
-                  </View>
-                  {data.hasTransportation ? (
-                    <View className="w-[30%]">
-                      <Feather
-                        className="ml-5"
-                        name={'truck'}
-                        size={25}
-                        color={
-                          data.transportationStatus === 'Requested'
-                            ? '#cf8442'
-                            : data.transportationStatus === 'Rejected'
-                              ? 'red'
-                              : 'green'
-                        }
-                      />
                     </View>
-                  ) : (
-                    <View />
-                  )}
+                    <View className="flex-row">
+                      <Typography className="font-400 ml-5 w-full text-black">
+                        {data.location ? data.location : ''}
+                      </Typography>
+                    </View>
+                    <View className="flex-row">
+                      <Typography className="text-primary font-400 ml-5 w-[55%] max-w-[55%] text-[16px]">
+                        {data.title ? data.title : ''}
+                      </Typography>
+                      {data.markCompleteCancel ? (
+                        <Typography className="font-400 ml-5 w-[40%] text-[#FF0000]">
+                          {'Mark Complete/Cancel'}
+                        </Typography>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                    {data.hasNotes ||
+                    data.hasReminders ||
+                    data.hasTransportation ? (
+                      <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                    ) : (
+                      <View />
+                    )}
+
+                    <View className="ml-5 flex-row self-center">
+                      <View className="w-[30%]">
+                        {data.hasNotes ? (
+                          <View className="flex-row">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'message-circle'}
+                              size={25}
+                              color={'green'}
+                            />
+                            {data.unreadMessageCount > 0 ? (
+                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                {data.unreadMessageCount}
+                              </Typography>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                      <View className="w-[30%]">
+                        {data.hasReminders ? (
+                          <View className="flex-row">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'clock'}
+                              size={25}
+                              color={'red'}
+                            />
+                            {data.activeReminderCount > 0 ? (
+                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                {data.activeReminderCount}
+                              </Typography>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                        ) : (
+                          <View />
+                        )}
+                      </View>
+                      {data.hasTransportation ? (
+                        <View className="w-[30%]">
+                          <Feather
+                            className="ml-5"
+                            name={'truck'}
+                            size={25}
+                            color={
+                              data.transportationStatus === 'Requested'
+                                ? '#cf8442'
+                                : data.transportationStatus === 'Rejected'
+                                  ? 'red'
+                                  : 'green'
+                            }
+                          />
+                        </View>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                  </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

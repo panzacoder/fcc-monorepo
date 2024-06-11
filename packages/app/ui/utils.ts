@@ -35,6 +35,14 @@ export function googleMapOpenUrl(address: string) {
     })
     .catch((err) => console.error('An error occurred', err))
 }
+export const removeAllSpecialCharFromString = (phoneNumber: any) => {
+  let newNumber = String(phoneNumber).replace(
+    /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,
+    ''
+  )
+  newNumber = newNumber.replace(' ', '')
+  return newNumber
+}
 export const convertPhoneNumberToUsaPhoneNumberFormat = (value: any) => {
   if (!value) return value
   const currentValue = value.replace(/[^\d]/g, '')
@@ -224,8 +232,8 @@ export const formatTimeToUserLocalTime = (time: any) => {
     return getFullDate(moment(time).utc(true))
   }
 }
-export const getNameInitials = (fullName: string) => {
-  let fullNameStr = fullName.split(' ')
+export const getNameInitials = (fullName?: string) => {
+  let fullNameStr = fullName?.split(' ') || []
   let initials = ''
   if (fullNameStr[0]?.split('')[0]?.toUpperCase() !== undefined) {
     initials += fullNameStr[0]?.split('')[0]?.toUpperCase()

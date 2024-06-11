@@ -1,8 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable, SafeAreaView, TextInput } from 'react-native'
-import { ScrollView } from 'app/ui/scroll-view'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ScrollView
+} from 'react-native'
+// import { ScrollView } from 'app/ui/scroll-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
@@ -283,7 +290,7 @@ export function NoteMessageScreen() {
           {participantsList.map((data: any, index: number) => {
             return (
               <View key={index} className="ml-2">
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
                     // console.log('fullName', data.participantName)
                     if (data.participantName) {
@@ -294,7 +301,7 @@ export function NoteMessageScreen() {
                   <PtsNameInitials
                     fullName={data.participantName ? data.participantName : ''}
                   />
-                </Pressable>
+                </TouchableOpacity>
               </View>
             )
           })}
@@ -377,7 +384,7 @@ export function NoteMessageScreen() {
           />
         </View>
         <View className="ml-2 self-center">
-          <Pressable
+          <TouchableOpacity
             className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
             onPress={() => {}}
           >
@@ -390,7 +397,7 @@ export function NoteMessageScreen() {
                 updateMessageThread()
               }}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {/* </View> */}

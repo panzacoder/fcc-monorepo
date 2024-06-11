@@ -25,7 +25,7 @@ export function TermsAndConditonScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.back()
+            router.replace('/home')
           }}
         />
         <Typography className=" flex-1 text-center text-lg font-bold">

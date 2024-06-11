@@ -4,7 +4,7 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
@@ -16,33 +16,10 @@ cssInterop(LinearGradient, {
 export function CircleSummaryCard({ memberData, userDetails }) {
   const router = useRouter()
   const [isSeeMore, setSeeMore] = useState(true)
-  const [isShowMenu, setIsShowMenu] = useState(false)
 
-  const fullName = userDetails.firstName + ' ' + userDetails.lastName
-  let itemStyle = 'w-full flex-row self-center bg-white px-2 py-1'
-  function getMenuView(value: string, icon: any) {
-    return (
-      <View>
-        <Pressable
-          onPress={() => {
-            if (value === 'Member Profile') {
-              router.push(
-                formatUrl('/memberProfile', {
-                  memberData: JSON.stringify(memberData),
-                  userDetails: JSON.stringify(userDetails)
-                })
-              )
-            }
-          }}
-          className={itemStyle}
-        >
-          <Feather name={icon} size={20} className="mr-2" color={'gray'} />
-          <Typography className="font-400">{value}</Typography>
-        </Pressable>
-        <View className="h-[0.5px] w-full bg-gray-400" />
-      </View>
-    )
-  }
+  const fullName =
+    memberData.firstname.trim() + ' ' + memberData.lastname.trim()
+
   return (
     <LinearGradient
       colors={['#103264', '#113263', '#319D9D']}
@@ -57,23 +34,21 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <Pressable
+        <TouchableOpacity
           className=""
           onPress={() => {
-            setIsShowMenu(!isShowMenu)
+            router.push(
+              formatUrl('/memberProfile', {
+                memberData: JSON.stringify(memberData),
+                userDetails: JSON.stringify(userDetails)
+              })
+            )
           }}
         >
-          <Feather name={'menu'} size={20} color={'#5ACC6C'} />
-        </Pressable>
+          <Feather name={'settings'} size={20} color={'white'} />
+        </TouchableOpacity>
       </View>
-      {isShowMenu ? (
-        <View className="absolute right-5 top-10 w-[45%] border-[1px] border-gray-400 bg-white">
-          {getMenuView('Member Profile', 'user')}
-        </View>
-      ) : (
-        <View />
-      )}
-      <Pressable
+      <TouchableOpacity
         onPress={() => {
           router.push(
             formatUrl('/circles/calendar', {
@@ -83,11 +58,11 @@ export function CircleSummaryCard({ memberData, userDetails }) {
         }}
       >
         <TodayCard memberData={memberData} userDetails={userDetails} />
-      </Pressable>
+      </TouchableOpacity>
 
       <View className="mx-2 items-center gap-2">
         <View className="flex-row items-center gap-2">
-          <Pressable
+          <TouchableOpacity
             className="flex-row gap-2"
             onPress={() => {
               setSeeMore(!isSeeMore)
@@ -101,7 +76,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             <Typography className="text-white">
               {isSeeMore ? 'See less' : 'See more'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
           <View className="bg-accent-foreground h-[1] flex-1" />
         </View>
         {isSeeMore ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TextInput, View, Pressable } from 'react-native'
+import { TextInput, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
@@ -40,7 +40,7 @@ export const PtsComboBox = ({
           <ScrollView className="">
             {listData.map((data: any, index: number) => {
               return (
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
                     setIsShowDropdown(false)
                     setPurpose(data.label)
@@ -50,7 +50,7 @@ export const PtsComboBox = ({
                   className={`${index % 2 === 0 ? 'bg-[#9fc1c2]' : 'bg-white'}  border-[1px] border-gray-400 py-3`}
                 >
                   <Typography className="ml-5">{data.label}</Typography>
-                </Pressable>
+                </TouchableOpacity>
               )
             })}
           </ScrollView>

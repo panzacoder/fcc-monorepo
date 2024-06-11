@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import { Pressable, View, Alert } from 'react-native'
+import { FC, useState } from 'react'
+import { TouchableOpacity, View, Alert } from 'react-native'
 import store from 'app/redux/store'
 import PtsNameInitials from '../PtsNameInitials'
 import { Feather } from '../icons'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGOUT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
-import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import PtsLoader from 'app/ui/PtsLoader'
 
@@ -20,13 +19,30 @@ export type TabsHeaderProps = {
   }
 }
 
-// export function TabsHeader()
-export const TabsHeader = ({ helpClicked }) => {
+const MenuButton: FC<{
+  text: string
+  icon: any
+  onPress: () => void
+}> = ({ text, icon, onPress }) => {
+  return (
+    <View>
+      <TouchableOpacity
+        onPress={onPress}
+        className="w-full flex-row self-center bg-white px-2 py-1"
+      >
+        <Feather name={icon} size={20} className="mr-2" color={'gray'} />
+        <Typography className="font-400">{text}</Typography>
+      </TouchableOpacity>
+      <View className="h-[0.5px] w-full bg-gray-400" />
+    </View>
+  )
+}
+
+export const TabsHeader = ({}) => {
   const router = useRouter()
   const [isShowMenu, setIsShowMenu] = useState(false)
   const [isLoading, setLoading] = useState(false)
   const user = store.getState().userProfileState.header
-  let itemStyle = 'w-full flex-row self-center bg-white px-2 py-1'
   const header = store.getState().headerState.header
   async function logout() {
     setLoading(true)
@@ -48,46 +64,14 @@ export const TabsHeader = ({ helpClicked }) => {
         console.log(error)
       })
   }
-  function getMenuView(value: string, icon: any) {
-    return (
-      <View>
-        <Pressable
-          onPress={() => {
-            if (value === 'Profile') {
-              router.push(formatUrl('/profile', {}))
-            } else if (value === 'T&C') {
-              router.push('/termsAndConditions')
-            } else if (value === 'Privacy Policy') {
-              router.push('/privacyPolicy')
-            } else if (value === 'Logout') {
-              setIsShowMenu(false)
-              logout()
-            } else if (value === 'FAQ') {
-              router.push('/faq')
-            } else if (value === 'About Us') {
-              router.push('/aboutUs')
-            } else if (value === 'Refer A Friend') {
-              router.push('/referFriend')
-            } else if (value === 'Help') {
-              setIsShowMenu(false)
-              helpClicked()
-            }
-          }}
-          className={itemStyle}
-        >
-          <Feather name={icon} size={20} className="mr-2" color={'gray'} />
-          <Typography className="font-400">{value}</Typography>
-        </Pressable>
-        <View className="h-[0.5px] w-full bg-gray-400" />
-      </View>
-    )
-  }
   return (
     <View style={{ zIndex: 3 }}>
       <PtsLoader loading={isLoading} />
       <View className="absolute right-0 top-0 w-1/4 flex-row justify-end gap-2">
-        <PtsNameInitials className="" fullName={user.memberName} />
-        <Pressable
+        {user.memberName && (
+          <PtsNameInitials className="" fullName={user.memberName} />
+        )}
+        <TouchableOpacity
           className="bg-accent rounded-full p-2"
           onPress={() => {
             setIsShowMenu(!isShowMenu)
@@ -98,18 +82,67 @@ export const TabsHeader = ({ helpClicked }) => {
             size={25}
             className="color-accent-foreground"
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {isShowMenu ? (
         <View className="absolute right-5 top-10 w-[40%] border-[1px] border-gray-400 bg-white">
-          {getMenuView('Profile', 'user')}
-          {getMenuView('T&C', 'clipboard')}
-          {getMenuView('Privacy Policy', 'file-text')}
-          {getMenuView('Help', 'help-circle')}
-          {getMenuView('FAQ', 'info')}
-          {getMenuView('Refer A Friend', 'user-plus')}
-          {getMenuView('About Us', 'help-circle')}
-          {getMenuView('Logout', 'log-out')}
+          <MenuButton
+            text="Profile"
+            icon="user"
+            onPress={() => {
+              router.push('/profile')
+            }}
+          />
+          <MenuButton
+            text="T&C"
+            icon="clipboard"
+            onPress={() => {
+              router.push('/termsAndConditions')
+            }}
+          />
+          <MenuButton
+            text="Privacy Policy"
+            icon="file-text"
+            onPress={() => {
+              router.push('/privacyPolicy')
+            }}
+          />
+          <MenuButton
+            text="Help"
+            icon="help-circle"
+            onPress={() => {
+              router.push('/help')
+            }}
+          />
+          <MenuButton
+            text="FAQ"
+            icon="info"
+            onPress={() => {
+              router.push('/faq')
+            }}
+          />
+          <MenuButton
+            text="Refer A Friend"
+            icon="user-plus"
+            onPress={() => {
+              router.push('/referFriend')
+            }}
+          />
+          <MenuButton
+            text="About Us"
+            icon="info"
+            onPress={() => {
+              router.push('/aboutUs')
+            }}
+          />
+          <MenuButton
+            text="Logout"
+            icon="log-out"
+            onPress={() => {
+              setIsShowMenu(false)
+              logout()
+            }}
+          />
         </View>
       ) : (
         <View />
@@ -117,3 +150,5 @@ export const TabsHeader = ({ helpClicked }) => {
     </View>
   )
 }
+
+// MenuButton('Logout', 'log-out')}

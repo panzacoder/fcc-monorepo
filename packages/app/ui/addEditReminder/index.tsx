@@ -41,7 +41,7 @@ export const AddEditReminder = ({
     createUpdateReminder(formData.title, selectedDate, reminderData)
   }
   return (
-    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5">
+    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5 border-[0.5px] border-gray-400">
       <Typography className="self-center font-bold">{`${_.isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
@@ -62,6 +62,7 @@ export const AddEditReminder = ({
           <Button
             className="bg-[#86939e]"
             title="Cancel"
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               cancelClicked()
@@ -69,8 +70,9 @@ export const AddEditReminder = ({
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(reminderData) ? 'Save' : 'Update'}
+            title={_.isEmpty(reminderData) ? 'Create' : 'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={handleSubmit(createUpdateReminderCall)}
           />
         </View>

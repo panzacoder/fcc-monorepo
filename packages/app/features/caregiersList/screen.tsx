@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, TouchableOpacity, Alert, Pressable } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -56,6 +56,16 @@ export function CaregiversListScreen() {
           let list = data.data.familyMemberList
             ? data.data.familyMemberList
             : []
+          list.sort(function (a: any, b: any) {
+            if (a.memberStatus < b.memberStatus) {
+              return -1
+            }
+            if (a.memberStatus > b.memberStatus) {
+              return 1
+            }
+            return 0
+          })
+
           getFilteredList(list, currentFilter)
           setCaregiversListFull(list)
           setIsDataReceived(true)
@@ -143,41 +153,46 @@ export function CaregiversListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="flex-row ">
-          <TouchableOpacity
-            onPress={() => {
-              setIsShowFilter(!isShowFilter)
-            }}
-            className="w-[85%] flex-row"
-          >
-            <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-              {currentFilter}
-            </Typography>
-            <Feather
-              className="ml-2 mt-6"
-              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-              size={25}
-              color={'black'}
-            />
-          </TouchableOpacity>
-          {getUserPermission(caregiverPrivileges).createPermission ? (
-            <View className=" mt-[20] self-center">
-              <TouchableOpacity
-                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-                onPress={() => {
-                  setIsAddCaregiver(true)
-                }}
-              >
-                <Feather name={'plus'} size={25} color={COLORS.primary} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View />
-          )}
-        </View>
+        {!isAddCaregiver ? (
+          <View className="flex-row ">
+            <TouchableOpacity
+              onPress={() => {
+                setIsShowFilter(!isShowFilter)
+              }}
+              className="w-[85%] flex-row"
+            >
+              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                {currentFilter}
+              </Typography>
+              <Feather
+                className="ml-2 mt-6"
+                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                size={25}
+                color={'black'}
+              />
+            </TouchableOpacity>
+            {getUserPermission(caregiverPrivileges).createPermission ? (
+              <View className=" mt-[20] self-center">
+                <TouchableOpacity
+                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                  onPress={() => {
+                    setIsAddCaregiver(true)
+                  }}
+                >
+                  <Feather name={'plus'} size={25} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+        ) : (
+          <View />
+        )}
+
         {isShowFilter ? (
           <View className="ml-5 w-[40%]">
-            <Pressable
+            <TouchableOpacity
               className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('All')
@@ -186,8 +201,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
                 {'All'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Accepted' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Accepted')
@@ -196,8 +211,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Accepted'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Requested' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Requested')
@@ -206,8 +221,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Requested'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Rejected' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Rejected')
@@ -216,8 +231,8 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Rejected'}
               </Typography>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               className={`${currentFilter === 'Not Yet Registered' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
               onPress={() => {
                 setFilteredList('Not Yet Registered')
@@ -226,7 +241,7 @@ export function CaregiversListScreen() {
               <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
                 {'Not Yet Registered'}
               </Typography>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
@@ -247,51 +262,58 @@ export function CaregiversListScreen() {
               key={index}
               className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
             >
-              <View className="my-2 flex-row">
-                <Typography className="text-primary font-400 ml-5 w-[45%]">
-                  {data.name ? data.name : ''}
-                </Typography>
+              <View className="w-[95%] flex-row">
+                <View>
+                  <View className="my-2 flex-row">
+                    <Typography className="text-primary font-400 ml-5 w-[45%]">
+                      {data.name ? data.name : ''}
+                    </Typography>
 
-                <Typography className="ml-5 mr-5 w-[40%] text-right">
-                  {data.role ? data.role : ''}
-                </Typography>
-              </View>
-
-              <View className=" flex-row">
-                <Typography className="font-400 ml-5 w-[65%] text-black">
-                  {data.email ? data.email : ''}
-                </Typography>
-                <View className="self-center text-center">
-                  <Typography
-                    className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.memberStatus.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
-                  >
-                    {data.memberStatus ? data.memberStatus : ''}
-                  </Typography>
-                </View>
-              </View>
-              {data.phone && data.phone !== '' ? (
-                <View className="flex-row">
-                  <View className="w-[90%]">
-                    <Typography className="ml-5 ">{data.phone}</Typography>
+                    <Typography className="ml-5 mr-5 w-[40%] text-right">
+                      {data.role ? data.role : ''}
+                    </Typography>
                   </View>
+
+                  <View className=" flex-row">
+                    <Typography className="font-400 ml-5 w-[65%] text-black">
+                      {data.email ? data.email : ''}
+                    </Typography>
+                    <View className="self-center text-center">
+                      <Typography
+                        className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.memberStatus.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
+                      >
+                        {data.memberStatus ? data.memberStatus : ''}
+                      </Typography>
+                    </View>
+                  </View>
+                  {data.phone && data.phone !== '' ? (
+                    <View className="flex-row">
+                      <View className="w-[90%]">
+                        <Typography className="ml-5 ">{data.phone}</Typography>
+                      </View>
+                    </View>
+                  ) : (
+                    <View />
+                  )}
+                  {data.showResendRequest ? (
+                    <View className="flex-row justify-center">
+                      <Button
+                        className="bg-[#1a7088]"
+                        title={'Resend Request'}
+                        variant="default"
+                        onPress={() => {
+                          resendRequest(data)
+                        }}
+                      />
+                    </View>
+                  ) : (
+                    <View />
+                  )}
                 </View>
-              ) : (
-                <View />
-              )}
-              {data.showResendRequest ? (
-                <View className="flex-row justify-center">
-                  <Button
-                    className="bg-[#1a7088]"
-                    title={'Resend Request'}
-                    variant="default"
-                    onPress={() => {
-                      resendRequest(data)
-                    }}
-                  />
+                <View className=" ml-[-10] self-center">
+                  <Feather name={'chevron-right'} size={20} color={'black'} />
                 </View>
-              ) : (
-                <View />
-              )}
+              </View>
             </TouchableOpacity>
           )
         })}

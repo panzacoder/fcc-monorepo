@@ -1,7 +1,7 @@
 'use client'
-
+import * as React from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Linking, Pressable } from 'react-native'
+import { View, Alert, Linking, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -86,8 +86,18 @@ export function DoctorDetailsScreen() {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
   }
+
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
+  function iconPressed(title: any, value: any) {
+    if (title === 'Phone:' && value !== '') {
+      Linking.openURL(`tel:${value}`)
+    } else if (title === 'Email:' && value !== '') {
+      Linking.openURL(`mailto:${value}`)
+    } else if (title === 'Website:' && value !== '') {
+      Linking.openURL(`http://${getWebsite(value)}`)
+    }
+  }
   function getDetailsView(
     title: string,
     value: string,
@@ -99,7 +109,14 @@ export function DoctorDetailsScreen() {
         <View className="w-[95%] flex-row">
           <Typography className={titleStyle}>{title}</Typography>
           {title !== 'Status:' ? (
-            <Typography className={valueStyle}>{value}</Typography>
+            <TouchableOpacity
+              className="w-[65%]"
+              onPress={() => {
+                iconPressed(title, value)
+              }}
+            >
+              <Typography className={valueStyle}>{value}</Typography>
+            </TouchableOpacity>
           ) : (
             <View>
               <Typography
@@ -111,21 +128,14 @@ export function DoctorDetailsScreen() {
           )}
         </View>
         {isIcon ? (
-          <Feather
+          <TouchableOpacity
+            className="w-[65%]"
             onPress={() => {
-              if (title === 'Phone:' && value !== '') {
-                Linking.openURL(`tel:${value}`)
-              } else if (title === 'Email:' && value !== '') {
-                Linking.openURL(`mailto:${value}`)
-              } else if (title === 'Website:' && value !== '') {
-                Linking.openURL(`http://${getWebsite(value)}`)
-              }
+              iconPressed(title, value)
             }}
-            className=""
-            name={iconValue}
-            size={20}
-            color={'black'}
-          />
+          >
+            <Feather className="" name={iconValue} size={20} color={'black'} />
+          </TouchableOpacity>
         ) : (
           <View />
         )}
@@ -258,7 +268,7 @@ export function DoctorDetailsScreen() {
                 getDetailsView(
                   'Username:',
                   doctorDetails.websiteuser,
-                  true,
+                  false,
                   'copy'
                 )
               ) : (
@@ -282,7 +292,7 @@ export function DoctorDetailsScreen() {
 
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowLocations(!isShowLocations)
                 }}
@@ -304,7 +314,7 @@ export function DoctorDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               <Button
                 className=""
                 title="Add Location"
@@ -339,7 +349,7 @@ export function DoctorDetailsScreen() {
 
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setIsShowAppointments(!isShowAppointments)
                 }}
@@ -361,7 +371,7 @@ export function DoctorDetailsScreen() {
                 ) : (
                   <View />
                 )}
-              </Pressable>
+              </TouchableOpacity>
               <Button
                 className="ml-2"
                 title="Add Appointment"
@@ -380,7 +390,7 @@ export function DoctorDetailsScreen() {
               <ScrollView className="mt-2 h-[60%] flex-1">
                 {appointmentList.map((data: any, index: number) => {
                   return (
-                    <Pressable
+                    <TouchableOpacity
                       onPress={() => {
                         router.replace(
                           formatUrl('/circles/appointmentDetails', {
@@ -496,7 +506,7 @@ export function DoctorDetailsScreen() {
                           <View />
                         )}
                       </View>
-                    </Pressable>
+                    </TouchableOpacity>
                   )
                 })}
               </ScrollView>

@@ -1,4 +1,4 @@
-import { View, Image, Pressable, PressableProps } from 'react-native'
+import { TouchableOpacity, PressableProps } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { cn } from './utils'
 import { Feather } from 'app/ui/icons'
@@ -21,7 +21,7 @@ const PtsButton = ({
   onPress
 }: ButtonProps) => {
   return (
-    <Pressable
+    <TouchableOpacity
       disabled={isDisabled}
       className={cn(
         'bg-primary flex-row justify-center self-center rounded-[20px] p-[10]',
@@ -38,7 +38,7 @@ const PtsButton = ({
       {trailingIcon && (
         <Feather name={trailingIcon} size={16} color="white" className="" />
       )}
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 export default PtsButton

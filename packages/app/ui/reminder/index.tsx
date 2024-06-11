@@ -1,4 +1,4 @@
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
@@ -21,7 +21,7 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
           </Typography>
         </View>
         <View className="flex-row">
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
             <Feather
               className="self-center"
               onPress={() => {
@@ -41,8 +41,8 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
               size={15}
               color={'white'}
             />
-          </Pressable>
-          <Pressable className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          </TouchableOpacity>
+          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
             <Feather
               className="self-center"
               onPress={() => {
@@ -52,7 +52,7 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
               size={15}
               color={'white'}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       <View>

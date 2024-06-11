@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Pressable } from 'react-native'
+import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -357,7 +357,7 @@ export function ConsolidatedViewScreen() {
   }
   function getCard(data: any, index: any) {
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={() => {
           if (
             data.type === 'Doctor Appointment' ||
@@ -488,7 +488,7 @@ export function ConsolidatedViewScreen() {
             <View />
           )}
         </View>
-      </Pressable>
+      </TouchableOpacity>
     )
   }
   async function setSelectedTypeChange(value: any) {
@@ -617,7 +617,7 @@ export function ConsolidatedViewScreen() {
       <PtsLoader loading={isLoading} />
 
       <View className="mt-[50px] w-full flex-row">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsDayView(true)
             setIsWeekView(false)
@@ -631,8 +631,8 @@ export function ConsolidatedViewScreen() {
               {'Day'}
             </Typography>
           </View>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             clearLists()
             setIsWeekView(true)
@@ -652,15 +652,15 @@ export function ConsolidatedViewScreen() {
               {'Week'}
             </Typography>
           </View>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             setIsShowFilter(!isShowFilter)
           }}
           className={`w-[20%] items-center justify-center bg-white py-2`}
         >
           <Feather className="ml-2" name={'filter'} size={25} color={'black'} />
-        </Pressable>
+        </TouchableOpacity>
       </View>
       {isShowFilter ? (
         <View className="my-2">
@@ -736,7 +736,7 @@ export function ConsolidatedViewScreen() {
       <View className="bg-primary h-[60] w-full justify-center">
         <View className="flex-row">
           <View className="w-[15%]">
-            <Pressable
+            <TouchableOpacity
               onPress={() => {
                 if (isDayView) {
                   getPreviousDate()
@@ -753,7 +753,7 @@ export function ConsolidatedViewScreen() {
                 size={25}
                 color={'black'}
               />
-            </Pressable>
+            </TouchableOpacity>
           </View>
           <View className="w-[70%] justify-center">
             <Typography className="text-center font-bold text-white">
@@ -771,7 +771,7 @@ export function ConsolidatedViewScreen() {
             </Typography>
           </View>
           <View className="w-[15%]">
-            <Pressable
+            <TouchableOpacity
               onPress={() => {
                 if (isDayView) {
                   getNextDate()
@@ -788,7 +788,7 @@ export function ConsolidatedViewScreen() {
                 size={25}
                 color={'black'}
               />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

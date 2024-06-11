@@ -196,6 +196,7 @@ export const AddEditMedicalDevice = ({
           <Button
             className="bg-[#86939e]"
             title="Cancel"
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               cancelClicked()
@@ -203,8 +204,9 @@ export const AddEditMedicalDevice = ({
           />
           <Button
             className="ml-5"
-            title={'Save'}
+            title={_.isEmpty(medicalDeviceDetails) ? 'Create' : 'Save'}
             variant="default"
+            leadingIcon="save"
             onPress={handleSubmit(callCreateUpdateDevice)}
           />
         </View>

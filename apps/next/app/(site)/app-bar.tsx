@@ -15,9 +15,18 @@ export function AppBar() {
           height={40}
         />
       </Link>
-      <div className="flex items-center">
-        {/* <Button variant="ghost-secondary" className="mr-4" title="Log in" /> */}
-        {/* <Button variant="secondary" title="Sign up" /> */}
+      <div className="flex items-center gap-2">
+        <div className="hidden md:flex">
+          <Link href="https://familycarecircle.com/#/login">
+            <Button variant="link-secondary" className="" title="Log in" />
+          </Link>
+          <Link href="https://familycarecircle.com/#/createAccount">
+            <Button variant="light" title="Sign up" />
+          </Link>
+        </div>
+        <Link href="/links">
+          <Button variant="accent" className="mr-4" title="Get the app" />
+        </Link>
       </div>
     </div>
   )

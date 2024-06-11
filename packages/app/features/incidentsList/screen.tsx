@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -140,7 +140,7 @@ export function IncidentsListScreen() {
 
         {getUserPermission(incidentsPrivileges).createPermission ? (
           <View className="mt-5 self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 router.push(
@@ -151,13 +151,13 @@ export function IncidentsListScreen() {
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
         )}
         <View className="mt-5 self-center">
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setIsFilter(!isFilter)
             }}
@@ -169,7 +169,7 @@ export function IncidentsListScreen() {
               size={25}
               color={COLORS.primary}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
       {isFilter ? (
@@ -230,7 +230,7 @@ export function IncidentsListScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {incidentsList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.replace(
                     formatUrl('/circles/incidentDetails', {
@@ -242,56 +242,63 @@ export function IncidentsListScreen() {
                 key={index}
                 className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
               >
-                <View className="my-2 flex-row">
-                  <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
-                    {data.title ? data.title : ''}
-                  </Typography>
-                  <View className="">
-                    <Typography className="font-bold text-black">
-                      {data.type ? data.type : ''}
-                    </Typography>
-                  </View>
-                </View>
-                <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-full text-black">
-                    {data.location ? data.location : ''}
-                  </Typography>
-                </View>
-                <View className="flex-row">
-                  <Typography className="font-400 ml-5 w-full text-black">
-                    {data.date ? formatTimeToUserLocalTime(data.date) : ''}
-                  </Typography>
-                </View>
-                {data.hasNotes ? (
-                  <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                ) : (
-                  <View />
-                )}
-
-                <View className="ml-5 flex-row">
-                  <View className="w-[30%]">
+                <View className="w-[90%] flex-row">
+                  <View>
+                    <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                        {data.title ? data.title : ''}
+                      </Typography>
+                      <View className="">
+                        <Typography className="font-bold text-black">
+                          {data.type ? data.type : ''}
+                        </Typography>
+                      </View>
+                    </View>
+                    <View className="flex-row">
+                      <Typography className="font-400 ml-5 w-full text-black">
+                        {data.location ? data.location : ''}
+                      </Typography>
+                    </View>
+                    <View className="flex-row">
+                      <Typography className="font-400 ml-5 w-full text-black">
+                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                      </Typography>
+                    </View>
                     {data.hasNotes ? (
-                      <View className="flex-row">
-                        <Feather
-                          className="ml-5 mt-1"
-                          name={'message-circle'}
-                          size={25}
-                          color={'green'}
-                        />
-                        {data.unreadMessageCount > 0 ? (
-                          <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                            {data.unreadMessageCount}
-                          </Typography>
+                      <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
+                    ) : (
+                      <View />
+                    )}
+
+                    <View className="ml-5 flex-row">
+                      <View className="w-[30%]">
+                        {data.hasNotes ? (
+                          <View className="flex-row">
+                            <Feather
+                              className="ml-5 mt-1"
+                              name={'message-circle'}
+                              size={25}
+                              color={'green'}
+                            />
+                            {data.unreadMessageCount > 0 ? (
+                              <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                {data.unreadMessageCount}
+                              </Typography>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
                         ) : (
                           <View />
                         )}
                       </View>
-                    ) : (
-                      <View />
-                    )}
+                    </View>
+                  </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

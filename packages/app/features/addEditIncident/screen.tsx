@@ -159,6 +159,7 @@ export function AddEditIncidentScreen() {
     }
     if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
       url = `${BASE_URL}${CREATE_INCIDENT}`
+      dataObject.incident.location.address.id = ''
     } else {
       url = `${BASE_URL}${UPDATE_INCIDENT}`
       dataObject.incident.id = incidentDetails.id
@@ -247,7 +248,8 @@ export function AddEditIncidentScreen() {
         <View className="my-2 mb-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"
-            title="Cancel"
+            title={'Cancel'}
+            leadingIcon="x"
             variant="default"
             onPress={() => {
               router.back()
