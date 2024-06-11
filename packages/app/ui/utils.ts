@@ -232,8 +232,8 @@ export const formatTimeToUserLocalTime = (time: any) => {
     return getFullDate(moment(time).utc(true))
   }
 }
-export const getNameInitials = (fullName: string) => {
-  let fullNameStr = fullName.split(' ')
+export const getNameInitials = (fullName?: string) => {
+  let fullNameStr = fullName?.split(' ') || []
   let initials = ''
   if (fullNameStr[0]?.split('')[0]?.toUpperCase() !== undefined) {
     initials += fullNameStr[0]?.split('')[0]?.toUpperCase()

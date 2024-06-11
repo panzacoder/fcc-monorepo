@@ -3,7 +3,7 @@ import { Typography } from 'app/ui/typography'
 import { getNameInitials } from 'app/ui/utils'
 import { cn } from './utils'
 export type Props = {
-  fullName?: any
+  fullName?: string
   className?: string
 }
 const PtsNameInitials = ({ fullName, className }: Props) => {
