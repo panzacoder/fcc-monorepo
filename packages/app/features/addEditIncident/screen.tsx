@@ -8,7 +8,7 @@ import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Stack } from 'expo-router'
@@ -172,12 +172,18 @@ export function AddEditIncidentScreen() {
           let details = _.isEmpty(incidentDetails)
             ? data.data.incident
             : data.data
+
           router.replace(
             formatUrl('/circles/incidentDetails', {
               incidentDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
+          if (_.isEmpty(incidentDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(1)
+          }
         } else {
           Alert.alert('', data.message)
         }
@@ -210,7 +216,7 @@ export function AddEditIncidentScreen() {
             onSelection={onSelection}
           />
         </View>
-        <View className="mt-2 w-[95%] self-center">
+        <View className="mt-2 w-full self-center">
           <PtsComboBox
             currentData={incidentType}
             listData={incidentTypeList}
@@ -223,7 +229,7 @@ export function AddEditIncidentScreen() {
             control={control}
             name="title"
             placeholder={'Title*'}
-            className="w-[95%] bg-white"
+            className="w-full bg-white"
             autoCapitalize="none"
           />
         </View>
@@ -232,7 +238,7 @@ export function AddEditIncidentScreen() {
             control={control}
             name="description"
             placeholder={'Description'}
-            className="w-[95%] bg-white"
+            className="w-full bg-white"
             autoCapitalize="none"
           />
         </View>

@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 let selectedType = ''
@@ -158,8 +158,11 @@ export function AddEditFacilityScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          let details = data.data.facility ? data.data.facility : {}
+          router.dismiss(2)
           router.push(
-            formatUrl('/circles/facilitiesList', {
+            formatUrl('/circles/facilityDetails', {
+              facilityDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
@@ -203,7 +206,14 @@ export function AddEditFacilityScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.back()
+          let details = data.data.facility ? data.data.facility : {}
+          router.dismiss(1)
+          router.push(
+            formatUrl('/circles/facilityDetails', {
+              facilityDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData)
+            })
+          )
         } else {
           Alert.alert('', data.message)
         }

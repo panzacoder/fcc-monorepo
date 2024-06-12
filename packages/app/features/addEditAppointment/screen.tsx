@@ -21,7 +21,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-// import { useRouter } from 'solito/navigation'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
@@ -218,7 +217,12 @@ export function AddEditAppointmentScreen() {
           } else {
             apptDetails = data.data.appointment ? data.data.appointment : {}
           }
-          router.dismiss(1)
+          if (_.isEmpty(appointmentDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
@@ -300,7 +304,7 @@ export function AddEditAppointmentScreen() {
       />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full py-2 ">
-        <ScrollView className="w-full flex-1">
+      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
           <View className="mt-5 w-full items-center">
             <ControlledDropdown
               control={control}
@@ -315,7 +319,7 @@ export function AddEditAppointmentScreen() {
               }
               maxHeight={300}
               list={typesList}
-              className="w-[95%]"
+              className=""
               onChangeValue={setSelectedTypeChange}
             />
             {isShowDoctorFacilityDropdown && isDataReceived ? (
@@ -326,7 +330,7 @@ export function AddEditAppointmentScreen() {
                 defaultValue={''}
                 maxHeight={300}
                 list={doctorFacilityList}
-                className="mt-2 w-[95%]"
+                className="mt-2 "
                 // onChangeValue={setSelectedTypeChange}
               />
             ) : (
@@ -345,11 +349,11 @@ export function AddEditAppointmentScreen() {
               control={control}
               name="description"
               placeholder={'Description'}
-              className="w-[95%] bg-white"
+              className=" bg-white"
               autoCapitalize="none"
             />
           </View>
-          <View className="w-[95%] self-center">
+          <View className="w-full self-center">
             <PtsComboBox
               currentData={purpose}
               listData={purposeList}

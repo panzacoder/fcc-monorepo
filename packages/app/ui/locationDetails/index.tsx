@@ -207,7 +207,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               name="locationName"
               placeholder={'Location Name'}
               className="w-full bg-white"
-              autoCapitalize="none"
               onChangeText={(text) => {
                 // console.log('text', text)
                 setAddressObject(text, 0)
@@ -224,7 +223,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="line"
             placeholder={'Address'}
             className="w-full bg-white"
-            autoCapitalize="none"
             onChangeText={(text) => {
               // console.log('text', text)
               setAddressObject(text, 1)
@@ -268,7 +266,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="city"
             placeholder={'City'}
             className="w-full bg-white"
-            autoCapitalize="none"
             onChangeText={(text) => {
               // console.log('text', text)
               setAddressObject(text, 2)
@@ -281,7 +278,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="postalCode"
             placeholder={'Postal Code'}
             className="w-full bg-white"
-            autoCapitalize="none"
+            keyboard="number-pad"
             onChangeText={(text) => {
               // console.log('text', text)
               setAddressObject(text, 3)

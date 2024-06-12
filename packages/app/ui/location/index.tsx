@@ -1,7 +1,7 @@
 import { Alert, View, Linking, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getAddressFromObject, googleMapOpenUrl } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
@@ -9,7 +9,7 @@ export function Location(data: any) {
   // export const Location = ({ data }) => {
   const router = useRouter()
   let locationData = data.data ? data.data : {}
-  console.log('locationData', JSON.stringify(locationData))
+  // console.log('locationData', JSON.stringify(locationData))
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
@@ -17,13 +17,70 @@ export function Location(data: any) {
   async function deleteLocation() {
     console.log('deleteLocation')
   }
+  let touchStyle =
+    'mt-2 h-[32px] w-[32px] items-center justify-center  rounded-full bg-[#0d9195] ml-2'
   return (
     <View>
       {locationData.nickName && locationData.nickName !== '' ? (
         <View className="mt-2 w-full ">
-          <Typography className="text-primary mr-2 font-bold">
-            {locationData.nickName ? locationData.nickName : ''}
-          </Typography>
+          <View className="flex-row items-center py-1">
+            <Typography className="text-primary mr-2 w-[70%] font-bold">
+              {locationData.nickName ? locationData.nickName : ''}
+            </Typography>
+            <View className="flex-row self-center">
+              {locationData.component !== 'Appointment' ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert(
+                      'Are you sure about deleting Location?',
+                      'It cannot be recovered once deleted.',
+                      [
+                        {
+                          text: 'Ok',
+                          onPress: () => deleteLocation()
+                        },
+                        { text: 'Cancel', onPress: () => {} }
+                      ]
+                    )
+                  }}
+                  className={touchStyle}
+                >
+                  <Feather
+                    className=" "
+                    name={'trash'}
+                    size={20}
+                    color={'white'}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View />
+              )}
+              {locationData.component !== 'Appointment' ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.replace(
+                      formatUrl('/circles/addEditLocation', {
+                        locationDetails: JSON.stringify(locationData),
+                        component: locationData.component
+                          ? locationData.component
+                          : ''
+                      })
+                    )
+                  }}
+                  className={touchStyle}
+                >
+                  <Feather
+                    className=""
+                    name={'edit-2'}
+                    size={20}
+                    color={'white'}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View />
+              )}
+            </View>
+          </View>
           <View className="h-[0.5px] w-full bg-gray-400" />
         </View>
       ) : (
@@ -32,7 +89,7 @@ export function Location(data: any) {
 
       <View className="w-full flex-row">
         {locationData.address && locationData.address !== '' ? (
-          <View className="mt-2 w-[70%] flex-row items-center">
+          <View className="mt-2 w-[85%] flex-row items-center">
             <Typography className="font-400 text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>
@@ -45,67 +102,15 @@ export function Location(data: any) {
             let addressString = getAddressFromObject(locationData.address)
             googleMapOpenUrl(addressString)
           }}
-          className="mt-2"
+          className={touchStyle}
         >
           <Feather
-            className="ml-2"
+            className="self-center"
             name={'navigation'}
             size={20}
-            color={'black'}
+            color={'white'}
           />
         </TouchableOpacity>
-
-        {locationData.component !== 'Appointment' ? (
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert(
-                'Are you sure about deleting Location?',
-                'It cannot be recovered once deleted.',
-                [
-                  {
-                    text: 'Ok',
-                    onPress: () => deleteLocation()
-                  },
-                  { text: 'Cancel', onPress: () => {} }
-                ]
-              )
-            }}
-            className="mt-2"
-          >
-            <Feather
-              className="ml-2 "
-              name={'trash'}
-              size={20}
-              color={'black'}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View />
-        )}
-        {locationData.component !== 'Appointment' ? (
-          <TouchableOpacity
-            onPress={() => {
-              router.replace(
-                formatUrl('/circles/addEditLocation', {
-                  locationDetails: JSON.stringify(locationData),
-                  component: locationData.component
-                    ? locationData.component
-                    : ''
-                })
-              )
-            }}
-            className="mt-2"
-          >
-            <Feather
-              className="ml-2 "
-              name={'edit-2'}
-              size={20}
-              color={'black'}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View />
-        )}
       </View>
       {locationData.phone && locationData.phone !== '' ? (
         <TouchableOpacity

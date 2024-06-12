@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
 import { formatUrl } from 'app/utils/format-url'
 import {
@@ -210,6 +210,8 @@ export function AddEditDoctorScreen() {
           let details: any = data.data.doctor
             ? JSON.stringify(data.data.doctor)
             : {}
+
+          router.dismiss(2)
           router.replace(
             formatUrl('/circles/doctorDetails', {
               doctorDetails: details,
@@ -252,8 +254,13 @@ export function AddEditDoctorScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.push(
-            formatUrl('/circles/doctorsList', {
+          router.dismiss(1)
+          let details: any = data.data.doctor
+            ? JSON.stringify(data.data.doctor)
+            : {}
+          router.replace(
+            formatUrl('/circles/doctorDetails', {
+              doctorDetails: details,
               memberData: JSON.stringify(memberData)
             })
           )
@@ -312,7 +319,6 @@ export function AddEditDoctorScreen() {
                   name="firstName"
                   placeholder={'First Name'}
                   className="w-[50%]"
-                  autoCapitalize="none"
                 />
                 <ControlledTextField
                   control={control}
