@@ -105,6 +105,7 @@ export function AppointmentsListScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          setLoading(false)
           const list: Array<{ id: number; title: string }> = [
             { title: 'All', id: 1 }
           ]

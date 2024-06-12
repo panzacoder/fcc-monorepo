@@ -30,7 +30,7 @@ import {
 import { useParams } from 'solito/navigation'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -376,6 +376,7 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/appointmentsList', {
               memberData: JSON.stringify(memberData)

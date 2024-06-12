@@ -26,7 +26,7 @@ import { Note } from 'app/ui/note'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -336,6 +336,7 @@ export function IncidentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/incidentsList', {
               memberData: JSON.stringify(memberData)

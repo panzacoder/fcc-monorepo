@@ -18,7 +18,7 @@ import {
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -100,6 +100,7 @@ export function FacilityDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/facilitiesList', {
               memberData: JSON.stringify(memberData)
@@ -154,7 +155,9 @@ export function FacilityDetailsScreen() {
                 </Typography>
                 <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
                 <Typography className="font-400 text-primary ml-2 text-[16px]">
-                  {facilityInfo.status ? facilityInfo.status : ''}
+                  {facilityInfo.status && facilityInfo.status.status
+                    ? facilityInfo.status.status
+                    : ''}
                 </Typography>
               </View>
               <Button

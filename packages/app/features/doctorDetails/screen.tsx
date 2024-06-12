@@ -20,7 +20,7 @@ import {
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
@@ -155,6 +155,7 @@ export function DoctorDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)

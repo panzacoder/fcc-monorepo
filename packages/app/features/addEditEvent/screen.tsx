@@ -9,7 +9,7 @@ import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
 import { Stack } from 'expo-router'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
@@ -144,6 +144,11 @@ export function AddEditEventScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          if (_.isEmpty(eventDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
           router.replace(
             formatUrl('/circles/eventDetails', {
               eventDetails: JSON.stringify(data.data.event),

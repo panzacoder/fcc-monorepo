@@ -25,7 +25,7 @@ import { useParams } from 'solito/navigation'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
 import { consoleData } from 'app/ui/utils'
@@ -328,10 +328,12 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(1)
           if (item.component === 'Doctor') {
             let details: any = data.data.doctor
               ? JSON.stringify(data.data.doctor)
               : {}
+
             router.replace(
               formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
@@ -339,7 +341,17 @@ export function AddEditLocationScreen() {
               })
             )
           } else {
-            router.back()
+            // router.back()
+            let details: any = data.data.facility
+              ? JSON.stringify(data.data.facility)
+              : {}
+
+            router.replace(
+              formatUrl('/circles/facilityDetails', {
+                facilityDetails: details,
+                memberData: JSON.stringify(memberData)
+              })
+            )
           }
         } else {
           Alert.alert('', data.message)
