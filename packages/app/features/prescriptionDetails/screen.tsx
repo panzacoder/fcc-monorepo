@@ -14,21 +14,18 @@ import {
   GET_PRESCRIPTION,
   DELETE_PRESCRIPTION,
   GET_PHARMACY_LIST,
-  GET_ACTIVE_DOCTORS,
-  UPDATE_PRESCRIPTION
+  GET_ACTIVE_DOCTORS
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
-import { AddEditPrescription } from 'app/ui/addEditPrescription'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
 let prescriptionPrivileges = {}
 export function PrescriptionDetailsScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
-  const [isAddPrescription, setIsAddPrescription] = useState(false)
   const [pharmacyListFull, setPharmacyListFull] = useState([]) as any
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
@@ -65,7 +62,6 @@ export function PrescriptionDetailsScreen() {
               : {}
           }
           setPrescriptionDetails(data.data.medicine ? data.data.medicine : {})
-          setIsAddPrescription(false)
         } else {
           Alert.alert('', data.message)
         }
@@ -245,66 +241,7 @@ export function PrescriptionDetailsScreen() {
         console.log(error)
       })
   }
-  const cancelClicked = () => {
-    setIsAddPrescription(false)
-  }
-  async function createUpdatePrescription(object: any) {
-    console.log('createUpdatePrescription', JSON.stringify(object))
-    setLoading(true)
-    let doctorId = ''
-    let facilityId = ''
-    if (object.prescribedBy !== '') {
-      doctorListFull.map((data: any, index: any) => {
-        if (data.name === object.prescribedBy) {
-          doctorId = data.id
-        }
-      })
-    }
-    if (object.selectedPharmacy !== '') {
-      pharmacyListFull.map((data: any, index: any) => {
-        if (data.name === object.selectedPharmacy) {
-          facilityId = data.id
-        }
-      })
-    }
-    let url = `${BASE_URL}${UPDATE_PRESCRIPTION}`
-    let dataObject = {
-      header: header,
-      medicine: {
-        id: prescriptionData.id ? prescriptionData.id : '',
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        name: object.drugName ? object.drugName : '',
-        strength: object.strength ? object.strength : '',
-        prescribedDate: object.prescribedDate ? object.prescribedDate : '',
-        startDate: object.startDate ? object.startDate : '',
-        endDate: object.endDate ? object.endDate : '',
-        instructions: object.instructions ? object.instructions : '',
-        notes: object.notes ? object.notes : '',
-        pharmacy: object.selectedPharmacy ? object.selectedPharmacy : '',
-        doctorName: object.prescribedBy ? object.prescribedBy : '',
-        facilityid: facilityId,
-        doctorid: doctorId,
-        type: {
-          id: object.type ? object.type : ''
-        }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getPrescriptionDetails()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -320,14 +257,14 @@ export function PrescriptionDetailsScreen() {
                     title="Edit"
                     variant="border"
                     onPress={() => {
-                      // router.push(
-                      //   formatUrl('/circles/addEditIncident', {
-                      //     memberData: JSON.stringify(memberData),
-                      //     prescriptionDetails:
-                      //       JSON.stringify(prescriptionDetails)
-                      //   })
-                      // )
-                      setIsAddPrescription(true)
+                      router.push(
+                        formatUrl('/circles/addEditPrescription', {
+                          memberData: JSON.stringify(memberData),
+                          prescriptionDetails:
+                            JSON.stringify(prescriptionDetails)
+                        })
+                      )
+                      // setIsAddPrescription(true)
                     }}
                   />
                 ) : (
@@ -374,19 +311,6 @@ export function PrescriptionDetailsScreen() {
             <View />
           )}
         </ScrollView>
-        {isAddPrescription ? (
-          <View className="h-full w-full ">
-            <AddEditPrescription
-              prescriptionDetails={prescriptionDetails}
-              cancelClicked={cancelClicked}
-              createUpdatePrescription={createUpdatePrescription}
-              activeDoctorList={doctorListFull}
-              pharmacyList={pharmacyListFull}
-            />
-          </View>
-        ) : (
-          <View />
-        )}
       </View>
     </View>
   )

@@ -50,6 +50,7 @@ export function AddEditAppointmentScreen() {
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
+  console.log('isFromCreateSimilar', isFromCreateSimilar)
   let component = item.component ? item.component : ''
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
@@ -215,9 +216,16 @@ export function AddEditAppointmentScreen() {
               ? data.data.appointmentWithPreviousAppointment.appointment
               : {}
           } else {
-            apptDetails = data.data.appointment ? data.data.appointment : {}
+            if (isFromCreateSimilar === 'true') {
+              apptDetails = data.data.appointmentWithPreviousAppointment
+                .appointment
+                ? data.data.appointmentWithPreviousAppointment.appointment
+                : {}
+            } else {
+              apptDetails = data.data.appointment ? data.data.appointment : {}
+            }
           }
-          if (_.isEmpty(appointmentDetails)) {
+          if (_.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true') {
             router.dismiss(1)
           } else {
             router.dismiss(2)
@@ -304,7 +312,7 @@ export function AddEditAppointmentScreen() {
       />
       <PtsLoader loading={isLoading} />
       <View className="absolute top-[0] h-full w-full py-2 ">
-      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
           <View className="mt-5 w-full items-center">
             <ControlledDropdown
               control={control}

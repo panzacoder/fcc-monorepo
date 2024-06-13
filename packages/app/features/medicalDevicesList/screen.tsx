@@ -188,12 +188,12 @@ export function MedicalDevicesListScreen() {
                 <TouchableOpacity
                   className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                   onPress={() => {
-                    // router.push(
-                    //   formatUrl('/circles/addEditDoctor', {
-                    //     memberData: JSON.stringify(memberData)
-                    //   })
-                    // )
-                    setIsAddDevice(true)
+                    router.push(
+                      formatUrl('/circles/addEditMedicalDevice', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                    // setIsAddDevice(true)
                   }}
                 >
                   <Feather name={'plus'} size={25} color={COLORS.primary} />

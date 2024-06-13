@@ -169,21 +169,21 @@ export function AddEditIncidentScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           //   console.log('addEditIncident', JSON.stringify(data.data))
-          let details = _.isEmpty(incidentDetails)
-            ? data.data.incident
-            : data.data
-
+          let details =
+            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+              ? data.data.incident
+              : data.data
+          if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
           router.replace(
             formatUrl('/circles/incidentDetails', {
               incidentDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
-          if (_.isEmpty(incidentDetails)) {
-            router.dismiss(1)
-          } else {
-            router.dismiss(1)
-          }
         } else {
           Alert.alert('', data.message)
         }

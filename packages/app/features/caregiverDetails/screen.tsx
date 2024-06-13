@@ -9,13 +9,11 @@ import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import {
   BASE_URL,
   DELETE_CAREGIVER,
-  GET_CAREGIVER_DETAILS,
-  UPDATE_CAREGIVER
+  GET_CAREGIVER_DETAILS
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
 import { useParams } from 'solito/navigation'
@@ -35,7 +33,6 @@ export function CaregiverDetailsScreen() {
 
   const [isLoading, setLoading] = useState(false)
   const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
-  const [isAddCaregiver, setIsAddCaregiver] = useState(false)
 
   const [fullName, setFullName] = useState('')
   const [status, setStatus] = useState('')
@@ -127,14 +124,9 @@ export function CaregiverDetailsScreen() {
     )
   }
   const cancelClicked = () => {
-    setIsAddCaregiver(false)
     setIsShowProfileInfo(false)
   }
 
-  const infoClicked = () => {
-    setIsAddCaregiver(false)
-    setIsShowProfileInfo(true)
-  }
   async function deleteCaregiver() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_CAREGIVER}`
@@ -163,28 +155,7 @@ export function CaregiverDetailsScreen() {
         console.log('error', error)
       })
   }
-  async function createUpdateCaregiver(object: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: object
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getCaregiverDetails()
-          setIsAddCaregiver(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -199,7 +170,13 @@ export function CaregiverDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  setIsAddCaregiver(true)
+                  // setIsAddCaregiver(true)
+                  router.push(
+                    formatUrl('/circles/addEditCaregiver', {
+                      memberData: JSON.stringify(memberData),
+                      caregiverDetails: JSON.stringify(caregiverDetails)
+                    })
+                  )
                 }}
               />
             </View>
@@ -246,19 +223,7 @@ export function CaregiverDetailsScreen() {
           </View>
         </ScrollView>
       </View>
-      {isAddCaregiver ? (
-        <View className="h-full w-full ">
-          <AddEditCaregiver
-            caregiverDetails={caregiverDetails}
-            cancelClicked={cancelClicked}
-            createUpdateCaregiver={createUpdateCaregiver}
-            memberData={memberData}
-            infoClicked={infoClicked}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
+
       {isShowProfileInfo ? (
         <View className="h-full w-full justify-center">
           <CaregiverProfileInfo cancelClicked={cancelClicked} />

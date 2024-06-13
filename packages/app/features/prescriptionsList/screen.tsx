@@ -13,11 +13,9 @@ import {
   BASE_URL,
   GET_PRESCRIPTION_LIST,
   GET_PHARMACY_LIST,
-  GET_ACTIVE_DOCTORS,
-  CREATE_PRESCRIPTION
+  GET_ACTIVE_DOCTORS
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
-import { AddEditPrescription } from 'app/ui/addEditPrescription'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'solito/navigation'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -48,7 +46,6 @@ export function PrescriptionsListScreen() {
   const [doctorList, setDoctorList] = useState([]) as any
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [isAddPrescription, setIsAddPrescription] = useState(false)
   const [prescriptionListFull, setPrescriptionListFull] = useState([]) as any
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
@@ -107,7 +104,6 @@ export function PrescriptionsListScreen() {
           setIsDataReceived(true)
           getFilteredList(list, currentFilter)
           setIsFilter(false)
-          setIsAddPrescription(false)
         } else {
           Alert.alert('', data.message)
         }
@@ -255,127 +251,69 @@ export function PrescriptionsListScreen() {
       drugName: ''
     })
   }
-  const cancelClicked = () => {
-    setIsAddPrescription(false)
-  }
-  async function createUpdatePrescription(object: any) {
-    let doctorId = ''
-    let facilityId = ''
-    if (object.prescribedBy !== '') {
-      doctorListFull.map((data: any, index: any) => {
-        if (data.name === object.prescribedBy) {
-          doctorId = data.id
-        }
-      })
-    }
-    if (object.selectedPharmacy !== '') {
-      pharmacyListFull.map((data: any, index: any) => {
-        if (data.name === object.selectedPharmacy) {
-          facilityId = data.id
-        }
-      })
-    }
-    setLoading(true)
-    let url = `${BASE_URL}${CREATE_PRESCRIPTION}`
-    let dataObject = {
-      header: header,
-      medicine: {
-        name: object.drugName ? object.drugName : '',
-        prescribedDate: object.prescribedDate ? object.prescribedDate : '',
-        startDate: object.startDate ? object.startDate : '',
-        endDate: object.endDate ? object.endDate : '',
-        instructions: object.instructions ? object.instructions : '',
-        notes: object.notes ? object.notes : '',
-        pharmacy: object.selectedPharmacy ? object.selectedPharmacy : '',
-        doctorName: object.prescribedBy ? object.prescribedBy : '',
-        facilityid: facilityId,
-        doctorid: doctorId,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        type: {
-          id: object.type ? object.type : ''
-        }
-      }
-    }
-    console.log('in createUpdatePrescription', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getPrescriptionList(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   return (
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        {!isAddPrescription ? (
-          <View className="w-full flex-row">
-            <View className="min-w-[75%]">
-              <TouchableOpacity
-                onPress={() => {
-                  setIsShowFilter(!isShowFilter)
-                }}
-                className=" flex-row"
-              >
-                <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-                  {currentFilter}
-                </Typography>
-                <Feather
-                  className="ml-2 mt-6"
-                  name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-                  size={25}
-                  color={'black'}
-                />
-              </TouchableOpacity>
-            </View>
-            {getUserPermission(prescriptionPrivileges).createPermission ? (
-              <View className=" mt-[20] self-center">
-                <TouchableOpacity
-                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-                  onPress={() => {
-                    // router.push(
-                    //   formatUrl('/circles/addEditDoctor', {
-                    //     memberData: JSON.stringify(memberData)
-                    //   })
-                    // )
-                    setIsAddPrescription(true)
-                  }}
-                >
-                  <Feather name={'plus'} size={25} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View />
-            )}
-            <View className="mt-5 self-center">
-              <TouchableOpacity
-                onPress={() => {
-                  setIsShowFilter(false)
-                  setIsFilter(!isFilter)
-                }}
-                className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
-              >
-                <Feather
-                  className=""
-                  name={'filter'}
-                  size={25}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
-            </View>
+
+        <View className="w-full flex-row">
+          <View className="min-w-[75%]">
+            <TouchableOpacity
+              onPress={() => {
+                setIsShowFilter(!isShowFilter)
+              }}
+              className=" flex-row"
+            >
+              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+                {currentFilter}
+              </Typography>
+              <Feather
+                className="ml-2 mt-6"
+                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+                size={25}
+                color={'black'}
+              />
+            </TouchableOpacity>
           </View>
-        ) : (
-          <View />
-        )}
+          {getUserPermission(prescriptionPrivileges).createPermission ? (
+            <View className=" mt-[20] self-center">
+              <TouchableOpacity
+                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/addEditPrescription', {
+                      memberData: JSON.stringify(memberData),
+                      activeDoctorList: JSON.stringify(doctorListFull),
+                      pharmacyList: JSON.stringify(pharmacyListFull)
+                    })
+                  )
+                  // setIsAddPrescription(true)
+                }}
+              >
+                <Feather name={'plus'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View />
+          )}
+          <View className="mt-5 self-center">
+            <TouchableOpacity
+              onPress={() => {
+                setIsShowFilter(false)
+                setIsFilter(!isFilter)
+              }}
+              className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+            >
+              <Feather
+                className=""
+                name={'filter'}
+                size={25}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
       {isFilter ? (
         <View className="mt-2 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -560,19 +498,6 @@ export function PrescriptionsListScreen() {
           )
         })}
       </ScrollView>
-      {isAddPrescription ? (
-        <View className="h-full w-full ">
-          <AddEditPrescription
-            prescriptionDetails={{}}
-            cancelClicked={cancelClicked}
-            createUpdatePrescription={createUpdatePrescription}
-            activeDoctorList={doctorListFull}
-            pharmacyList={pharmacyListFull}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
     </View>
   )
 }
