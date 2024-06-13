@@ -243,7 +243,7 @@ export function EventsListScreen() {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
           }}
-          className="w-[75%] flex-row"
+          className="w-[40%] flex-row"
         >
           <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
             {currentFilter}
@@ -255,6 +255,7 @@ export function EventsListScreen() {
             color={'black'}
           />
         </TouchableOpacity>
+        <View className="w-[35%]" />
         {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity

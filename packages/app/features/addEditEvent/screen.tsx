@@ -144,14 +144,15 @@ export function AddEditEventScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          if (_.isEmpty(eventDetails)) {
+          if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
             router.dismiss(1)
           } else {
             router.dismiss(2)
           }
+          let details = data.data.event ? data.data.event : {}
           router.replace(
             formatUrl('/circles/eventDetails', {
-              eventDetails: JSON.stringify(data.data.event),
+              eventDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
@@ -188,7 +189,7 @@ export function AddEditEventScreen() {
             control={control}
             name="title"
             placeholder={'Title*'}
-            className="w-[95%] bg-white"
+            className="bg-white"
             autoCapitalize="none"
           />
         </View>
@@ -197,7 +198,7 @@ export function AddEditEventScreen() {
             control={control}
             name="description"
             placeholder={'Description'}
-            className="w-[95%] bg-white"
+            className="bg-white"
             autoCapitalize="none"
           />
         </View>
@@ -210,10 +211,23 @@ export function AddEditEventScreen() {
           }
           setAddressObject={setAddressObject}
         />
-        <View className="my-2 mb-5 flex-row justify-center">
+        <View className="mb-5 flex-row justify-center">
           <Button
-            className="bg-[#287CFA]"
-            title={'Save'}
+            className="bg-[#86939e]"
+            title={'Cancel'}
+            leadingIcon="x"
+            variant="default"
+            onPress={() => {
+              router.back()
+            }}
+          />
+          <Button
+            className="ml-5 bg-[#287CFA]"
+            title={
+              _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+                ? 'Create'
+                : 'Save'
+            }
             leadingIcon="save"
             variant="default"
             onPress={handleSubmit(addEditEvent)}

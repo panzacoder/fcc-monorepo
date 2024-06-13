@@ -13,22 +13,17 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   GET_MEMBER_CAREGIVERS,
-  CREATE_CAREGIVER,
   RESEND_CAREGIVER_REQEST
 } from 'app/utils/urlConstants'
 import { useParams } from 'solito/navigation'
-import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 let caregiverPrivileges = {}
 export function CaregiversListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
-  const [isAddCaregiver, setIsAddCaregiver] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
   const [caregiversList, setCaregiversList] = useState([]) as any
   const [caregiversListFull, setCaregiversListFull] = useState([])
@@ -99,36 +94,6 @@ export function CaregiversListScreen() {
     })
     setCaregiversList(filteredList)
   }
-  const cancelClicked = () => {
-    setIsAddCaregiver(false)
-    setIsShowProfileInfo(false)
-  }
-  const infoClicked = () => {
-    setIsAddCaregiver(false)
-    setIsShowProfileInfo(true)
-  }
-  async function createUpdateCaregiver(object: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${CREATE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: object
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getCaregiversList()
-          setIsAddCaregiver(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
   async function resendRequest(object: any) {
     setLoading(true)
     let url = `${BASE_URL}${RESEND_CAREGIVER_REQEST}`
@@ -153,42 +118,44 @@ export function CaregiversListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        {!isAddCaregiver ? (
-          <View className="flex-row ">
-            <TouchableOpacity
-              onPress={() => {
-                setIsShowFilter(!isShowFilter)
-              }}
-              className="w-[85%] flex-row"
-            >
-              <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
-                {currentFilter}
-              </Typography>
-              <Feather
-                className="ml-2 mt-6"
-                name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
-                size={25}
-                color={'black'}
-              />
-            </TouchableOpacity>
-            {getUserPermission(caregiverPrivileges).createPermission ? (
-              <View className=" mt-[20] self-center">
-                <TouchableOpacity
-                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-                  onPress={() => {
-                    setIsAddCaregiver(true)
-                  }}
-                >
-                  <Feather name={'plus'} size={25} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View />
-            )}
-          </View>
-        ) : (
-          <View />
-        )}
+
+        <View className="flex-row ">
+          <TouchableOpacity
+            onPress={() => {
+              setIsShowFilter(!isShowFilter)
+            }}
+            className="w-[85%] flex-row"
+          >
+            <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
+              {currentFilter}
+            </Typography>
+            <Feather
+              className="ml-2 mt-6"
+              name={!isShowFilter ? 'chevron-down' : 'chevron-up'}
+              size={25}
+              color={'black'}
+            />
+          </TouchableOpacity>
+          {getUserPermission(caregiverPrivileges).createPermission ? (
+            <View className=" mt-[20] self-center">
+              <TouchableOpacity
+                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
+                onPress={() => {
+                  // setIsAddCaregiver(true)
+                  router.push(
+                    formatUrl('/circles/addEditCaregiver', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
+              >
+                <Feather name={'plus'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View />
+          )}
+        </View>
 
         {isShowFilter ? (
           <View className="ml-5 w-[40%]">
@@ -326,26 +293,6 @@ export function CaregiversListScreen() {
         )}
       </ScrollView>
 
-      {isAddCaregiver ? (
-        <View className="h-full w-full ">
-          <AddEditCaregiver
-            caregiverDetails={{}}
-            cancelClicked={cancelClicked}
-            createUpdateCaregiver={createUpdateCaregiver}
-            memberData={memberData}
-            infoClicked={infoClicked}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
-      {isShowProfileInfo ? (
-        <View className="h-full w-full ">
-          <CaregiverProfileInfo cancelClicked={cancelClicked} />
-        </View>
-      ) : (
-        <View />
-      )}
     </View>
   )
 }
