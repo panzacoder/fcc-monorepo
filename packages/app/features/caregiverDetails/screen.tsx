@@ -16,14 +16,14 @@ import {
   GET_CAREGIVER_DETAILS
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
-import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let caregiverPrivileges = {}
 export function CaregiverDetailsScreen() {
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let caregiverInfo = item.caregiverDetails
@@ -140,6 +140,7 @@ export function CaregiverDetailsScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.replace(
             formatUrl('/circles/caregiversList', {
               memberData: JSON.stringify(memberData)

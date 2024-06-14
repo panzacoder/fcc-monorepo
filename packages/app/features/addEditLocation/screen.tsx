@@ -21,7 +21,7 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
@@ -48,7 +48,7 @@ export function AddEditLocationScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let locationDetails = item.locationDetails

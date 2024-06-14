@@ -17,7 +17,7 @@ import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import store from 'app/redux/store'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {
   BASE_URL,
@@ -44,7 +44,7 @@ export function NoteMessageScreen() {
   const [threadDetails, setThreadDetails] = useState({}) as any
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let noteData = item.noteData !== undefined ? JSON.parse(item.noteData) : {}
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}

@@ -13,7 +13,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -38,7 +38,7 @@ let prescribedBy: any = ''
 let selectedPharmacy: any = ''
 let selectedTypeIndex: any = -1
 export function AddEditPrescriptionScreen() {
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   const header = store.getState().headerState.header
   let prescriptionDetails =

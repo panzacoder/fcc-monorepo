@@ -11342,6 +11342,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-secure-store@npm:~12.8.1":
+  version: 12.8.1
+  resolution: "expo-secure-store@npm:12.8.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/fcdb4ed0d04838003ce9efff3398ba0db6270596de0d778daa6198fbf6962aa36267d75e544e4fa82cb93ac0694490fc7404defcbcdd54c220c78f03ec6fea86
+  languageName: node
+  linkType: hard
+
 "expo-splash-screen@npm:0.26.4, expo-splash-screen@npm:~0.26.4":
   version: 0.26.4
   resolution: "expo-splash-screen@npm:0.26.4"
@@ -11640,6 +11649,7 @@ __metadata:
     "@types/react-native__assets": "npm:^1"
     chromatic: "npm:^11.0.0"
     eslint: "npm:^8.57.0"
+    expo-secure-store: "npm:~12.8.1"
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
     react-native-blob-util: "npm:^0.19.9"

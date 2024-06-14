@@ -18,9 +18,9 @@ import {
   GET_THREAD_PARTICIPANTS,
   CREATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let messagePrivileges = {}
 
@@ -36,7 +36,7 @@ export function MessagesScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [messagesList, setMessagesList] = useState([]) as any
   const [messagesListFull, setMessagesListFull] = useState([]) as any
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)

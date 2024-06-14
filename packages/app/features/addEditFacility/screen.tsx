@@ -24,7 +24,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
@@ -74,7 +74,7 @@ export function AddEditFacilityScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let facilityDetails = item.facilityDetails
     ? JSON.parse(item.facilityDetails)

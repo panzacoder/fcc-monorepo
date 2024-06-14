@@ -14,10 +14,10 @@ import {
   GET_MEDICAL_DEVICES,
   CREATE_MEDICAL_DEVICE
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
@@ -41,7 +41,7 @@ export function MedicalDevicesListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}

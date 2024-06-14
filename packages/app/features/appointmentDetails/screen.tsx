@@ -27,7 +27,7 @@ import {
   CANCEL_TRANSPORTATION_REQUEST,
   SEND_CALENDAR_INVITE
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -46,13 +46,13 @@ let notePrivileges = {}
 let transportationPrivileges = {}
 export function AppointmentDetailsScreen() {
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
+  console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -732,7 +732,7 @@ export function AppointmentDetailsScreen() {
                     title="Edit"
                     variant="border"
                     onPress={() => {
-                      router.push(
+                      router.replace(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
                           appointmentDetails:

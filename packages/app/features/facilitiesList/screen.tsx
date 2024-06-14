@@ -10,10 +10,10 @@ import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 let facilityPrivileges = {}
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -23,7 +23,7 @@ export function FacilitiesListScreen() {
   const [currentFilter, setCurrentFilter] = useState('Active')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
   useEffect(() => {

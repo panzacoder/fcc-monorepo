@@ -19,7 +19,7 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
@@ -45,7 +45,7 @@ type DoctorFacilityResponse = {
 export function AddEditAppointmentScreen() {
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
@@ -225,12 +225,7 @@ export function AddEditAppointmentScreen() {
               apptDetails = data.data.appointment ? data.data.appointment : {}
             }
           }
-          if (_.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true') {
-            router.dismiss(1)
-          } else {
-            router.dismiss(2)
-          }
-
+          router.dismiss(1)
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),

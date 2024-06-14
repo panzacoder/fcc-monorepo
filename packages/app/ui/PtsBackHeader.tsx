@@ -1,7 +1,7 @@
 import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 export type Props = {
   title?: string
 }

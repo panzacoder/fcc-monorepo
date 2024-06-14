@@ -16,7 +16,7 @@ import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
 
@@ -26,7 +26,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { formatUrl } from 'app/utils/format-url'
-
+import * as SecureStore from 'expo-secure-store'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
   password: z.string().min(1, { message: 'Password is required' })
@@ -94,6 +94,9 @@ export function LoginScreen() {
               })
             )
           }
+
+          SecureStore.setItemAsync('Username', formData.email)
+          SecureStore.setItemAsync('Password', formData.password)
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))

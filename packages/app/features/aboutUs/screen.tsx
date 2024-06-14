@@ -2,7 +2,7 @@
 import { View, ScrollView, Linking } from 'react-native'
 import { Image } from 'app/ui/image'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 export function AboutUsScreen() {
   const router = useRouter()

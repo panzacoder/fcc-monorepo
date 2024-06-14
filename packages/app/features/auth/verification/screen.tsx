@@ -5,7 +5,7 @@ import { View, Alert, Text } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
-import { useRouter, useSearchParams } from 'solito/navigation'
+import { useRouter, useLocalSearchParams } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/layouts/card-view'
@@ -24,8 +24,8 @@ type Schema = z.infer<typeof schema>
 
 export function VerificationScreen() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams?.get('email') || '\n(email not found)'
+  const item = useLocalSearchParams()
+  const email = item.email ? item.email : ''
   const [isLoading, setLoading] = useState(false)
 
   const { control, handleSubmit } = useForm({
@@ -49,7 +49,7 @@ export function VerificationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.replace(formatUrl('/login', { email }))
+          router.replace(formatUrl('/login', {}))
         } else {
           Alert.alert('', data.message)
         }

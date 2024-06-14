@@ -8,7 +8,7 @@ import { TouchableOpacity, View } from 'react-native'
 import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 
 cssInterop(LinearGradient, {
   className: { target: 'style' }
