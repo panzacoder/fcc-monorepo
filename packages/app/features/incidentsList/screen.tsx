@@ -11,9 +11,9 @@ import { Button } from 'app/ui/button'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_INCIDENTS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
@@ -38,7 +38,7 @@ export function IncidentsListScreen() {
   const [incidentsList, setIncidentsList] = useState([]) as any
   const header = store.getState().headerState.header
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const { control, handleSubmit, reset } = useForm({

@@ -3,7 +3,7 @@
 import { View, ScrollView } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 export function FaqScreen() {
   const router = useRouter()
   let titleStyle = 'font-400 w-[95%] text-[15px] text-[#1A1A1A] font-bold'

@@ -6,7 +6,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -61,7 +61,7 @@ export function AddEditIncidentScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar

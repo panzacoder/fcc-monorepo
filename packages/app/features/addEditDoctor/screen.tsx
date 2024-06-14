@@ -14,7 +14,7 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
 import { formatUrl } from 'app/utils/format-url'
@@ -69,7 +69,7 @@ export function AddEditDoctorScreen() {
   const staticData = store.getState().staticDataState.staticData as any
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
   // console.log('doctorDetails', JSON.stringify(doctorDetails))

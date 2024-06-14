@@ -16,7 +16,7 @@ import {
   REJECT_MEMBER_REQUEST,
   ACCEPT_MEMBER_REQUEST
 } from 'app/utils/urlConstants'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { SharedContactList } from 'app/ui/sharedContactList'
 import { NewCirclesList } from 'app/ui/newCirclesList'
 import { PrivacyPolicy } from 'app/ui/privacyPolicy'

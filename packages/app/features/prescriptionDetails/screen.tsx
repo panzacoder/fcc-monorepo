@@ -16,7 +16,7 @@ import {
   GET_PHARMACY_LIST,
   GET_ACTIVE_DOCTORS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
@@ -30,7 +30,7 @@ export function PrescriptionDetailsScreen() {
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -226,6 +226,7 @@ export function PrescriptionDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/prescriptionsList', {
               memberData: JSON.stringify(memberData)

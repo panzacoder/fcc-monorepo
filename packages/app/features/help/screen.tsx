@@ -1,7 +1,7 @@
 'use client'
 
 import { View, ScrollView } from 'react-native'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 export function HelpScreen() {

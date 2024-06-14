@@ -16,9 +16,9 @@ import {
   GET_APPOINTMENTS,
   GET_DOCTOR_FACILITIES
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
@@ -63,7 +63,7 @@ export function AppointmentsListScreen() {
   ) as any
   const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const staticData: any = store.getState().staticDataState.staticData
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -90,7 +90,7 @@ export function AppointmentsListScreen() {
       title: name
     })
   })
-  const getDoctorFacilities = useCallback(async () => {
+  const getDoctorFacilities = useCallback(async (isFirstLoad: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_DOCTOR_FACILITIES}`
     let dataObject = {
@@ -105,7 +105,10 @@ export function AppointmentsListScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          setLoading(false)
+          if (!isFirstLoad) {
+            setLoading(false)
+          }
+
           const list: Array<{ id: number; title: string }> = [
             { title: 'All', id: 1 }
           ]
@@ -167,7 +170,7 @@ export function AppointmentsListScreen() {
   }, [])
 
   useEffect(() => {
-    getDoctorFacilities()
+    getDoctorFacilities(true)
     getAppointmentDetails()
   }, [])
 
@@ -281,7 +284,7 @@ export function AppointmentsListScreen() {
       } else {
         selectedType = 'Facility Appointment'
       }
-      getDoctorFacilities()
+      getDoctorFacilities(false)
     } else {
       selectedType = 'All'
       reset({

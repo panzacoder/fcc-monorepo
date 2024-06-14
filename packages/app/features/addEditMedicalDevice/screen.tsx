@@ -18,7 +18,7 @@ import {
 import { CallPostService } from 'app/utils/fetchServerData'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from 'app/ui/typography'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import PtsLoader from 'app/ui/PtsLoader'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -36,7 +36,7 @@ let selectedDate: any = new Date()
 let selectedPrescriberIndex: any = -1
 let doctorList: Array<{ id: number; title: string }> = []
 export function AddEditMedicalDeviceScreen() {
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
@@ -44,7 +44,9 @@ export function AddEditMedicalDeviceScreen() {
     item.medicalDeviceDetails !== undefined
       ? JSON.parse(item.medicalDeviceDetails)
       : {}
-
+  let isFromCreateSimilar = item.isFromCreateSimilar
+    ? item.isFromCreateSimilar
+    : 'false'
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [isLoading, setLoading] = useState(false)
   const [isPrescribed, setIsPrescribed] = useState(
@@ -52,7 +54,6 @@ export function AddEditMedicalDeviceScreen() {
       ? medicalDeviceDetails.isPrescribedBy
       : false
   )
-
   const staticData: any = store.getState().staticDataState.staticData
   const header = store.getState().headerState.header
   useEffect(() => {
@@ -110,7 +111,7 @@ export function AddEditMedicalDeviceScreen() {
   })
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      prescriberIndex: selectedPrescriberIndex,
+      prescriberIndex: !isPrescribed ? 1 : selectedPrescriberIndex,
       description:
         !_.isEmpty(medicalDeviceDetails) && medicalDeviceDetails.description
           ? medicalDeviceDetails.description
@@ -138,13 +139,17 @@ export function AddEditMedicalDeviceScreen() {
   async function createUpdateMedicalDevice(object: any) {
     // console.log('in createUpdateMedicalDevice', JSON.stringify(object))
     setLoading(true)
-    let url = _.isEmpty(medicalDeviceDetails)
-      ? `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
-      : `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
+    let url =
+      _.isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
+        ? `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
+        : `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
     let dataObject: any = {
       header: header,
       purchase: {
-        id: !_.isEmpty(medicalDeviceDetails) ? medicalDeviceDetails.id : null,
+        id:
+          !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
+            ? medicalDeviceDetails.id
+            : null,
         date: object.date ? object.date : '',
         description: object.description ? object.description : '',
         type: object.selectedType ? object.selectedType : '',
@@ -160,6 +165,14 @@ export function AddEditMedicalDeviceScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          let details = data.data.purchase ? data.data.purchase : {}
+          router.dismiss(1)
+          router.replace(
+            formatUrl('/circles/medicalDeviceDetails', {
+              medicalDevicesDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData)
+            })
+          )
         } else {
           Alert.alert('', data.message)
         }
@@ -185,7 +198,7 @@ export function AddEditMedicalDeviceScreen() {
     }
   }
   return (
-    <ScrollView className=" my-2 max-h-[70%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
+    <ScrollView className=" my-2 max-h-[90%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
       <PtsLoader loading={isLoading} />
       <View className="my-2 w-full">
         <View className="w-[95%] self-center">
@@ -214,6 +227,9 @@ export function AddEditMedicalDeviceScreen() {
               checkedColor={'#6493d9'}
               onPress={() => {
                 setIsPrescribed(!isPrescribed)
+                reset({
+                  prescriberIndex: isPrescribed ? 1 : -1
+                })
               }}
               className=""
             />

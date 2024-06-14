@@ -22,7 +22,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Stack } from 'expo-router'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 let profile = ''
 let profileIndex = -1
@@ -37,7 +37,7 @@ export type Schema = z.infer<typeof schema>
 let email = ''
 export function AddEditCaregiverScreen() {
   const router = useRouter()
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let caregiverDetails = item.caregiverDetails
     ? JSON.parse(item.caregiverDetails)
     : {}

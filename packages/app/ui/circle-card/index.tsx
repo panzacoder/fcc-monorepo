@@ -2,7 +2,7 @@ import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { googleMapOpenUrl } from 'app/ui/utils'
 

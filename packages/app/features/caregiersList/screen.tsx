@@ -15,7 +15,7 @@ import {
   GET_MEMBER_CAREGIVERS,
   RESEND_CAREGIVER_REQEST
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -28,7 +28,7 @@ export function CaregiversListScreen() {
   const [caregiversList, setCaregiversList] = useState([]) as any
   const [caregiversListFull, setCaregiversListFull] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
   const getCaregiversList = useCallback(async () => {

@@ -16,8 +16,8 @@ import {
   UPDATE_MEMBER_AUTHORIZED_CAREGIVER,
   UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
@@ -79,7 +79,7 @@ export function MemberProfileScreen() {
   const [isUpdateAddress, setIsUpdateAddress] = useState(false)
   const [isFromSelfCircle, setIsFromSelfCircle] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}

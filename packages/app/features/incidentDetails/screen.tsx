@@ -20,7 +20,7 @@ import {
   UPDATE_INCIDENT_NOTE,
   DELETE_INCIDENT
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { AddEditNote } from 'app/ui/addEditNote'
@@ -44,7 +44,7 @@ export function IncidentDetailsScreen() {
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)

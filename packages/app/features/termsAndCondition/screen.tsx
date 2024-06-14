@@ -2,7 +2,7 @@
 import { View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 export function TermsAndConditonScreen() {
   const router = useRouter()

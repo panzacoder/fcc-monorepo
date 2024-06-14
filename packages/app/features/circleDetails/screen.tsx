@@ -5,10 +5,10 @@ import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { CircleSummaryCard } from './circle-summary-card'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -18,7 +18,7 @@ export function CircleDetailsScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = JSON.parse(item.memberData)
   const [isLoading, setLoading] = useState(false)
 

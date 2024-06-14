@@ -16,7 +16,7 @@ import {
   DELETE_FACILITY,
   SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
@@ -28,7 +28,7 @@ export function FacilityDetailsScreen() {
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let facilityInfo = item.facilityDetails

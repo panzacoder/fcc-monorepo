@@ -10,9 +10,9 @@ import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_CALENDER_ITEMS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
@@ -23,7 +23,7 @@ export function CalendarScreen() {
   const [isShowAddModal, setIsShowAddModal] = useState(false)
   const [calenderEvents, setCalenderEvents] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
   let currentMonth = String(moment().format('MMM')).toUpperCase()

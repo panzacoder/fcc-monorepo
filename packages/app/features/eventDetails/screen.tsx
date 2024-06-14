@@ -28,7 +28,7 @@ import {
   DELETE_EVENT,
   UPDATE_EVENT_STATUS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -66,7 +66,7 @@ export function EventDetailsScreen() {
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)

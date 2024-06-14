@@ -89,7 +89,7 @@ export function Location(data: any) {
 
       <View className="w-full flex-row">
         {locationData.address && locationData.address !== '' ? (
-          <View className="mt-2 w-[85%] flex-row items-center">
+          <View className="mt-2 w-[90%] flex-row items-center">
             <Typography className="font-400 text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>

@@ -8,7 +8,7 @@ import {
   Linking
 } from 'react-native'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatUrl } from 'app/utils/format-url'

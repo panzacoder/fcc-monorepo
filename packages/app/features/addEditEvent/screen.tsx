@@ -6,7 +6,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { Stack } from 'expo-router'
 import { useRouter } from 'expo-router'
@@ -54,7 +54,7 @@ export type Schema = z.infer<typeof schema>
 export function AddEditEventScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const [isLoading, setLoading] = useState(false)
   let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}

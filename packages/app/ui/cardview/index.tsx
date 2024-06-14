@@ -2,7 +2,7 @@ import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { COLORS } from 'app/utils/colors'
 import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {

@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "fcc-monorepo",
+    "slug": "fcc-monorepo",
+    "version": "1.0",
+    "sdkVersion": "50.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "android": {
+      "package": "app.familycarecircle.fcc"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "81c4d21b-9728-4c21-9a64-81552f25c9e4"
+      }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}

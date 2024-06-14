@@ -18,7 +18,7 @@ import {
   GET_FILTER_CONSOLIDATED_DETAILS
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import {
   getFullDateForCalendar,
@@ -363,7 +363,7 @@ export function ConsolidatedViewScreen() {
             data.type === 'Doctor Appointment' ||
             data.type === 'Facility Appointment'
           ) {
-            router.replace(
+            router.push(
               formatUrl('/circles/appointmentDetails', {
                 appointmentDetails: JSON.stringify(data),
                 memberData: JSON.stringify(memberData)
