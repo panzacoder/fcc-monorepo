@@ -22,13 +22,12 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-let messagePrivileges = {}
-
 export function MessagesScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [messagePrivileges, setMessagePrivileges] = useState({})
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
@@ -56,9 +55,13 @@ export function MessagesScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('data', JSON.stringify(data.data.eventList))
             if (data.data.domainObjectPrivileges) {
-              messagePrivileges = data.data.domainObjectPrivileges.MESSAGETHREAD
-                ? data.data.domainObjectPrivileges.MESSAGETHREAD
-                : {}
+              setMessagePrivileges(
+                data.data.domainObjectPrivileges.MESSAGETHREAD
+                  ? data.data.domainObjectPrivileges.MESSAGETHREAD
+                  : data.data.domainObjectPrivileges.MessageThread
+                    ? data.data.domainObjectPrivileges.MessageThread
+                    : {}
+              )
             }
             setMessagesList(data.data.threadList ? data.data.threadList : [])
             setMessagesListFull(

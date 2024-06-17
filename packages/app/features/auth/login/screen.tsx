@@ -26,7 +26,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { formatUrl } from 'app/utils/format-url'
-import * as SecureStore from 'expo-secure-store'
+// import * as SecureStore from 'expo-secure-store'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
   password: z.string().min(1, { message: 'Password is required' })
@@ -40,8 +40,10 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: 'sachaudhari0704@gmail.com',
-      password: 'Shubh@m27'
+      // email: 'sachaudhari0704@gmail.com',
+      // password: 'Shubh@m27'
+      email: '',
+      password: ''
     },
     resolver: zodResolver(schema)
   })
@@ -95,8 +97,8 @@ export function LoginScreen() {
             )
           }
 
-          SecureStore.setItemAsync('Username', formData.email)
-          SecureStore.setItemAsync('Password', formData.password)
+          // SecureStore.setItemAsync('Username', formData.email)
+          // SecureStore.setItemAsync('Password', formData.password)
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))

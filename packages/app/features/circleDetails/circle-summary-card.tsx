@@ -83,7 +83,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
           <View>
             <View className="mt-5 flex-row self-center">
               <Button
-                className="px-3"
+                className="px-3 w-[30%]"
                 title="Caregivers"
                 leadingIcon="pocket"
                 onPress={() => {
@@ -95,7 +95,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3"
+                className="ml-2 px-3 w-[30%]"
                 title="Doctors"
                 leadingIcon="briefcase"
                 onPress={() => {
@@ -107,7 +107,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3"
+                className="ml-2 px-3 w-[30%]"
                 title="Facilities"
                 leadingIcon="home"
                 onPress={() => {
@@ -122,7 +122,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
 
             <View className="mt-5 flex-row self-center">
               <Button
-                className="px-3"
+                className="px-3 w-[45%]"
                 title="Prescriptions"
                 leadingIcon="thermometer"
                 onPress={() => {
@@ -134,7 +134,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3"
+                className="ml-2 px-3 w-[45%]"
                 title="Medical Devices"
                 leadingIcon="watch"
                 onPress={() => {

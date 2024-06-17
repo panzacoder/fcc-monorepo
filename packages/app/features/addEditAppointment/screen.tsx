@@ -32,7 +32,7 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 let selectedDate: any = new Date()
-let purpose: any = ''
+// let purpose: any = ''
 let facilityDoctorIndex = -1
 type TypeResponse = {
   id: number
@@ -58,6 +58,7 @@ export function AddEditAppointmentScreen() {
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [purpose, setPurpose] = useState('')
   const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(
     null
   ) as any
@@ -144,7 +145,8 @@ export function AddEditAppointmentScreen() {
   }, [])
   let typeIndex: any = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
-    purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
+    // purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
+    setPurpose(appointmentDetails.purpose ? appointmentDetails.purpose : '')
     selectedDate = appointmentDetails.date
       ? appointmentDetails.date
       : new Date()
@@ -225,7 +227,12 @@ export function AddEditAppointmentScreen() {
               apptDetails = data.data.appointment ? data.data.appointment : {}
             }
           }
-          router.dismiss(1)
+          if (_.isEmpty(appointmentDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
@@ -274,7 +281,8 @@ export function AddEditAppointmentScreen() {
     selectedDate = date
   }
   const onSelectionPurpose = (data: any) => {
-    purpose = data
+    // purpose = data
+    setPurpose(data)
     console.log('purpose1', purpose)
   }
   async function setSelectedTypeChange(value: any) {
@@ -356,12 +364,12 @@ export function AddEditAppointmentScreen() {
               autoCapitalize="none"
             />
           </View>
-          <View className="w-full self-center">
+          <View className="w-full self-center mt-1">
             <PtsComboBox
               currentData={purpose}
               listData={purposeList}
               onSelection={onSelectionPurpose}
-              placeholderValue={'Select Purpose'}
+              placeholderValue={'Purpose'}
             />
           </View>
           <View className="mt-5 flex-row justify-center">

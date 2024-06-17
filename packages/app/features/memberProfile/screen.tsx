@@ -151,8 +151,10 @@ export function MemberProfileScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -233,7 +235,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -257,7 +259,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -282,7 +284,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }

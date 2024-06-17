@@ -159,7 +159,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
             setIsRender(!isRender)
           }}
         >
-          <Typography className="ml-2">{dateSelected}</Typography>
+          <Typography className="ml-3">{dateSelected}</Typography>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {

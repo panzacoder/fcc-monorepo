@@ -9,7 +9,7 @@ import { Typography } from 'app/ui/typography'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import PtsLoader from 'app/ui/PtsLoader'
-import * as SecureStore from 'expo-secure-store'
+// import * as SecureStore from 'expo-secure-store'
 
 export type TabsHeaderProps = {
   navigation: any
@@ -39,8 +39,8 @@ export const TabsHeader = ({}) => {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          await SecureStore.deleteItemAsync('Username')
-          await SecureStore.deleteItemAsync('Password')
+          // await SecureStore.deleteItemAsync('Username')
+          // await SecureStore.deleteItemAsync('Password')
           router.push('/login')
         } else {
           Alert.alert('', data.message)

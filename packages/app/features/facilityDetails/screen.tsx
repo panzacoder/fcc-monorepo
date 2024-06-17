@@ -260,6 +260,7 @@ export function FacilityDetailsScreen() {
                 {locationList.map((data: any, index: number) => {
                   data.component = 'Facility'
                   data.doctorFacilityId = facilityInfo.id
+                  data.memberData = memberData
                   return (
                     <View key={index}>
                       <Location data={data} />

@@ -170,7 +170,7 @@ export function DoctorsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/doctorDetails', {
                       doctorDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)

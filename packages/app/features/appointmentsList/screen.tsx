@@ -26,7 +26,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
-import { AddEditAppointment } from 'app/ui/addEditAppointment'
 let appointmentPrivileges = {}
 let selectedMonth = 'All'
 let selectedYear = 'All'
@@ -53,7 +52,6 @@ export function AppointmentsListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [isAddAppointment, setIsAddAppointment] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [appointmentsList, setAppointmentsList] = useState([]) as any
@@ -292,12 +290,6 @@ export function AppointmentsListScreen() {
       })
     }
   }
-  async function cancelClicked() {
-    setIsAddAppointment(false)
-  }
-  async function createUpdateAppointment() {
-    console.log('in createUpdateAppointment')
-  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -515,7 +507,7 @@ export function AppointmentsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/appointmentDetails', {
                       appointmentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
@@ -648,16 +640,7 @@ export function AppointmentsListScreen() {
       ) : (
         <View />
       )}
-      {isAddAppointment ? (
-        <View className="mt-2 h-full w-full items-center self-center">
-          <AddEditAppointment
-            createUpdateAppointment={createUpdateAppointment}
-            cancelClicked={cancelClicked}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
+      
     </View>
   )
 }

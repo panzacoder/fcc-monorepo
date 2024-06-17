@@ -103,8 +103,10 @@ export function AddEditIncidentScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -173,12 +175,12 @@ export function AddEditIncidentScreen() {
             _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
               ? data.data.incident
               : data.data
-          if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
+          if (_.isEmpty(incidentDetails)) {
             router.dismiss(1)
           } else {
             router.dismiss(2)
           }
-          router.replace(
+          router.push(
             formatUrl('/circles/incidentDetails', {
               incidentDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
