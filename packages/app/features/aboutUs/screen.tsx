@@ -16,7 +16,7 @@ export function AboutUsScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.replace('/home')
+            router.back()
           }}
         />
         <Typography className=" flex-1 text-center text-lg font-bold">

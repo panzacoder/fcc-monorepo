@@ -26,7 +26,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { AddEditEvent } from 'app/ui/addEditEvent'
 let eventsPrivileges = {}
 const schema = z.object({
   monthIndex: z.number(),
@@ -40,7 +39,6 @@ let selectedYear = 'All'
 export function EventsListScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
-  const [isAddEvent, setIsAddEvent] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
@@ -177,49 +175,7 @@ export function EventsListScreen() {
       yearIndex: 1
     })
   }
-  async function createUpdateEvent(formData: Schema, selectedDate: any) {
-    console.log('in createUpdateEvent')
-    // setLoading(true)
-    // let url = `${BASE_URL}${CREATE_EVENT}`
 
-    // let dataObject: any = {
-    //   header: header,
-    //   event: {
-    //     date: selectedDate,
-    //     title: formData.title,
-    //     description: formData.description,
-    //     member: {
-    //       id: memberData.member ? memberData.member : ''
-    //     },
-    //     location: formData.address,
-    //     contactList: [],
-    //     reminderList: []
-    //   }
-    // }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    // CallPostService(url, dataObject)
-    //   .then(async (data: any) => {
-    //     setLoading(false)
-    //     if (data.status === 'SUCCESS') {
-    //       router.replace(
-    //         formatUrl('/circles/eventDetails', {
-    //           eventDetails: JSON.stringify(data.data.event),
-    //           memberData: JSON.stringify(memberData)
-    //         })
-    //       )
-    //     } else {
-    //       Alert.alert('', data.message)
-    //     }
-    //     setLoading(false)
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false)
-    //     console.log(error)
-    //   })
-  }
-  async function cancelClicked() {
-    setIsAddEvent(false)
-  }
   async function setYearChange(value: any) {
     if (value === null) {
       reset({
@@ -266,7 +222,6 @@ export function EventsListScreen() {
                     memberData: JSON.stringify(memberData)
                   })
                 )
-                // setIsAddEvent(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
@@ -407,7 +362,7 @@ export function EventsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/eventDetails', {
                       eventDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
@@ -531,17 +486,6 @@ export function EventsListScreen() {
       {isDataReceived && eventsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
           <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} events`}</Typography>
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddEvent ? (
-        <View className="mt-2 h-full w-full items-center self-center">
-          <AddEditEvent
-            component={'Event'}
-            createUpdateEvent={createUpdateEvent}
-            cancelClicked={cancelClicked}
-          />
         </View>
       ) : (
         <View />

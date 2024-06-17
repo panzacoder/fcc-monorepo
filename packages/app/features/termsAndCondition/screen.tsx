@@ -25,14 +25,14 @@ export function TermsAndConditonScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.replace('/home')
+            router.back()
           }}
         />
         <Typography className=" flex-1 text-center text-lg font-bold">
           {'Terms and conditions'}
         </Typography>
       </View>
-      <ScrollView>
+      <ScrollView className="border-gray-400 mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px]">
         <Typography className="mt-[10px] text-center font-bold">
           {'Family Care Circle: Terms and Conditions'}
         </Typography>

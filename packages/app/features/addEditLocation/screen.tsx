@@ -11,9 +11,7 @@ import {
   BASE_URL,
   GET_STATES_AND_TIMEZONES,
   CREATE_DOCTOR_LOCATION,
-  DELETE_DOCTOR_LOCATION,
   CREATE_FACILITY_LOCATION,
-  DELETE_FACILITY_LOCATION,
   UPDATE_FACILITY_LOCATION,
   UPDATE_DOCTOR_LOCATION
 } from 'app/utils/urlConstants'
@@ -185,62 +183,7 @@ export function AddEditLocationScreen() {
       setStatesListFull([])
     }
   }
-  async function deleteLocation() {
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
-    if (item.component === 'Doctor') {
-      url = `${BASE_URL}${DELETE_DOCTOR_LOCATION}`
-      dataObject = {
-        header: header,
-        doctorLocation: {
-          id: locationDetails.id ? locationDetails.id : '',
-          doctor: {
-            id: locationDetails.doctorFacilityId
-              ? locationDetails.doctorFacilityId
-              : ''
-          }
-        }
-      }
-    } else {
-      url = `${BASE_URL}${DELETE_FACILITY_LOCATION}`
-      dataObject = {
-        header: header,
-        facilityLocation: {
-          id: locationDetails.id ? locationDetails.id : '',
-          facility: {
-            id: locationDetails.doctorFacilityId
-              ? locationDetails.doctorFacilityId
-              : ''
-          }
-        }
-      }
-    }
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details: any = data.data ? JSON.stringify(data.data) : {}
-          if (item.component === 'Doctor') {
-            router.replace(
-              formatUrl('/circles/doctorDetails', {
-                doctorDetails: details,
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          } else {
-            router.back()
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
   async function addUpdateLocation(formData: Schema) {
     setLoading(true)
     let stateObject = statesListFull[formData.state - 1]
@@ -473,30 +416,6 @@ export function AddEditLocationScreen() {
               </View>
             </View>
           </View>
-          {!_.isEmpty(locationDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="borderRed"
-                onPress={() => {
-                  Alert.alert(
-                    'Are you sure about deleting Location?',
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => deleteLocation()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
-              />
-            </View>
-          ) : (
-            <View />
-          )}
         </ScrollView>
       </View>
     </View>

@@ -14,7 +14,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'expo-router'
-let facilityPrivileges = {}
+let facilityPrivileges = {} 
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)

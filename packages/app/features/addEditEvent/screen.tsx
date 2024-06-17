@@ -82,8 +82,10 @@ export function AddEditEventScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -144,13 +146,13 @@ export function AddEditEventScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
+          if (_.isEmpty(eventDetails)) {
             router.dismiss(1)
           } else {
             router.dismiss(2)
           }
           let details = data.data.event ? data.data.event : {}
-          router.replace(
+          router.push(
             formatUrl('/circles/eventDetails', {
               eventDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)

@@ -216,7 +216,7 @@ export function DoctorDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  router.push(
+                  router.replace(
                     formatUrl('/circles/addEditDoctor', {
                       memberData: JSON.stringify(memberData),
                       doctorDetails: JSON.stringify(doctorDetails),
@@ -336,6 +336,7 @@ export function DoctorDetailsScreen() {
                 {locationList.map((data: any, index: number) => {
                   data.component = 'Doctor'
                   data.doctorFacilityId = doctorInfo.id
+                  data.memberData = memberData
                   return (
                     <View key={index}>
                       <Location data={data}></Location>

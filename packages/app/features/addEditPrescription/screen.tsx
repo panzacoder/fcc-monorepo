@@ -197,10 +197,12 @@ export function AddEditPrescriptionScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let details = data.data.medicine ? data.data.medicine : {}
-          if (!_.isEmpty(prescriptionDetails)) {
+          if (_.isEmpty(prescriptionDetails)) {
             router.dismiss(1)
+          } else {
+            router.dismiss(2)
           }
-          router.replace(
+          router.push(
             formatUrl('/circles/prescriptionDetails', {
               prescriptionDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)

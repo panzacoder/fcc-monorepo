@@ -29,14 +29,14 @@ export function PrivacyPolicyScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.replace('/home')
+            router.back()
           }}
         />
-        <Typography className=" flex-1 text-center text-lg font-bold">
+        <Typography className="flex-1 text-center text-lg font-bold">
           {'Privacy Policy'}
         </Typography>
       </View>
-      <ScrollView>
+      <ScrollView className="mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px] border-gray-400">
         <Typography className="mt-[10px] text-center font-bold">
           {'Family Care Circle: Privacy Policy'}
         </Typography>

@@ -708,7 +708,7 @@ export function AppointmentDetailsScreen() {
                     title="Create Similar"
                     variant="border"
                     onPress={() => {
-                      router.replace(
+                      router.push(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
                           appointmentDetails:
@@ -732,7 +732,7 @@ export function AppointmentDetailsScreen() {
                     title="Edit"
                     variant="border"
                     onPress={() => {
-                      router.replace(
+                      router.push(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
                           appointmentDetails:

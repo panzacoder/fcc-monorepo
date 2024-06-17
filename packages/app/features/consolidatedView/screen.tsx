@@ -20,15 +20,11 @@ import {
 import store from 'app/redux/store'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import {
-  getFullDateForCalendar,
-  formatTimeToUserLocalTime,
-  convertTimeToUserLocalTime
-} from 'app/ui/utils'
+import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
   CalendarView,
   CalendarViewInput
-} from '../../ui/addEditPrescription/calendar-view'
+} from '../../features/addEditPrescription/calendar-view'
 const schema = z.object({
   typeIndex: z.number()
 })

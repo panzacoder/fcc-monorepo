@@ -108,8 +108,10 @@ export function AddEditDoctorScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -211,8 +213,8 @@ export function AddEditDoctorScreen() {
             ? JSON.stringify(data.data.doctor)
             : {}
 
-          router.dismiss(2)
-          router.replace(
+          router.dismiss(1)
+          router.push(
             formatUrl('/circles/doctorDetails', {
               doctorDetails: details,
               memberData: JSON.stringify(memberData)
@@ -258,7 +260,7 @@ export function AddEditDoctorScreen() {
           let details: any = data.data.doctor
             ? JSON.stringify(data.data.doctor)
             : {}
-          router.replace(
+          router.push(
             formatUrl('/circles/doctorDetails', {
               doctorDetails: details,
               memberData: JSON.stringify(memberData)

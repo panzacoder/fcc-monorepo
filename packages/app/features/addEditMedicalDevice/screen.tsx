@@ -166,8 +166,13 @@ export function AddEditMedicalDeviceScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let details = data.data.purchase ? data.data.purchase : {}
-          router.dismiss(1)
-          router.replace(
+          if (_.isEmpty(medicalDeviceDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+
+          router.push(
             formatUrl('/circles/medicalDeviceDetails', {
               medicalDevicesDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)

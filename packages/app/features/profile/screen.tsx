@@ -94,6 +94,7 @@ export function ProfileScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowOrderList, setIsShowOrderList] = useState(false)
+  const [isShowSponsorship, setIsShowSponsorship] = useState(false)
   const [isUpdateProfile, setIsUpdateProfile] = useState(false)
   const [isUpdateAddress, setIsUpdateAddress] = useState(false)
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
@@ -639,8 +640,10 @@ export function ProfileScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -687,7 +690,7 @@ export function ProfileScreen() {
           size={20}
           color={'black'}
           onPress={() => {
-            router.replace('/home')
+            router.back()
           }}
         />
         <Typography className="ml-[5px] flex-1 text-[18px] font-bold">
@@ -992,25 +995,38 @@ export function ProfileScreen() {
           </View>
           <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className="flex-row">
-              <Typography className="ml-2 w-[85%] self-center font-bold">
+              <Typography className="ml-2 w-[90%] self-center font-bold">
                 {'Sponsorship Details'}
               </Typography>
-            </View>
-            <View className="ml-2">
-              <ControlledTextField
-                control={control2}
-                name="sponsorCode"
-                placeholder={'Sponsor Code*'}
-                className="w-[95%] bg-white"
-              />
-              <Button
-                className="my-2 w-[40%] self-center bg-[#ef6603]"
-                title={'Save'}
-                leadingIcon="save"
-                variant="default"
-                onPress={handleSubmit2(saveSponsorCode)}
+              <Feather
+                onPress={() => {
+                  setIsShowSponsorship(!isShowSponsorship)
+                }}
+                className="self-center"
+                name={!isShowSponsorship ? 'chevron-down' : 'chevron-up'}
+                size={20}
+                color={'black'}
               />
             </View>
+            {isShowSponsorship ? (
+              <View className="ml-2">
+                <ControlledTextField
+                  control={control2}
+                  name="sponsorCode"
+                  placeholder={'Sponsor Code*'}
+                  className="w-[95%] bg-white"
+                />
+                <Button
+                  className="my-2 w-[40%] self-center bg-[#ef6603]"
+                  title={'Save'}
+                  leadingIcon="save"
+                  variant="default"
+                  onPress={handleSubmit2(saveSponsorCode)}
+                />
+              </View>
+            ) : (
+              <View />
+            )}
           </View>
 
           {isShowDeleteModal ? (

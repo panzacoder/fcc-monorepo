@@ -12,14 +12,12 @@ import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CheckBox } from 'react-native-elements'
 import { formatUrl } from 'app/utils/format-url'
-
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
-
 const schema = addressSchema
   .extend({
     firstName: z.string().min(1, { message: 'First Name is required' }),
@@ -188,7 +186,24 @@ export function SignUpScreen() {
               )}
             />
             <Typography className="flex-1">
-              {'I accept the Terms and Conditions and Privacy Policy'}
+              {'I accept the'}
+              <Typography
+                className="text-primary font-bold"
+                onPress={() => {
+                  router.push('/termsAndConditions')
+                }}
+              >
+                {' Terms and Conditions'}
+              </Typography>
+              <Typography>{' and '}</Typography>
+              <Typography
+                onPress={() => {
+                  router.push('/privacyPolicy')
+                }}
+                className="text-primary font-bold"
+              >
+                {'Privacy Policy.'}
+              </Typography>
             </Typography>
           </View>
           <Button

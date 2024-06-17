@@ -20,7 +20,11 @@ const schema = z.object({
   country: z.number().min(0, { message: 'Country is required' }),
   timeZone: z.number().min(0, { message: 'Timezone is required' })
 })
+const schema1 = z.object({
+  shortName: z.string()
+})
 export type Schema = z.infer<typeof schema>
+export type Schema1 = z.infer<typeof schema1>
 let statesListFull = []
 let timeZoneListFull = []
 let countryIndex = -1
@@ -142,6 +146,10 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         !_.isEmpty(locationData) && locationData.nickName
           ? locationData.nickName
           : '',
+      shortName:
+        !_.isEmpty(locationData) && locationData.shortName
+          ? locationData.shortName
+          : '',
       line:
         !_.isEmpty(locationData) && locationData.address.line
           ? locationData.address.line
@@ -159,6 +167,15 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       timeZone: !_.isEmpty(locationData) ? timeZoneIndex : -1
     },
     resolver: zodResolver(schema)
+  })
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      shortName:
+        !_.isEmpty(locationData) && locationData.shortName
+          ? locationData.shortName
+          : ''
+    },
+    resolver: zodResolver(schema1)
   })
   type Response = {
     id: number
@@ -208,8 +225,27 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               placeholder={'Location Name'}
               className="w-full bg-white"
               onChangeText={(text) => {
-                // console.log('text', text)
                 setAddressObject(text, 0)
+                let shortName = text.substring(0, 10)
+                reset1({
+                  shortName: shortName
+                })
+              }}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
+        {component !== 'Profile' ? (
+          <View className="mt-2 w-full flex-row justify-center">
+            <ControlledTextField
+              control={control1}
+              name="shortName"
+              placeholder={'Short Name'}
+              className="w-full bg-white"
+              onChangeText={(text) => {
+                // console.log('text', text)
+                setAddressObject(text, 7)
               }}
             />
           </View>

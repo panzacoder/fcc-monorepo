@@ -232,7 +232,7 @@ export function IncidentsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/incidentDetails', {
                       incidentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)

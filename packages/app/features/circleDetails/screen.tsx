@@ -21,7 +21,7 @@ export function CircleDetailsScreen() {
   const item = useLocalSearchParams<any>()
   let memberData = JSON.parse(item.memberData)
   const [isLoading, setLoading] = useState(false)
-
+  console.log('memberData', JSON.stringify(memberData))
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
     todayAppt =
@@ -80,7 +80,6 @@ export function CircleDetailsScreen() {
               <Typography className=" ml-2 flex w-[75%] rounded text-[18px] font-bold text-black">
                 {'Messages'}
               </Typography>
-              <View className="w-[35%] self-center" />
               {memberData.unreadMessages &&
               memberData.unreadMessages.length > 0 ? (
                 <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">

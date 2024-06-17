@@ -15,7 +15,6 @@ import {
   CREATE_MEDICAL_DEVICE
 } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
-import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -37,7 +36,6 @@ export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [devicesList, setDevicesList] = useState([]) as any
-  const [isAddDevice, setIsAddDevice] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const header = store.getState().headerState.header
@@ -85,7 +83,6 @@ export function MedicalDevicesListScreen() {
           setDevicesList(list)
           setIsFilter(false)
           setIsDataReceived(true)
-          setIsAddDevice(false)
         } else {
           Alert.alert('', data.message)
         }
@@ -125,43 +122,7 @@ export function MedicalDevicesListScreen() {
       yearIndex: 1
     })
   }
-  const cancelClicked = () => {
-    setIsAddDevice(false)
-  }
-  async function createUpdateMedicalDevice(object: any) {
-    // console.log('in createUpdateMedicalDevice', JSON.stringify(object))
-    setLoading(true)
-    let url = `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
-    let dataObject: any = {
-      header: header,
-      purchase: {
-        date: object.date ? object.date : '',
-        description: object.description ? object.description : '',
-        type: object.selectedType ? object.selectedType : '',
-        isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        doctor: {
-          id: object.doctorId ? object.doctorId : ''
-        }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsAddDevice(false)
-          getDevicesList(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   async function setYearChange(value: any) {
     if (value === null) {
       reset({
@@ -180,47 +141,43 @@ export function MedicalDevicesListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        {!isAddDevice ? (
-          <View className="flex-row ">
-            <View className="w-[70%]" />
-            {getUserPermission(medicalDevicesPrivileges).createPermission ? (
-              <View className=" mt-[20] self-center">
-                <TouchableOpacity
-                  className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
-                  onPress={() => {
-                    router.push(
-                      formatUrl('/circles/addEditMedicalDevice', {
-                        memberData: JSON.stringify(memberData)
-                      })
-                    )
-                    // setIsAddDevice(true)
-                  }}
-                >
-                  <Feather name={'plus'} size={25} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View />
-            )}
-            <View className="mt-5 self-center">
+
+        <View className="flex-row ">
+          <View className="w-[70%]" />
+          {getUserPermission(medicalDevicesPrivileges).createPermission ? (
+            <View className=" mt-[20] self-center">
               <TouchableOpacity
+                className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                 onPress={() => {
-                  setIsFilter(!isFilter)
+                  router.push(
+                    formatUrl('/circles/addEditMedicalDevice', {
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
                 }}
-                className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
               >
-                <Feather
-                  className=""
-                  name={'filter'}
-                  size={25}
-                  color={COLORS.primary}
-                />
+                <Feather name={'plus'} size={25} color={COLORS.primary} />
               </TouchableOpacity>
             </View>
+          ) : (
+            <View />
+          )}
+          <View className="mt-5 self-center">
+            <TouchableOpacity
+              onPress={() => {
+                setIsFilter(!isFilter)
+              }}
+              className="ml-5 h-[30px] w-[30px] items-center justify-center rounded-[5px] bg-[#c5dbfd]"
+            >
+              <Feather
+                className=""
+                name={'filter'}
+                size={25}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
           </View>
-        ) : (
-          <View />
-        )}
+        </View>
       </View>
       {isFilter ? (
         <View className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -283,7 +240,7 @@ export function MedicalDevicesListScreen() {
           return (
             <TouchableOpacity
               onPress={() => {
-                router.replace(
+                router.push(
                   formatUrl('/circles/medicalDeviceDetails', {
                     medicalDevicesDetails: JSON.stringify(data),
                     memberData: JSON.stringify(memberData)
@@ -378,19 +335,6 @@ export function MedicalDevicesListScreen() {
           <View />
         )}
       </ScrollView>
-
-      {isAddDevice ? (
-        <View className="h-full w-full ">
-          <AddEditMedicalDevice
-            medicalDeviceDetails={{}}
-            cancelClicked={cancelClicked}
-            createUpdateMedicalDevice={createUpdateMedicalDevice}
-            memberData={memberData}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
     </View>
   )
 }
