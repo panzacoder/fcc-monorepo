@@ -36,6 +36,7 @@ export function DoctorDetailsScreen() {
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const [doctorDetails, setDoctorDetails] = useState({}) as any
+  const [doctorName, setDoctorName] = useState('')
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   const [isShareDoctor, setIsShareDoctor] = useState(false)
@@ -58,6 +59,14 @@ export function DoctorDetailsScreen() {
               : {}
           }
           setDoctorDetails(data.data.doctor || {})
+          if (data.data.doctor) {
+            let details = data.data.doctor
+            let fullName = ''
+            fullName += details.salutation ? details.salutation + '. ' : ''
+            fullName += details.firstName ? details.firstName + ' ' : ''
+            fullName += details.lastName ? details.lastName + ' ' : ''
+            setDoctorName(fullName)
+          }
           setLocationList(
             data.data.doctor && data.data.doctor.doctorLocationList
               ? data.data.doctor.doctorLocationList
@@ -90,11 +99,11 @@ export function DoctorDetailsScreen() {
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
   function iconPressed(title: any, value: any) {
-    if (title === 'Phone:' && value !== '') {
+    if (title === 'Phone' && value !== '') {
       Linking.openURL(`tel:${value}`)
-    } else if (title === 'Email:' && value !== '') {
+    } else if (title === 'Email' && value !== '') {
       Linking.openURL(`mailto:${value}`)
-    } else if (title === 'Website:' && value !== '') {
+    } else if (title === 'Website' && value !== '') {
       Linking.openURL(`http://${getWebsite(value)}`)
     }
   }
@@ -108,7 +117,7 @@ export function DoctorDetailsScreen() {
       <View className="mt-2 w-full flex-row items-center">
         <View className="w-[95%] flex-row">
           <Typography className={titleStyle}>{title}</Typography>
-          {title !== 'Status:' ? (
+          {title !== 'Status' ? (
             <TouchableOpacity
               className="w-[65%]"
               onPress={() => {
@@ -228,21 +237,16 @@ export function DoctorDetailsScreen() {
             </View>
             <View>
               <View className="mt-2 flex-row items-center">
-                <Typography className="font-400 w-[25%] text-[12px] text-[#1A1A1A]">
+                <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Contact Info'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+                <View className="bg-primary h-[1px] w-[70%]" />
               </View>
 
-              {getDetailsView(
-                'Name:',
-                doctorInfo.doctorName ? doctorInfo.doctorName : '',
-                true,
-                'user'
-              )}
+              {getDetailsView('Name', doctorName, true, 'user')}
               {doctorDetails.phone && doctorDetails.phone !== '' ? (
                 getDetailsView(
-                  'Phone:',
+                  'Phone',
                   convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone),
                   true,
                   'phone'
@@ -251,7 +255,7 @@ export function DoctorDetailsScreen() {
                 <View />
               )}
               {doctorDetails.email && doctorDetails.email !== '' ? (
-                getDetailsView('Email:', doctorDetails.email, true, 'mail')
+                getDetailsView('Email', doctorDetails.email, true, 'mail')
               ) : (
                 <View />
               )}
@@ -262,12 +266,12 @@ export function DoctorDetailsScreen() {
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Portal details'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
+                <View className="bg-primary  h-[1px] w-[70%]" />
               </View>
 
               {doctorDetails.websiteuser && doctorDetails.websiteuser !== '' ? (
                 getDetailsView(
-                  'Username:',
+                  'Username',
                   doctorDetails.websiteuser,
                   false,
                   'copy'
@@ -276,12 +280,12 @@ export function DoctorDetailsScreen() {
                 <View />
               )}
               {doctorDetails.website && doctorDetails.website !== '' ? (
-                getDetailsView('Website:', doctorDetails.website, true, 'globe')
+                getDetailsView('Website', doctorDetails.website, true, 'globe')
               ) : (
                 <View />
               )}
               {getDetailsView(
-                'Status:',
+                'Status',
                 doctorDetails.status && doctorDetails.status.status
                   ? doctorDetails.status.status
                   : '',

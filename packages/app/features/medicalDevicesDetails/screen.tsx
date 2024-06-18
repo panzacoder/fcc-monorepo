@@ -84,7 +84,9 @@ export function MedicalDevicesDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.PURCHASENOTE
                 ? data.data.domainObjectPrivileges.PURCHASENOTE
-                : {}
+                : data.data.domainObjectPrivileges.PurchaseNote
+                  ? data.data.domainObjectPrivileges.PurchaseNote
+                  : {}
             }
 
             setMedicalDevicesDetails(
@@ -523,10 +525,10 @@ export function MedicalDevicesDetailsScreen() {
                   {medicalDevice}
                 </Typography>
               </View>
-              {getDetailsView('Date:', medicalDeviceDate)}
-              {getDetailsView('Purchase Type:', type)}
-              {getDetailsView('Prescribed By:', prescriber)}
-              {getDetailsView('Description:', description)}
+              {getDetailsView('Date', medicalDeviceDate)}
+              {getDetailsView('Purchase Type', type)}
+              {getDetailsView('Prescribed By', prescriber)}
+              {getDetailsView('Description', description)}
             </View>
           </View>
 

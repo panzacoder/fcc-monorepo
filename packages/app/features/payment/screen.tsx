@@ -554,7 +554,7 @@ export function PaymentsScreen() {
         <View className="my-2 max-h-[95%] w-[95%] self-center rounded-[10px] border-[1px] border-[#e0deda] bg-white ">
           <View className="flex-row">
             <Typography className="m-2 ml-5 text-[16px] font-bold">
-              {'Order Total:'}
+              {'Order Total'}
             </Typography>
             <Typography className="m-2 ml-10 text-[16px]">
               {`$ ${planDetails.price ? planDetails.price : ''}`}

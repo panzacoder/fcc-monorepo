@@ -724,10 +724,6 @@ export function ProfileScreen() {
               'Email',
               appuserDetails.email ? appuserDetails.email : ''
             )}
-            {/* {getDetailsView(
-              'Phone:',
-              convertPhoneNumberToUsaPhoneNumberFormat(appuserDetails.phone)
-            )} */}
             <View className="mt-2 w-full flex-row items-center">
               <View className="w-full flex-row">
                 <Typography className={titleStyle}>{'Phone'}</Typography>

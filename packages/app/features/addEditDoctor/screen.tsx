@@ -195,7 +195,7 @@ export function AddEditDoctorScreen() {
         salutation: 'Dr',
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: doctorPhone,
+        phone: removeAllSpecialCharFromString(doctorPhone),
         website: formData.website,
         websiteuser: formData.username,
         specialist: findSpecializationFromId(formData.specialization),

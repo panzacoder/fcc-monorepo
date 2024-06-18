@@ -49,6 +49,7 @@ type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
   const [isLoading, setLoading] = useState(false)
+  const [isTandCAccepted, setIsTandCAccepted] = useState(false)
 
   const formMethods = useForm<Schema>({
     resolver: zodResolver(schema)
@@ -180,6 +181,7 @@ export function SignUpScreen() {
                   checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
                   onPress={() => {
                     onChange(!value)
+                    setIsTandCAccepted(!value)
                   }}
                   className="flex-shrink"
                 />
@@ -210,6 +212,7 @@ export function SignUpScreen() {
             onPress={formMethods.handleSubmit(submitRegistration)}
             className="w-full"
             title="Sign Up"
+            disabled={!isTandCAccepted}
           />
         </View>
       </FormProvider>

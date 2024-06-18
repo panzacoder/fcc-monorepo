@@ -141,6 +141,26 @@ export function FacilityDetailsScreen() {
         console.log(error)
       })
   }
+  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  function getDetailsView(title: string, value: string) {
+    return (
+      <View className="mt-2 w-full flex-row items-center">
+        <View className="w-full flex-row">
+          <Typography className={titleStyle}>{title}</Typography>
+          {title !== 'Status' ? (
+            <Typography className={valueStyle}>{value}</Typography>
+          ) : (
+            <Typography
+              className={`font-400 ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
+            >
+              {value}
+            </Typography>
+          )}
+        </View>
+      </View>
+    )
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -150,10 +170,9 @@ export function FacilityDetailsScreen() {
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className="font-400 max-w-[65%] text-[16px] text-[#86939e]">
+                <Typography className="font-400 max-w-[90%] text-[16px] text-[#86939e]">
                   {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
-                <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
                 <Typography className="font-400 text-primary ml-2 text-[16px]">
                   {facilityInfo.status && facilityInfo.status.status
                     ? facilityInfo.status.status
@@ -179,24 +198,54 @@ export function FacilityDetailsScreen() {
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Facility Details'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
+                <View className="self-center bg-primary h-[1px] w-[70%]" />
               </View>
+              {getDetailsView(
+                'Name',
+                facilityDetails.name ? facilityDetails.name : ''
+              )}
+              {getDetailsView(
+                'Description',
+                facilityDetails.description ? facilityDetails.description : ''
+              )}
+              {facilityDetails.website !== '' ? (
+                <View className="mt-2 w-[95%] flex-row">
+                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                    {'Facility Portal'}
+                  </Typography>
+                  <Typography className="font-400 text-primary w-[70%] text-[16px] underline">
+                    {facilityDetails.website ? facilityDetails.website : ''}
+                  </Typography>
+                </View>
+              ) : (
+                <View />
+              )}
+              {facilityDetails.websiteuser !== '' ? (
+                <View className="mt-2 w-[95%] flex-row">
+                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                    {'Portal Username'}
+                  </Typography>
+                  <Typography className="font-400 text-primary w-[70%] text-[16px]">
+                    {facilityDetails.websiteuser
+                      ? facilityDetails.websiteuser
+                      : ''}
+                  </Typography>
+                </View>
+              ) : (
+                <View />
+              )}
 
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                  {'Name:'}
-                </Typography>
-                <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                  {facilityDetails.name ? facilityDetails.name : ''}
-                </Typography>
-              </View>
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                  {'Status:'}
+              {getDetailsView(
+                'Description',
+                facilityDetails.description ? facilityDetails.description : ''
+              )}
+              <View className="mt-2 w-[95%] flex-row">
+                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
+                  {'Status'}
                 </Typography>
                 {facilityDetails.status && facilityDetails.status.status ? (
                   <Typography
-                    className={`ml-2 mr-5 rounded-[5px] px-5 py-1 text-right font-bold ${facilityDetails.status.status.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
+                    className={` rounded-[5px] px-5 py-1 text-right font-bold ${facilityDetails.status.status.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
                   >
                     {facilityDetails.status.status}
                   </Typography>
@@ -204,11 +253,11 @@ export function FacilityDetailsScreen() {
                   <View />
                 )}
               </View>
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[60%] text-[16px] text-[#1A1A1A]">
+              <View className="mt-2 w-[95%] flex-row">
+                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
                   {'Is this Pharmacy ?'}
                 </Typography>
-                <Typography className="font-400 ml-2 w-[30%] text-[16px] font-bold text-[#1A1A1A]">
+                <Typography className="font-400 w-[35%] text-[16px] font-bold text-[#1A1A1A]">
                   {facilityDetails.ispharmacy ? 'Yes' : 'No'}
                 </Typography>
               </View>

@@ -99,11 +99,15 @@ export function EventDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.EVENTNOTE
                 ? data.data.domainObjectPrivileges.EVENTNOTE
-                : {}
+                : data.data.domainObjectPrivileges.EventNote
+                  ? data.data.domainObjectPrivileges.EventNote
+                  : {}
               transportationPrivileges = data.data.domainObjectPrivileges
                 .EVENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
-                : {}
+                : data.data.domainObjectPrivileges.EventTransportation
+                  ? data.data.domainObjectPrivileges.EventTransportation
+                  : {}
             }
 
             setEventDetails(data.data.event ? data.data.event : {})
@@ -610,9 +614,9 @@ export function EventDetailsScreen() {
                   {event}
                 </Typography>
               </View>
-              {getDetailsView('Date:', eventDate)}
-              {getDetailsView('Status:', status)}
-              {getDetailsView('Description:', description)}
+              {getDetailsView('Date', eventDate)}
+              {getDetailsView('Status', status)}
+              {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(eventPrivileges).createPermission ||
                 getUserPermission(eventPrivileges).updatePermission ||

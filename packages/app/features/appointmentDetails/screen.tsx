@@ -92,11 +92,15 @@ export function AppointmentDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.APPOINTMENTNOTE
                 ? data.data.domainObjectPrivileges.APPOINTMENTNOTE
-                : {}
+                : data.data.domainObjectPrivileges.AppointmentNote
+                  ? data.data.domainObjectPrivileges.AppointmentNote
+                  : {}
               transportationPrivileges = data.data.domainObjectPrivileges
                 .APPOINTMENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                : {}
+                : data.data.domainObjectPrivileges.AppointmentTransportation
+                  ? data.data.domainObjectPrivileges.AppointmentTransportation
+                  : {}
             }
             if (
               data.data.appointmentWithPreviousAppointment &&
@@ -672,11 +676,11 @@ export function AppointmentDetailsScreen() {
         {isIcon ? (
           <Feather
             onPress={() => {
-              if (title === 'Phone:' && value !== '') {
+              if (title === 'Phone' && value !== '') {
                 Linking.openURL(`tel:${value}`)
-              } else if (title === 'Email:' && value !== '') {
+              } else if (title === 'Email' && value !== '') {
                 Linking.openURL(`mailto:${value}`)
-              } else if (title === 'Website:' && value !== '') {
+              } else if (title === 'Website' && value !== '') {
                 Linking.openURL(`http://${getWebsite(value)}`)
               }
             }}
@@ -758,23 +762,23 @@ export function AppointmentDetailsScreen() {
                 </View>
               </View>
               {phone !== '' ? (
-                getDetailsView('Phone:', phone, true, 'phone')
+                getDetailsView('Phone', phone, true, 'phone')
               ) : (
                 <View />
               )}
 
               {email !== '' ? (
-                getDetailsView('Email:', email, true, 'mail')
+                getDetailsView('Email', email, true, 'mail')
               ) : (
                 <View />
               )}
               {website !== '' ? (
-                getDetailsView('Website:', website, true, 'globe')
+                getDetailsView('Website', website, true, 'globe')
               ) : (
                 <View />
               )}
               {websiteUser !== '' ? (
-                getDetailsView('Username:', websiteUser, false, 'copy')
+                getDetailsView('Username', websiteUser, false, 'copy')
               ) : (
                 <View />
               )}
@@ -786,10 +790,10 @@ export function AppointmentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getDetailsView('Date:', apptDate, false, '')}
-              {getDetailsView('Purpose:', purpose, false, '')}
-              {getDetailsView('Status:', status, false, '')}
-              {getDetailsView('Description:', description, false, '')}
+              {getDetailsView('Date', apptDate, false, '')}
+              {getDetailsView('Purpose', purpose, false, '')}
+              {getDetailsView('Status', status, false, '')}
+              {getDetailsView('Description', description, false, '')}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(appointmentPrivileges).createPermission ||
                 getUserPermission(appointmentPrivileges).updatePermission ||

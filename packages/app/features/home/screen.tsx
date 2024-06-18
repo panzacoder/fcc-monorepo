@@ -28,7 +28,10 @@ export function HomeScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            consoleData('getMemberDetails', data.data.memberList)
+            // consoleData(
+            //   'getMemberDetails',
+            //   JSON.stringify(data.data.memberList)
+            // )
             setMemberList(data.data.memberList ? data.data.memberList : [])
             setDataReceived(true)
           } else {

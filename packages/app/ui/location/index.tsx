@@ -161,7 +161,7 @@ export function Location(data: any) {
 
       <View className="w-full flex-row">
         {locationData.address && locationData.address !== '' ? (
-          <View className=" w-[85%] flex-row items-center">
+          <View className="w-[85%] flex-row items-center">
             <Typography className="font-400 text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
             </Typography>
@@ -174,10 +174,10 @@ export function Location(data: any) {
             let addressString = getAddressFromObject(locationData.address)
             googleMapOpenUrl(addressString)
           }}
-          className={touchStyle}
+          className={`${touchStyle} ml-5`}
         >
           <Feather
-            className="self-center"
+            className="self-center "
             name={'navigation'}
             size={20}
             color={'white'}
@@ -193,7 +193,7 @@ export function Location(data: any) {
         >
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
-              {'Phone:'}
+              {'Phone'}
             </Typography>
             <Typography className="font-400 ml-2 w-[70%] text-[16px] font-bold text-[#1A1A1A]">
               {convertPhoneNumberToUsaPhoneNumberFormat(locationData.phone)}
@@ -209,7 +209,7 @@ export function Location(data: any) {
         <View className=" mt-2 w-[95%] flex-row items-center">
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
-              {'Fax:'}
+              {'Fax'}
             </Typography>
             <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
               {locationData.fax}
@@ -229,7 +229,7 @@ export function Location(data: any) {
         >
           <View className="w-[95%] flex-row">
             <Typography className="font-400 w-[25%] text-[16px] text-[#1A1A1A]">
-              {'Website:'}
+              {'Website'}
             </Typography>
             <Typography className="font-400 text-primary ml-2 w-[70%] text-[16px]">
               {locationData.website}
