@@ -182,11 +182,11 @@ export function FacilitiesListScreen() {
               <View className="w-[95%] flex-row">
                 <View>
                   <View className="my-2 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[45%]">
+                    <Typography className="text-primary font-400 ml-5 w-[40%]">
                       {data.name ? data.name : ''}
                     </Typography>
 
-                    <Typography className="ml-5 mr-5 w-[40%] text-right">
+                    <Typography className="ml-5 mr-5 w-[45%] text-right">
                       {data.type ? data.type : ''}
                     </Typography>
                   </View>

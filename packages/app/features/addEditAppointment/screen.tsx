@@ -58,7 +58,11 @@ export function AddEditAppointmentScreen() {
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [purpose, setPurpose] = useState('')
+  const [purpose, setPurpose] = useState(
+    !_.isEmpty(appointmentDetails) && appointmentDetails.purpose
+      ? appointmentDetails.purpose
+      : ''
+  )
   const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(
     null
   ) as any
@@ -146,7 +150,6 @@ export function AddEditAppointmentScreen() {
   let typeIndex: any = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
     // purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
-    setPurpose(appointmentDetails.purpose ? appointmentDetails.purpose : '')
     selectedDate = appointmentDetails.date
       ? appointmentDetails.date
       : new Date()
@@ -364,7 +367,7 @@ export function AddEditAppointmentScreen() {
               autoCapitalize="none"
             />
           </View>
-          <View className="w-full self-center mt-1">
+          <View className="mt-1 w-full self-center">
             <PtsComboBox
               currentData={purpose}
               listData={purposeList}

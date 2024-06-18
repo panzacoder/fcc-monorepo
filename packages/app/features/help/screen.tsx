@@ -84,7 +84,7 @@ export function HelpScreen() {
           {'Family Care Circle Document'}
         </Typography>
         <Typography className="text-primary my-2 ml-5 text-[16px] font-bold">
-          {'Family Care Circle:'}
+          {'Family Care Circle'}
         </Typography>
         {getTextView(
           'Family Care Circle is group of Caregivers taking care of one person called Member. Communication around appointments, transportation needs, and incidents help providethe best care possible along with reducing stress for the Caregivers. '

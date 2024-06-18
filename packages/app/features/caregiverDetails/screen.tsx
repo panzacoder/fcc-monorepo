@@ -16,8 +16,7 @@ import {
   GET_CAREGIVER_DETAILS
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
-import { useLocalSearchParams } from 'expo-router'
-import { useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let caregiverPrivileges = {}
@@ -40,6 +39,7 @@ export function CaregiverDetailsScreen() {
   const [email, setEmail] = useState('')
   const [caregiverDetails, setCaregiverDetails] = useState({}) as any
   let memberFullName = ''
+
   if (!_.isEmpty(memberData)) {
     memberFullName += memberData.firstname ? memberData.firstname : ''
     memberFullName += memberData.lastname ? ' ' + memberData.lastname : ''
@@ -160,7 +160,6 @@ export function CaregiverDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-
       <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">

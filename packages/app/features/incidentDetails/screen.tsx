@@ -74,7 +74,7 @@ export function IncidentDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
                 ? data.data.domainObjectPrivileges.INCIDENTNOTE
-                : {}
+                :data.data.domainObjectPrivileges.IncidentNote?data.data.domainObjectPrivileges.IncidentNote: {}
             }
 
             setIncidentDetails(data.data.incident ? data.data.incident : {})
@@ -402,9 +402,9 @@ export function IncidentDetailsScreen() {
                   {incident}
                 </Typography>
               </View>
-              {getDetailsView('Date:', incidentDate)}
-              {getDetailsView('Type:', type)}
-              {getDetailsView('Description:', description)}
+              {getDetailsView('Date', incidentDate)}
+              {getDetailsView('Type', type)}
+              {getDetailsView('Description', description)}
             </View>
           </View>
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
