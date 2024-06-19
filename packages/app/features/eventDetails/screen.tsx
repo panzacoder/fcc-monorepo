@@ -92,7 +92,7 @@ export function EventDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            // console.log('data', JSON.stringify(data.data))
+            console.log('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
               eventPrivileges = data.data.domainObjectPrivileges.Event
                 ? data.data.domainObjectPrivileges.Event
@@ -168,6 +168,9 @@ export function EventDetailsScreen() {
     }
     if (eventDetails.location) {
       eventAddress = eventDetails.location
+    }
+    if (eventDetails.description) {
+      description = eventDetails.description
     }
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
@@ -610,7 +613,7 @@ export function EventDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[95%] text-[15px] text-black">
                   {event}
                 </Typography>
               </View>

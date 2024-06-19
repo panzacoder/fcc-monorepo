@@ -63,8 +63,9 @@ const phoneSchema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 let isDoctorActive = true
-let doctorPhone = ''
+
 export function AddEditDoctorScreen() {
+  let doctorPhone = ''
   const router = useRouter()
   const staticData = store.getState().staticDataState.staticData as any
   // console.log('header', JSON.stringify(header))
@@ -360,6 +361,7 @@ export function AddEditDoctorScreen() {
                   onChangeText={(value) => {
                     doctorPhone =
                       convertPhoneNumberToUsaPhoneNumberFormat(value)
+
                     reset1({
                       phone: doctorPhone
                     })

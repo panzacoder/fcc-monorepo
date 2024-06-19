@@ -47,11 +47,16 @@ export function AddEditAppointmentScreen() {
   const staticData: any = store.getState().staticDataState.staticData
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let doctorFacilityDetails = item.doctorFacilityDetails
+    ? JSON.parse(item.doctorFacilityDetails)
+    : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
-  console.log('isFromCreateSimilar', isFromCreateSimilar)
+  // console.log('doctorFacilityDetails', JSON.stringify(doctorFacilityDetails))
+
   let component = item.component ? item.component : ''
+  console.log('component', component)
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
@@ -116,6 +121,25 @@ export function AddEditAppointmentScreen() {
           setDoctorFacilityListFull(list)
           setIsDataReceived(true)
           let facilityDoctorLocationId = -1
+          if (!_.isEmpty(doctorFacilityDetails)) {
+            if (component === 'Doctor') {
+              if (
+                doctorFacilityDetails.doctorLocationList[0] &&
+                doctorFacilityDetails.doctorLocationList[0].id
+              ) {
+                facilityDoctorLocationId =
+                  doctorFacilityDetails.doctorLocationList[0].id
+              }
+            } else {
+              if (
+                doctorFacilityDetails.facilityLocationList[0] &&
+                doctorFacilityDetails.facilityLocationList[0].id
+              ) {
+                facilityDoctorLocationId =
+                  doctorFacilityDetails.facilityLocationList[0].id
+              }
+            }
+          }
           if (
             appointmentDetails.doctorLocation &&
             appointmentDetails.doctorLocation.id
@@ -167,6 +191,7 @@ export function AddEditAppointmentScreen() {
   }
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
+
     // console.log('typeIndex1', '' + typeIndex)
   }
 

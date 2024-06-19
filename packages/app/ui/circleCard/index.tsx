@@ -123,13 +123,15 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
               <View />
             )}
           </View>
-          <View className={iconStyle}>
+          <TouchableOpacity
+            onPress={() => {
+              googleMapOpenUrl(memberData.address)
+            }}
+            className={iconStyle}
+          >
             {memberData.address ? (
               <View className="flex-row">
                 <Feather
-                  onPress={() => {
-                    googleMapOpenUrl(memberData.address)
-                  }}
                   className="mt-1"
                   name={'map-pin'}
                   size={25}
@@ -139,7 +141,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             ) : (
               <View />
             )}
-          </View>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     </View>

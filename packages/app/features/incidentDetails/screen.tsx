@@ -398,7 +398,7 @@ export function IncidentDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[95%] text-[15px] text-black">
                   {incident}
                 </Typography>
               </View>

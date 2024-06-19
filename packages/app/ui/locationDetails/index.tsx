@@ -35,7 +35,10 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   const [timezonesList, setTimezonesList] = useState([]) as any
   const [isRender, setIsRender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-
+  const staticData: any = store.getState().staticDataState.staticData
+  const memberAddress: any =
+    store.getState().currentMemberAddress.currentMemberAddress
+  // console.log('memberAddress', JSON.stringify(memberAddress))
   const getStates = useCallback(async (countryId: any) => {
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
     let dataObject = {
@@ -89,6 +92,29 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 })
               }
             })
+          } else if (!_.isEmpty(memberAddress)) {
+            let stateName = memberAddress.state.name
+              ? memberAddress.state.name
+              : ''
+            data.data.stateList.map((data: any, index: any) => {
+              if (data.name === stateName) {
+                stateIndex = index + 1
+                reset({
+                  state: stateIndex
+                })
+              }
+            })
+            let timeZoneName = memberAddress.timezone.name
+              ? memberAddress.timezone.name
+              : ''
+            data.data.timeZoneList.map((data: any, index: any) => {
+              if (data.name === timeZoneName) {
+                timeZoneIndex = index + 1
+                reset({
+                  timeZone: timeZoneIndex
+                })
+              }
+            })
           }
           setIsDataReceived(true)
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
@@ -100,46 +126,55 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         console.log(error)
       })
   }, [])
-  useEffect(() => {
-    async function setCountryState() {
-      let countryName = ''
-      if (!_.isEmpty(locationData)) {
-        countryName = locationData.address.state.country.name
-          ? locationData.address.state.country.name
-          : ''
-        let addressObject = {
-          nickName: locationData.nickName ? locationData.nickName : '',
-          shortDescription: locationData.shortDescription
-            ? locationData.shortDescription
-            : '',
-          address: locationData.address ? locationData.address : {}
-        }
-        setAddressObject(addressObject, 6)
-      } else {
-        let newTimeZone = moment.tz.guess()
-        const countryObject = ct.getCountriesForTimezone(newTimeZone)
-        countryName = countryObject[0]?.name ? countryObject[0].name : ''
+  const setCountryState = useCallback(async () => {
+    let countryName = ''
+    if (!_.isEmpty(locationData)) {
+      countryName = locationData.address.state.country.name
+        ? locationData.address.state.country.name
+        : ''
+      let addressObject = {
+        nickName: locationData.nickName ? locationData.nickName : '',
+        shortDescription: locationData.shortDescription
+          ? locationData.shortDescription
+          : '',
+        address: locationData.address ? locationData.address : {}
       }
-      staticData.countryList.map(async (data: any, index: any) => {
-        if (data.name === countryName) {
-          countryIndex = index + 1
-          reset({
-            country: countryIndex
-          })
-          console.log('countryName index', '' + countryIndex)
-          setIsRender(!isRender)
-        }
-      })
-      let countryId = staticData.countryList[countryIndex - 1].id
-        ? staticData.countryList[countryIndex - 1].id
-        : 101
-      await getStates(countryId)
+      setAddressObject(addressObject, 6)
+    } else if (!_.isEmpty(memberAddress)) {
+      countryName = memberAddress.state.country.name
+        ? memberAddress.state.country.name
+        : ''
+      let addressObject = {
+        nickName: '',
+        shortDescription: '',
+        address: memberAddress
+      }
+      setAddressObject(addressObject, 6)
+    } else {
+      let newTimeZone = moment.tz.guess()
+      const countryObject = ct.getCountriesForTimezone(newTimeZone)
+      countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
+    staticData.countryList.map(async (data: any, index: any) => {
+      if (data.name === countryName) {
+        countryIndex = index + 1
+
+        // setIsRender(!isRender)
+        reset({
+          country: countryIndex
+        })
+      }
+    })
+    let countryId = staticData.countryList[countryIndex - 1].id
+      ? staticData.countryList[countryIndex - 1].id
+      : 101
+    await getStates(countryId)
+  }, [])
+  useEffect(() => {
     setCountryState()
   }, [])
-  const staticData: any = store.getState().staticDataState.staticData
+
   let locationData = data ? data : {}
-  // console.log('locationData', JSON.stringify(locationData))
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
@@ -162,9 +197,16 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         !_.isEmpty(locationData) && locationData.address.zipCode
           ? locationData.address.zipCode
           : '',
-      country: !_.isEmpty(locationData) ? countryIndex : 97,
-      state: !_.isEmpty(locationData) ? stateIndex : -1,
-      timeZone: !_.isEmpty(locationData) ? timeZoneIndex : -1
+      country:
+        !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
+          ? countryIndex
+          : 97,
+      state:
+        !_.isEmpty(locationData) || !_.isEmpty(memberAddress) ? stateIndex : -1,
+      timeZone:
+        !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
+          ? timeZoneIndex
+          : -1
     },
     resolver: zodResolver(schema)
   })
@@ -191,11 +233,14 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   async function setSelectedCountryChange(value: any) {
     let countryId = ''
     if (value) {
-      setAddressObject(staticData.countryList[value.id - 1], 4)
-      countryId = staticData.countryList[value.id - 1].id
-        ? staticData.countryList[value.id - 1].id
-        : 101
-      await getStates(countryId)
+      if (isDataReceived) {
+        console.log('value', JSON.stringify(value))
+        setAddressObject(staticData.countryList[value.id - 1], 4)
+        countryId = staticData.countryList[value.id - 1].id
+          ? staticData.countryList[value.id - 1].id
+          : 101
+        await getStates(countryId)
+      }
     } else {
       setStateslist([])
     }
@@ -230,6 +275,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 reset1({
                   shortName: shortName
                 })
+                setAddressObject(shortName, 7)
               }}
             />
           </View>
@@ -271,11 +317,11 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="country"
             label="Country*"
             maxHeight={300}
-            defaultValue={
-              countryIndex !== -1 && countryList[countryIndex - 1]
-                ? countryList[countryIndex - 1]?.title
-                : ''
-            }
+            // defaultValue={
+            //   countryIndex !== -1 && countryList[countryIndex - 1]
+            //     ? countryList[countryIndex - 1]?.title
+            //     : ''
+            // }
             list={countryList}
             onChangeValue={setSelectedCountryChange}
           />

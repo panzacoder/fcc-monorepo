@@ -521,7 +521,7 @@ export function MedicalDevicesDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="flex-row">
-                <Typography className=" font-400 w-[80%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[80%] text-[15px] text-black">
                   {medicalDevice}
                 </Typography>
               </View>

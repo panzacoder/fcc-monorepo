@@ -21,7 +21,7 @@ export function CircleDetailsScreen() {
   const item = useLocalSearchParams<any>()
   let memberData = JSON.parse(item.memberData)
   const [isLoading, setLoading] = useState(false)
-  console.log('memberData', JSON.stringify(memberData))
+  // console.log('memberData', JSON.stringify(memberData))
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
     todayAppt =
@@ -42,9 +42,15 @@ export function CircleDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            if (data.member && data.member.address) {
+            if (data.data.member && data.data.member.address) {
               store.dispatch(
-                currentMemberAddressAction.setMemberAddress(data.member.address)
+                currentMemberAddressAction.setMemberAddress(
+                  data.data.member.address
+                )
+              )
+              console.log(
+                'data.data.member.address',
+                JSON.stringify(data.data.member.address)
               )
             }
           } else {

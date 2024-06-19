@@ -90,15 +90,15 @@ export const Note = ({
         </Typography>
       </View>
       <View className="my-2 h-[1px] w-full bg-[#86939e]" />
-      <View className="flex-row">
+      <View className="">
         <Typography
-          className={`font-400 ml-2 text-[9px] text-[#1A1A1A] ${noteData.occurance && noteData.occurance.occurance ? 'w-[65%]' : 'w-full'}`}
+          className={`font-400 ml-2 text-[9px] text-[#1A1A1A] w-full`}
         >
           {noteData.createdByName
             ? 'Created by ' + noteData.createdByName + ' on ' + creationDate
             : ''}
         </Typography>
-        <Typography className="font-400 mr-5 text-right text-[10px] text-[#1A1A1A]">
+        <Typography className="font-400 ml-2 text-[10px] text-[#1A1A1A]">
           {noteData.occurance && noteData.occurance.occurance
             ? noteData.occurance.occurance
             : ''}

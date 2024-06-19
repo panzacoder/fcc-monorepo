@@ -16,13 +16,10 @@ export function CardView(data: any) {
   let fullName = '',
     appointmentText = ''
   let dateText = ''
-  let locationText = ''
   let incidentText = ''
   let incidentDateText = ''
-  let incidentLocationText = ''
   let eventText = ''
   let eventDateText = ''
-  let eventLocationText = ''
   if (memberData.firstname) {
     fullName += memberData.firstname.trim() + ' '
   }
@@ -47,8 +44,7 @@ export function CardView(data: any) {
       memberData.upcomingAppointment &&
       memberData.upcomingAppointment.location
     ) {
-      appointmentText += ' with ' + memberData.upcomingAppointment.location
-      locationText += memberData.upcomingAppointment.location
+      appointmentText += ' , ' + memberData.upcomingAppointment.location
     }
   }
   if (memberData.recentIncident) {
@@ -59,12 +55,14 @@ export function CardView(data: any) {
       )
       incidentDateText += date + ' - '
     }
-    if (memberData.recentIncident && memberData.recentIncident.title) {
-      incidentText += memberData.recentIncident.title
+    if (memberData.recentIncident && memberData.recentIncident.title !== '') {
+      incidentText += memberData.recentIncident.title + ', '
     }
-    if (memberData.recentIncident && memberData.recentIncident.location) {
+    if (
+      memberData.recentIncident &&
+      memberData.recentIncident.location !== ''
+    ) {
       incidentText += memberData.recentIncident.location
-      incidentLocationText += memberData.recentIncident.location
     }
   }
   if (memberData.upcomingEvent) {
@@ -75,12 +73,11 @@ export function CardView(data: any) {
       )
       eventText += date + ' - '
     }
-    if (memberData.upcomingEvent && memberData.upcomingEvent.title) {
-      eventText += memberData.upcomingEvent.title
+    if (memberData.upcomingEvent && memberData.upcomingEvent.title !== '') {
+      eventText += memberData.upcomingEvent.title + ', '
     }
-    if (memberData.upcomingEvent && memberData.upcomingEvent.location) {
+    if (memberData.upcomingEvent && memberData.upcomingEvent.location !== '') {
       eventText += memberData.upcomingEvent.location
-      eventLocationText += memberData.upcomingEvent.location
     }
   }
   return (
@@ -117,16 +114,8 @@ export function CardView(data: any) {
                 {memberData.upcomingAppointment ? (
                   <View className="my-[5px]">
                     <Typography className={`${textStyle1}`}>
-                      {appointmentText}
+                      {dateText + appointmentText}
                     </Typography>
-                    <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
-                        {dateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
-                        {locationText}
-                      </Typography>
-                    </View>
                   </View>
                 ) : (
                   <View />
@@ -134,16 +123,8 @@ export function CardView(data: any) {
                 {memberData.upcomingEvent ? (
                   <View className="my-[5px]">
                     <Typography className={`${textStyle1}`}>
-                      {eventText}
+                      {eventText + eventDateText}
                     </Typography>
-                    <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
-                        {eventDateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
-                        {eventLocationText}
-                      </Typography>
-                    </View>
                   </View>
                 ) : (
                   <View />
@@ -151,15 +132,15 @@ export function CardView(data: any) {
                 {memberData.recentIncident ? (
                   <View className="my-[5px]">
                     <Typography className={`${textStyle1}`}>
-                      {incidentText}
+                      {incidentDateText + incidentText}
                     </Typography>
                     <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
+                      {/* <Typography className={`${textStyle2}`}>
                         {incidentDateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
+                      </Typography> */}
+                      {/* <Typography className={`${textStyle3}`}>
                         {incidentLocationText}
-                      </Typography>
+                      </Typography> */}
                     </View>
                   </View>
                 ) : (
