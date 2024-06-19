@@ -199,6 +199,10 @@ export function AppointmentDetailsScreen() {
       appointmentDetails.doctorLocation &&
       appointmentDetails.doctorLocation.doctor
     ) {
+      if (appointmentDetails.doctorLocation.doctor.salutation) {
+        doctorFacilityName +=
+          appointmentDetails.doctorLocation.doctor.salutation + '. '
+      }
       if (appointmentDetails.doctorLocation.doctor.firstName) {
         doctorFacilityName += appointmentDetails.doctorLocation.doctor.firstName
       }
@@ -695,9 +699,7 @@ export function AppointmentDetailsScreen() {
       </View>
     )
   }
-  async function refreshPage() {
-    console.log('in refreshPage')
-  }
+
   return (
     <View className="flex-1 ">
       <PtsLoader loading={isLoading} />
@@ -752,11 +754,11 @@ export function AppointmentDetailsScreen() {
               </View>
               <View className=" w-full flex-row items-center">
                 <View className="mt-2 w-full flex-row">
-                  <Typography className="font-400 max-w-[65%] text-[15px] text-[#86939e]">
+                  <Typography className="font-400 max-w-[50%] text-[15px] text-black">
                     {doctorFacilityName}
                   </Typography>
                   <View className="ml-2 h-[25] w-[2px] bg-[#86939e] " />
-                  <Typography className="font-400 text-primary ml-2 max-w-[30%] text-[15px] ">
+                  <Typography className="font-400 text-primary ml-2 text-[15px] ">
                     {specialist}
                   </Typography>
                 </View>

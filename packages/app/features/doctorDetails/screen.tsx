@@ -97,7 +97,7 @@ export function DoctorDetailsScreen() {
   }
 
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 text-[16px] font-bold text-[#1A1A1A]'
   function iconPressed(title: any, value: any) {
     if (title === 'Phone' && value !== '') {
       Linking.openURL(`tel:${value}`)
@@ -215,7 +215,7 @@ export function DoctorDetailsScreen() {
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className=" font-400 max-w-[80%] text-[16px] text-[#86939e]">
+                <Typography className=" font-400 max-w-[80%] text-[16px] text-black">
                   {doctorInfo.specialist ? doctorInfo.specialist : ''}
                 </Typography>
                 {/* <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" /> */}
@@ -386,6 +386,7 @@ export function DoctorDetailsScreen() {
                   router.push(
                     formatUrl('/circles/addEditAppointment', {
                       memberData: JSON.stringify(memberData),
+                      doctorFacilityDetails: JSON.stringify(doctorDetails),
                       component: 'Doctor'
                     })
                   )

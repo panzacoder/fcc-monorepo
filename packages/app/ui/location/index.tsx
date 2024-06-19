@@ -21,8 +21,8 @@ export function Location(data: any) {
   const [isLoading, setLoading] = useState(false)
   let locationData = data.data ? data.data : {}
   let memberData = locationData.memberData ? locationData.memberData : {}
-  console.log('locationData', JSON.stringify(locationData))
-  console.log('memberData', JSON.stringify(memberData))
+  // console.log('locationData', JSON.stringify(locationData))
+  // console.log('memberData', JSON.stringify(memberData))
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
@@ -95,8 +95,8 @@ export function Location(data: any) {
     <View>
       <PtsLoader loading={isLoading} />
       {locationData.nickName && locationData.nickName !== '' ? (
-        <View className=" w-full ">
-          <View className="flex-row items-center">
+        <View className="ml-2 w-full ">
+          <View className=" flex-row items-center ">
             <Typography className="text-primary mr-2 w-[70%] font-bold">
               {locationData.nickName ? locationData.nickName : ''}
             </Typography>

@@ -170,7 +170,7 @@ export function FacilityDetailsScreen() {
           <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className="font-400 max-w-[90%] text-[16px] text-[#86939e]">
+                <Typography className="font-400 max-w-[90%] text-[16px] text-black">
                   {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
                 <Typography className="font-400 text-primary ml-2 text-[16px]">
@@ -198,7 +198,7 @@ export function FacilityDetailsScreen() {
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Facility Details'}
                 </Typography>
-                <View className="self-center bg-primary h-[1px] w-[70%]" />
+                <View className="bg-primary h-[1px] w-[70%] self-center" />
               </View>
               {getDetailsView(
                 'Name',
@@ -355,6 +355,7 @@ export function FacilityDetailsScreen() {
                   router.push(
                     formatUrl('/circles/addEditAppointment', {
                       memberData: JSON.stringify(memberData),
+                      doctorFacilityDetails: JSON.stringify(facilityDetails),
                       component: 'Facility'
                     })
                   )

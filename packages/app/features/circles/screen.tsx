@@ -45,10 +45,6 @@ export function CirclesListScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setMemberList(data.data.memberList ? data.data.memberList : [])
-          console.log(
-            'data.data.memberList',
-            JSON.stringify(data.data.memberList)
-          )
         } else {
           Alert.alert('', data.message)
         }

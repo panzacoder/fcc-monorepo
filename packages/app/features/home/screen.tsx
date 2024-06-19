@@ -15,6 +15,7 @@ export function HomeScreen() {
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
+  const [upcomingSentence, setUpcomingSentence] = useState('')
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
 
@@ -28,11 +29,22 @@ export function HomeScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            // consoleData(
-            //   'getMemberDetails',
-            //   JSON.stringify(data.data.memberList)
-            // )
+            consoleData(
+              'getMemberDetails',
+              JSON.stringify(data.data.memberList)
+            )
             setMemberList(data.data.memberList ? data.data.memberList : [])
+            let sentence = ''
+            sentence +=
+              data.data.upcomingAppointmentCount &&
+              data.data.upcomingAppointmentCount > 0
+                ? data.data.upcomingAppointmentCount + ' Appointments, '
+                : ''
+            sentence +=
+              data.data.upcomingEventCount && data.data.upcomingEventCount > 0
+                ? data.data.upcomingEventCount + ' Events'
+                : ''
+            setUpcomingSentence(sentence)
             setDataReceived(true)
           } else {
             Alert.alert('', data.message)
@@ -72,7 +84,7 @@ export function HomeScreen() {
                   {'Your Week'}
                 </Typography>
                 <Typography className="font-400 text-[16px]">
-                  {'6 Appointments, 2 Events'}
+                  {upcomingSentence}
                 </Typography>
               </View>
             </View>
