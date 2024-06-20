@@ -501,7 +501,7 @@ export function AppointmentsListScreen() {
       ) : (
         <View />
       )}
-      {appointmentsList.length > 0 ? (
+      {isDataReceived && appointmentsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
           {appointmentsList.map((data: any, index: number) => {
             return (
@@ -640,7 +640,6 @@ export function AppointmentsListScreen() {
       ) : (
         <View />
       )}
-      
     </View>
   )
 }

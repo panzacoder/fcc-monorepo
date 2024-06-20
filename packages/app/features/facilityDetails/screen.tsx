@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader' 
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
@@ -164,10 +165,10 @@ export function FacilityDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Facility Details" memberData={memberData} />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
+          <View className="border-primary mt-[5] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
                 <Typography className="font-400 max-w-[90%] text-[16px] text-black">

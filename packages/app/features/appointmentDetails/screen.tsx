@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, Alert, TouchableOpacity, Linking } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
@@ -52,7 +53,7 @@ export function AppointmentDetailsScreen() {
     ? JSON.parse(item.appointmentDetails)
     : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
+  // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -703,10 +704,11 @@ export function AppointmentDetailsScreen() {
   return (
     <View className="flex-1 ">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
-        <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+        <View className=" h-full w-full flex-1 py-2">
           <ScrollView persistentScrollbar={true} className="flex-1">
-            <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+            <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View style={{ justifyContent: 'flex-end' }} className="flex-row">
                 {getUserPermission(appointmentPrivileges).createPermission ? (
                   <Button

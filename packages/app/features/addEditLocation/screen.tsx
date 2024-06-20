@@ -27,22 +27,29 @@ import { useRouter } from 'expo-router'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
 import { consoleData } from 'app/ui/utils'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 const schema = z.object({
   locationName: z.string().min(1, { message: 'Location name is required' }),
   address: z.string(),
   city: z.string(),
   postalCode: z.string(),
-  phone: z.string(),
   fax: z.string(),
   website: z.string(),
   state: z.number().min(0, { message: 'State is required' }),
   country: z.number().min(0, { message: 'Country is required' })
+})
+const phoneSchema = z.object({
+  phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
 // let statesList = []
 let countryIndex = -1
 let stateIndex = -1
 export function AddEditLocationScreen() {
+  let locationPhone = ''
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
@@ -154,10 +161,7 @@ export function AddEditLocationScreen() {
       postalCode: !_.isEmpty(locationDetails)
         ? locationDetails.address.zipCode
         : '',
-      phone:
-        !_.isEmpty(locationDetails) && locationDetails.phone
-          ? locationDetails.phone
-          : '',
+
       fax:
         !_.isEmpty(locationDetails) && locationDetails.fax
           ? locationDetails.fax
@@ -170,6 +174,15 @@ export function AddEditLocationScreen() {
       state: !_.isEmpty(locationDetails) ? stateIndex : -1
     },
     resolver: zodResolver(schema)
+  })
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      phone:
+        !_.isEmpty(locationDetails) && locationDetails.phone
+          ? locationDetails.phone
+          : ''
+    },
+    resolver: zodResolver(phoneSchema)
   })
   async function setSelectedCountryChange(value: any) {
     let countryId = ''
@@ -195,7 +208,7 @@ export function AddEditLocationScreen() {
       nickName: formData.locationName,
       fax: formData.fax,
       website: formData.website,
-      phone: formData.phone,
+      phone: removeAllSpecialCharFromString(locationPhone),
       address: {
         id: '',
         line: formData.address,
@@ -375,11 +388,19 @@ export function AddEditLocationScreen() {
                   />
                 </View>
                 <ControlledTextField
-                  control={control}
+                  control={control1}
                   name="phone"
                   placeholder={'Phone'}
                   className="w-full"
                   keyboard="number-pad"
+                  onChangeText={(value) => {
+                    locationPhone =
+                      convertPhoneNumberToUsaPhoneNumberFormat(value)
+
+                    reset1({
+                      phone: locationPhone
+                    })
+                  }}
                 />
                 <ControlledTextField
                   control={control}

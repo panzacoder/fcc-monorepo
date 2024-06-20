@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import { Feather } from 'app/ui/icons'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function TermsAndConditonScreen() {
   const router = useRouter()
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
@@ -18,21 +18,10 @@ export function TermsAndConditonScreen() {
   }
   return (
     <View className="flex-1">
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.back()
-          }}
-        />
-        <Typography className=" flex-1 text-center text-lg font-bold">
-          {'Terms and conditions'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="Terms and conditions" memberData={{}} />
       </View>
-      <ScrollView className="border-gray-400 mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px]">
+      <ScrollView className="mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px] border-gray-400">
         <Typography className="mt-[10px] text-center font-bold">
           {'Family Care Circle: Terms and Conditions'}
         </Typography>
