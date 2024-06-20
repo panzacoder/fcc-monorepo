@@ -24,18 +24,25 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 let profile = ''
 let profileIndex = -1
 const schema = z.object({
   profileIndex: z.number().min(0, { message: 'Profile is required' }),
   email: z.string().min(1, { message: 'Required' }),
-  phone: z.string(),
   firstName: z.string().min(1, { message: 'First name is required ' }),
   lastName: z.string().min(1, { message: 'Last name is required ' })
+})
+const phoneSchema = z.object({
+  phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
 let email = ''
 export function AddEditCaregiverScreen() {
+  let caregiverPhone = ''
   const router = useRouter()
   const item = useLocalSearchParams<any>()
   let caregiverDetails = item.caregiverDetails
@@ -92,10 +99,6 @@ export function AddEditCaregiverScreen() {
         !_.isEmpty(caregiverDetails) && caregiverDetails.email
           ? caregiverDetails.email
           : '',
-      phone:
-        !_.isEmpty(caregiverDetails) && caregiverDetails.phone
-          ? caregiverDetails.phone
-          : '',
       firstName:
         !_.isEmpty(caregiverDetails) && caregiverDetails.firstName
           ? caregiverDetails.firstName
@@ -106,6 +109,15 @@ export function AddEditCaregiverScreen() {
           : ''
     },
     resolver: zodResolver(schema)
+  })
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      phone:
+        !_.isEmpty(caregiverDetails) && caregiverDetails.phone
+          ? caregiverDetails.phone
+          : ''
+    },
+    resolver: zodResolver(phoneSchema)
   })
   async function findCaregiver() {
     if (email !== '') {
@@ -132,8 +144,10 @@ export function AddEditCaregiverScreen() {
               reset({
                 email: 'default',
                 firstName: 'default',
-                phone: 'default',
                 lastName: 'default'
+              })
+              reset1({
+                phone: 'default'
               })
             }
           } else {
@@ -195,7 +209,7 @@ export function AddEditCaregiverScreen() {
     } else if (_.isEmpty(caregiverDetails)) {
       object = {
         email: formData.email,
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(caregiverPhone),
         firstName: formData.firstName,
         lastName: formData.lastName,
         memberId: memberData.member ? memberData.member : '',
@@ -315,11 +329,19 @@ export function AddEditCaregiverScreen() {
                   }}
                 />
                 <ControlledTextField
-                  control={control}
+                  control={control1}
                   name="phone"
                   placeholder={'Phone'}
                   className="mt-2 w-[95%] self-center bg-white"
                   keyboard="number-pad"
+                  onChangeText={(value) => {
+                    caregiverPhone =
+                      convertPhoneNumberToUsaPhoneNumberFormat(value)
+
+                    reset1({
+                      phone: caregiverPhone
+                    })
+                  }}
                 />
                 <ControlledTextField
                   control={control}

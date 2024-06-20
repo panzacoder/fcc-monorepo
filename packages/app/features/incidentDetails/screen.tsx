@@ -10,6 +10,7 @@ import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   BASE_URL,
   GET_INCIDENT_DETAILS,
@@ -74,7 +75,9 @@ export function IncidentDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
                 ? data.data.domainObjectPrivileges.INCIDENTNOTE
-                :data.data.domainObjectPrivileges.IncidentNote?data.data.domainObjectPrivileges.IncidentNote: {}
+                : data.data.domainObjectPrivileges.IncidentNote
+                  ? data.data.domainObjectPrivileges.IncidentNote
+                  : {}
             }
 
             setIncidentDetails(data.data.incident ? data.data.incident : {})
@@ -356,9 +359,10 @@ export function IncidentDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Incident Details" memberData={memberData} />
+      <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
               {getUserPermission(incidentPrivileges).createPermission ? (
                 <Button

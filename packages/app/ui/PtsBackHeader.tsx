@@ -2,24 +2,81 @@ import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
-export type Props = {
-  title?: string
-}
-const PtsBackHeader = ({ title }: Props) => {
+import { formatUrl } from 'app/utils/format-url'
+export const PtsBackHeader = ({ title, memberData }) => {
   const router = useRouter()
+  async function goToScreen(title: any) {
+    if (title === 'Appointment Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/appointmentsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Event Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/eventsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Incident Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/incidentsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Caregiver Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/caregiversList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Doctor Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/doctorsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Facility Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/facilitiesList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Prescription Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/prescriptionsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else if (title === 'Medical Device Details') {
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/medicalDevicesList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.back()
+    }
+  }
   return (
-    <View className=" ml-[5] mt-20 w-[100%] flex-row ">
+    <View className=" mt-2 w-[100%] flex-row ">
       <TouchableOpacity
         className="mx-[10px] self-center"
         onPress={() => {
-          router.back()
+          goToScreen(title)
         }}
       >
         <Feather name={'arrow-left'} size={25} color={'black'} />
       </TouchableOpacity>
-      <Typography className=" text-center text-[18px] font-bold text-black">
-        {title}
-      </Typography>
+      <Typography className="flex-1 text-[20px] font-bold">{title}</Typography>
     </View>
   )
 }

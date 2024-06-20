@@ -3,7 +3,9 @@ import { Stack } from 'expo-router'
 export default function IncidentDetails() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Incident Details' }} />
+      <Stack.Screen
+        options={{ title: 'Incident Details', headerShown: false }}
+      />
       <IncidentDetailsScreen />
     </>
   )

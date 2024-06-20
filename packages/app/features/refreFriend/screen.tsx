@@ -9,12 +9,12 @@ import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, REFER_FRIEND } from 'app/utils/urlConstants'
-import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
@@ -53,19 +53,8 @@ export function ReferFriendScreen() {
   return (
     <ScrollView className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.back()
-          }}
-        />
-        <Typography className=" flex-1 text-center text-lg font-bold">
-          {'Refer A Friend'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="Refer A Friend" memberData={{}} />
       </View>
       <View className="mt-5 w-[95%] self-center rounded-[5px] border-[1px] border-gray-400">
         <Image

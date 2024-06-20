@@ -3,25 +3,14 @@ import { View, ScrollView, Linking } from 'react-native'
 import { Image } from 'app/ui/image'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import { Feather } from 'app/ui/icons'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function AboutUsScreen() {
   const router = useRouter()
 
   return (
     <View className="flex-1">
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.back()
-          }}
-        />
-        <Typography className=" flex-1 text-center text-lg font-bold">
-          {'About Us'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="About Us" memberData={{}} />
       </View>
       <ScrollView>
         <View className="my-2 w-[95%] self-center rounded-[5px] border-[0.5px] border-gray-400">
