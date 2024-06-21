@@ -1,12 +1,12 @@
 'use client'
 import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
-import { Alert, View } from 'react-native'
+import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
-import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -32,8 +32,6 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 let selectedDate: any = new Date()
-// let purpose: any = ''
-let facilityDoctorIndex = -1
 type TypeResponse = {
   id: number
   type: string
@@ -56,12 +54,13 @@ export function AddEditAppointmentScreen() {
   // console.log('doctorFacilityDetails', JSON.stringify(doctorFacilityDetails))
 
   let component = item.component ? item.component : ''
-  console.log('component', component)
+  // console.log('component', component)
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
+  const [facilityDoctorIndex, setFacilityDoctorIndex] = useState(-1)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [purpose, setPurpose] = useState(
     !_.isEmpty(appointmentDetails) && appointmentDetails.purpose
@@ -154,7 +153,7 @@ export function AddEditAppointmentScreen() {
 
           list.map(async (data: any, index: any) => {
             if (data.locationId === facilityDoctorLocationId) {
-              facilityDoctorIndex = index + 1
+              setFacilityDoctorIndex(index + 1)
               reset({
                 doctoFacilityIndex: index + 1
               })
@@ -320,6 +319,12 @@ export function AddEditAppointmentScreen() {
       getDoctorFacilities(value.id - 1)
     }
   }
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    router.back()
+    return true
+  }
+
   useEffect(() => {
     if (
       !_.isEmpty(appointmentDetails) ||
@@ -330,20 +335,27 @@ export function AddEditAppointmentScreen() {
       getDoctorFacilities(typeIndex - 1)
       setSelectedDoctorFacility(facilityDoctorIndex)
     }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   return (
     <View className="w-full flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Appointment'
-              : 'Edit Appointment'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full py-2 ">
-        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+      <PtsBackHeader
+        title={
+          _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Appointment'
+            : 'Edit Appointment'
+        }
+        memberData={memberData}
+      />
+      <View className="h-full w-full flex-1 py-2 ">
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2 ">
           <View className="mt-5 w-full items-center">
             <ControlledDropdown
               control={control}

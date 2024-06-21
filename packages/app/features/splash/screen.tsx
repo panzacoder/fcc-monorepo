@@ -6,6 +6,7 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState } from 'react'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getUserDeviceInformation } from 'app/utils/device'
 import headerAction from 'app/redux/header/headerAction'
@@ -16,7 +17,6 @@ import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
-// import * as SecureStore from 'expo-secure-store'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
 export function SplashScreen() {
@@ -24,21 +24,20 @@ export function SplashScreen() {
   const [isShowButtons, setIsShowButtons] = useState(false)
   const getUsernamePassword = useCallback(async () => {
     setLoading(true)
-    // let username = await SecureStore.getItemAsync('Username')
-    // let password = await SecureStore.getItemAsync('Password')
-    // if (
-    //   username !== null &&
-    //   username !== '' &&
-    //   password !== null &&
-    //   password !== ''
-    // ) {
-    //   login(username, password)
-    // } else {
-    //   setIsShowButtons(true)
-    //   setLoading(false)
-    // }
-    setIsShowButtons(true)
-    setLoading(false)
+    try {
+      let loginDetails: any = await AsyncStorage.getItem('loginDetails')
+      loginDetails = loginDetails != null ? JSON.parse(loginDetails) : null
+      if (loginDetails !== null) {
+        login(loginDetails.email, loginDetails.password)
+      } else {
+        setIsShowButtons(true)
+        setLoading(false)
+      }
+    } catch (e) {
+      // error reading value
+      setIsShowButtons(true)
+      setLoading(false)
+    }
   }, [])
   useEffect(() => {
     getUsernamePassword()
@@ -91,9 +90,6 @@ export function SplashScreen() {
               })
             )
           }
-
-          // SecureStore.setItemAsync('Username', email)
-          // SecureStore.setItemAsync('Password', password)
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: email }))

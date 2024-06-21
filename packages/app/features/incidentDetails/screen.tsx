@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, ScrollView } from 'react-native'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  ScrollView,
+  BackHandler
+} from 'react-native'
 // import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -106,10 +112,25 @@ export function IncidentDetailsScreen() {
     },
     []
   )
-
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/incidentsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getIncidentDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let incidentDate = '',

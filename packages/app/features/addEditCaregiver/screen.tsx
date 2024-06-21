@@ -19,7 +19,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
-import { Stack } from 'expo-router'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
@@ -119,6 +119,7 @@ export function AddEditCaregiverScreen() {
     },
     resolver: zodResolver(phoneSchema)
   })
+
   async function findCaregiver() {
     if (email !== '') {
       setLoading(true)
@@ -271,169 +272,168 @@ export function AddEditCaregiverScreen() {
     setIsShowProfileInfo(true)
   }
   return (
-    <ScrollView
-      className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[90%]' : ' mt-10 max-h-[60%]'} w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 `}
-    >
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(caregiverDetails)
-            ? 'Add Caregiver'
-            : 'Edit Caregiver'
-        }}
-      />
+    <View>
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader
+        title={_.isEmpty(caregiverDetails) ? 'Add Caregiver' : 'Edit Caregiver'}
+        memberData={memberData}
+      />
 
-      <View className="my-2 w-full">
-        {isMemberFound ? (
-          <View className="my-2 w-full justify-center">
-            <View className="mx-[10px]">
-              {getDetailsView('Name', memberName)}
-              {getDetailsView('Email', memberEmail)}
-            </View>
-            <View className="flex-row">
-              <ControlledDropdown
-                control={control}
-                name="profileIndex"
-                label="Profile*"
-                maxHeight={300}
-                list={profileList}
-                className="ml-2 mt-2 w-[85%]"
-                defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-              />
-              <Feather
-                onPress={() => {
-                  infoClicked()
-                }}
-                className="ml-2 mt-5 self-center"
-                name={'info'}
-                size={20}
-                color={'#1a7088'}
-              />
-            </View>
-          </View>
-        ) : (
-          <View>
-            {_.isEmpty(caregiverDetails) ? (
-              <View className="my-2 w-full justify-center">
-                <ControlledTextField
-                  control={control}
-                  name="email"
-                  placeholder={'Email*'}
-                  className="mt-2 w-[95%] self-center bg-white"
-                  autoCapitalize="none"
-                  onChangeText={(text) => {
-                    email = text
-                  }}
-                  onBlur={() => {
-                    findCaregiver()
-                  }}
-                />
-                <ControlledTextField
-                  control={control1}
-                  name="phone"
-                  placeholder={'Phone'}
-                  className="mt-2 w-[95%] self-center bg-white"
-                  keyboard="number-pad"
-                  onChangeText={(value) => {
-                    caregiverPhone =
-                      convertPhoneNumberToUsaPhoneNumberFormat(value)
-
-                    reset1({
-                      phone: caregiverPhone
-                    })
-                  }}
-                />
-                <ControlledTextField
-                  control={control}
-                  name="firstName"
-                  placeholder={'First Name*'}
-                  className="mt-2 w-[95%] self-center bg-white"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="lastName"
-                  placeholder={'Last Name*'}
-                  className="mt-2 w-[95%] self-center bg-white"
-                />
-                <View className="flex-row ">
-                  <ControlledDropdown
-                    control={control}
-                    name="profileIndex"
-                    label="Profile*"
-                    maxHeight={300}
-                    list={profileList}
-                    className="ml-2 mt-2 w-[85%]"
-                    defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-                  />
-                  <Feather
-                    onPress={() => {
-                      infoClicked()
-                    }}
-                    className="ml-2 mt-5 self-center"
-                    name={'info'}
-                    size={20}
-                    color={'#1a7088'}
-                  />
-                </View>
+      <ScrollView
+        className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[90%]' : ' mt-10 max-h-[60%]'} w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 `}
+      >
+        <View className="my-2 w-full">
+          {isMemberFound ? (
+            <View className="my-2 w-full justify-center">
+              <View className="mx-[10px]">
+                {getDetailsView('Name', memberName)}
+                {getDetailsView('Email', memberEmail)}
               </View>
-            ) : (
-              <View className="my-2 w-full justify-center">
-                <View className="mx-[10px]">
-                  {getDetailsView('Name', fullName)}
-                  {getDetailsView('Email', caregiverDetails.email)}
-                  {getDetailsView('Status', status)}
-                </View>
-                <View className="flex-row">
-                  <ControlledDropdown
-                    control={control}
-                    name="profileIndex"
-                    label="Profile*"
-                    maxHeight={300}
-                    list={profileList}
-                    className="ml-2 mt-2 w-[85%]"
-                    defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
-                  />
-                  <Feather
-                    onPress={() => {
-                      infoClicked()
-                    }}
-                    className="ml-2 mt-5 self-center"
-                    name={'info'}
-                    size={20}
-                    color={'#1a7088'}
-                  />
-                </View>
+              <View className="flex-row">
+                <ControlledDropdown
+                  control={control}
+                  name="profileIndex"
+                  label="Profile*"
+                  maxHeight={300}
+                  list={profileList}
+                  className="ml-2 mt-2 w-[85%]"
+                  defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                />
+                <Feather
+                  onPress={() => {
+                    infoClicked()
+                  }}
+                  className="ml-2 mt-5 self-center"
+                  name={'info'}
+                  size={20}
+                  color={'#1a7088'}
+                />
               </View>
-            )}
-          </View>
-        )}
+            </View>
+          ) : (
+            <View>
+              {_.isEmpty(caregiverDetails) ? (
+                <View className="my-2 w-full justify-center">
+                  <ControlledTextField
+                    control={control}
+                    name="email"
+                    placeholder={'Email*'}
+                    className="mt-2 w-[95%] self-center bg-white"
+                    autoCapitalize="none"
+                    onChangeText={(text) => {
+                      email = text
+                    }}
+                    onBlur={() => {
+                      findCaregiver()
+                    }}
+                  />
+                  <ControlledTextField
+                    control={control1}
+                    name="phone"
+                    placeholder={'Phone'}
+                    className="mt-2 w-[95%] self-center bg-white"
+                    keyboard="number-pad"
+                    onChangeText={(value) => {
+                      caregiverPhone =
+                        convertPhoneNumberToUsaPhoneNumberFormat(value)
 
-        <View className="my-2 mt-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title="Cancel"
-            variant="default"
-            leadingIcon="x"
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Button
-            className="ml-5"
-            leadingIcon="save"
-            title={_.isEmpty(caregiverDetails) ? 'Create' : 'Save'}
-            variant="default"
-            onPress={handleSubmit(callCreateUpdateDevice)}
-          />
+                      reset1({
+                        phone: caregiverPhone
+                      })
+                    }}
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="firstName"
+                    placeholder={'First Name*'}
+                    className="mt-2 w-[95%] self-center bg-white"
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="lastName"
+                    placeholder={'Last Name*'}
+                    className="mt-2 w-[95%] self-center bg-white"
+                  />
+                  <View className="flex-row ">
+                    <ControlledDropdown
+                      control={control}
+                      name="profileIndex"
+                      label="Profile*"
+                      maxHeight={300}
+                      list={profileList}
+                      className="ml-2 mt-2 w-[85%]"
+                      defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                    />
+                    <Feather
+                      onPress={() => {
+                        infoClicked()
+                      }}
+                      className="ml-2 mt-5 self-center"
+                      name={'info'}
+                      size={20}
+                      color={'#1a7088'}
+                    />
+                  </View>
+                </View>
+              ) : (
+                <View className="my-2 w-full justify-center">
+                  <View className="mx-[10px]">
+                    {getDetailsView('Name', fullName)}
+                    {getDetailsView('Email', caregiverDetails.email)}
+                    {getDetailsView('Status', status)}
+                  </View>
+                  <View className="flex-row">
+                    <ControlledDropdown
+                      control={control}
+                      name="profileIndex"
+                      label="Profile*"
+                      maxHeight={300}
+                      list={profileList}
+                      className="ml-2 mt-2 w-[85%]"
+                      defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                    />
+                    <Feather
+                      onPress={() => {
+                        infoClicked()
+                      }}
+                      className="ml-2 mt-5 self-center"
+                      name={'info'}
+                      size={20}
+                      color={'#1a7088'}
+                    />
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          <View className="my-2 mt-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title="Cancel"
+              variant="default"
+              leadingIcon="x"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5"
+              leadingIcon="save"
+              title={_.isEmpty(caregiverDetails) ? 'Create' : 'Save'}
+              variant="default"
+              onPress={handleSubmit(callCreateUpdateDevice)}
+            />
+          </View>
+          {isShowProfileInfo ? (
+            <View className="top-50 absolute h-full w-full">
+              <CaregiverProfileInfo cancelClicked={cancelClicked} />
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
-        {isShowProfileInfo ? (
-          <View className="top-50 absolute h-full w-full">
-            <CaregiverProfileInfo cancelClicked={cancelClicked} />
-          </View>
-        ) : (
-          <View />
-        )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }

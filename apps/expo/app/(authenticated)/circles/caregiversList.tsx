@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function Caregivers() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Caregivers' }} />
+      <Stack.Screen options={{ title: 'Caregivers', headerShown: false }} />
       <CaregiversListScreen />
     </>
   )

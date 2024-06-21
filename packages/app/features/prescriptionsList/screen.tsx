@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -256,7 +257,7 @@ export function PrescriptionsListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-
+        <PtsBackHeader title="Prescriptions" memberData={memberData} />
         <View className="w-full flex-row">
           <View className="min-w-[75%]">
             <TouchableOpacity

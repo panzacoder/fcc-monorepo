@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function Events() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Events' }} />
+      <Stack.Screen options={{ title: 'Events', headerShown: false }} />
       <EventsListScreen />
     </>
   )

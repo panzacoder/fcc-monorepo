@@ -12,6 +12,7 @@ import {
 // import { ScrollView } from 'app/ui/scroll-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -275,6 +276,7 @@ export function NoteMessageScreen() {
   return (
     <SafeAreaView className="h-full flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Messages" memberData={memberData} />
       <Typography className="mt-5 text-left text-[16px] font-bold">
         {threadDetails.subject ? threadDetails.subject : ''}
       </Typography>

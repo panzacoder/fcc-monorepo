@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Alert, View } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useLocalSearchParams } from 'expo-router'
@@ -11,7 +12,6 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { Stack } from 'expo-router'
 import {
   BASE_URL,
   CREATE_INCIDENT,
@@ -100,6 +100,36 @@ export function AddEditIncidentScreen() {
     },
     resolver: zodResolver(schema)
   })
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    if (_.isEmpty(incidentDetails)) {
+      router.push(
+        formatUrl('/circles/incidentsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.replace(
+        formatUrl('/circles/incidentDetails', {
+          incidentDetails: JSON.stringify(incidentDetails),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    return true
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
+  }, [])
+
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
@@ -202,23 +232,23 @@ export function AddEditIncidentScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Incident'
-              : 'Edit Incident Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader
+        title={
+          _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Incident'
+            : 'Edit Incident Details'
+        }
+        memberData={{}}
+      />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-        <View className="w-full">
+        <View className="w-[95%] self-center">
           <PtsDateTimePicker
             currentData={selectedDate}
             onSelection={onSelection}
           />
         </View>
-        <View className="mt-2 w-full self-center">
+        <View className="mt-2 w-[95%] self-center">
           <PtsComboBox
             currentData={incidentType}
             listData={incidentTypeList}
@@ -226,7 +256,7 @@ export function AddEditIncidentScreen() {
             placeholderValue={'Incident Type'}
           />
         </View>
-        <View className="my-2 w-full flex-row justify-center">
+        <View className="my-2 w-[95%] flex-row self-center">
           <ControlledTextField
             control={control}
             name="title"
@@ -235,7 +265,7 @@ export function AddEditIncidentScreen() {
             autoCapitalize="none"
           />
         </View>
-        <View className="w-full flex-row justify-center">
+        <View className="w-[95%] flex-row self-center">
           <ControlledTextField
             control={control}
             name="description"

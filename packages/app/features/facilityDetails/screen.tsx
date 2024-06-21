@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsBackHeader from 'app/ui/PtsBackHeader' 
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
@@ -39,6 +39,16 @@ export function FacilityDetailsScreen() {
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
+
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/facilitiesList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     async function getfacilityDetails() {
       setLoading(true)
@@ -84,10 +94,15 @@ export function FacilityDetailsScreen() {
         })
     }
     getfacilityDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
-  async function deleteFacilityLocation(locationData: any) {
-    console.log('deleteFacilityLocation', JSON.stringify(locationData))
-  }
+
   async function deleteFacility() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_FACILITY}`
@@ -295,7 +310,7 @@ export function FacilityDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(facilityInfo),
@@ -369,7 +384,7 @@ export function FacilityDetailsScreen() {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        router.replace(
+                        router.push(
                           formatUrl('/circles/appointmentDetails', {
                             appointmentDetails: JSON.stringify(data),
                             memberData: JSON.stringify(memberData)

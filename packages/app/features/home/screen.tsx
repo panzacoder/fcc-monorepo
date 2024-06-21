@@ -8,7 +8,6 @@ import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
-import { consoleData } from 'app/ui/utils'
 import { CardView } from 'app/ui/cardview'
 import { TabsHeader } from 'app/ui/tabs-header'
 export function HomeScreen() {

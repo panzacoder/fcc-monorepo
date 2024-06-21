@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from 'app/ui/typography'
 import { useLocalSearchParams } from 'expo-router'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
@@ -203,87 +204,100 @@ export function AddEditMedicalDeviceScreen() {
     }
   }
   return (
-    <ScrollView className=" my-2 max-h-[90%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="my-2 w-full">
-        <View className="w-[95%] self-center">
-          <PtsDateTimePicker
-            currentData={
-              medicalDeviceDetails.date ? medicalDeviceDetails.date : new Date()
-            }
-            onSelection={onSelection}
-          />
-        </View>
-        <View className="my-2 w-full justify-center ">
-          <View className="mt-2 w-[95%] self-center">
-            <PtsComboBox
-              currentData={selectedType}
-              listData={typesList}
-              onSelection={onSelectionType}
-              placeholderValue={'Type*'}
-            />
-          </View>
-          <View className="m-[-5px] ml-[10px] w-full flex-row items-center">
-            <Typography className="">
-              {'Is It Prescribed by Doctor? '}
-            </Typography>
-            <CheckBox
-              checked={isPrescribed}
-              checkedColor={'#6493d9'}
-              onPress={() => {
-                setIsPrescribed(!isPrescribed)
-                reset({
-                  prescriberIndex: isPrescribed ? 1 : -1
-                })
-              }}
-              className=""
-            />
-          </View>
-          {isPrescribed ? (
-            <ControlledDropdown
-              control={control}
-              name="prescriberIndex"
-              label="Prescribed By*"
-              maxHeight={300}
-              list={doctorList}
-              className="w-[95%] self-center"
-              defaultValue={
-                !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''
+      <PtsBackHeader
+        title={
+          _.isEmpty(medicalDeviceDetails)
+            ? 'Add Medical Device'
+            : 'Edit Medical Device'
+        }
+        memberData={{}}
+      />
+
+      <ScrollView className=" my-2 max-h-[90%] w-full self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2 ">
+        <View className="my-2 w-full">
+          <View className="w-[95%] self-center">
+            <PtsDateTimePicker
+              currentData={
+                medicalDeviceDetails.date
+                  ? medicalDeviceDetails.date
+                  : new Date()
               }
-              onChangeValue={setPrescriberChange}
+              onSelection={onSelection}
             />
-          ) : (
-            <View />
-          )}
+          </View>
+          <View className="my-2 w-full justify-center ">
+            <View className="mt-2 w-[95%] self-center">
+              <PtsComboBox
+                currentData={selectedType}
+                listData={typesList}
+                onSelection={onSelectionType}
+                placeholderValue={'Type*'}
+              />
+            </View>
+            <View className="m-[-5px] ml-[10px] w-full flex-row items-center">
+              <Typography className="">
+                {'Is It Prescribed by Doctor? '}
+              </Typography>
+              <CheckBox
+                checked={isPrescribed}
+                checkedColor={'#6493d9'}
+                onPress={() => {
+                  setIsPrescribed(!isPrescribed)
+                  reset({
+                    prescriberIndex: isPrescribed ? 1 : -1
+                  })
+                }}
+                className=""
+              />
+            </View>
+            {isPrescribed ? (
+              <ControlledDropdown
+                control={control}
+                name="prescriberIndex"
+                label="Prescribed By*"
+                maxHeight={300}
+                list={doctorList}
+                className="w-[95%] self-center"
+                defaultValue={
+                  !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''
+                }
+                onChangeValue={setPrescriberChange}
+              />
+            ) : (
+              <View />
+            )}
 
-          <ControlledTextField
-            control={control}
-            name="description"
-            placeholder={'Description*'}
-            className="mt-2 w-[95%] self-center bg-white"
-            autoCapitalize="none"
-          />
-        </View>
+            <ControlledTextField
+              control={control}
+              name="description"
+              placeholder={'Description*'}
+              className="w-[95%] self-center bg-white"
+              autoCapitalize="none"
+            />
+          </View>
 
-        <View className="my-2 mt-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title="Cancel"
-            leadingIcon="x"
-            variant="default"
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Button
-            className="ml-5"
-            title={_.isEmpty(medicalDeviceDetails) ? 'Create' : 'Save'}
-            variant="default"
-            leadingIcon="save"
-            onPress={handleSubmit(callCreateUpdateDevice)}
-          />
+          <View className="my-2 mt-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title="Cancel"
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5"
+              title={_.isEmpty(medicalDeviceDetails) ? 'Create' : 'Save'}
+              variant="default"
+              leadingIcon="save"
+              onPress={handleSubmit(callCreateUpdateDevice)}
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }
