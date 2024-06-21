@@ -4,7 +4,7 @@ import { Stack } from 'expo-router'
 export default function CircleDetails() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Circle Details' }} />
+      <Stack.Screen options={{ title: 'Circle Details', headerShown: false }} />
       <CircleDetailsScreen />
     </>
   )

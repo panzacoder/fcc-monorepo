@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function AddEditIncident() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Add Incident' }} />
+      <Stack.Screen options={{ title: 'Add Incident', headerShown: false }} />
       <AddEditIncidentScreen />
     </>
   )

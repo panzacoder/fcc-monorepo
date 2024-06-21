@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function NoteMessage() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Messages' }} />
+      <Stack.Screen options={{ title: 'Messages', headerShown: false }} />
       <NoteMessageScreen />
     </>
   )

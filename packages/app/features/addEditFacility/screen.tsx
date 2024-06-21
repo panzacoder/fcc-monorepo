@@ -3,9 +3,9 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
-import { Stack } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { LocationDetails } from 'app/ui/locationDetails'
@@ -185,6 +185,7 @@ export function AddEditFacilityScreen() {
     selectedAddress.fax = formData.fax
     selectedAddress.website = formData.website
     selectedAddress.phone = removeAllSpecialCharFromString(locationPhone)
+    selectedAddress.address.id = ''
     locationList.push(selectedAddress)
     let url = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
@@ -269,17 +270,16 @@ export function AddEditFacilityScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(facilityDetails)
-            ? 'Add Facility'
-            : 'Edit Facility Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader
+        title={
+          _.isEmpty(facilityDetails) ? 'Add Facility' : 'Edit Facility Details'
+        }
+        memberData={{}}
+      />
+      <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
               <View className="w-[45%] flex-row">
                 <ToggleSwitch

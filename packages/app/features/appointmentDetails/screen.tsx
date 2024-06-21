@@ -1,7 +1,13 @@
 'use client'
 import _ from 'lodash'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, Linking } from 'react-native'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  Linking,
+  BackHandler
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -160,9 +166,25 @@ export function AppointmentDetailsScreen() {
     },
     []
   )
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/appointmentsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getAppointmentDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let doctorFacilityName = '',

@@ -4,6 +4,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
@@ -15,7 +16,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
-import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -280,124 +280,128 @@ export function AddEditPrescriptionScreen() {
   }
 
   return (
-    <ScrollView automaticallyAdjustKeyboardInsets className="my-5 ">
+    <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(prescriptionDetails)
+      <PtsBackHeader
+        title={
+          _.isEmpty(prescriptionDetails)
             ? 'Add Prescription'
             : 'Edit Prescription'
-        }}
+        }
+        memberData={memberData}
       />
-      <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
-        <ControlledDropdown
-          control={control}
-          name="typeIndex"
-          label="Type*"
-          maxHeight={300}
-          list={typesList}
-          className="w-full"
-          defaultValue={
-            !_.isEmpty(prescriptionDetails) &&
-            prescriptionDetails.type &&
-            prescriptionDetails.type.type
-              ? prescriptionDetails.type.type
-              : ''
-          }
-        />
-        <ControlledTextField
-          control={control}
-          name="drugName"
-          placeholder={'Drug Name*'}
-          className="w-full"
-        />
-        <ControlledTextField
-          control={control}
-          name="strength"
-          placeholder={'Strength'}
-          className="w-full"
-        />
-        <PtsComboBox
-          currentData={prescribedBy}
-          listData={doctorList}
-          onSelection={onSelectionPrescriber}
-          placeholderValue={'Prescribed by'}
-        />
-        <PtsComboBox
-          currentData={selectedPharmacy}
-          listData={pharmaciesList}
-          onSelection={onSelectionPharmacy}
-          placeholderValue={'Pharmacy'}
-        />
 
-        <CalendarViewInput
-          label="Date prescribed:"
-          value={prescribedDate}
-          onPress={() => {
-            setCalenderClickedCount(0)
-            setIsShowCalender(true)
-          }}
-        />
+      <ScrollView automaticallyAdjustKeyboardInsets className="my-5 ">
+        <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
+          <ControlledDropdown
+            control={control}
+            name="typeIndex"
+            label="Type*"
+            maxHeight={300}
+            list={typesList}
+            className="w-full"
+            defaultValue={
+              !_.isEmpty(prescriptionDetails) &&
+              prescriptionDetails.type &&
+              prescriptionDetails.type.type
+                ? prescriptionDetails.type.type
+                : ''
+            }
+          />
+          <ControlledTextField
+            control={control}
+            name="drugName"
+            placeholder={'Drug Name*'}
+            className="w-full"
+          />
+          <ControlledTextField
+            control={control}
+            name="strength"
+            placeholder={'Strength'}
+            className="w-full"
+          />
+          <PtsComboBox
+            currentData={prescribedBy}
+            listData={doctorList}
+            onSelection={onSelectionPrescriber}
+            placeholderValue={'Prescribed by'}
+          />
+          <PtsComboBox
+            currentData={selectedPharmacy}
+            listData={pharmaciesList}
+            onSelection={onSelectionPharmacy}
+            placeholderValue={'Pharmacy'}
+          />
 
-        <View className="flex flex-row gap-4">
           <CalendarViewInput
-            className="flex-1"
-            label="Start date:"
-            value={startDate}
+            label="Date prescribed:"
+            value={prescribedDate}
             onPress={() => {
-              setCalenderClickedCount(1)
+              setCalenderClickedCount(0)
               setIsShowCalender(true)
             }}
           />
 
-          <CalendarViewInput
-            className="flex-1"
-            label="End date:"
-            value={endDate}
-            onPress={() => {
-              setCalenderClickedCount(2)
-              setIsShowCalender(true)
-            }}
-          />
-        </View>
+          <View className="flex flex-row gap-4">
+            <CalendarViewInput
+              className="flex-1"
+              label="Start date:"
+              value={startDate}
+              onPress={() => {
+                setCalenderClickedCount(1)
+                setIsShowCalender(true)
+              }}
+            />
 
-        <ControlledTextField
-          control={control}
-          name="instructions"
-          placeholder={'Instructions'}
-        />
-        <ControlledTextField
-          control={control}
-          name="notes"
-          placeholder={'Notes'}
-        />
-        <View className="my-2 mb-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            leadingIcon="x"
-            variant="default"
-            onPress={() => {
-              router.back()
-            }}
+            <CalendarViewInput
+              className="flex-1"
+              label="End date:"
+              value={endDate}
+              onPress={() => {
+                setCalenderClickedCount(2)
+                setIsShowCalender(true)
+              }}
+            />
+          </View>
+
+          <ControlledTextField
+            control={control}
+            name="instructions"
+            placeholder={'Instructions'}
           />
-          <Button
-            className="ml-5 bg-[#287CFA]"
-            title={'Save'}
-            leadingIcon="save"
-            variant="default"
-            onPress={handleSubmit(callCreateUpdatePrescription)}
+          <ControlledTextField
+            control={control}
+            name="notes"
+            placeholder={'Notes'}
           />
+          <View className="my-2 mb-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
+              title={'Save'}
+              leadingIcon="save"
+              variant="default"
+              onPress={handleSubmit(callCreateUpdatePrescription)}
+            />
+          </View>
+          {isShowCalender && (
+            <CalendarView
+              component={'Prescription'}
+              onCancel={() => setIsShowCalender(false)}
+              onClear={handleDateCleared}
+              calendarPickerProps={{ onDateChange: handleDateChange }}
+            />
+          )}
         </View>
-        {isShowCalender && (
-          <CalendarView
-            component={'Prescription'}
-            onCancel={() => setIsShowCalender(false)}
-            onClear={handleDateCleared}
-            calendarPickerProps={{ onDateChange: handleDateChange }}
-          />
-        )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Feather } from 'app/ui/icons'
@@ -143,6 +144,7 @@ export function CalendarScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
+        <PtsBackHeader title="Calendar" memberData={memberData} />
         <View className="flex-row ">
           <View className="w-[90%]" />
           {getUserPermission(calendarPrivileges.Appointment).createPermission ||

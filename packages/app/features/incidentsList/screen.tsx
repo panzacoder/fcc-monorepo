@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -96,8 +97,33 @@ export function IncidentsListScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    let fullName = ''
+    if (memberData.firstname) {
+      fullName += memberData.firstname.trim() + ' '
+    }
+    if (memberData.lastname) {
+      fullName += memberData.lastname.trim()
+    }
+    router.dismiss(1)
+    router.push(
+      formatUrl('/circles/circleDetails', {
+        fullName,
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
+
   useEffect(() => {
     getIncidentDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
 
   function filterEvents(formData: Schema) {
@@ -135,11 +161,12 @@ export function IncidentsListScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Incidents" memberData={memberData} />
       <View className="flex-row">
         <View className="w-[75%]" />
 
         {getUserPermission(incidentsPrivileges).createPermission ? (
-          <View className="mt-5 self-center">
+          <View className="self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
@@ -156,7 +183,7 @@ export function IncidentsListScreen() {
         ) : (
           <View />
         )}
-        <View className="mt-5 self-center">
+        <View className="self-center">
           <TouchableOpacity
             onPress={() => {
               setIsFilter(!isFilter)

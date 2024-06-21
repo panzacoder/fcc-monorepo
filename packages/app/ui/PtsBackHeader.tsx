@@ -62,6 +62,27 @@ export const PtsBackHeader = ({ title, memberData }) => {
           memberData: JSON.stringify(memberData)
         })
       )
+    } else if (title === 'Circle Details') {
+      router.replace(formatUrl('/home', {}))
+    } else if (
+      title === 'Appointments' ||
+      title === 'Events' ||
+      title === 'Incidents'
+    ) {
+      let fullName = ''
+      if (memberData.firstname) {
+        fullName += memberData.firstname.trim() + ' '
+      }
+      if (memberData.lastname) {
+        fullName += memberData.lastname.trim()
+      }
+      router.dismiss(1)
+      router.push(
+        formatUrl('/circles/circleDetails', {
+          fullName,
+          memberData: JSON.stringify(memberData)
+        })
+      )
     } else {
       router.back()
     }

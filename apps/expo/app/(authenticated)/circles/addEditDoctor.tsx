@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function AddEditDoctor() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Add Doctor' }} />
+      <Stack.Screen options={{ title: 'Add Doctor', headerShown: false }} />
       <AddEditDoctorScreen />
     </>
   )

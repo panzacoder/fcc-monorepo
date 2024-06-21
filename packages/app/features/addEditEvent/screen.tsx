@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Alert, View } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { Stack } from 'expo-router'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -79,6 +79,36 @@ export function AddEditEventScreen() {
   if (!_.isEmpty(eventDetails) && !isLoading) {
     selectedDate = eventDetails.date ? eventDetails.date : new Date()
   }
+  function handleBackButtonClick() {
+    console.log('handleBackButtonClick')
+    router.dismiss(1)
+    if (_.isEmpty(eventDetails)) {
+      router.push(
+        formatUrl('/circles/eventsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.push(
+        formatUrl('/circles/eventDetails', {
+          eventDetails: JSON.stringify(eventDetails),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    return true
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
+  }, [])
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
@@ -170,15 +200,15 @@ export function AddEditEventScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Event'
-              : 'Edit Event Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader
+        title={
+          _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Event'
+            : 'Edit Event Details'
+        }
+        memberData={{}}
+      />
       <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
         <View className="w-full">
           <PtsDateTimePicker

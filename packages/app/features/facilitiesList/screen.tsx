@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -14,7 +15,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'expo-router'
-let facilityPrivileges = {} 
+let facilityPrivileges = {}
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -84,6 +85,7 @@ export function FacilitiesListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
+        <PtsBackHeader title="Facilities" memberData={memberData} />
         <View className="flex-row ">
           <TouchableOpacity
             onPress={() => {

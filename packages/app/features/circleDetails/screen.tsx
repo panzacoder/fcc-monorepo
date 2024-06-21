@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
@@ -66,9 +67,12 @@ export function CircleDetailsScreen() {
     getMemberMenus()
   }, [])
   return (
-    <View className="mt-14 flex-1">
+    <View className=" flex-1">
       <PtsLoader loading={isLoading} />
-      <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
+      <PtsBackHeader title="Circle Details" memberData={{}} />
+      <View className="mt-5">
+        <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
+      </View>
       <ScrollView className=" flex-1">
         <TouchableOpacity
           onPress={() => {

@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { BASE_URL, CREATE_DOCTOR, UPDATE_DOCTOR } from 'app/utils/urlConstants'
-import { Stack } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -233,6 +233,7 @@ export function AddEditDoctorScreen() {
   async function createDoctor(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
+    selectedAddress.address.id = ''
     locationList.push(selectedAddress)
     let url = `${BASE_URL}${CREATE_DOCTOR}`
     let dataObject = {
@@ -283,15 +284,14 @@ export function AddEditDoctorScreen() {
 
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(doctorDetails) ? 'Add Doctor' : 'Edit Doctor Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader
+        title={_.isEmpty(doctorDetails) ? 'Add Doctor' : 'Edit Doctor Details'}
+        memberData={{}}
+      />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
             <View className="flex-row">
               <View className="w-[45%] flex-row">
                 <ToggleSwitch

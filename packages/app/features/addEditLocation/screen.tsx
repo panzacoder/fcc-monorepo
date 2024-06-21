@@ -1,11 +1,11 @@
 'use client'
 import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
-import { View, Alert } from 'react-native'
+import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
-import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -123,7 +123,25 @@ export function AddEditLocationScreen() {
         console.log(error)
       })
   }, [])
-
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    if (item.component === 'Doctor') {
+      router.push(
+        formatUrl('/circles/doctorDetails', {
+          doctorDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.push(
+        formatUrl('/circles/facilityDetails', {
+          facilityDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+    return true
+  }
   useEffect(() => {
     async function setCountryState() {
       let countryName = ''
@@ -152,6 +170,13 @@ export function AddEditLocationScreen() {
       await getStates(countryId)
     }
     setCountryState()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -321,16 +346,14 @@ export function AddEditLocationScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(locationDetails)
-            ? 'Add Location'
-            : 'Edit Location Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader
+        title={
+          _.isEmpty(locationDetails) ? 'Add Location' : 'Edit Location Details'
+        }
+        memberData={memberData}
+      />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className="my-2 w-full">

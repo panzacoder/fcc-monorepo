@@ -1,7 +1,12 @@
 'use client'
-import * as React from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Linking, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Alert,
+  Linking,
+  TouchableOpacity,
+  BackHandler
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -89,8 +94,24 @@ export function DoctorDetailsScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/doctorsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     getDoctorDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
@@ -226,7 +247,7 @@ export function DoctorDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/addEditDoctor', {
                       memberData: JSON.stringify(memberData),
                       doctorDetails: JSON.stringify(doctorDetails),
@@ -326,7 +347,7 @@ export function DoctorDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(doctorInfo),
@@ -400,7 +421,7 @@ export function DoctorDetailsScreen() {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        router.replace(
+                        router.push(
                           formatUrl('/circles/appointmentDetails', {
                             appointmentDetails: JSON.stringify(data),
                             memberData: JSON.stringify(memberData)

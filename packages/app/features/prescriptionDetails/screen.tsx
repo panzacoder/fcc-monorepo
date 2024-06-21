@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert } from 'react-native'
+import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
-import PtsBackHeader from 'app/ui/PtsBackHeader' 
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -13,9 +13,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   GET_PRESCRIPTION,
-  DELETE_PRESCRIPTION,
-  GET_PHARMACY_LIST,
-  GET_ACTIVE_DOCTORS
+  DELETE_PRESCRIPTION
 } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -27,8 +25,6 @@ let prescriptionPrivileges = {}
 export function PrescriptionDetailsScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
-  const [pharmacyListFull, setPharmacyListFull] = useState([]) as any
-  const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
   const header = store.getState().headerState.header
   const item = useLocalSearchParams<any>()
@@ -73,62 +69,24 @@ export function PrescriptionDetailsScreen() {
         console.log('error', error)
       })
   }, [])
-  const getPharmacyList = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_PHARMACY_LIST}`
-    let dataObject = {
-      header: header,
-      facility: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list = data.data.list ? data.data.list : []
-          setPharmacyListFull(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/prescriptionsList', {
+        memberData: JSON.stringify(memberData)
       })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
-  const getActiveDoctorsList = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_ACTIVE_DOCTORS}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list = data.data.doctorList ? data.data.doctorList : []
-          setDoctorListFull(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }, [])
+    )
+    return true
+  }
   useEffect(() => {
     getPrescriptionDetails()
-    getActiveDoctorsList()
-    getPharmacyList()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   let prescribedDate = '',
     startDate = '',
