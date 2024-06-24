@@ -49,10 +49,6 @@ export function CircleDetailsScreen() {
                   data.data.member.address
                 )
               )
-              console.log(
-                'data.data.member.address',
-                JSON.stringify(data.data.member.address)
-              )
             }
           } else {
             Alert.alert('', data.message)

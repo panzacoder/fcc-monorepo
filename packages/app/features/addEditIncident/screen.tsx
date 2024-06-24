@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
@@ -241,67 +242,69 @@ export function AddEditIncidentScreen() {
         }
         memberData={{}}
       />
-      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-        <View className="w-[95%] self-center">
-          <PtsDateTimePicker
-            currentData={selectedDate}
-            onSelection={onSelection}
+      <SafeAreaView>
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View className="w-[95%] self-center">
+            <PtsDateTimePicker
+              currentData={selectedDate}
+              onSelection={onSelection}
+            />
+          </View>
+          <View className="mt-2 w-[95%] self-center">
+            <PtsComboBox
+              currentData={incidentType}
+              listData={incidentTypeList}
+              onSelection={onSelectionIncidentType}
+              placeholderValue={'Incident Type'}
+            />
+          </View>
+          <View className="my-2 w-[95%] flex-row self-center">
+            <ControlledTextField
+              control={control}
+              name="title"
+              placeholder={'Title*'}
+              className="w-full bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <View className="w-[95%] flex-row self-center">
+            <ControlledTextField
+              control={control}
+              name="description"
+              placeholder={'Description'}
+              className="w-full bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <LocationDetails
+            component={'AddEditIncident'}
+            data={
+              !_.isEmpty(incidentDetails) && incidentDetails.location
+                ? incidentDetails.location
+                : {}
+            }
+            setAddressObject={setAddressObject}
           />
-        </View>
-        <View className="mt-2 w-[95%] self-center">
-          <PtsComboBox
-            currentData={incidentType}
-            listData={incidentTypeList}
-            onSelection={onSelectionIncidentType}
-            placeholderValue={'Incident Type'}
-          />
-        </View>
-        <View className="my-2 w-[95%] flex-row self-center">
-          <ControlledTextField
-            control={control}
-            name="title"
-            placeholder={'Title*'}
-            className="w-full bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <View className="w-[95%] flex-row self-center">
-          <ControlledTextField
-            control={control}
-            name="description"
-            placeholder={'Description'}
-            className="w-full bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <LocationDetails
-          component={'AddEditIncident'}
-          data={
-            !_.isEmpty(incidentDetails) && incidentDetails.location
-              ? incidentDetails.location
-              : {}
-          }
-          setAddressObject={setAddressObject}
-        />
-        <View className="my-2 mb-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            leadingIcon="x"
-            variant="default"
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Button
-            className="ml-5 bg-[#287CFA]"
-            title={'Save'}
-            leadingIcon="save"
-            variant="default"
-            onPress={handleSubmit(addEditIncident)}
-          />
-        </View>
-      </ScrollView>
+          <View className="my-2 mb-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
+              title={'Save'}
+              leadingIcon="save"
+              variant="default"
+              onPress={handleSubmit(addEditIncident)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

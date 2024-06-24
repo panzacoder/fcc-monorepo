@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
@@ -19,7 +20,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
-let selectedDate: any = new Date()
+// let selectedDate: any = new Date()
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -56,14 +57,19 @@ export function AddEditEventScreen() {
   const router = useRouter()
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  const [isLoading, setLoading] = useState(false)
   let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
+  const [isLoading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(
+    _.isEmpty(eventDetails) && eventDetails.date
+      ? eventDetails.date
+      : new Date()
+  )
   // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: any) => {
-    selectedDate = date
+    setSelectedDate(date)
   }
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -76,9 +82,6 @@ export function AddEditEventScreen() {
     },
     resolver: zodResolver(schema)
   })
-  if (!_.isEmpty(eventDetails) && !isLoading) {
-    selectedDate = eventDetails.date ? eventDetails.date : new Date()
-  }
   function handleBackButtonClick() {
     console.log('handleBackButtonClick')
     router.dismiss(1)
@@ -209,63 +212,65 @@ export function AddEditEventScreen() {
         }
         memberData={{}}
       />
-      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-        <View className="w-full">
-          <PtsDateTimePicker
-            currentData={selectedDate}
-            onSelection={onSelection}
-          />
-        </View>
-        <View className="my-2 w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="title"
-            placeholder={'Title*'}
-            className="bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <View className="w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="description"
-            placeholder={'Description'}
-            className="bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <LocationDetails
-          component={'AddEditEvent'}
-          data={
-            !_.isEmpty(eventDetails) && eventDetails.location
-              ? eventDetails.location
-              : {}
-          }
-          setAddressObject={setAddressObject}
-        />
-        <View className="mb-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            leadingIcon="x"
-            variant="default"
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Button
-            className="ml-5 bg-[#287CFA]"
-            title={
-              _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
-                ? 'Create'
-                : 'Save'
+      <SafeAreaView>
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View className="w-full">
+            <PtsDateTimePicker
+              currentData={selectedDate}
+              onSelection={onSelection}
+            />
+          </View>
+          <View className="my-2 w-full flex-row justify-center">
+            <ControlledTextField
+              control={control}
+              name="title"
+              placeholder={'Title*'}
+              className="bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <View className="w-full flex-row justify-center">
+            <ControlledTextField
+              control={control}
+              name="description"
+              placeholder={'Description'}
+              className="bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <LocationDetails
+            component={'AddEditEvent'}
+            data={
+              !_.isEmpty(eventDetails) && eventDetails.location
+                ? eventDetails.location
+                : {}
             }
-            leadingIcon="save"
-            variant="default"
-            onPress={handleSubmit(addEditEvent)}
+            setAddressObject={setAddressObject}
           />
-        </View>
-      </ScrollView>
+          <View className="mb-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
+              title={
+                _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+                  ? 'Create'
+                  : 'Save'
+              }
+              leadingIcon="save"
+              variant="default"
+              onPress={handleSubmit(addEditEvent)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

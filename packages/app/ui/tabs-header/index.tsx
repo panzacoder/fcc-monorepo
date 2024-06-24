@@ -8,7 +8,7 @@ import { BASE_URL, USER_LOGOUT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+// import AsyncStorage from '@react-native-async-storage/async-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 // import * as SecureStore from 'expo-secure-store'
 
@@ -57,11 +57,11 @@ export const TabsHeader = ({}) => {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          try {
-            await AsyncStorage.setItem('loginDetails', JSON.stringify(null))
-          } catch (e) {
-            // saving error
-          }
+          // try {
+          //   await AsyncStorage.setItem('loginDetails', JSON.stringify(null))
+          // } catch (e) {
+          //   // saving error
+          // }
           router.push('/login')
         } else {
           Alert.alert('', data.message)

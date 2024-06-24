@@ -7,7 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_MEMBER_DETAILS } from 'app/utils/urlConstants'
+import { BASE_URL, GET_WEEK_DETAILS } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/cardview'
 import { TabsHeader } from 'app/ui/tabs-header'
 export function HomeScreen() {
@@ -21,7 +21,7 @@ export function HomeScreen() {
   useEffect(() => {
     async function getMemberDetails() {
       setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
+      let url = `${BASE_URL}${GET_WEEK_DETAILS}`
       let dataObject = {
         header: header
       }
@@ -71,7 +71,7 @@ export function HomeScreen() {
         </View>
         {isDataReceived ? (
           <View
-            className={`border-primary bg-card mx-[10px] mt-[50] h-[80%] w-[94%] self-center rounded-[15px] border-[2px]`}
+            className={`border-primary bg-card mx-[10px] mt-[30] h-[85%] w-full self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
               <View>
