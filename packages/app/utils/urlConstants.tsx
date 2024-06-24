@@ -138,6 +138,7 @@ export const RESEND_CAREGIVER_REQEST = 'memberms/resendRequest'
 export const GET_TC_HTML_CONTENT = 'apTermsConditions/geActive'
 export const GET_CONSOLIDATED_FILTER_OPTIONS = 'homems/getFilterOptions'
 export const GET_CONSOLIDATED_DETAILS = 'homems/getConsolidatedMemberDetails'
+export const GET_WEEK_DETAILS = 'homems/getClassicWeekDetails'
 export const GET_FILTER_CONSOLIDATED_DETAILS =
   'homems/getFilteredConsolidatedMemberDetails'
 export const SHARE_CONTACT_INFO = 'infoSharingMs/create'

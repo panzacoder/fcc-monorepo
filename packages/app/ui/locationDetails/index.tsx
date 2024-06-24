@@ -257,11 +257,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     }
   }
   return (
-    <View className="w-[95%] self-center py-2">
+    <View className="w-full self-center py-2">
       <View className="w-full">
-        {/* <Typography className="font-400 ml-[10px] text-[#1A1A1A]">
-          {'Location'}
-        </Typography> */}
         {component !== 'Profile' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledTextField

@@ -27,8 +27,8 @@ export const PtsBackHeader = ({ title, memberData }) => {
           memberData: JSON.stringify(memberData)
         })
       )
-    } else if (title === 'Caregiver Details') {
-      router.dismiss(2)
+    } else if (title === 'Caregiver Details' || title === 'Edit Caregiver') {
+      router.dismiss(3)
       router.push(
         formatUrl('/circles/caregiversList', {
           memberData: JSON.stringify(memberData)
@@ -67,7 +67,8 @@ export const PtsBackHeader = ({ title, memberData }) => {
     } else if (
       title === 'Appointments' ||
       title === 'Events' ||
-      title === 'Incidents'
+      title === 'Incidents' ||
+      title === 'Doctors'
     ) {
       let fullName = ''
       if (memberData.firstname) {

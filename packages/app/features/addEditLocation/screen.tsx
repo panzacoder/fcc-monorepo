@@ -2,6 +2,7 @@
 import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -354,113 +355,115 @@ export function AddEditLocationScreen() {
         memberData={memberData}
       />
       <View className="h-full w-full flex-1 py-2 ">
-        <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-            <View className="my-2 w-full">
-              <View className="flex w-full gap-2">
-                <ControlledTextField
-                  control={control}
-                  name="locationName"
-                  placeholder="Location Name"
-                  className="w-full"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="address"
-                  placeholder="Address"
-                  className="w-full"
-                />
-                <ControlledDropdown
-                  control={control}
-                  name="country"
-                  label="Country"
-                  maxHeight={300}
-                  defaultValue={
-                    countryIndex !== -1 && countryList[countryIndex - 1]
-                      ? countryList[countryIndex - 1]?.title
-                      : ''
-                  }
-                  list={countryList}
-                  onChangeValue={setSelectedCountryChange}
-                />
-                <ControlledDropdown
-                  control={control}
-                  name="state"
-                  label="State*"
-                  defaultValue={
-                    stateIndex !== -1 && statesList[stateIndex - 1]
-                      ? statesList[stateIndex - 1].title
-                      : ''
-                  }
-                  maxHeight={300}
-                  list={statesList}
-                />
-                <View className="w-full flex-row gap-2">
+        <SafeAreaView>
+          <ScrollView persistentScrollbar={true} className="flex-1">
+            <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <View className="my-2 w-full">
+                <View className="flex w-full gap-2">
                   <ControlledTextField
                     control={control}
-                    name="city"
-                    placeholder={'City'}
-                    className="w-[50%]"
+                    name="locationName"
+                    placeholder="Location Name"
+                    className="w-full"
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="address"
+                    placeholder="Address"
+                    className="w-full"
+                  />
+                  <ControlledDropdown
+                    control={control}
+                    name="country"
+                    label="Country"
+                    maxHeight={300}
+                    defaultValue={
+                      countryIndex !== -1 && countryList[countryIndex - 1]
+                        ? countryList[countryIndex - 1]?.title
+                        : ''
+                    }
+                    list={countryList}
+                    onChangeValue={setSelectedCountryChange}
+                  />
+                  <ControlledDropdown
+                    control={control}
+                    name="state"
+                    label="State*"
+                    defaultValue={
+                      stateIndex !== -1 && statesList[stateIndex - 1]
+                        ? statesList[stateIndex - 1].title
+                        : ''
+                    }
+                    maxHeight={300}
+                    list={statesList}
+                  />
+                  <View className="w-full flex-row gap-2">
+                    <ControlledTextField
+                      control={control}
+                      name="city"
+                      placeholder={'City'}
+                      className="w-[50%]"
+                      autoCapitalize="none"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="postalCode"
+                      placeholder="Postal Code"
+                      className="w-[48%]"
+                    />
+                  </View>
+                  <ControlledTextField
+                    control={control1}
+                    name="phone"
+                    placeholder={'Phone'}
+                    className="w-full"
+                    keyboard="number-pad"
+                    onChangeText={(value) => {
+                      locationPhone =
+                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+
+                      reset1({
+                        phone: locationPhone
+                      })
+                    }}
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="fax"
+                    placeholder={'Fax'}
+                    className="w-full"
                     autoCapitalize="none"
                   />
                   <ControlledTextField
                     control={control}
-                    name="postalCode"
-                    placeholder="Postal Code"
-                    className="w-[48%]"
+                    name="website"
+                    placeholder={'Website'}
+                    className="w-full"
+                    autoCapitalize="none"
                   />
                 </View>
-                <ControlledTextField
-                  control={control1}
-                  name="phone"
-                  placeholder={'Phone'}
-                  className="w-full"
-                  keyboard="number-pad"
-                  onChangeText={(value) => {
-                    locationPhone =
-                      convertPhoneNumberToUsaPhoneNumberFormat(value)
-
-                    reset1({
-                      phone: locationPhone
-                    })
-                  }}
-                />
-                <ControlledTextField
-                  control={control}
-                  name="fax"
-                  placeholder={'Fax'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="website"
-                  placeholder={'Website'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
-              </View>
-              <View className="mt-5 flex-row justify-center">
-                <Button
-                  className="bg-[#86939e]"
-                  title="Cancel"
-                  variant="default"
-                  leadingIcon="x"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className="ml-5"
-                  title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
-                  variant="default"
-                  leadingIcon="save"
-                  onPress={handleSubmit(addUpdateLocation)}
-                />
+                <View className="mt-5 flex-row justify-center">
+                  <Button
+                    className="bg-[#86939e]"
+                    title="Cancel"
+                    variant="default"
+                    leadingIcon="x"
+                    onPress={() => {
+                      router.back()
+                    }}
+                  />
+                  <Button
+                    className="ml-5"
+                    title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
+                    variant="default"
+                    leadingIcon="save"
+                    onPress={handleSubmit(addUpdateLocation)}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </SafeAreaView>
       </View>
     </View>
   )

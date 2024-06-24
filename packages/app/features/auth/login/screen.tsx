@@ -5,7 +5,7 @@ import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+// import AsyncStorage from '@react-native-async-storage/async-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
@@ -96,16 +96,16 @@ export function LoginScreen() {
               })
             )
           }
-          try {
-            let loginDetails = {
-              email: formData.email,
-              password: formData.password
-            }
-            const jsonValue = JSON.stringify(loginDetails)
-            await AsyncStorage.setItem('loginDetails', jsonValue)
-          } catch (e) {
-            // saving error
-          }
+          // try {
+          //   let loginDetails = {
+          //     email: formData.email,
+          //     password: formData.password
+          //   }
+          //   const jsonValue = JSON.stringify(loginDetails)
+          //   await AsyncStorage.setItem('loginDetails', jsonValue)
+          // } catch (e) {
+          //   // saving error
+          // }
           router.replace('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))

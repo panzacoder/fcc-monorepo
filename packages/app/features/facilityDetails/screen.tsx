@@ -250,11 +250,6 @@ export function FacilityDetailsScreen() {
               ) : (
                 <View />
               )}
-
-              {getDetailsView(
-                'Description',
-                facilityDetails.description ? facilityDetails.description : ''
-              )}
               <View className="mt-2 w-[95%] flex-row">
                 <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
                   {'Status'}
