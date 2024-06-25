@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -14,14 +14,20 @@ import { formatUrl } from 'app/utils/format-url'
 import { CircleSummaryCard } from './circle-summary-card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
-import { BASE_URL, GET_MEMBER_MENUS } from 'app/utils/urlConstants'
+import {
+  BASE_URL,
+  GET_MEMBER_MENUS,
+  GET_MEMBER_DETAILS
+} from 'app/utils/urlConstants'
 export function CircleDetailsScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
   const item = useLocalSearchParams<any>()
-  let memberData = JSON.parse(item.memberData)
   const [isLoading, setLoading] = useState(false)
+  const [memberData, setMemberData] = useState(
+    item.memberData ? JSON.parse(item.memberData) : {}
+  )
   // console.log('memberData', JSON.stringify(memberData))
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
@@ -30,37 +36,63 @@ export function CircleDetailsScreen() {
       ' with ' +
       memberData.upcomingAppointment.location
   }
-  useEffect(() => {
-    async function getMemberMenus() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_MENUS}`
-      let dataObject = {
-        header: header,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.member && data.data.member.address) {
-              store.dispatch(
-                currentMemberAddressAction.setMemberAddress(
-                  data.data.member.address
-                )
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log('error', error)
-        })
+  const getMemberDetails = useCallback(async () => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
+    let dataObject = {
+      header: header
     }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          data.data.memberList.map((data: any, index: any) => {
+            if (memberData.member === data.member) {
+              setMemberData(data)
+              console.log('memberData', JSON.stringify(memberData))
+            }
+          })
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }, [])
+  const getMemberMenus = useCallback(async () => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_MEMBER_MENUS}`
+    let dataObject = {
+      header: header,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          if (data.data.member && data.data.member.address) {
+            store.dispatch(
+              currentMemberAddressAction.setMemberAddress(
+                data.data.member.address
+              )
+            )
+          }
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log('error', error)
+      })
+  }, [])
+  useEffect(() => {
     getMemberMenus()
+    getMemberDetails()
   }, [])
   return (
     <View className=" flex-1">

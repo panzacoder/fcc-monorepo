@@ -61,9 +61,9 @@ export function AddEditLocationScreen() {
     ? JSON.parse(item.locationDetails)
     : {}
 
-  // console.log('locationDetails', JSON.stringify(locationDetails))
+  console.log('locationDetails', JSON.stringify(locationDetails))
   let details = item.details ? JSON.parse(item.details) : {}
-  // console.log('details', JSON.stringify(details))
+  console.log('details', JSON.stringify(details))
   const [isLoading, setLoading] = useState(false)
   const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
@@ -213,10 +213,12 @@ export function AddEditLocationScreen() {
   async function setSelectedCountryChange(value: any) {
     let countryId = ''
     if (value) {
-      countryId = staticData.countryList[value.id - 1].id
-        ? staticData.countryList[value.id - 1].id
-        : 101
-      await getStates(countryId)
+      if (!isLoading) {
+        countryId = staticData.countryList[value.id - 1].id
+          ? staticData.countryList[value.id - 1].id
+          : 101
+        await getStates(countryId)
+      }
     } else {
       setStatesList([])
       setStatesListFull([])
