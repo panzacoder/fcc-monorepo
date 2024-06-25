@@ -383,7 +383,7 @@ export function EventsListScreen() {
       ) : (
         <View />
       )}
-      {eventsList.length > 0 ? (
+      {!isLoading && eventsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
           {eventsList.map((data: any, index: number) => {
             return (
@@ -412,7 +412,7 @@ export function EventsListScreen() {
                       </View>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
+                      <Typography className="font-400 ml-5 w-[90%] text-black">
                         {data.location ? data.location : ''}
                       </Typography>
                     </View>

@@ -95,13 +95,14 @@ export function Location(data: any) {
     <View>
       <PtsLoader loading={isLoading} />
       {locationData.nickName && locationData.nickName !== '' ? (
-        <View className="ml-2 w-full ">
+        <View className=" w-full ">
           <View className=" flex-row items-center ">
             <Typography className="text-primary mr-2 w-[70%] font-bold">
               {locationData.nickName ? locationData.nickName : ''}
             </Typography>
             <View className="flex-row self-center">
-              {locationData.component !== 'Appointment' ? (
+              {locationData.component &&
+              locationData.component !== 'Appointment' ? (
                 <TouchableOpacity
                   onPress={() => {
                     Alert.alert(
@@ -128,7 +129,8 @@ export function Location(data: any) {
               ) : (
                 <View />
               )}
-              {locationData.component !== 'Appointment' ? (
+              {locationData.component &&
+              locationData.component !== 'Appointment' ? (
                 <TouchableOpacity
                   onPress={() => {
                     router.replace(

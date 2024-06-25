@@ -40,10 +40,10 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: 'sachaudhari0704@gmail.com',
-      password: 'Shubh@m27'
-      // email: '',
-      // password: ''
+      // email: 'sachaudhari0704@gmail.com',
+      // password: 'Shubh@m27'
+      email: '',
+      password: ''
     },
     resolver: zodResolver(schema)
   })

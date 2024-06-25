@@ -35,6 +35,7 @@ export function FacilityDetailsScreen() {
   let facilityInfo = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
+    console.log('facilityInfo',JSON.stringify(facilityInfo))
   const [isLoading, setLoading] = useState(false)
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
