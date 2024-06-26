@@ -10,7 +10,7 @@ import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'expo-router' 
+import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
@@ -165,7 +165,8 @@ export function AddEditEventScreen() {
           id: memberData.member ? memberData.member : ''
         },
         location: selectedAddress,
-        contactList: []
+        contactList: [],
+        reminderList: []
       }
     }
     if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {

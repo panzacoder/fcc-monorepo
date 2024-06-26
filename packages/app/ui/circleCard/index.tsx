@@ -37,7 +37,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
       <TouchableOpacity
         className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
-          router.push(
+          router.replace(
             formatUrl('/circles/circleDetails', {
               fullName,
               memberData: JSON.stringify(memberData)

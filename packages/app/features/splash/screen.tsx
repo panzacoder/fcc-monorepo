@@ -92,7 +92,7 @@ export function SplashScreen() {
               })
             )
           }
-          router.replace('/home')
+          router.push('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: email }))
         } else {

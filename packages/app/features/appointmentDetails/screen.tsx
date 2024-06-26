@@ -1108,7 +1108,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="mt-[20] h-full w-full">
           <AddEditNote
             component={'Appointment'}
             noteData={noteData}
@@ -1120,7 +1120,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="mt-[20] h-full w-full">
           <AddEditReminder
             component={'Appointment'}
             reminderData={reminderData}
@@ -1132,7 +1132,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddTransportation ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-[90%] w-full">
           <AddEditTransport
             component={'Appointment'}
             transportData={transportationData}

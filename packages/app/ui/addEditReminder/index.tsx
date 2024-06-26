@@ -41,7 +41,7 @@ export const AddEditReminder = ({
     createUpdateReminder(formData.title, selectedDate, reminderData)
   }
   return (
-    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5 border-[0.5px] border-gray-400">
+    <View className="my-2 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#fbe2e3] py-5">
       <Typography className="self-center font-bold">{`${_.isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
@@ -53,11 +53,12 @@ export const AddEditReminder = ({
             autoCapitalize="none"
           />
         </View>
-        <PtsDateTimePicker
-          currentData={reminderData.date ? reminderData.date : new Date()}
-          onSelection={onSelection}
-        />
-
+        <View className="w-[95%] self-center">
+          <PtsDateTimePicker
+            currentData={reminderData.date ? reminderData.date : new Date()}
+            onSelection={onSelection}
+          />
+        </View>
         <View className="mt-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"

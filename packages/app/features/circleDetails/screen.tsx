@@ -37,7 +37,6 @@ export function CircleDetailsScreen() {
       memberData.upcomingAppointment.location
   }
   const getMemberDetails = useCallback(async () => {
-    setLoading(true)
     let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
     let dataObject = {
       header: header
@@ -82,8 +81,8 @@ export function CircleDetailsScreen() {
           }
         } else {
           Alert.alert('', data.message)
+          setLoading(false)
         }
-        setLoading(false)
       })
       .catch((error) => {
         setLoading(false)
@@ -214,7 +213,7 @@ export function CircleDetailsScreen() {
               </View>
             ) : (
               <View className="flex-row">
-                <Typography className="ml-5 flex w-[80%] rounded text-[14px] text-black">
+                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
                   {'No recent incidents'}
                 </Typography>
               </View>
