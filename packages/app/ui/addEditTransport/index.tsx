@@ -4,6 +4,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getAddressFromObject } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import {
   BASE_URL,
   GET_TRANSPORTATION_MEMBER_LIST,
@@ -285,143 +286,145 @@ export const AddEditTransport = ({
     }
   }
   return (
-    <View className="my-5 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5">
+    <View className="my-5 w-[90%] flex-1 self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5">
       <PtsLoader loading={isLoading} />
       <Typography className="self-center font-bold">{`${_.isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
-      <ScrollView className="my-2 w-full">
-        {_.isEmpty(transportData) ? (
-          <View>
-            <View className="w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="member"
-                label="Acompany by*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={memberList}
-                onChangeValue={setAcompanyChange}
-              />
-            </View>
-            <View className="my-2">
-              <PtsDateTimePicker
-                currentData={
-                  transportData.date ? transportData.date : new Date()
-                }
-                onSelection={onSelection}
-              />
-            </View>
+      <SafeAreaView>
+        <ScrollView className="my-2 w-full">
+          {_.isEmpty(transportData) ? (
+            <View>
+              <View className="w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="member"
+                  label="Acompany by*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={memberList}
+                  onChangeValue={setAcompanyChange}
+                />
+              </View>
+              <View className="my-2 w-[95%] self-center">
+                <PtsDateTimePicker
+                  currentData={
+                    transportData.date ? transportData.date : new Date()
+                  }
+                  onSelection={onSelection}
+                />
+              </View>
 
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="description"
-                placeholder={'Description'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="description"
+                  placeholder={'Description'}
+                  className="w-[95%] bg-white"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="addressLine"
+                  placeholder={'Address Line'}
+                  className="w-[95%] bg-white"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="country"
+                  label="Country*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={countryList}
+                  onChangeValue={setSelectedCountryChange}
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="state"
+                  label="State*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={statesList}
+                  onChangeValue={setSelectedStateChange}
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="city"
+                  placeholder={'City'}
+                  className="w-[95%] bg-white"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View className=" w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="postalCode"
+                  placeholder={'Zip Code'}
+                  className="w-[95%] bg-white"
+                  autoCapitalize="none"
+                />
+              </View>
             </View>
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="addressLine"
-                placeholder={'Address Line'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
+          ) : (
+            <View>
+              {getDetailsView(
+                'Acompany',
+                transportData.accompanyName ? transportData.accompanyName : '',
+                false,
+                ''
+              )}
+              <View className="my-2">
+                <PtsDateTimePicker
+                  currentData={
+                    transportData.date ? transportData.date : new Date()
+                  }
+                  onSelection={onSelection}
+                />
+              </View>
+              {getDetailsView(
+                'Description',
+                transportData.description ? transportData.description : '',
+                false,
+                ''
+              )}
+              {getDetailsView(
+                'Address',
+                transportData.address
+                  ? getAddressFromObject(transportData.address)
+                  : '',
+                false,
+                ''
+              )}
             </View>
-            <View className="my-2 w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="country"
-                label="Country*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={countryList}
-                onChangeValue={setSelectedCountryChange}
-              />
-            </View>
-            <View className="my-2 w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="state"
-                label="State*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={statesList}
-                onChangeValue={setSelectedStateChange}
-              />
-            </View>
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="city"
-                placeholder={'City'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
-            </View>
-            <View className=" w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="postalCode"
-                placeholder={'Zip Code'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-        ) : (
-          <View>
-            {getDetailsView(
-              'Acompany',
-              transportData.accompanyName ? transportData.accompanyName : '',
-              false,
-              ''
-            )}
-            <View className="my-2">
-              <PtsDateTimePicker
-                currentData={
-                  transportData.date ? transportData.date : new Date()
-                }
-                onSelection={onSelection}
-              />
-            </View>
-            {getDetailsView(
-              'Description',
-              transportData.description ? transportData.description : '',
-              false,
-              ''
-            )}
-            {getDetailsView(
-              'Address',
-              transportData.address
-                ? getAddressFromObject(transportData.address)
-                : '',
-              false,
-              ''
-            )}
-          </View>
-        )}
+          )}
 
-        <View className="mt-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title="Cancel"
-            variant="default"
-            leadingIcon="x"
-            onPress={() => {
-              cancelClicked()
-            }}
-          />
-          <Button
-            className="ml-5"
-            title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
-            variant="default"
-            leadingIcon="save"
-            onPress={handleSubmit(createUpdateTransport)}
-          />
-        </View>
-      </ScrollView>
+          <View className="mt-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title="Cancel"
+              variant="default"
+              leadingIcon="x"
+              onPress={() => {
+                cancelClicked()
+              }}
+            />
+            <Button
+              className="ml-5"
+              title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
+              variant="default"
+              leadingIcon="save"
+              onPress={handleSubmit(createUpdateTransport)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

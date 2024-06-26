@@ -33,7 +33,6 @@ let timeZoneIndex = -1
 export const LocationDetails = ({ component, data, setAddressObject }) => {
   const [statesList, setStateslist] = useState([]) as any
   const [timezonesList, setTimezonesList] = useState([]) as any
-  const [isRender, setIsRender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const staticData: any = store.getState().staticDataState.staticData
   const memberAddress: any =
@@ -303,7 +302,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             placeholder={'Address'}
             className="w-full bg-white"
             onChangeText={(text) => {
-              // console.log('text', text)
+              console.log('text', text)
               setAddressObject(text, 1)
             }}
           />

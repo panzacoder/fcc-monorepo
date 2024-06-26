@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -17,40 +17,39 @@ export function HomeScreen() {
   const [upcomingSentence, setUpcomingSentence] = useState('')
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
-
-  useEffect(() => {
-    async function getMemberDetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_WEEK_DETAILS}`
-      let dataObject = {
-        header: header
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            setMemberList(data.data.memberList ? data.data.memberList : [])
-            let sentence = ''
-            sentence +=
-              data.data.upcomingAppointmentCount &&
-              data.data.upcomingAppointmentCount > 0
-                ? data.data.upcomingAppointmentCount + ' Appointments, '
-                : ''
-            sentence +=
-              data.data.upcomingEventCount && data.data.upcomingEventCount > 0
-                ? data.data.upcomingEventCount + ' Events'
-                : ''
-            setUpcomingSentence(sentence)
-            setDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.log(error)
-        })
+  const getMemberDetails = useCallback(async () => {
+    setLoading(true)
+    let url = `${BASE_URL}${GET_WEEK_DETAILS}`
+    let dataObject = {
+      header: header
     }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          setMemberList(data.data.memberList ? data.data.memberList : [])
+          let sentence = ''
+          sentence +=
+            data.data.upcomingAppointmentCount &&
+            data.data.upcomingAppointmentCount > 0
+              ? data.data.upcomingAppointmentCount + ' Appointments, '
+              : ''
+          sentence +=
+            data.data.upcomingEventCount && data.data.upcomingEventCount > 0
+              ? data.data.upcomingEventCount + ' Events'
+              : ''
+          setUpcomingSentence(sentence)
+          setDataReceived(true)
+        } else {
+          Alert.alert('', data.message)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }, [])
+  useEffect(() => {
     getMemberDetails()
   }, [])
 

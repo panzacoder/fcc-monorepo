@@ -1,10 +1,11 @@
 import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { useRouter } from 'expo-router'
+import { useRouter, useNavigation } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 export const PtsBackHeader = ({ title, memberData }) => {
   const router = useRouter()
+  const navigation = useNavigation()
   async function goToScreen(title: any) {
     if (title === 'Appointment Details') {
       router.dismiss(2)
@@ -63,7 +64,8 @@ export const PtsBackHeader = ({ title, memberData }) => {
         })
       )
     } else if (title === 'Circle Details') {
-      router.replace(formatUrl('/home', {}))
+      router.dismissAll()
+      router.push('/home')
     } else if (
       title === 'Appointments' ||
       title === 'Events' ||

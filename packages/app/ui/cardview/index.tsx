@@ -11,8 +11,6 @@ export function CardView(data: any) {
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
   let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}] max-w-[90%]`
-  let textStyle2 = 'ml-5 text-[12px] text-black '
-  let textStyle3 = ' text-[12px] text-black underline max-w-[75%]'
   let fullName = '',
     appointmentText = ''
   let dateText = ''
@@ -96,6 +94,7 @@ export function CardView(data: any) {
               <TouchableOpacity
                 className="ml-[5px] flex-row self-center"
                 onPress={() => {
+
                   router.push(
                     formatUrl('/circles/circleDetails', {
                       fullName,
