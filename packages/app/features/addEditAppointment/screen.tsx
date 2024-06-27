@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
 import { Alert, View, BackHandler, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
@@ -33,7 +34,7 @@ const schema = z.object({
   doctoFacilityIndex: z.number().min(0, { message: 'Select Doctor/Facility' })
 })
 export type Schema = z.infer<typeof schema>
-let selectedDate: any = new Date()
+// let selectedDate: any = new Date()
 type TypeResponse = {
   id: number
   type: string
@@ -62,6 +63,10 @@ export function AddEditAppointmentScreen() {
     : {}
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(
+    appointmentDetails.date ? appointmentDetails.date : new Date()
+  )
+  const [key, setKey] = useState(0)
   const [isAddDoctorFacility, setIsAddDoctorFacility] = useState(false)
   const [facilityDoctorIndex, setFacilityDoctorIndex] = useState(-1)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -181,10 +186,6 @@ export function AddEditAppointmentScreen() {
   }, [])
   let typeIndex: any = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
-    // purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
-    selectedDate = appointmentDetails.date
-      ? appointmentDetails.date
-      : new Date()
     if (
       appointmentDetails.type &&
       appointmentDetails.type.type === 'Doctor Appointment'
@@ -317,8 +318,9 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: any) => {
-    console.log('onSelection', '' + date)
-    selectedDate = date
+    // console.log('onSelection', '' + date)
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   const onSelectionPurpose = (data: any) => {
     // purpose = data
@@ -431,7 +433,7 @@ export function AddEditAppointmentScreen() {
     )
   }
   return (
-    <View className="w-full flex-1">
+    <View key={key} className="w-full flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
@@ -441,8 +443,9 @@ export function AddEditAppointmentScreen() {
         }
         memberData={memberData}
       />
-      <View className="h-full w-full flex-1 py-2 ">
-        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2 ">
+      <SafeAreaView>
+        {/* <View className="h-full w-full flex-1 py-2 "> */}
+        <ScrollView className="mt-5 h-[90%] w-full flex-1 rounded-[5px] border-[1px] border-gray-400 p-2 py-2">
           <View className="mt-5 w-full items-center">
             <ControlledDropdown
               control={control}
@@ -522,7 +525,7 @@ export function AddEditAppointmentScreen() {
             />
           </View>
         </ScrollView>
-      </View>
+      </SafeAreaView>
       {isAddDoctorFacility ? (
         <View className="absolute top-[100] w-[95%] flex-1 self-center">
           {showAddDcotoFacilityModal()}

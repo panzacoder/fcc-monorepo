@@ -489,8 +489,8 @@ export function MedicalDevicesDetailsScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader title="Medical Device Details" memberData={memberData} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
-        <ScrollView persistentScrollbar={true} className="flex-1">
+      <View className=" h-full w-full flex-1 py-2 ">
+        <ScrollView className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
               {getUserPermission(medicalDevicePrivileges).createPermission ? (
@@ -700,7 +700,7 @@ export function MedicalDevicesDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Medical Device'}
             noteData={noteData}
@@ -712,7 +712,7 @@ export function MedicalDevicesDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditReminder
             component={'Medical Device'}
             reminderData={reminderData}
@@ -724,7 +724,7 @@ export function MedicalDevicesDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

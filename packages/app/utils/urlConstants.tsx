@@ -181,3 +181,4 @@ export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER =
   'memberms/updateMemberForAuthorisedCaregiver'
 export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS =
   'memberms/updateAddressForAuthorisedCaregiver'
+export const GET_TRANSPORTATION_REQUESTS = 'homems/getTransportationRequests'

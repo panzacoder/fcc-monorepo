@@ -21,33 +21,37 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
           </Typography>
         </View>
         <View className="flex-row">
-          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                'Are you sure about deleting Reminder?',
+                'It cannot be recovered once deleted.',
+                [
+                  {
+                    text: 'Ok',
+                    onPress: () => deleteReminder(reminderData)
+                  },
+                  { text: 'Cancel', onPress: () => {} }
+                ]
+              )
+            }}
+            className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+          >
             <Feather
               className="self-center"
-              onPress={() => {
-                Alert.alert(
-                  'Are you sure about deleting Reminder?',
-                  'It cannot be recovered once deleted.',
-                  [
-                    {
-                      text: 'Ok',
-                      onPress: () => deleteReminder(reminderData)
-                    },
-                    { text: 'Cancel', onPress: () => {} }
-                  ]
-                )
-              }}
               name={'trash'}
               size={15}
               color={'white'}
             />
           </TouchableOpacity>
-          <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+          <TouchableOpacity
+            onPress={() => {
+              editReminder(reminderData)
+            }}
+            className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+          >
             <Feather
               className="self-center"
-              onPress={() => {
-                editReminder(reminderData)
-              }}
               name={'edit-2'}
               size={15}
               color={'white'}

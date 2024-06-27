@@ -26,33 +26,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 let incidentType: any = ''
-let selectedDate: any = new Date()
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter incident title' })
@@ -68,17 +41,46 @@ export function AddEditIncidentScreen() {
     ? item.isFromCreateSimilar
     : 'false'
   const [isLoading, setLoading] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
   let incidentDetails = item.incidentDetails
     ? JSON.parse(item.incidentDetails)
     : {}
+  const [selectedDate, setSelectedDate] = useState(
+    incidentDetails.date ? incidentDetails.date : new Date()
+  )
+  const [key, setKey] = useState(0)
   // console.log('incidentDetails', JSON.stringify(incidentDetails))
   const onSelection = (date: any) => {
-    selectedDate = date
-    console.log('selectedAddress', JSON.stringify(selectedAddress))
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   if (!_.isEmpty(incidentDetails) && !isLoading) {
     incidentType = incidentDetails.type ? incidentDetails.type : ''
-    selectedDate = incidentDetails.date ? incidentDetails.date : new Date()
   }
   const incidentTypeList = staticData.incidentTypeList.map(
     (data: any, index: any) => {
@@ -153,7 +155,6 @@ export function AddEditIncidentScreen() {
         selectedAddress.address.state.country.name = value.name
         selectedAddress.address.state.country.code = value.code
         selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
         selectedAddress.address.state.country.description = value.description
       }
       if (index === 5) {
@@ -165,10 +166,11 @@ export function AddEditIncidentScreen() {
         selectedAddress.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        // selectedAddress = value
+        setSelectedAddress(value)
       }
-      console.log('value', JSON.stringify(value))
-      console.log('index', JSON.stringify(index))
+      // console.log('value', JSON.stringify(value))
+      // console.log('index', JSON.stringify(index))
       console.log('selectedAddress1', JSON.stringify(selectedAddress))
     }
   }
@@ -244,13 +246,13 @@ export function AddEditIncidentScreen() {
       />
       <SafeAreaView>
         <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-          <View className="w-[95%] self-center">
+          <View key={key} className="w-full self-center">
             <PtsDateTimePicker
               currentData={selectedDate}
               onSelection={onSelection}
             />
           </View>
-          <View className="mt-2 w-[95%] self-center">
+          <View className="mt-2 w-full self-center">
             <PtsComboBox
               currentData={incidentType}
               listData={incidentTypeList}
@@ -258,7 +260,7 @@ export function AddEditIncidentScreen() {
               placeholderValue={'Incident Type'}
             />
           </View>
-          <View className="my-2 w-[95%] flex-row self-center">
+          <View className="my-2 w-full flex-row self-center">
             <ControlledTextField
               control={control}
               name="title"
@@ -267,7 +269,7 @@ export function AddEditIncidentScreen() {
               autoCapitalize="none"
             />
           </View>
-          <View className="w-[95%] flex-row self-center">
+          <View className="w-full flex-row self-center">
             <ControlledTextField
               control={control}
               name="description"

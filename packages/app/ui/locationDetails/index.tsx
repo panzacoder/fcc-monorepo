@@ -143,6 +143,11 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       countryName = memberAddress.state.country.name
         ? memberAddress.state.country.name
         : ''
+      console.log('memberAddress', JSON.stringify(memberAddress))
+      memberAddress.line = ''
+      memberAddress.city = ''
+      memberAddress.zipCode = ''
+      memberAddress.id = ''
       let addressObject = {
         nickName: '',
         shortDescription: '',

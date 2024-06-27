@@ -34,7 +34,6 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 let prescribedBy: any = ''
 let selectedType: any = ''
-let selectedDate: any = new Date()
 let selectedPrescriberIndex: any = -1
 let doctorList: Array<{ id: number; title: string }> = []
 export function AddEditMedicalDeviceScreen() {
@@ -49,6 +48,10 @@ export function AddEditMedicalDeviceScreen() {
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
+  const [selectedDate, setSelectedDate] = useState(
+    medicalDeviceDetails.date ? medicalDeviceDetails.date : new Date()
+  )
+  const [key, setKey] = useState(0)
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [isLoading, setLoading] = useState(false)
   const [isPrescribed, setIsPrescribed] = useState(
@@ -104,7 +107,6 @@ export function AddEditMedicalDeviceScreen() {
   // console.log('medicalDeviceDetails', JSON.stringify(medicalDeviceDetails))
   if (!_.isEmpty(medicalDeviceDetails)) {
     selectedType = medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
-    selectedDate = medicalDeviceDetails.date ? medicalDeviceDetails.date : ''
   }
   const typesList = staticData.purchaseTypeList.map((data: any, index: any) => {
     return {
@@ -195,7 +197,8 @@ export function AddEditMedicalDeviceScreen() {
     // console.log('purpose1', purpose)
   }
   const onSelection = (date: any) => {
-    selectedDate = date
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   async function setPrescriberChange(value: any) {
     if (value === null) {
@@ -205,7 +208,7 @@ export function AddEditMedicalDeviceScreen() {
     }
   }
   return (
-    <View className="flex-1">
+    <View key={key} className="flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
@@ -220,11 +223,7 @@ export function AddEditMedicalDeviceScreen() {
           <View className="my-2 w-full">
             <View className="w-[95%] self-center">
               <PtsDateTimePicker
-                currentData={
-                  medicalDeviceDetails.date
-                    ? medicalDeviceDetails.date
-                    : new Date()
-                }
+                currentData={selectedDate}
                 onSelection={onSelection}
               />
             </View>

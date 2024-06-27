@@ -907,7 +907,7 @@ export function EventDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Event'}
             noteData={noteData}
@@ -919,7 +919,7 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditReminder
             component={'Event'}
             reminderData={reminderData}
@@ -931,9 +931,10 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isAddTransportation ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditTransport
             component={'Event'}
+            date={eventDetails.date ? eventDetails.date : ''}
             transportData={transportationData}
             appointmentId={eventDetails.id}
             cancelClicked={cancelClicked}
@@ -944,7 +945,7 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}
