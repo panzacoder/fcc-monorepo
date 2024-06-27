@@ -538,7 +538,7 @@ export function FacilityDetailsScreen() {
         </ScrollView>
       </View>
       {isShareFacility ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full mt-[20px]">
           <ShareDoctorFacility
             cancelClicked={cancelClicked}
             shareDoctorFacility={shareFacility}

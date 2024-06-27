@@ -9,7 +9,7 @@ export function SafeAreaView({
       className="flex-column flex-1 justify-center"
       behavior="padding"
       enabled
-      keyboardVerticalOffset={60}
+      keyboardVerticalOffset={80}
       {...props}
     >
       {children}

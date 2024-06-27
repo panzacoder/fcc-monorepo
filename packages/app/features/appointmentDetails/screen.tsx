@@ -113,35 +113,35 @@ export function AppointmentDetailsScreen() {
               data.data.appointmentWithPreviousAppointment &&
               data.data.appointmentWithPreviousAppointment.appointment
             ) {
-              setAppointmentDetails(
+              let details =
                 data.data.appointmentWithPreviousAppointment.appointment
-              )
+              setAppointmentDetails(details)
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .noteList
               ) {
-                setNotesList(
+                let notesList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .noteList
-                )
+                setNotesList(notesList)
               }
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .reminderList
               ) {
-                setRemindersList(
+                let reminderList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .reminderList
-                )
+                setRemindersList(reminderList)
               }
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .transportationList
               ) {
-                setTransportationList(
+                let transportationList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .transportationList
-                )
+                setTransportationList(transportationList)
               }
             }
             if (isFromCreateThread) {
@@ -491,6 +491,7 @@ export function AppointmentDetailsScreen() {
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
     setLoading(true)
+    setIsShowTransportation(false)
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -1132,10 +1133,13 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddTransportation ? (
-        <View className="h-[90%] w-full">
+        <View className="h-[95%] w-full">
           <AddEditTransport
             component={'Appointment'}
             transportData={transportationData}
+            date={
+              appointmentDetails.date ? appointmentDetails.date : new Date()
+            }
             appointmentId={appointmentDetails.id}
             cancelClicked={cancelClicked}
             createUpdateTransportation={createUpdateTransportation}
@@ -1145,7 +1149,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

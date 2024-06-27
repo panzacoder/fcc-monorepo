@@ -529,7 +529,7 @@ export function IncidentDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Incident'}
             noteData={noteData}
@@ -542,7 +542,7 @@ export function IncidentDetailsScreen() {
       )}
 
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

@@ -3,14 +3,14 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'expo-router'
-import { COLORS } from 'app/utils/colors'
 import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
-  let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}] max-w-[90%]`
+  let textStyle1 = `ml-5 text-[14px] text-[#103264] max-w-[95%] mr-4`
+  let textStyle2 = `ml-5 text-[14px] font-bold max-w-[95%]`
   let fullName = '',
     appointmentText = ''
   let dateText = ''
@@ -24,6 +24,18 @@ export function CardView(data: any) {
   if (memberData.lastname) {
     fullName += memberData.lastname.trim()
   }
+  let eventTransporationCount = 0,
+    appointmentTransportationCount = 0,
+    totalTransportationCount = 0
+  memberData.transportationRequests.map((data) => {
+    if (data.type === 'Appointment') {
+      appointmentTransportationCount = data.count
+    } else {
+      eventTransporationCount = data.count
+    }
+  })
+  totalTransportationCount =
+    appointmentTransportationCount + eventTransporationCount
   if (memberData.upcomingAppointment) {
     if (memberData.upcomingAppointment.date) {
       let date = getFullDateForCalendar(
@@ -94,7 +106,7 @@ export function CardView(data: any) {
               <TouchableOpacity
                 className="ml-[5px] flex-row self-center"
                 onPress={() => {
-
+                  router.dismiss(1)
                   router.push(
                     formatUrl('/circles/circleDetails', {
                       fullName,
@@ -112,7 +124,10 @@ export function CardView(data: any) {
               <View className="my-[2px]">
                 {memberData.upcomingAppointment ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
+                    <Typography className={textStyle2}>
+                      {'Appointment'}
+                    </Typography>
+                    <Typography className={textStyle1}>
                       {dateText + appointmentText}
                     </Typography>
                   </View>
@@ -121,7 +136,8 @@ export function CardView(data: any) {
                 )}
                 {memberData.upcomingEvent ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
+                    <Typography className={textStyle2}>{'Event'}</Typography>
+                    <Typography className={textStyle1}>
                       {eventText + eventDateText}
                     </Typography>
                   </View>
@@ -130,17 +146,36 @@ export function CardView(data: any) {
                 )}
                 {memberData.recentIncident ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
+                    <Typography className={textStyle2}>{'Incident'}</Typography>
+                    <Typography className={textStyle1}>
                       {incidentDateText + incidentText}
                     </Typography>
-                    <View className="flex-row">
-                      {/* <Typography className={`${textStyle2}`}>
-                        {incidentDateText}
-                      </Typography> */}
-                      {/* <Typography className={`${textStyle3}`}>
-                        {incidentLocationText}
-                      </Typography> */}
-                    </View>
+                  </View>
+                ) : (
+                  <View />
+                )}
+
+                {totalTransportationCount > 0 ? (
+                  <View className="my-[5px]">
+                    <Typography className={textStyle2}>
+                      {'Transportation'}
+                    </Typography>
+                    {appointmentTransportationCount > 0 ? (
+                      <Typography className={textStyle1}>
+                        {'Appointment - ' +
+                          appointmentTransportationCount +
+                          ' '}
+                        {eventTransporationCount > 0 ? (
+                          <Typography className={textStyle1}>
+                            {'Event - ' + eventTransporationCount}
+                          </Typography>
+                        ) : (
+                          <View />
+                        )}
+                      </Typography>
+                    ) : (
+                      <View />
+                    )}
                   </View>
                 ) : (
                   <View />

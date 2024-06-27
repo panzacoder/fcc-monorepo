@@ -35,27 +35,28 @@ const schema = z.object({
   postalCode: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let selectedDate: any = new Date()
+let countryIndex = 97
+let stateIndex = -1
 export const AddEditTransport = ({
   component,
   transportData,
+  date,
   appointmentId,
   cancelClicked,
   createUpdateTransportation
 }) => {
-  let countryIndex = 97
-  let stateIndex = -1
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const staticData: any = store.getState().staticDataState.staticData
   const [isLoading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(
+    !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
+  )
+  const [key, setKey] = useState(0)
   const [memberList, setMemberList] = useState([]) as any
   const [memberListFull, setMemberListFull] = useState([]) as any
-  if (!_.isEmpty(transportData)) {
-    selectedDate = new Date(transportData.date)
-  }
-  // console.log('transportData', JSON.stringify(transportData))
-
+  const memberAddress: any =
+    store.getState().currentMemberAddress.currentMemberAddress
   useEffect(() => {
     async function getMemberList() {
       setLoading(true)
@@ -103,8 +104,8 @@ export const AddEditTransport = ({
       description: '',
       member: _.isEmpty(transportData) ? -1 : 1,
       addressLine: '',
-      state: _.isEmpty(transportData) ? stateIndex : 0,
-      country: _.isEmpty(transportData) ? countryIndex : 0,
+      state: _.isEmpty(transportData) ? stateIndex : 1,
+      country: _.isEmpty(transportData) ? countryIndex : 1,
       city: '',
       postalCode: ''
     },
@@ -135,13 +136,25 @@ export const AddEditTransport = ({
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let statesList: Array<{ id: number; title: string }> =
-            data.data.stateList.map(({ name, id }: Response, index: any) => {
-              return {
-                title: name,
-                id: index + 1
-              }
-            })
+          let stateName = ''
+          if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+            stateName = memberAddress.state.name ? memberAddress.state.name : ''
+          }
+          let statesList: Array<{ id: number; title: string }> = []
+          data.data.stateList.map(({ name, id }: Response, index: any) => {
+            if (name === stateName) {
+              stateIndex = index + 1
+              reset({
+                state: stateIndex
+              })
+            }
+            let object = {
+              title: name,
+              id: index + 1
+            }
+            statesList.push(object)
+          })
+
           setStatesList(statesList)
           setStatesListFull(data.data.stateList || [])
         } else {
@@ -173,8 +186,8 @@ export const AddEditTransport = ({
         transportation: {
           date: selectedDate,
           description: formData.description,
-          accompany: memberListFull[formData.member].memberId
-            ? memberListFull[formData.member].memberId
+          accompany: memberListFull[formData.member - 1].memberId
+            ? memberListFull[formData.member - 1].memberId
             : '',
           accompanyType: {
             type: 'Family Member'
@@ -226,8 +239,9 @@ export const AddEditTransport = ({
     createUpdateTransportation(url, dataObject)
   }
   const onSelection = (date: any) => {
-    selectedDate = date
-    console.log('selectedDate', selectedDate)
+    setSelectedDate(date)
+    setKey(Math.random())
+    // console.log('selectedDate', '' + selectedDate)
   }
 
   async function setSelectedStateChange(value: any) {
@@ -286,7 +300,10 @@ export const AddEditTransport = ({
     }
   }
   return (
-    <View className="my-5 w-[90%] flex-1 self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5">
+    <View
+      key={key}
+      className="my-5 mt-0 h-[90%] w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5"
+    >
       <PtsLoader loading={isLoading} />
       <Typography className="self-center font-bold">{`${_.isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
       <SafeAreaView>
@@ -306,9 +323,7 @@ export const AddEditTransport = ({
               </View>
               <View className="my-2 w-[95%] self-center">
                 <PtsDateTimePicker
-                  currentData={
-                    transportData.date ? transportData.date : new Date()
-                  }
+                  currentData={selectedDate}
                   onSelection={onSelection}
                 />
               </View>
@@ -319,7 +334,6 @@ export const AddEditTransport = ({
                   name="description"
                   placeholder={'Description'}
                   className="w-[95%] bg-white"
-                  autoCapitalize="none"
                 />
               </View>
               <View className="my-2 w-full flex-row justify-center gap-2">
@@ -328,7 +342,6 @@ export const AddEditTransport = ({
                   name="addressLine"
                   placeholder={'Address Line'}
                   className="w-[95%] bg-white"
-                  autoCapitalize="none"
                 />
               </View>
               <View className="my-2 w-full flex-row justify-center">
@@ -380,11 +393,9 @@ export const AddEditTransport = ({
                 false,
                 ''
               )}
-              <View className="my-2">
+              <View className="my-2 w-[95%] self-center">
                 <PtsDateTimePicker
-                  currentData={
-                    transportData.date ? transportData.date : new Date()
-                  }
+                  currentData={selectedDate}
                   onSelection={onSelection}
                 />
               </View>

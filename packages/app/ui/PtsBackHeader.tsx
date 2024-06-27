@@ -79,7 +79,7 @@ export const PtsBackHeader = ({ title, memberData }) => {
       if (memberData.lastname) {
         fullName += memberData.lastname.trim()
       }
-      router.dismiss(1)
+      router.dismiss(2)
       router.push(
         formatUrl('/circles/circleDetails', {
           fullName,

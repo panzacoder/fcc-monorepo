@@ -20,33 +20,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
-// let selectedDate: any = new Date()
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
+
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter event title' })
@@ -62,6 +36,33 @@ export function AddEditEventScreen() {
     ? item.isFromCreateSimilar
     : 'false'
   const [isLoading, setLoading] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
+  const [key, setKey] = useState(0)
   const [selectedDate, setSelectedDate] = useState(
     _.isEmpty(eventDetails) && eventDetails.date
       ? eventDetails.date
@@ -70,6 +71,7 @@ export function AddEditEventScreen() {
   // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: any) => {
     setSelectedDate(date)
+    setKey(Math.random())
   }
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -134,7 +136,6 @@ export function AddEditEventScreen() {
         selectedAddress.address.state.country.name = value.name
         selectedAddress.address.state.country.code = value.code
         selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
         selectedAddress.address.state.country.description = value.description
       }
       if (index === 5) {
@@ -146,7 +147,7 @@ export function AddEditEventScreen() {
         selectedAddress.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        setSelectedAddress(value)
       }
     }
 
@@ -215,7 +216,7 @@ export function AddEditEventScreen() {
       />
       <SafeAreaView>
         <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-          <View className="w-full">
+          <View key={key} className="w-full">
             <PtsDateTimePicker
               currentData={selectedDate}
               onSelection={onSelection}
