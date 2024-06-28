@@ -172,8 +172,8 @@ export const AddEditTransport = ({
     let dataObject = {} as any
     let url = ''
     if (_.isEmpty(transportData)) {
-      let stateObject = statesListFull[formData.state]
-      let countryObject: object = staticData.countryList[formData.country]
+      let stateObject = statesListFull[formData.state - 1]
+      let countryObject: object = staticData.countryList[formData.country - 1]
 
       let address = {
         line: formData.addressLine,
@@ -372,7 +372,6 @@ export const AddEditTransport = ({
                   name="city"
                   placeholder={'City'}
                   className="w-[95%] bg-white"
-                  autoCapitalize="none"
                 />
               </View>
               <View className=" w-full flex-row justify-center gap-2">
@@ -381,7 +380,7 @@ export const AddEditTransport = ({
                   name="postalCode"
                   placeholder={'Zip Code'}
                   className="w-[95%] bg-white"
-                  autoCapitalize="none"
+                  keyboard={'number-pad'}
                 />
               </View>
             </View>

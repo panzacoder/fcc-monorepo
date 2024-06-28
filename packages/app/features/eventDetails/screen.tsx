@@ -110,7 +110,7 @@ export function EventDetailsScreen() {
                   ? data.data.domainObjectPrivileges.EventTransportation
                   : {}
             }
-
+            console.log('data.data.event', JSON.stringify(data.data.event))
             setEventDetails(data.data.event ? data.data.event : {})
             if (data.data.event.status) {
               setEventStatus(data.data.event.status.status)

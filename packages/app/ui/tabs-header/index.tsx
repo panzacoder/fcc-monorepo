@@ -62,6 +62,7 @@ export const TabsHeader = ({}) => {
           // } catch (e) {
           //   // saving error
           // }
+          router.dismissAll()
           router.push('/login')
         } else {
           Alert.alert('', data.message)

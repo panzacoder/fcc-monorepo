@@ -10,6 +10,10 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 import { CheckBox } from 'react-native-elements'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -63,7 +67,7 @@ export function SignUpScreen() {
       registration: {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(formData.phone),
         email: formData.email,
         credential: formData.password,
         userTimezone: formData.timezone,
@@ -149,6 +153,10 @@ export function SignUpScreen() {
               keyboard={'numeric'}
               onSubmitEditing={() => {
                 formMethods.setFocus('password')
+              }}
+              onChangeText={(value) => {
+                let userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+                formMethods.setValue('phone', userPhone)
               }}
             />
             <ControlledSecureField
