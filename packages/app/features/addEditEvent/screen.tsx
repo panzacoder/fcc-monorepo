@@ -64,7 +64,7 @@ export function AddEditEventScreen() {
   })
   const [key, setKey] = useState(0)
   const [selectedDate, setSelectedDate] = useState(
-    _.isEmpty(eventDetails) && eventDetails.date
+    !_.isEmpty(eventDetails) && eventDetails.date
       ? eventDetails.date
       : new Date()
   )

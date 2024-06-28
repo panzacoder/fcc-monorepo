@@ -4,9 +4,9 @@ import { Feather } from 'app/ui/icons'
 import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-export function CardView(data: any) {
+export const CardView = ({ data, trasportationClicked }) => {
   const router = useRouter()
-  let memberData = data.data
+  let memberData = data ? JSON.parse(data) : {}
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
   let textStyle1 = `ml-5 text-[14px] text-[#103264] max-w-[95%] mr-4`
@@ -91,7 +91,23 @@ export function CardView(data: any) {
       eventText += memberData.upcomingEvent.location
     }
   }
-
+  async function transportClicked() {
+    console.log('transportClicked')
+  }
+  const showRequestModal = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: 'white'
+        }}
+        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
+      >
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-full self-center text-center font-bold text-white">{`Transportation`}</Typography>
+        </View>
+      </View>
+    )
+  }
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||
@@ -158,7 +174,12 @@ export function CardView(data: any) {
                 )}
 
                 {totalTransportationCount > 0 ? (
-                  <TouchableOpacity onPress={() => {}} className="my-[5px]">
+                  <TouchableOpacity
+                    onPress={() => {
+                      trasportationClicked(memberData)
+                    }}
+                    className="my-[5px]"
+                  >
                     <Typography className={textStyle2}>
                       {'Transportation'}
                     </Typography>
@@ -193,7 +214,16 @@ export function CardView(data: any) {
       ) : (
         <View />
       )}
-
+      {/* {isShowRequests ? (
+        <View className="absolute top-[100] w-[95%] self-center">
+          {showRequestModal()}
+        </View>
+      ) : (
+        <View />
+      )} */}
     </View>
   )
+  // return (
+  //   <View className="my-2 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#FCF3CF] py-5"></View>
+  // )
 }

@@ -134,7 +134,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
               <View className="flex-row">
                 <Feather
                   className="mt-1"
-                  name={'map-pin'}
+                  name={'navigation'}
                   size={25}
                   color={'black'}
                 />

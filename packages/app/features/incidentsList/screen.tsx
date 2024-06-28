@@ -105,7 +105,7 @@ export function IncidentsListScreen() {
     if (memberData.lastname) {
       fullName += memberData.lastname.trim()
     }
-    router.dismiss(1)
+    router.dismiss(2)
     router.push(
       formatUrl('/circles/circleDetails', {
         fullName,
@@ -271,15 +271,23 @@ export function IncidentsListScreen() {
               >
                 <View className="w-[90%] flex-row">
                   <View>
-                    <View className="my-2 flex-row">
-                      <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                    {/* <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%] text-[16px]">
                         {data.title ? data.title : ''}
                       </Typography>
                       <View className="">
-                        <Typography className="font-bold text-black">
+                        <Typography className="font-bold text-black w-[45%] max-w-[45%]">
                           {data.type ? data.type : ''}
                         </Typography>
                       </View>
+                    </View> */}
+                    <View className="w-full flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%]">
+                        {data.title ? data.title : ''}
+                      </Typography>
+                      <Typography className="font-400 mr-5 w-[40%] max-w-[40%] text-right text-black">
+                        {data.type ? data.type : ''}
+                      </Typography>
                     </View>
                     <View className="flex-row">
                       <Typography className="font-400 ml-5 w-full text-black">

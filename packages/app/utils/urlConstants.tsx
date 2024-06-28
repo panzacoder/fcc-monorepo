@@ -182,3 +182,11 @@ export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER =
 export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS =
   'memberms/updateAddressForAuthorisedCaregiver'
 export const GET_TRANSPORTATION_REQUESTS = 'homems/getTransportationRequests'
+
+export const REJECT_TRANSPORT = 'apptransportms/rejectTransportationRequest'
+
+export const APPROVE_TRANSPORT = 'apptransportms/acceptTransporationRequest'
+
+export const EVENT_ACCEPT_TRANSPORTATION_REQUEST = 'eventtransportms/acceptTransportationRequest';
+
+export const EVENT_REJECT_TRANSPORTATION_REQUEST = 'eventtransportms/rejectTransportationRequest';

@@ -40,6 +40,8 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
+      // email: 'sachaudhari0704@gmail.com',
+      // password: 'Shubh@m27'
       email: 'pritipatilfcc@gmail.com',
       password: 'Priti@123'
       // email: '',
