@@ -14,10 +14,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#287CFA"
     },
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "ios": {
       "bundleIdentifier": "app.familycarecircle.fcc"
     },
@@ -29,8 +26,6 @@
         "projectId": "c1498af4-be97-46be-97a2-ed2b81d0b300"
       }
     },
-    "plugins": [
-      "expo-router"
-    ]
+    "plugins": ["expo-router", "expo-secure-store"]
   }
 }
