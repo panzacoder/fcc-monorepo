@@ -11506,6 +11506,7 @@ __metadata:
     expo-secure-store: "npm:~12.8.1"
     expo-splash-screen: "npm:~0.26.4"
     expo-status-bar: "npm:~1.11.1"
+    expo-system-ui: "npm:~2.9.4"
     nativewind: "npm:^4.0.36"
     react: "npm:18.2.0"
     react-native: "npm:0.73.6"
@@ -11829,6 +11830,18 @@ __metadata:
   version: 1.11.1
   resolution: "expo-status-bar@npm:1.11.1"
   checksum: 10/f2c9d51fd5211520d0a53df69310f1b0a1b40c935ded24a267ff23becaf0dfb19517440ab3b1ff8c4adda651e99dafef681c055a1efe397df68056667dde2512
+  languageName: node
+  linkType: hard
+
+"expo-system-ui@npm:~2.9.4":
+  version: 2.9.4
+  resolution: "expo-system-ui@npm:2.9.4"
+  dependencies:
+    "@react-native/normalize-color": "npm:^2.0.0"
+    debug: "npm:^4.3.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/848c524a4e22ac441c1bc6d191a7f6e76fcca8e58855af3911aacc55a9e37540e7aac7f88d2d7f7632b607fe2f0a9f620285e27c0b889e03a27e278b8b2ea8c9
   languageName: node
   linkType: hard
 
