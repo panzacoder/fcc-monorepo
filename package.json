@@ -6,14 +6,12 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@babel/core": "^7.20.0",
     "@types/react": "^18.2.67",
-    "@types/react-native-calendar-picker": "^8",
-    "@types/react-native__assets": "^1",
     "chromatic": "^11.0.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.12",
-    "redux-devtools-extension": "^2.13.9",
     "turbo": "^1.13.0",
     "typescript": "^5.4.3"
   },
@@ -24,9 +22,13 @@
     "web:sb": "yarn workspace next-app storybook",
     "web:sb:build": "yarn workspace next-app build-storybook",
     "format": "prettier --write .",
-    "chromatic": "npx chromatic --project-token=chpt_0d90c7462008c0a --build-script-name=web:sb:build"
+    "chromatic": "npx chromatic --project-token=chpt_0d90c7462008c0a --build-script-name=web:sb:build",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "resolutions": {
+    "react-native-reanimated": "2.9.1",
     "@react-native/assets-registry@npm:0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch",
     "@react-native/assets-registry@npm:~0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch"
   },
@@ -35,14 +37,5 @@
     "**/expo-router/**"
   ],
   "packageManager": "yarn@4.1.1",
-  "version": "1.0",
-  "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.23.1",
-    "@stripe/stripe-react-native": "0.28.0",
-    "react-native-blob-util": "^0.19.9",
-    "react-native-calendar-picker": "^8.0.2",
-    "react-native-calendars": "^1.1304.1",
-    "react-native-iap": "^12.15.1",
-    "react-native-pdf": "^6.7.5"
-  }
+  "version": "1.0"
 }

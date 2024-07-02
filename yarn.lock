@@ -468,6 +468,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-plugin-utils@npm:^7.18.9":
+  version: 7.24.8
+  resolution: "@babel/helper-plugin-utils@npm:7.24.8"
+  checksum: 10/adbc9fc1142800a35a5eb0793296924ee8057fe35c61657774208670468a9fbfbb216f2d0bc46c680c5fefa785e5ff917cc1674b10bd75cdf9a6aa3444780630
+  languageName: node
+  linkType: hard
+
 "@babel/helper-plugin-utils@npm:^7.24.0":
   version: 7.24.0
   resolution: "@babel/helper-plugin-utils@npm:7.24.0"
@@ -811,6 +818,18 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: 10/f5a438413b8728cbf5a76ef65510418e5e2e1c82292ee4a031a0c941bee488f7e7dec960c1fd314a42bfadf40ffa9a4ef5c1aa1b3c906b9bc140d4530e7bc8be
+  languageName: node
+  linkType: hard
+
+"@babel/plugin-proposal-export-namespace-from@npm:^7.17.12":
+  version: 7.18.9
+  resolution: "@babel/plugin-proposal-export-namespace-from@npm:7.18.9"
+  dependencies:
+    "@babel/helper-plugin-utils": "npm:^7.18.9"
+    "@babel/plugin-syntax-export-namespace-from": "npm:^7.8.3"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 10/84ff22bacc5d30918a849bfb7e0e90ae4c5b8d8b65f2ac881803d1cf9068dffbe53bd657b0e4bc4c20b4db301b1c85f1e74183cf29a0dd31e964bd4e97c363ef
   languageName: node
   linkType: hard
 
@@ -4444,17 +4463,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-async-storage/async-storage@npm:^1.23.1":
-  version: 1.23.1
-  resolution: "@react-native-async-storage/async-storage@npm:1.23.1"
-  dependencies:
-    merge-options: "npm:^3.0.4"
-  peerDependencies:
-    react-native: ^0.0.0-0 || >=0.60 <1.0
-  checksum: 10/9d0acc7edb0ba9ee414d6e62c656e5d571c9d9615e7e9f4748865b965178998f2e73786b8050387ada00ddb6faaca97b5cf2e010ceaeebe91571991364a0f515
-  languageName: node
-  linkType: hard
-
 "@react-native-community/cli-clean@npm:12.3.6":
   version: 12.3.6
   resolution: "@react-native-community/cli-clean@npm:12.3.6"
@@ -4641,33 +4649,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^20.1.0":
-  version: 20.1.0
-  resolution: "@react-native-firebase/app@npm:20.1.0"
+"@react-native-firebase/app@npm:11.3.2":
+  version: 11.3.2
+  resolution: "@react-native-firebase/app@npm:11.3.2"
   dependencies:
-    opencollective-postinstall: "npm:^2.0.3"
+    opencollective-postinstall: "npm:^2.0.1"
     superstruct: "npm:^0.6.2"
   peerDependencies:
-    expo: ">=47.0.0"
     react: "*"
     react-native: "*"
-  peerDependenciesMeta:
-    expo:
-      optional: true
-  checksum: 10/5a06d1f60fb813f1e114066a03c57e46efd58f753fc7d00cadcd47399a8b9f88f221e2ccb31b5d095b00b06d4921fa3b5be720b67450d69315ea730f7499716e
+  checksum: 10/ac5687e94ed7882bda878316547a547ae254e1465fb0cca219190f684e8414a1e88e4c9d4439c9af8571ac041ecd8515d52f53bd0b22a9e5961b2ce36e2ff2f0
   languageName: node
   linkType: hard
 
-"@react-native-firebase/messaging@npm:^20.1.0":
-  version: 20.1.0
-  resolution: "@react-native-firebase/messaging@npm:20.1.0"
+"@react-native-firebase/messaging@npm:11.3.2":
+  version: 11.3.2
+  resolution: "@react-native-firebase/messaging@npm:11.3.2"
   peerDependencies:
-    "@react-native-firebase/app": 20.1.0
-    expo: ">=47.0.0"
-  peerDependenciesMeta:
-    expo:
-      optional: true
-  checksum: 10/8948f45373b58f128c5460fc5786b413b29d07158081f9c381c94fc29e208b1f5f77381eb1c621e161a1ce82a3130287d56db260c7bed3f06e3b07446eb054ec
+    "@react-native-firebase/app": 11.3.2
+  checksum: 10/b1eba3a0e48c0cf1f5ebd9c8f0ca0d8f636b54ee6333b37473c1374cea3e7cc72ede353258de65cbce5266d0fc12ceaf70da643c1f2fe2b84f2f8bea1f72e77f
   languageName: node
   linkType: hard
 
@@ -6599,6 +6599,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/invariant@npm:^2.2.35":
+  version: 2.2.37
+  resolution: "@types/invariant@npm:2.2.37"
+  checksum: 10/dd6ee07af8516d21c868f95fd96c601c50a231e69c2df69360cb491b5858c76cf9b5a646df166cb4197b5078ca824da3dd90d6142d01a3cefc1176c57278b129
+  languageName: node
+  linkType: hard
+
 "@types/is-stream@npm:^1.1.0":
   version: 1.1.0
   resolution: "@types/is-stream@npm:1.1.0"
@@ -7719,7 +7726,7 @@ __metadata:
     react-native-autocomplete-dropdown: "npm:^3.1.4"
     react-native-calendar-picker: "npm:^8.0.2"
     react-native-elements: "npm:^3.4.3"
-    react-native-reanimated: "npm:3.6.2"
+    react-native-reanimated: "npm:2.9.1"
     react-native-safe-area-context: "npm:4.8.2"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-webview: "npm:13.6.4"
@@ -11466,11 +11473,13 @@ __metadata:
     "@babel/core": "npm:^7.24.3"
     "@react-native-async-storage/async-storage": "npm:1.21.0"
     "@react-native-community/datetimepicker": "npm:7.6.4"
-    "@react-native-firebase/app": "npm:^20.1.0"
-    "@react-native-firebase/messaging": "npm:^20.1.0"
+    "@react-native-firebase/app": "npm:11.3.2"
+    "@react-native-firebase/messaging": "npm:11.3.2"
     "@react-navigation/drawer": "npm:^6.6.15"
+    "@stripe/stripe-react-native": "npm:0.28.0"
     "@types/react": "npm:^18.2.67"
     "@types/react-native-calendar-picker": "npm:^8"
+    "@types/react-native__assets": "npm:^1"
     app: "workspace:*"
     expo: "npm:^50.0.14"
     expo-clipboard: "npm:~5.0.1"
@@ -11482,19 +11491,26 @@ __metadata:
     expo-localization: "npm:^14.8.3"
     expo-notifications: "npm:~0.27.8"
     expo-router: "npm:~3.4.8"
+    expo-secure-store: "npm:~12.8.1"
     expo-splash-screen: "npm:~0.26.4"
     expo-status-bar: "npm:~1.11.1"
     nativewind: "npm:^4.0.36"
     react: "npm:18.2.0"
     react-native: "npm:0.73.6"
+    react-native-blob-util: "npm:^0.19.9"
     react-native-calendar-picker: "npm:^8.0.2"
+    react-native-calendars: "npm:^1.1304.1"
     react-native-gesture-handler: "npm:~2.14.0"
+    react-native-iap: "npm:10.1.3"
+    react-native-pdf: "npm:^6.7.5"
+    react-native-reanimated: "npm:2.9.1"
     react-native-safe-area-context: "npm:4.8.2"
     react-native-screens: "npm:~3.29.0"
     react-native-svg: "npm:14.1.0"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-web: "npm:~0.19.10"
     react-native-webview: "npm:13.6.4"
+    react-redux: "npm:9.1.0"
     tailwindcss: "npm:^3.4.1"
     typescript: "npm:^5.4.3"
   languageName: unknown
@@ -11774,6 +11790,15 @@ __metadata:
     react-native-reanimated:
       optional: true
   checksum: 10/c8fe551c1cd1d9c05707e6d1938ad0c32db6bdf668cac0bc62aaf0b741f275aa02c8337572ef1c75d6be7ba2f6fd209ca03cf9530006537aa5d33caafb6486ed
+  languageName: node
+  linkType: hard
+
+"expo-secure-store@npm:~12.8.1":
+  version: 12.8.1
+  resolution: "expo-secure-store@npm:12.8.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/fcdb4ed0d04838003ce9efff3398ba0db6270596de0d778daa6198fbf6962aa36267d75e544e4fa82cb93ac0694490fc7404defcbcdd54c220c78f03ec6fea86
   languageName: node
   linkType: hard
 
@@ -12069,21 +12094,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fcc-monorepo@workspace:."
   dependencies:
-    "@react-native-async-storage/async-storage": "npm:^1.23.1"
-    "@stripe/stripe-react-native": "npm:0.28.0"
+    "@babel/core": "npm:^7.20.0"
     "@types/react": "npm:^18.2.67"
-    "@types/react-native-calendar-picker": "npm:^8"
-    "@types/react-native__assets": "npm:^1"
     chromatic: "npm:^11.0.0"
     eslint: "npm:^8.57.0"
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
-    react-native-blob-util: "npm:^0.19.9"
-    react-native-calendar-picker: "npm:^8.0.2"
-    react-native-calendars: "npm:^1.1304.1"
-    react-native-iap: "npm:^12.15.1"
-    react-native-pdf: "npm:^6.7.5"
-    redux-devtools-extension: "npm:^2.13.9"
     turbo: "npm:^1.13.0"
     typescript: "npm:^5.4.3"
   languageName: unknown
@@ -16676,7 +16692,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"opencollective-postinstall@npm:^2.0.3":
+"opencollective-postinstall@npm:^2.0.1, opencollective-postinstall@npm:^2.0.3":
   version: 2.0.3
   resolution: "opencollective-postinstall@npm:2.0.3"
   bin:
@@ -18325,17 +18341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-iap@npm:^12.15.1":
-  version: 12.15.1
-  resolution: "react-native-iap@npm:12.15.1"
+"react-native-iap@npm:10.1.3":
+  version: 10.1.3
+  resolution: "react-native-iap@npm:10.1.3"
   peerDependencies:
-    expo: ">=47.0.0"
     react: ">=16.13.1"
     react-native: ">=0.65.1"
-  peerDependenciesMeta:
-    expo:
-      optional: true
-  checksum: 10/92115cde6e6b85cc42bd00cbd692d439049cafcf8ccf6768f81f49a29b5cbff0688883b9cbfcda5d2346e652c32c602b8846f4e17ffd0b79252e19bff61a665d
+  checksum: 10/d83541de103aa9788919dc642cbb61a58037c2b423c3ebe6d82dfd1e74dc53ca1b95d59f852cd3b954d04963ddcdb856903b24cb1b358f596727725497c3edcb
   languageName: node
   linkType: hard
 
@@ -18365,24 +18377,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.6.2":
-  version: 3.6.2
-  resolution: "react-native-reanimated@npm:3.6.2"
+"react-native-reanimated@npm:2.9.1":
+  version: 2.9.1
+  resolution: "react-native-reanimated@npm:2.9.1"
   dependencies:
+    "@babel/plugin-proposal-export-namespace-from": "npm:^7.17.12"
     "@babel/plugin-transform-object-assign": "npm:^7.16.7"
     "@babel/preset-typescript": "npm:^7.16.7"
-    convert-source-map: "npm:^2.0.0"
+    "@types/invariant": "npm:^2.2.35"
     invariant: "npm:^2.2.4"
+    lodash.isequal: "npm:^4.5.0"
+    setimmediate: "npm:^1.0.5"
+    string-hash-64: "npm:^1.0.3"
   peerDependencies:
     "@babel/core": ^7.0.0-0
-    "@babel/plugin-proposal-nullish-coalescing-operator": ^7.0.0-0
-    "@babel/plugin-proposal-optional-chaining": ^7.0.0-0
-    "@babel/plugin-transform-arrow-functions": ^7.0.0-0
-    "@babel/plugin-transform-shorthand-properties": ^7.0.0-0
-    "@babel/plugin-transform-template-literals": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10/06c44d4dde054e48e1d030369e93e7590b8c56b6bc80f90e03f2deb9766dad8b96bf60b2c1406abf5bb424a78bc3a89d6274d5aba7d2ff89781357a23381a0a6
+  checksum: 10/c8fe2a3d590fdd5be52e5259ca328262c90b36497ab0ca1e7f14c8491df583b8db98a35d008963c11453e919222bf6f44b7f35fe03213c1eff03b67c991a519c
   languageName: node
   linkType: hard
 
@@ -18544,7 +18555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^9.1.0":
+"react-redux@npm:9.1.0, react-redux@npm:^9.1.0":
   version: 9.1.0
   resolution: "react-redux@npm:9.1.0"
   dependencies:
@@ -18793,15 +18804,6 @@ __metadata:
     indent-string: "npm:^4.0.0"
     strip-indent: "npm:^3.0.0"
   checksum: 10/fa1ef20404a2d399235e83cc80bd55a956642e37dd197b4b612ba7327bf87fa32745aeb4a1634b2bab25467164ab4ed9c15be2c307923dd08b0fe7c52431ae6b
-  languageName: node
-  linkType: hard
-
-"redux-devtools-extension@npm:^2.13.9":
-  version: 2.13.9
-  resolution: "redux-devtools-extension@npm:2.13.9"
-  peerDependencies:
-    redux: ^3.1.0 || ^4.0.0
-  checksum: 10/8d979c95031dee495e62d90cc12cd9923546227a177f6d3fba973a0d022d819854e47eceea7d0c68254cd410632a5eac2eaf84e17644d2fcecf94a1e246fed88
   languageName: node
   linkType: hard
 
@@ -20055,6 +20057,13 @@ __metadata:
   version: 2.0.0
   resolution: "strict-uri-encode@npm:2.0.0"
   checksum: 10/eaac4cf978b6fbd480f1092cab8b233c9b949bcabfc9b598dd79a758f7243c28765ef7639c876fa72940dac687181b35486ea01ff7df3e65ce3848c64822c581
+  languageName: node
+  linkType: hard
+
+"string-hash-64@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "string-hash-64@npm:1.0.3"
+  checksum: 10/39aab30e05dfe2effe9a0807a4987cedb6c04f4dfcda3c4915add5b90d68676a6c583d2ad51683932ac3546a4f64a5e99136521b8f2eb1956d581bd2947a96a9
   languageName: node
   linkType: hard
 

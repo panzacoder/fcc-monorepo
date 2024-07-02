@@ -20,7 +20,6 @@ import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import { CallPostService } from 'app/utils/fetchServerData'
-import messaging from '@react-native-firebase/messaging'
 import {
   BASE_URL,
   GET_WEEK_DETAILS,
@@ -31,6 +30,7 @@ import {
   EVENT_REJECT_TRANSPORTATION_REQUEST,
   UPDATE_FCM_TOKEN
 } from 'app/utils/urlConstants'
+import messaging from '@react-native-firebase/messaging'
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
 import { useForm } from 'react-hook-form'
