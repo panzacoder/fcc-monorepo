@@ -37,5 +37,9 @@
     "**/expo-router/**"
   ],
   "packageManager": "yarn@4.1.1",
-  "version": "1.0"
+  "version": "",
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.6"
+  }
 }
