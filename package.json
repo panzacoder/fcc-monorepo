@@ -28,7 +28,6 @@
     "ios": "expo run:ios"
   },
   "resolutions": {
-    "react-native-reanimated": "2.9.1",
     "@react-native/assets-registry@npm:0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch",
     "@react-native/assets-registry@npm:~0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch"
   },

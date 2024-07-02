@@ -29,7 +29,16 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.familycarecircle.fccmobileapp",
+          "publishableKey": "pk_test_51JAmgDG03dd4BHZM3C08oeGQu5A8rXJgh76L7Jwi4x2QaH2MhHtu6EMj3W8AMDQfaQ16WPiBZ4zpDHcL3zSZ0IfT00j27YaRq0"
+        }
+      ]
     ]
   }
 }
