@@ -149,7 +149,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
     )
   }
   return (
-    <View className="mt-2 w-[95%] self-center bg-white">
+    <View className="mt-2 w-full self-center bg-white">
       <View className="w-full flex-row self-center rounded-[5px] border-[1px] border-[#86939e] py-4">
         <TouchableOpacity
           onPress={() => {
@@ -159,7 +159,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
             setIsRender(!isRender)
           }}
         >
-          <Typography className="ml-2">{dateSelected}</Typography>
+          <Typography className="ml-3">{dateSelected}</Typography>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {

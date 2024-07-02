@@ -8,12 +8,13 @@ import {
   Linking
 } from 'react-native'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatUrl } from 'app/utils/format-url'
 import moment from 'moment'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   BASE_URL,
   GET_USER_PROFILE,
@@ -32,11 +33,11 @@ import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-// import { AddressFields } from 'app/ui/form-fields/address-fields'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString,
   getAddressFromObject,
   getFullDateForCalendar
 } from 'app/ui/utils'
@@ -45,14 +46,16 @@ import { LocationDetails } from 'app/ui/locationDetails'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
+const phoneSchema = z.object({
+  phone: z.string()
+})
 const sponsorSchema = z.object({
   sponsorCode: z.string().min(1, { message: 'Sponsor code is required' })
 })
 const profileSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
-  email: z.string().min(1, { message: 'Email is required' }),
-  phone: z.string()
+  email: z.string().min(1, { message: 'Email is required' })
 })
 export type Schema = z.infer<typeof schema>
 export type SponsorSchema = z.infer<typeof sponsorSchema>
@@ -88,12 +91,14 @@ let selectedAddress: any = {
 }
 let isShowRenewButton = false
 export function ProfileScreen() {
+  let userPhone = ''
   const header = store.getState().headerState.header
   const userProfile = store.getState().userProfileState.header
   // console.log('userProfile', JSON.stringify(userProfile))
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowOrderList, setIsShowOrderList] = useState(false)
+  const [isShowSponsorship, setIsShowSponsorship] = useState(false)
   const [isUpdateProfile, setIsUpdateProfile] = useState(false)
   const [isUpdateAddress, setIsUpdateAddress] = useState(false)
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
@@ -108,8 +113,7 @@ export function ProfileScreen() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      email: '',
-      phone: ''
+      email: ''
     },
     resolver: zodResolver(profileSchema)
   })
@@ -129,6 +133,12 @@ export function ProfileScreen() {
       sponsorCode: ''
     },
     resolver: zodResolver(sponsorSchema)
+  })
+  const { control: control3, reset: reset2 } = useForm({
+    defaultValues: {
+      phone: ''
+    },
+    resolver: zodResolver(phoneSchema)
   })
   const getUserProfile = useCallback(async () => {
     setLoading(true)
@@ -223,8 +233,12 @@ export function ProfileScreen() {
           reset({
             firstName: appUser.firstName ? appUser.firstName : '',
             lastName: appUser.lastName ? appUser.lastName : '',
-            email: appUser.email ? appUser.email : '',
-            phone: appUser.phone ? appUser.phone : ''
+            email: appUser.email ? appUser.email : ''
+          })
+          reset2({
+            phone: appUser.phone
+              ? convertPhoneNumberToUsaPhoneNumberFormat(appUser.phone)
+              : ''
           })
         } else {
           Alert.alert('', data.message)
@@ -337,7 +351,7 @@ export function ProfileScreen() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(userPhone),
         isMemberUpdate: true
       }
     }
@@ -559,7 +573,7 @@ export function ProfileScreen() {
           }
           setAddressObject={setAddressObject}
         />
-        <View className="my-2 mb-5 flex-row self-center ">
+        <View className="my-2 mb-10 flex-row self-center ">
           <Button
             className="bg-[#86939e]"
             title={'Cancel'}
@@ -602,11 +616,17 @@ export function ProfileScreen() {
           className="w-[95%] self-center"
         />
         <ControlledTextField
-          control={control}
+          control={control3}
           name="phone"
           placeholder={'Phone'}
           className="w-[95%] self-center"
           keyboard="number-pad"
+          onChangeText={(value) => {
+            userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+            reset2({
+              phone: userPhone
+            })
+          }}
         />
         <ControlledTextField
           name="email"
@@ -639,8 +659,10 @@ export function ProfileScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -680,19 +702,8 @@ export function ProfileScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.replace('/home')
-          }}
-        />
-        <Typography className="ml-[5px] flex-1 text-[18px] font-bold">
-          {'Profile'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="Profile" memberData={{}} />
       </View>
       {isDataReceived ? (
         <ScrollView persistentScrollbar={true} className="flex-1">
@@ -721,10 +732,6 @@ export function ProfileScreen() {
               'Email',
               appuserDetails.email ? appuserDetails.email : ''
             )}
-            {/* {getDetailsView(
-              'Phone:',
-              convertPhoneNumberToUsaPhoneNumberFormat(appuserDetails.phone)
-            )} */}
             <View className="mt-2 w-full flex-row items-center">
               <View className="w-full flex-row">
                 <Typography className={titleStyle}>{'Phone'}</Typography>
@@ -992,25 +999,38 @@ export function ProfileScreen() {
           </View>
           <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className="flex-row">
-              <Typography className="ml-2 w-[85%] self-center font-bold">
+              <Typography className="ml-2 w-[90%] self-center font-bold">
                 {'Sponsorship Details'}
               </Typography>
-            </View>
-            <View className="ml-2">
-              <ControlledTextField
-                control={control2}
-                name="sponsorCode"
-                placeholder={'Sponsor Code*'}
-                className="w-[95%] bg-white"
-              />
-              <Button
-                className="my-2 w-[40%] self-center bg-[#ef6603]"
-                title={'Save'}
-                leadingIcon="save"
-                variant="default"
-                onPress={handleSubmit2(saveSponsorCode)}
+              <Feather
+                onPress={() => {
+                  setIsShowSponsorship(!isShowSponsorship)
+                }}
+                className="self-center"
+                name={!isShowSponsorship ? 'chevron-down' : 'chevron-up'}
+                size={20}
+                color={'black'}
               />
             </View>
+            {isShowSponsorship ? (
+              <View className="ml-2">
+                <ControlledTextField
+                  control={control2}
+                  name="sponsorCode"
+                  placeholder={'Sponsor Code*'}
+                  className="w-[95%] bg-white"
+                />
+                <Button
+                  className="my-2 w-[40%] self-center bg-[#ef6603]"
+                  title={'Save'}
+                  leadingIcon="save"
+                  variant="default"
+                  onPress={handleSubmit2(saveSponsorCode)}
+                />
+              </View>
+            ) : (
+              <View />
+            )}
           </View>
 
           {isShowDeleteModal ? (

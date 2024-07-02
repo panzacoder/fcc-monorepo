@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, ScrollView } from 'react-native'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  ScrollView,
+  BackHandler
+} from 'react-native'
 // import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -10,6 +16,7 @@ import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   BASE_URL,
   GET_INCIDENT_DETAILS,
@@ -20,13 +27,13 @@ import {
   UPDATE_INCIDENT_NOTE,
   DELETE_INCIDENT
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -44,7 +51,7 @@ export function IncidentDetailsScreen() {
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -74,7 +81,9 @@ export function IncidentDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
                 ? data.data.domainObjectPrivileges.INCIDENTNOTE
-                : {}
+                : data.data.domainObjectPrivileges.IncidentNote
+                  ? data.data.domainObjectPrivileges.IncidentNote
+                  : {}
             }
 
             setIncidentDetails(data.data.incident ? data.data.incident : {})
@@ -103,10 +112,25 @@ export function IncidentDetailsScreen() {
     },
     []
   )
-
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/incidentsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getIncidentDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let incidentDate = '',
@@ -336,6 +360,7 @@ export function IncidentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/incidentsList', {
               memberData: JSON.stringify(memberData)
@@ -355,9 +380,10 @@ export function IncidentDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Incident Details" memberData={memberData} />
+      <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
               {getUserPermission(incidentPrivileges).createPermission ? (
                 <Button
@@ -397,13 +423,13 @@ export function IncidentDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[95%] text-[15px] text-black">
                   {incident}
                 </Typography>
               </View>
-              {getDetailsView('Date:', incidentDate)}
-              {getDetailsView('Type:', type)}
-              {getDetailsView('Description:', description)}
+              {getDetailsView('Date', incidentDate)}
+              {getDetailsView('Type', type)}
+              {getDetailsView('Description', description)}
             </View>
           </View>
           <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
@@ -503,7 +529,7 @@ export function IncidentDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Incident'}
             noteData={noteData}
@@ -516,7 +542,7 @@ export function IncidentDetailsScreen() {
       )}
 
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

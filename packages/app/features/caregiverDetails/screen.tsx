@@ -1,31 +1,29 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert } from 'react-native'
+import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { AddEditCaregiver } from 'app/ui/addEditCaregiver'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import {
   BASE_URL,
   DELETE_CAREGIVER,
-  GET_CAREGIVER_DETAILS,
-  UPDATE_CAREGIVER
+  GET_CAREGIVER_DETAILS
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
-import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let caregiverPrivileges = {}
 export function CaregiverDetailsScreen() {
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let caregiverInfo = item.caregiverDetails
@@ -35,7 +33,6 @@ export function CaregiverDetailsScreen() {
 
   const [isLoading, setLoading] = useState(false)
   const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
-  const [isAddCaregiver, setIsAddCaregiver] = useState(false)
 
   const [fullName, setFullName] = useState('')
   const [status, setStatus] = useState('')
@@ -43,6 +40,7 @@ export function CaregiverDetailsScreen() {
   const [email, setEmail] = useState('')
   const [caregiverDetails, setCaregiverDetails] = useState({}) as any
   let memberFullName = ''
+
   if (!_.isEmpty(memberData)) {
     memberFullName += memberData.firstname ? memberData.firstname : ''
     memberFullName += memberData.lastname ? ' ' + memberData.lastname : ''
@@ -103,8 +101,24 @@ export function CaregiverDetailsScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/caregiversList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     getCaregiverDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[75%] text-[15px] font-bold text-[#1A1A1A]'
@@ -127,14 +141,9 @@ export function CaregiverDetailsScreen() {
     )
   }
   const cancelClicked = () => {
-    setIsAddCaregiver(false)
     setIsShowProfileInfo(false)
   }
 
-  const infoClicked = () => {
-    setIsAddCaregiver(false)
-    setIsShowProfileInfo(true)
-  }
   async function deleteCaregiver() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_CAREGIVER}`
@@ -148,6 +157,7 @@ export function CaregiverDetailsScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.replace(
             formatUrl('/circles/caregiversList', {
               memberData: JSON.stringify(memberData)
@@ -163,35 +173,14 @@ export function CaregiverDetailsScreen() {
         console.log('error', error)
       })
   }
-  async function createUpdateCaregiver(object: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: object
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getCaregiverDetails()
-          setIsAddCaregiver(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Caregiver Details" memberData={memberData} />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%]" />
               <Button
@@ -199,7 +188,13 @@ export function CaregiverDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  setIsAddCaregiver(true)
+                  // setIsAddCaregiver(true)
+                  router.push(
+                    formatUrl('/circles/addEditCaregiver', {
+                      memberData: JSON.stringify(memberData),
+                      caregiverDetails: JSON.stringify(caregiverDetails)
+                    })
+                  )
                 }}
               />
             </View>
@@ -246,19 +241,7 @@ export function CaregiverDetailsScreen() {
           </View>
         </ScrollView>
       </View>
-      {isAddCaregiver ? (
-        <View className="h-full w-full ">
-          <AddEditCaregiver
-            caregiverDetails={caregiverDetails}
-            cancelClicked={cancelClicked}
-            createUpdateCaregiver={createUpdateCaregiver}
-            memberData={memberData}
-            infoClicked={infoClicked}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
+
       {isShowProfileInfo ? (
         <View className="h-full w-full justify-center">
           <CaregiverProfileInfo cancelClicked={cancelClicked} />

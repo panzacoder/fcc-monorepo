@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function Calendar() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Calendar' }} />
+      <Stack.Screen options={{ title: 'Calendar',headerShown:false }} />
       <CalendarScreen />
     </>
   )

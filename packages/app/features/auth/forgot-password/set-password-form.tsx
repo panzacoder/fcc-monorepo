@@ -1,7 +1,7 @@
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Alert, View } from 'react-native'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { BASE_URL, RESET_PASSWORD } from 'app/utils/urlConstants'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'

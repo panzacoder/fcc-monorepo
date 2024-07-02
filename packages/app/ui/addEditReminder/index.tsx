@@ -1,4 +1,5 @@
 import { View } from 'react-native'
+import { useState } from 'react'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -11,16 +12,16 @@ const schema = z.object({
   title: z.string().min(1, { message: 'Reminder title is required' })
 })
 export type Schema = z.infer<typeof schema>
-
 export const AddEditReminder = ({
   component,
   reminderData,
-  // appointmentId,
   cancelClicked,
   createUpdateReminder
 }) => {
-  let selectedDate: any = ''
-  // console.log('reminderData', JSON.stringify(reminderData))
+  const [selectedDate, setSelectedDate] = useState(
+    reminderData.date ? reminderData.date : new Date()
+  )
+  const [key, setKey] = useState(0)
   const { control, handleSubmit } = useForm({
     defaultValues: {
       title:
@@ -32,16 +33,19 @@ export const AddEditReminder = ({
     },
     resolver: zodResolver(schema)
   })
-  selectedDate = reminderData.date ? reminderData.date : new Date()
 
   const onSelection = (date: any) => {
-    selectedDate = date
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   function createUpdateReminderCall(formData: Schema) {
     createUpdateReminder(formData.title, selectedDate, reminderData)
   }
   return (
-    <View className="my-2 w-[90%] self-center rounded-[15px] bg-[#fbe2e3] py-5 border-[0.5px] border-gray-400">
+    <View
+      key={key}
+      className="my-2 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#fbe2e3] py-5"
+    >
       <Typography className="self-center font-bold">{`${_.isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
@@ -53,11 +57,12 @@ export const AddEditReminder = ({
             autoCapitalize="none"
           />
         </View>
-        <PtsDateTimePicker
-          currentData={reminderData.date ? reminderData.date : new Date()}
-          onSelection={onSelection}
-        />
-
+        <View className="w-[95%] self-center">
+          <PtsDateTimePicker
+            currentData={selectedDate}
+            onSelection={onSelection}
+          />
+        </View>
         <View className="mt-5 flex-row justify-center">
           <Button
             className="bg-[#86939e]"

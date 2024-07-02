@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { CreateCircleProps, createCircle } from 'app/data/circle/create'
 import { CircleNameSection } from './name-section'
 import { CircleEmailSection } from './email-section'

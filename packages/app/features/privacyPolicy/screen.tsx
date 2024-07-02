@@ -2,8 +2,8 @@
 import { View, Linking } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
-import { useRouter } from 'solito/navigation'
-import { Feather } from 'app/ui/icons'
+import { useRouter } from 'expo-router'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function PrivacyPolicyScreen() {
   const router = useRouter()
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
@@ -22,21 +22,10 @@ export function PrivacyPolicyScreen() {
   }
   return (
     <View className="flex-1">
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.replace('/home')
-          }}
-        />
-        <Typography className=" flex-1 text-center text-lg font-bold">
-          {'Privacy Policy'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="Privacy Policy" memberData={{}} />
       </View>
-      <ScrollView>
+      <ScrollView className="mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px] border-gray-400">
         <Typography className="mt-[10px] text-center font-bold">
           {'Family Care Circle: Privacy Policy'}
         </Typography>

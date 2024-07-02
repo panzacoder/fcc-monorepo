@@ -16,7 +16,7 @@ import {
   REJECT_MEMBER_REQUEST,
   ACCEPT_MEMBER_REQUEST
 } from 'app/utils/urlConstants'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { SharedContactList } from 'app/ui/sharedContactList'
 import { NewCirclesList } from 'app/ui/newCirclesList'
 import { PrivacyPolicy } from 'app/ui/privacyPolicy'
@@ -45,10 +45,6 @@ export function CirclesListScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setMemberList(data.data.memberList ? data.data.memberList : [])
-          console.log(
-            'data.data.memberList',
-            JSON.stringify(data.data.memberList)
-          )
         } else {
           Alert.alert('', data.message)
         }

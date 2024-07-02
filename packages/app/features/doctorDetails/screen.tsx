@@ -1,9 +1,15 @@
 'use client'
-import * as React from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Linking, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Alert,
+  Linking,
+  TouchableOpacity,
+  BackHandler
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import {
   formatTimeToUserLocalTime,
@@ -18,9 +24,9 @@ import {
   DELETE_DOCTOR,
   SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
@@ -28,7 +34,7 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 let doctorPrivileges = {}
 export function DoctorDetailsScreen() {
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
@@ -36,6 +42,7 @@ export function DoctorDetailsScreen() {
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const [doctorDetails, setDoctorDetails] = useState({}) as any
+  const [doctorName, setDoctorName] = useState('')
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
   const [isShareDoctor, setIsShareDoctor] = useState(false)
@@ -58,6 +65,14 @@ export function DoctorDetailsScreen() {
               : {}
           }
           setDoctorDetails(data.data.doctor || {})
+          if (data.data.doctor) {
+            let details = data.data.doctor
+            let fullName = ''
+            fullName += details.salutation ? details.salutation + '. ' : ''
+            fullName += details.firstName ? details.firstName + ' ' : ''
+            fullName += details.lastName ? details.lastName + ' ' : ''
+            setDoctorName(fullName)
+          }
           setLocationList(
             data.data.doctor && data.data.doctor.doctorLocationList
               ? data.data.doctor.doctorLocationList
@@ -79,8 +94,24 @@ export function DoctorDetailsScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/doctorsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     getDoctorDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
@@ -88,13 +119,13 @@ export function DoctorDetailsScreen() {
   }
 
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[16px] font-bold text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 text-[16px] font-bold text-[#1A1A1A]'
   function iconPressed(title: any, value: any) {
-    if (title === 'Phone:' && value !== '') {
+    if (title === 'Phone' && value !== '') {
       Linking.openURL(`tel:${value}`)
-    } else if (title === 'Email:' && value !== '') {
+    } else if (title === 'Email' && value !== '') {
       Linking.openURL(`mailto:${value}`)
-    } else if (title === 'Website:' && value !== '') {
+    } else if (title === 'Website' && value !== '') {
       Linking.openURL(`http://${getWebsite(value)}`)
     }
   }
@@ -108,7 +139,7 @@ export function DoctorDetailsScreen() {
       <View className="mt-2 w-full flex-row items-center">
         <View className="w-[95%] flex-row">
           <Typography className={titleStyle}>{title}</Typography>
-          {title !== 'Status:' ? (
+          {title !== 'Status' ? (
             <TouchableOpacity
               className="w-[65%]"
               onPress={() => {
@@ -155,6 +186,7 @@ export function DoctorDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)
@@ -199,13 +231,13 @@ export function DoctorDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Doctor Details" memberData={memberData} />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
+          <View className="border-primary mt-[5] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className=" font-400 max-w-[80%] text-[16px] text-[#86939e]">
+                <Typography className=" font-400 max-w-[80%] text-[16px] text-black">
                   {doctorInfo.specialist ? doctorInfo.specialist : ''}
                 </Typography>
                 {/* <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" /> */}
@@ -227,21 +259,16 @@ export function DoctorDetailsScreen() {
             </View>
             <View>
               <View className="mt-2 flex-row items-center">
-                <Typography className="font-400 w-[25%] text-[12px] text-[#1A1A1A]">
+                <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Contact Info'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[75%]" />
+                <View className="bg-primary h-[1px] w-[70%]" />
               </View>
 
-              {getDetailsView(
-                'Name:',
-                doctorInfo.doctorName ? doctorInfo.doctorName : '',
-                true,
-                'user'
-              )}
+              {getDetailsView('Name', doctorName, true, 'user')}
               {doctorDetails.phone && doctorDetails.phone !== '' ? (
                 getDetailsView(
-                  'Phone:',
+                  'Phone',
                   convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone),
                   true,
                   'phone'
@@ -250,7 +277,7 @@ export function DoctorDetailsScreen() {
                 <View />
               )}
               {doctorDetails.email && doctorDetails.email !== '' ? (
-                getDetailsView('Email:', doctorDetails.email, true, 'mail')
+                getDetailsView('Email', doctorDetails.email, true, 'mail')
               ) : (
                 <View />
               )}
@@ -261,12 +288,12 @@ export function DoctorDetailsScreen() {
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Portal details'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
+                <View className="bg-primary  h-[1px] w-[70%]" />
               </View>
 
               {doctorDetails.websiteuser && doctorDetails.websiteuser !== '' ? (
                 getDetailsView(
-                  'Username:',
+                  'Username',
                   doctorDetails.websiteuser,
                   false,
                   'copy'
@@ -275,12 +302,12 @@ export function DoctorDetailsScreen() {
                 <View />
               )}
               {doctorDetails.website && doctorDetails.website !== '' ? (
-                getDetailsView('Website:', doctorDetails.website, true, 'globe')
+                getDetailsView('Website', doctorDetails.website, true, 'globe')
               ) : (
                 <View />
               )}
               {getDetailsView(
-                'Status:',
+                'Status',
                 doctorDetails.status && doctorDetails.status.status
                   ? doctorDetails.status.status
                   : '',
@@ -320,7 +347,7 @@ export function DoctorDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(doctorInfo),
@@ -335,6 +362,7 @@ export function DoctorDetailsScreen() {
                 {locationList.map((data: any, index: number) => {
                   data.component = 'Doctor'
                   data.doctorFacilityId = doctorInfo.id
+                  data.memberData = memberData
                   return (
                     <View key={index}>
                       <Location data={data}></Location>
@@ -380,6 +408,7 @@ export function DoctorDetailsScreen() {
                   router.push(
                     formatUrl('/circles/addEditAppointment', {
                       memberData: JSON.stringify(memberData),
+                      doctorFacilityDetails: JSON.stringify(doctorDetails),
                       component: 'Doctor'
                     })
                   )
@@ -392,7 +421,7 @@ export function DoctorDetailsScreen() {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        router.replace(
+                        router.push(
                           formatUrl('/circles/appointmentDetails', {
                             appointmentDetails: JSON.stringify(data),
                             memberData: JSON.stringify(memberData)
@@ -550,7 +579,7 @@ export function DoctorDetailsScreen() {
         </ScrollView>
       </View>
       {isShareDoctor ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full mt-[20px]">
           <ShareDoctorFacility
             cancelClicked={cancelClicked}
             shareDoctorFacility={shareDoctor}

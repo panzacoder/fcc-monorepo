@@ -1,12 +1,13 @@
 'use client'
 import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
-import { Alert, View } from 'react-native'
+import { Alert, View, BackHandler, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
-import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -18,23 +19,22 @@ import {
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { Feather } from 'app/ui/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-// import { useRouter } from 'solito/navigation'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
+import { Typography } from 'app/ui/typography'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
   doctoFacilityIndex: z.number().min(0, { message: 'Select Doctor/Facility' })
 })
 export type Schema = z.infer<typeof schema>
-let selectedDate: any = new Date()
-let purpose: any = ''
-let facilityDoctorIndex = -1
+// let selectedDate: any = new Date()
 type TypeResponse = {
   id: number
   type: string
@@ -46,18 +46,35 @@ type DoctorFacilityResponse = {
 export function AddEditAppointmentScreen() {
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let doctorFacilityDetails = item.doctorFacilityDetails
+    ? JSON.parse(item.doctorFacilityDetails)
+    : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
+  // console.log('doctorFacilityDetails', JSON.stringify(doctorFacilityDetails))
+
   let component = item.component ? item.component : ''
+  // console.log('component', component)
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(
+    appointmentDetails.date ? appointmentDetails.date : new Date()
+  )
+  const [key, setKey] = useState(0)
+  const [isAddDoctorFacility, setIsAddDoctorFacility] = useState(false)
+  const [facilityDoctorIndex, setFacilityDoctorIndex] = useState(-1)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [purpose, setPurpose] = useState(
+    !_.isEmpty(appointmentDetails) && appointmentDetails.purpose
+      ? appointmentDetails.purpose
+      : ''
+  )
   const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(
     null
   ) as any
@@ -97,20 +114,44 @@ export function AddEditAppointmentScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let doctorFacilities: Array<{ id: number; title: string }> =
-            data.data.map(
-              ({ name, id }: DoctorFacilityResponse, index: any) => {
-                return {
-                  id: index + 1,
-                  title: name
-                }
-              }
-            )
+          let doctorFacilities: Array<{ id: number; title: string }> = [
+            {
+              id: 1,
+              title: value === 0 ? 'Add New Doctor' : 'Add New Facility'
+            }
+          ]
+          data.data.map(({ name, id }: DoctorFacilityResponse, index: any) => {
+            let object = {
+              id: index + 2,
+              title: name
+            }
+            doctorFacilities.push(object)
+          })
           let list = data.data ? data.data : []
           setDoctorFacilityList(doctorFacilities)
           setDoctorFacilityListFull(list)
           setIsDataReceived(true)
+          setIsAddDoctorFacility(list.length === 0)
           let facilityDoctorLocationId = -1
+          if (!_.isEmpty(doctorFacilityDetails)) {
+            if (component === 'Doctor') {
+              if (
+                doctorFacilityDetails.doctorLocationList[0] &&
+                doctorFacilityDetails.doctorLocationList[0].id
+              ) {
+                facilityDoctorLocationId =
+                  doctorFacilityDetails.doctorLocationList[0].id
+              }
+            } else {
+              if (
+                doctorFacilityDetails.facilityLocationList[0] &&
+                doctorFacilityDetails.facilityLocationList[0].id
+              ) {
+                facilityDoctorLocationId =
+                  doctorFacilityDetails.facilityLocationList[0].id
+              }
+            }
+          }
           if (
             appointmentDetails.doctorLocation &&
             appointmentDetails.doctorLocation.id
@@ -125,9 +166,10 @@ export function AddEditAppointmentScreen() {
 
           list.map(async (data: any, index: any) => {
             if (data.locationId === facilityDoctorLocationId) {
-              facilityDoctorIndex = index + 1
+              setFacilityDoctorIndex(index + 2)
+              console.log('doctoFacilityIndex', String(index + 2))
               reset({
-                doctoFacilityIndex: index + 1
+                doctoFacilityIndex: index + 2
               })
             }
           })
@@ -144,10 +186,6 @@ export function AddEditAppointmentScreen() {
   }, [])
   let typeIndex: any = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
-    purpose = appointmentDetails.purpose ? appointmentDetails.purpose : ''
-    selectedDate = appointmentDetails.date
-      ? appointmentDetails.date
-      : new Date()
     if (
       appointmentDetails.type &&
       appointmentDetails.type.type === 'Doctor Appointment'
@@ -162,13 +200,13 @@ export function AddEditAppointmentScreen() {
   }
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
+
     // console.log('typeIndex1', '' + typeIndex)
   }
 
   async function addEditAppointment(formData: Schema) {
-    setLoading(true)
-    console.log('selectedDate', selectedDate)
-    console.log('purpose', purpose)
+    // console.log('selectedDate', selectedDate)
+    // console.log('purpose', purpose)
     let dataObject: any = {
       header: header,
       appointment: {
@@ -196,14 +234,19 @@ export function AddEditAppointmentScreen() {
       url = `${BASE_URL}${UPDATE_APPOINTMENT}`
       dataObject.appointment.id = appointmentDetails.id
     }
-
-    if (selectedDoctorFacility === 1) {
-      dataObject.appointment.doctorLocation.id =
-        doctorFacilityListFull[formData.doctoFacilityIndex - 1].locationId
+    if (formData.doctoFacilityIndex !== 1) {
+      if (selectedDoctorFacility === 1) {
+        dataObject.appointment.doctorLocation.id =
+          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+      } else {
+        dataObject.appointment.facilityLocation.id =
+          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+      }
     } else {
-      dataObject.appointment.facilityLocation.id =
-        doctorFacilityListFull[formData.doctoFacilityIndex - 1].locationId
+      Alert.alert('', 'Please Select Doctor/Facility')
+      return
     }
+    setLoading(true)
     // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -216,9 +259,21 @@ export function AddEditAppointmentScreen() {
               ? data.data.appointmentWithPreviousAppointment.appointment
               : {}
           } else {
-            apptDetails = data.data.appointment ? data.data.appointment : {}
+            if (isFromCreateSimilar === 'true') {
+              apptDetails = data.data.appointmentWithPreviousAppointment
+                .appointment
+                ? data.data.appointmentWithPreviousAppointment.appointment
+                : {}
+            } else {
+              apptDetails = data.data.appointment ? data.data.appointment : {}
+            }
           }
-          router.dismiss(1)
+          if (_.isEmpty(appointmentDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(apptDetails),
@@ -263,11 +318,13 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: any) => {
-    console.log('onSelection', '' + date)
-    selectedDate = date
+    // console.log('onSelection', '' + date)
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   const onSelectionPurpose = (data: any) => {
-    purpose = data
+    // purpose = data
+    setPurpose(data)
     console.log('purpose1', purpose)
   }
   async function setSelectedTypeChange(value: any) {
@@ -277,6 +334,32 @@ export function AddEditAppointmentScreen() {
       getDoctorFacilities(value.id - 1)
     }
   }
+  async function selectedDoctorFacilityChange(value: any) {
+    if (value && !isLoading) {
+      // console.log('value', JSON.stringify(value))
+      if (value.title === 'Add New Doctor') {
+        router.push(
+          formatUrl('/circles/addEditDoctor', {
+            component: 'addEditAppointment',
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      } else if (value.title === 'Add New Facility') {
+        router.push(
+          formatUrl('/circles/addEditFacility', {
+            component: 'addEditAppointment',
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
+    }
+  }
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    router.back()
+    return true
+  }
+
   useEffect(() => {
     if (
       !_.isEmpty(appointmentDetails) ||
@@ -287,20 +370,82 @@ export function AddEditAppointmentScreen() {
       getDoctorFacilities(typeIndex - 1)
       setSelectedDoctorFacility(facilityDoctorIndex)
     }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
-  return (
-    <View className="w-full flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Appointment'
-              : 'Edit Appointment'
+  const showAddDcotoFacilityModal = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: 'white'
         }}
-      />
+        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
+      >
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-[85%] self-center text-center font-bold text-white">{``}</Typography>
+          <View className="mr-[30] flex-row justify-end self-center">
+            <TouchableOpacity
+              className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
+              onPress={() => {
+                setIsAddDoctorFacility(false)
+              }}
+            >
+              <Feather name={'x'} size={25} className="color-primary" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View className="my-5 items-center">
+          <Typography className=" w-full self-center text-center font-bold text-black">
+            {selectedDoctorFacility === 1
+              ? `There are No Doctors set yet. Kindly Add Doctor details.`
+              : `There are No Facilities set yet. Kindly Add Facility details.`}
+          </Typography>
+
+          <Button
+            className="my-3 ml-5 w-[50%] bg-[#ef6603]"
+            title={selectedDoctorFacility === 1 ? 'Add Doctor' : 'Add Facility'}
+            variant="default"
+            onPress={() => {
+              if (selectedDoctorFacility === 1) {
+                router.push(
+                  formatUrl('/circles/addEditDoctor', {
+                    component: 'addEditAppointment',
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              } else {
+                router.push(
+                  formatUrl('/circles/addEditFacility', {
+                    component: 'addEditAppointment',
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }
+            }}
+          />
+        </View>
+      </View>
+    )
+  }
+  return (
+    <View key={key} className="w-full flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full py-2 ">
-        <ScrollView className="w-full flex-1">
+      <PtsBackHeader
+        title={
+          _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Appointment'
+            : 'Edit Appointment'
+        }
+        memberData={memberData}
+      />
+      <SafeAreaView>
+        {/* <View className="h-full w-full flex-1 py-2 "> */}
+        <ScrollView className="mt-5 h-[90%] w-full flex-1 rounded-[5px] border-[1px] border-gray-400 p-2 py-2">
           <View className="mt-5 w-full items-center">
             <ControlledDropdown
               control={control}
@@ -315,7 +460,7 @@ export function AddEditAppointmentScreen() {
               }
               maxHeight={300}
               list={typesList}
-              className="w-[95%]"
+              className=""
               onChangeValue={setSelectedTypeChange}
             />
             {isShowDoctorFacilityDropdown && isDataReceived ? (
@@ -326,8 +471,8 @@ export function AddEditAppointmentScreen() {
                 defaultValue={''}
                 maxHeight={300}
                 list={doctorFacilityList}
-                className="mt-2 w-[95%]"
-                // onChangeValue={setSelectedTypeChange}
+                className="mt-2 "
+                onChangeValue={selectedDoctorFacilityChange}
               />
             ) : (
               <View />
@@ -345,16 +490,16 @@ export function AddEditAppointmentScreen() {
               control={control}
               name="description"
               placeholder={'Description'}
-              className="w-[95%] bg-white"
+              className=" bg-white"
               autoCapitalize="none"
             />
           </View>
-          <View className="w-[95%] self-center">
+          <View className="mt-1 w-full self-center">
             <PtsComboBox
               currentData={purpose}
               listData={purposeList}
               onSelection={onSelectionPurpose}
-              placeholderValue={'Select Purpose'}
+              placeholderValue={'Purpose'}
             />
           </View>
           <View className="mt-5 flex-row justify-center">
@@ -380,7 +525,14 @@ export function AddEditAppointmentScreen() {
             />
           </View>
         </ScrollView>
-      </View>
+      </SafeAreaView>
+      {isAddDoctorFacility ? (
+        <View className="absolute top-[100] w-[95%] flex-1 self-center">
+          {showAddDcotoFacilityModal()}
+        </View>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

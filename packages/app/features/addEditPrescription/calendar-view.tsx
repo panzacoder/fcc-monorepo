@@ -2,9 +2,9 @@ import { TouchableOpacity, Text, View } from 'react-native'
 import CalendarPicker, {
   CalendarPickerProps
 } from 'react-native-calendar-picker'
-import { Button } from '../button'
-import { Typography } from '../typography'
-import { cn } from '../utils'
+import { Button } from 'app/ui/button'
+import { Typography } from 'app/ui/typography'
+import { cn } from 'app/ui/utils'
 
 export type CalendarViewProps = {
   component: any

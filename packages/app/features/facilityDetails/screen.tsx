@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
@@ -16,9 +17,9 @@ import {
   DELETE_FACILITY,
   SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -28,16 +29,27 @@ export function FacilityDetailsScreen() {
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let facilityInfo = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
+    console.log('facilityInfo',JSON.stringify(facilityInfo))
   const [isLoading, setLoading] = useState(false)
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
+
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/facilitiesList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     async function getfacilityDetails() {
       setLoading(true)
@@ -83,10 +95,15 @@ export function FacilityDetailsScreen() {
         })
     }
     getfacilityDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
-  async function deleteFacilityLocation(locationData: any) {
-    console.log('deleteFacilityLocation', JSON.stringify(locationData))
-  }
+
   async function deleteFacility() {
     setLoading(true)
     let url = `${BASE_URL}${DELETE_FACILITY}`
@@ -100,6 +117,7 @@ export function FacilityDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/facilitiesList', {
               memberData: JSON.stringify(memberData)
@@ -140,21 +158,42 @@ export function FacilityDetailsScreen() {
         console.log(error)
       })
   }
+  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  function getDetailsView(title: string, value: string) {
+    return (
+      <View className="mt-2 w-full flex-row items-center">
+        <View className="w-full flex-row">
+          <Typography className={titleStyle}>{title}</Typography>
+          {title !== 'Status' ? (
+            <Typography className={valueStyle}>{value}</Typography>
+          ) : (
+            <Typography
+              className={`font-400 ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
+            >
+              {value}
+            </Typography>
+          )}
+        </View>
+      </View>
+    )
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Facility Details" memberData={memberData} />
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[10px] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
+          <View className="border-primary mt-[5] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className="font-400 max-w-[65%] text-[16px] text-[#86939e]">
+                <Typography className="font-400 max-w-[90%] text-[16px] text-black">
                   {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
-                <View className="ml-2 h-[25] w-[2px] bg-[#86939e]" />
                 <Typography className="font-400 text-primary ml-2 text-[16px]">
-                  {facilityInfo.status ? facilityInfo.status : ''}
+                  {facilityInfo.status && facilityInfo.status.status
+                    ? facilityInfo.status.status
+                    : ''}
                 </Typography>
               </View>
               <Button
@@ -176,24 +215,49 @@ export function FacilityDetailsScreen() {
                 <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Facility Details'}
                 </Typography>
-                <View className="bg-primary  ml-2 h-[1px] w-[70%]" />
+                <View className="bg-primary h-[1px] w-[70%] self-center" />
               </View>
-
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                  {'Name:'}
-                </Typography>
-                <Typography className="font-400 ml-2 w-[75%] text-[16px] font-bold text-[#1A1A1A]">
-                  {facilityDetails.name ? facilityDetails.name : ''}
-                </Typography>
-              </View>
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[20%] text-[16px] text-[#1A1A1A]">
-                  {'Status:'}
+              {getDetailsView(
+                'Name',
+                facilityDetails.name ? facilityDetails.name : ''
+              )}
+              {getDetailsView(
+                'Description',
+                facilityDetails.description ? facilityDetails.description : ''
+              )}
+              {facilityDetails.website !== '' ? (
+                <View className="mt-2 w-[95%] flex-row">
+                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                    {'Facility Portal'}
+                  </Typography>
+                  <Typography className="font-400 text-primary w-[70%] text-[16px] underline">
+                    {facilityDetails.website ? facilityDetails.website : ''}
+                  </Typography>
+                </View>
+              ) : (
+                <View />
+              )}
+              {facilityDetails.websiteuser !== '' ? (
+                <View className="mt-2 w-[95%] flex-row">
+                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                    {'Portal Username'}
+                  </Typography>
+                  <Typography className="font-400 text-primary w-[70%] text-[16px]">
+                    {facilityDetails.websiteuser
+                      ? facilityDetails.websiteuser
+                      : ''}
+                  </Typography>
+                </View>
+              ) : (
+                <View />
+              )}
+              <View className="mt-2 w-[95%] flex-row">
+                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
+                  {'Status'}
                 </Typography>
                 {facilityDetails.status && facilityDetails.status.status ? (
                   <Typography
-                    className={`ml-2 mr-5 rounded-[5px] px-5 py-1 text-right font-bold ${facilityDetails.status.status.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
+                    className={` rounded-[5px] px-5 py-1 text-right font-bold ${facilityDetails.status.status.toLowerCase() === 'active' ? "bg-['#27ae60'] text-white" : "bg-['#d5d8dc'] text-black"}`}
                   >
                     {facilityDetails.status.status}
                   </Typography>
@@ -201,11 +265,11 @@ export function FacilityDetailsScreen() {
                   <View />
                 )}
               </View>
-              <View className="mt-2 w-[90%] flex-row">
-                <Typography className="font-400 w-[60%] text-[16px] text-[#1A1A1A]">
+              <View className="mt-2 w-[95%] flex-row">
+                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
                   {'Is this Pharmacy ?'}
                 </Typography>
-                <Typography className="font-400 ml-2 w-[30%] text-[16px] font-bold text-[#1A1A1A]">
+                <Typography className="font-400 w-[35%] text-[16px] font-bold text-[#1A1A1A]">
                   {facilityDetails.ispharmacy ? 'Yes' : 'No'}
                 </Typography>
               </View>
@@ -242,7 +306,7 @@ export function FacilityDetailsScreen() {
                 title="Add Location"
                 variant="border"
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/addEditLocation', {
                       memberData: JSON.stringify(memberData),
                       details: JSON.stringify(facilityInfo),
@@ -257,6 +321,7 @@ export function FacilityDetailsScreen() {
                 {locationList.map((data: any, index: number) => {
                   data.component = 'Facility'
                   data.doctorFacilityId = facilityInfo.id
+                  data.memberData = memberData
                   return (
                     <View key={index}>
                       <Location data={data} />
@@ -302,6 +367,7 @@ export function FacilityDetailsScreen() {
                   router.push(
                     formatUrl('/circles/addEditAppointment', {
                       memberData: JSON.stringify(memberData),
+                      doctorFacilityDetails: JSON.stringify(facilityDetails),
                       component: 'Facility'
                     })
                   )
@@ -314,7 +380,7 @@ export function FacilityDetailsScreen() {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        router.replace(
+                        router.push(
                           formatUrl('/circles/appointmentDetails', {
                             appointmentDetails: JSON.stringify(data),
                             memberData: JSON.stringify(memberData)
@@ -472,7 +538,7 @@ export function FacilityDetailsScreen() {
         </ScrollView>
       </View>
       {isShareFacility ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full mt-[20px]">
           <ShareDoctorFacility
             cancelClicked={cancelClicked}
             shareDoctorFacility={shareFacility}

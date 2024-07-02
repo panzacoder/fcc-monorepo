@@ -7,19 +7,21 @@ import { Button } from 'app/ui/button'
 import { BASE_URL, CREATE_ACCOUNT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 import { CheckBox } from 'react-native-elements'
 import { formatUrl } from 'app/utils/format-url'
-
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addressSchema, AddressFields } from 'app/ui/form-fields/address-fields'
-
 const schema = addressSchema
   .extend({
     firstName: z.string().min(1, { message: 'First Name is required' }),
@@ -51,6 +53,7 @@ type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
   const [isLoading, setLoading] = useState(false)
+  const [isTandCAccepted, setIsTandCAccepted] = useState(false)
 
   const formMethods = useForm<Schema>({
     resolver: zodResolver(schema)
@@ -64,7 +67,7 @@ export function SignUpScreen() {
       registration: {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(formData.phone),
         email: formData.email,
         credential: formData.password,
         userTimezone: formData.timezone,
@@ -151,6 +154,10 @@ export function SignUpScreen() {
               onSubmitEditing={() => {
                 formMethods.setFocus('password')
               }}
+              onChangeText={(value) => {
+                let userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+                formMethods.setValue('phone', userPhone)
+              }}
             />
             <ControlledSecureField
               name="password"
@@ -182,19 +189,38 @@ export function SignUpScreen() {
                   checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
                   onPress={() => {
                     onChange(!value)
+                    setIsTandCAccepted(!value)
                   }}
                   className="flex-shrink"
                 />
               )}
             />
             <Typography className="flex-1">
-              {'I accept the Terms and Conditions and Privacy Policy'}
+              {'I accept the'}
+              <Typography
+                className="text-primary font-bold"
+                onPress={() => {
+                  router.push('/termsAndConditions')
+                }}
+              >
+                {' Terms and Conditions'}
+              </Typography>
+              <Typography>{' and '}</Typography>
+              <Typography
+                onPress={() => {
+                  router.push('/privacyPolicy')
+                }}
+                className="text-primary font-bold"
+              >
+                {'Privacy Policy.'}
+              </Typography>
             </Typography>
           </View>
           <Button
             onPress={formMethods.handleSubmit(submitRegistration)}
             className="w-full"
             title="Sign Up"
+            disabled={!isTandCAccepted}
           />
         </View>
       </FormProvider>

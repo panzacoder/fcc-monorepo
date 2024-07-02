@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -13,9 +14,9 @@ import store from 'app/redux/store'
 import _ from 'lodash'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_EVENTS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import {
   formatTimeToUserLocalTime,
   getMonthsList,
@@ -26,7 +27,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { AddEditEvent } from 'app/ui/addEditEvent'
 let eventsPrivileges = {}
 const schema = z.object({
   monthIndex: z.number(),
@@ -40,7 +40,6 @@ let selectedYear = 'All'
 export function EventsListScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
-  const [isAddEvent, setIsAddEvent] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
@@ -49,7 +48,7 @@ export function EventsListScreen() {
   const [eventsListFull, setEventsListFull] = useState([]) as any
   const header = store.getState().headerState.header
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -111,8 +110,33 @@ export function EventsListScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    let fullName = ''
+    if (memberData.firstname) {
+      fullName += memberData.firstname.trim() + ' '
+    }
+    if (memberData.lastname) {
+      fullName += memberData.lastname.trim()
+    }
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/circleDetails', {
+        fullName,
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
+
   useEffect(() => {
     getEventDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   function setFilteredList(filter: any) {
     setIsShowFilter(false)
@@ -177,49 +201,7 @@ export function EventsListScreen() {
       yearIndex: 1
     })
   }
-  async function createUpdateEvent(formData: Schema, selectedDate: any) {
-    console.log('in createUpdateEvent')
-    // setLoading(true)
-    // let url = `${BASE_URL}${CREATE_EVENT}`
 
-    // let dataObject: any = {
-    //   header: header,
-    //   event: {
-    //     date: selectedDate,
-    //     title: formData.title,
-    //     description: formData.description,
-    //     member: {
-    //       id: memberData.member ? memberData.member : ''
-    //     },
-    //     location: formData.address,
-    //     contactList: [],
-    //     reminderList: []
-    //   }
-    // }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    // CallPostService(url, dataObject)
-    //   .then(async (data: any) => {
-    //     setLoading(false)
-    //     if (data.status === 'SUCCESS') {
-    //       router.replace(
-    //         formatUrl('/circles/eventDetails', {
-    //           eventDetails: JSON.stringify(data.data.event),
-    //           memberData: JSON.stringify(memberData)
-    //         })
-    //       )
-    //     } else {
-    //       Alert.alert('', data.message)
-    //     }
-    //     setLoading(false)
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false)
-    //     console.log(error)
-    //   })
-  }
-  async function cancelClicked() {
-    setIsAddEvent(false)
-  }
   async function setYearChange(value: any) {
     if (value === null) {
       reset({
@@ -237,13 +219,14 @@ export function EventsListScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Events" memberData={memberData} />
       <View className="flex-row ">
         <TouchableOpacity
           onPress={() => {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
           }}
-          className="w-[75%] flex-row"
+          className="w-[40%] flex-row"
         >
           <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
             {currentFilter}
@@ -255,6 +238,7 @@ export function EventsListScreen() {
             color={'black'}
           />
         </TouchableOpacity>
+        <View className="w-[35%]" />
         {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
@@ -265,7 +249,6 @@ export function EventsListScreen() {
                     memberData: JSON.stringify(memberData)
                   })
                 )
-                // setIsAddEvent(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
@@ -400,13 +383,13 @@ export function EventsListScreen() {
       ) : (
         <View />
       )}
-      {eventsList.length > 0 ? (
+      {!isLoading && eventsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
           {eventsList.map((data: any, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/eventDetails', {
                       eventDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
@@ -429,7 +412,7 @@ export function EventsListScreen() {
                       </View>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
+                      <Typography className="font-400 ml-5 w-[90%] text-black">
                         {data.location ? data.location : ''}
                       </Typography>
                     </View>
@@ -530,17 +513,6 @@ export function EventsListScreen() {
       {isDataReceived && eventsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
           <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} events`}</Typography>
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddEvent ? (
-        <View className="mt-2 h-full w-full items-center self-center">
-          <AddEditEvent
-            component={'Event'}
-            createUpdateEvent={createUpdateEvent}
-            cancelClicked={cancelClicked}
-          />
         </View>
       ) : (
         <View />

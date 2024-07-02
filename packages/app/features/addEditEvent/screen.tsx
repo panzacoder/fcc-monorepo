@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { Alert, View } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { Stack } from 'expo-router'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
@@ -19,33 +20,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
-let selectedDate: any = new Date()
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
+
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter event title' })
@@ -54,16 +29,49 @@ export type Schema = z.infer<typeof schema>
 export function AddEditEventScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  const [isLoading, setLoading] = useState(false)
   let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
+  const [isLoading, setLoading] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
+  const [key, setKey] = useState(0)
+  const [selectedDate, setSelectedDate] = useState(
+    !_.isEmpty(eventDetails) && eventDetails.date
+      ? eventDetails.date
+      : new Date()
+  )
   // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: any) => {
-    selectedDate = date
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -76,14 +84,43 @@ export function AddEditEventScreen() {
     },
     resolver: zodResolver(schema)
   })
-  if (!_.isEmpty(eventDetails) && !isLoading) {
-    selectedDate = eventDetails.date ? eventDetails.date : new Date()
+  function handleBackButtonClick() {
+    console.log('handleBackButtonClick')
+    router.dismiss(1)
+    if (_.isEmpty(eventDetails)) {
+      router.push(
+        formatUrl('/circles/eventsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.push(
+        formatUrl('/circles/eventDetails', {
+          eventDetails: JSON.stringify(eventDetails),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    return true
   }
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
+  }, [])
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -99,7 +136,6 @@ export function AddEditEventScreen() {
         selectedAddress.address.state.country.name = value.name
         selectedAddress.address.state.country.code = value.code
         selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
         selectedAddress.address.state.country.description = value.description
       }
       if (index === 5) {
@@ -111,7 +147,7 @@ export function AddEditEventScreen() {
         selectedAddress.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        setSelectedAddress(value)
       }
     }
 
@@ -130,7 +166,8 @@ export function AddEditEventScreen() {
           id: memberData.member ? memberData.member : ''
         },
         location: selectedAddress,
-        contactList: []
+        contactList: [],
+        reminderList: []
       }
     }
     if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
@@ -144,9 +181,15 @@ export function AddEditEventScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          router.replace(
+          if (_.isEmpty(eventDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+          let details = data.data.event ? data.data.event : {}
+          router.push(
             formatUrl('/circles/eventDetails', {
-              eventDetails: JSON.stringify(data.data.event),
+              eventDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
@@ -162,59 +205,74 @@ export function AddEditEventScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Event'
-              : 'Edit Event Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-        <View className="w-full">
-          <PtsDateTimePicker
-            currentData={selectedDate}
-            onSelection={onSelection}
+      <PtsBackHeader
+        title={
+          _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Event'
+            : 'Edit Event Details'
+        }
+        memberData={{}}
+      />
+      <SafeAreaView>
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View key={key} className="w-full">
+            <PtsDateTimePicker
+              currentData={selectedDate}
+              onSelection={onSelection}
+            />
+          </View>
+          <View className="my-2 w-full flex-row justify-center">
+            <ControlledTextField
+              control={control}
+              name="title"
+              placeholder={'Title*'}
+              className="bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <View className="w-full flex-row justify-center">
+            <ControlledTextField
+              control={control}
+              name="description"
+              placeholder={'Description'}
+              className="bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <LocationDetails
+            component={'AddEditEvent'}
+            data={
+              !_.isEmpty(eventDetails) && eventDetails.location
+                ? eventDetails.location
+                : {}
+            }
+            setAddressObject={setAddressObject}
           />
-        </View>
-        <View className="my-2 w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="title"
-            placeholder={'Title*'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <View className="w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="description"
-            placeholder={'Description'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <LocationDetails
-          component={'AddEditEvent'}
-          data={
-            !_.isEmpty(eventDetails) && eventDetails.location
-              ? eventDetails.location
-              : {}
-          }
-          setAddressObject={setAddressObject}
-        />
-        <View className="my-2 mb-5 flex-row justify-center">
-          <Button
-            className="bg-[#287CFA]"
-            title={'Save'}
-            leadingIcon="save"
-            variant="default"
-            onPress={handleSubmit(addEditEvent)}
-          />
-        </View>
-      </ScrollView>
+          <View className="mb-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
+              title={
+                _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+                  ? 'Create'
+                  : 'Save'
+              }
+              leadingIcon="save"
+              variant="default"
+              onPress={handleSubmit(addEditEvent)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

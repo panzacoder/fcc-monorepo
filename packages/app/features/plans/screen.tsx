@@ -18,9 +18,9 @@ import {
   ADD_CARD,
   DELETE_CARD
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
@@ -51,7 +51,7 @@ export function PlansScreen() {
   const [planNames, setPlanNames] = useState([]) as any
   const [cardDetails, setCardDetails] = useState([]) as any
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
   let isRenewPlan =

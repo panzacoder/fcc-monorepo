@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 let facilityPrivileges = {}
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -23,7 +24,7 @@ export function FacilitiesListScreen() {
   const [currentFilter, setCurrentFilter] = useState('Active')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
   useEffect(() => {
@@ -84,6 +85,7 @@ export function FacilitiesListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
+        <PtsBackHeader title="Facilities" memberData={memberData} />
         <View className="flex-row ">
           <TouchableOpacity
             onPress={() => {
@@ -182,11 +184,11 @@ export function FacilitiesListScreen() {
               <View className="w-[95%] flex-row">
                 <View>
                   <View className="my-2 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[45%]">
+                    <Typography className="text-primary font-400 ml-5 w-[40%]">
                       {data.name ? data.name : ''}
                     </Typography>
 
-                    <Typography className="ml-5 mr-5 w-[40%] text-right">
+                    <Typography className="ml-5 mr-5 w-[45%] text-right">
                       {data.type ? data.type : ''}
                     </Typography>
                   </View>

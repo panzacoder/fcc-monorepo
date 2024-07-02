@@ -138,6 +138,7 @@ export const RESEND_CAREGIVER_REQEST = 'memberms/resendRequest'
 export const GET_TC_HTML_CONTENT = 'apTermsConditions/geActive'
 export const GET_CONSOLIDATED_FILTER_OPTIONS = 'homems/getFilterOptions'
 export const GET_CONSOLIDATED_DETAILS = 'homems/getConsolidatedMemberDetails'
+export const GET_WEEK_DETAILS = 'homems/getClassicWeekDetails'
 export const GET_FILTER_CONSOLIDATED_DETAILS =
   'homems/getFilteredConsolidatedMemberDetails'
 export const SHARE_CONTACT_INFO = 'infoSharingMs/create'
@@ -180,3 +181,12 @@ export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER =
   'memberms/updateMemberForAuthorisedCaregiver'
 export const UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS =
   'memberms/updateAddressForAuthorisedCaregiver'
+export const GET_TRANSPORTATION_REQUESTS = 'homems/getTransportationRequests'
+
+export const REJECT_TRANSPORT = 'apptransportms/rejectTransportationRequest'
+
+export const APPROVE_TRANSPORT = 'apptransportms/acceptTransporationRequest'
+
+export const EVENT_ACCEPT_TRANSPORTATION_REQUEST = 'eventtransportms/acceptTransportationRequest';
+
+export const EVENT_REJECT_TRANSPORTATION_REQUEST = 'eventtransportms/rejectTransportationRequest';

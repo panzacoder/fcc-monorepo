@@ -2,33 +2,41 @@ import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
-import { useRouter } from 'solito/navigation'
-import { COLORS } from 'app/utils/colors'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 export function CardView(data: any) {
   const router = useRouter()
   let memberData = data.data
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
-  let textStyle1 = `ml-5 text-[14px] text-[${COLORS.blue}] max-w-[90%]`
-  let textStyle2 = 'ml-5 text-[12px] text-black '
-  let textStyle3 = ' text-[12px] text-black underline max-w-[75%]'
+  let textStyle1 = `ml-5 text-[14px] text-[#103264] max-w-[95%] mr-4`
+  let textStyle2 = `ml-5 text-[14px] font-bold max-w-[95%]`
   let fullName = '',
     appointmentText = ''
   let dateText = ''
-  let locationText = ''
   let incidentText = ''
   let incidentDateText = ''
-  let incidentLocationText = ''
   let eventText = ''
   let eventDateText = ''
-  let eventLocationText = ''
   if (memberData.firstname) {
     fullName += memberData.firstname.trim() + ' '
   }
   if (memberData.lastname) {
     fullName += memberData.lastname.trim()
   }
+  let eventTransporationCount = 0,
+    appointmentTransportationCount = 0,
+    totalTransportationCount = 0
+  memberData.transportationRequests.map((data: any) => {
+    if (data.type === 'Appointment') {
+      appointmentTransportationCount = data.count
+    } else {
+      eventTransporationCount = data.count
+    }
+  })
+
+  totalTransportationCount =
+    appointmentTransportationCount + eventTransporationCount
   if (memberData.upcomingAppointment) {
     if (memberData.upcomingAppointment.date) {
       let date = getFullDateForCalendar(
@@ -47,8 +55,7 @@ export function CardView(data: any) {
       memberData.upcomingAppointment &&
       memberData.upcomingAppointment.location
     ) {
-      appointmentText += ' with ' + memberData.upcomingAppointment.location
-      locationText += memberData.upcomingAppointment.location
+      appointmentText += ' , ' + memberData.upcomingAppointment.location
     }
   }
   if (memberData.recentIncident) {
@@ -59,12 +66,14 @@ export function CardView(data: any) {
       )
       incidentDateText += date + ' - '
     }
-    if (memberData.recentIncident && memberData.recentIncident.title) {
-      incidentText += memberData.recentIncident.title
+    if (memberData.recentIncident && memberData.recentIncident.title !== '') {
+      incidentText += memberData.recentIncident.title + ', '
     }
-    if (memberData.recentIncident && memberData.recentIncident.location) {
+    if (
+      memberData.recentIncident &&
+      memberData.recentIncident.location !== ''
+    ) {
       incidentText += memberData.recentIncident.location
-      incidentLocationText += memberData.recentIncident.location
     }
   }
   if (memberData.upcomingEvent) {
@@ -75,14 +84,14 @@ export function CardView(data: any) {
       )
       eventText += date + ' - '
     }
-    if (memberData.upcomingEvent && memberData.upcomingEvent.title) {
-      eventText += memberData.upcomingEvent.title
+    if (memberData.upcomingEvent && memberData.upcomingEvent.title !== '') {
+      eventText += memberData.upcomingEvent.title + ', '
     }
-    if (memberData.upcomingEvent && memberData.upcomingEvent.location) {
+    if (memberData.upcomingEvent && memberData.upcomingEvent.location !== '') {
       eventText += memberData.upcomingEvent.location
-      eventLocationText += memberData.upcomingEvent.location
     }
   }
+
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||
@@ -99,6 +108,7 @@ export function CardView(data: any) {
               <TouchableOpacity
                 className="ml-[5px] flex-row self-center"
                 onPress={() => {
+                  router.dismiss(1)
                   router.push(
                     formatUrl('/circles/circleDetails', {
                       fullName,
@@ -116,52 +126,63 @@ export function CardView(data: any) {
               <View className="my-[2px]">
                 {memberData.upcomingAppointment ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
-                      {appointmentText}
+                    <Typography className={textStyle2}>
+                      {'Appointment'}
                     </Typography>
-                    <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
-                        {dateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
-                        {locationText}
-                      </Typography>
-                    </View>
+                    <Typography className={textStyle1}>
+                      {dateText + appointmentText}
+                    </Typography>
                   </View>
                 ) : (
                   <View />
                 )}
                 {memberData.upcomingEvent ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
-                      {eventText}
+                    <Typography className={textStyle2}>{'Event'}</Typography>
+                    <Typography className={textStyle1}>
+                      {eventText + eventDateText}
                     </Typography>
-                    <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
-                        {eventDateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
-                        {eventLocationText}
-                      </Typography>
-                    </View>
                   </View>
                 ) : (
                   <View />
                 )}
                 {memberData.recentIncident ? (
                   <View className="my-[5px]">
-                    <Typography className={`${textStyle1}`}>
-                      {incidentText}
+                    <Typography className={textStyle2}>{'Incident'}</Typography>
+                    <Typography className={textStyle1}>
+                      {incidentDateText + incidentText}
                     </Typography>
-                    <View className="flex-row">
-                      <Typography className={`${textStyle2}`}>
-                        {incidentDateText}
-                      </Typography>
-                      <Typography className={`${textStyle3}`}>
-                        {incidentLocationText}
-                      </Typography>
-                    </View>
                   </View>
+                ) : (
+                  <View />
+                )}
+
+                {totalTransportationCount > 0 ? (
+                  <TouchableOpacity onPress={() => {}} className="my-[5px]">
+                    <Typography className={textStyle2}>
+                      {'Transportation'}
+                    </Typography>
+
+                    <View className="flex-row">
+                      {appointmentTransportationCount > 0 ? (
+                        <Typography className={textStyle1}>
+                          {'Appointment - ' +
+                            appointmentTransportationCount +
+                            ' '}
+                        </Typography>
+                      ) : (
+                        <View />
+                      )}
+
+                      {eventTransporationCount > 0 ? (
+                        <Typography className={textStyle1}>
+                          {'Event - ' + eventTransporationCount}
+                        </Typography>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
+                  </TouchableOpacity>
                 ) : (
                   <View />
                 )}
@@ -172,6 +193,7 @@ export function CardView(data: any) {
       ) : (
         <View />
       )}
+
     </View>
   )
 }

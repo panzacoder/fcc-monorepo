@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -16,9 +17,9 @@ import {
   GET_APPOINTMENTS,
   GET_DOCTOR_FACILITIES
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
@@ -26,7 +27,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
-import { AddEditAppointment } from 'app/ui/addEditAppointment'
 let appointmentPrivileges = {}
 let selectedMonth = 'All'
 let selectedYear = 'All'
@@ -53,7 +53,6 @@ export function AppointmentsListScreen() {
   const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [isAddAppointment, setIsAddAppointment] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [appointmentsList, setAppointmentsList] = useState([]) as any
@@ -63,7 +62,7 @@ export function AppointmentsListScreen() {
   ) as any
   const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const staticData: any = store.getState().staticDataState.staticData
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -90,7 +89,7 @@ export function AppointmentsListScreen() {
       title: name
     })
   })
-  const getDoctorFacilities = useCallback(async () => {
+  const getDoctorFacilities = useCallback(async (isFirstLoad: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_DOCTOR_FACILITIES}`
     let dataObject = {
@@ -105,6 +104,10 @@ export function AppointmentsListScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          if (!isFirstLoad) {
+            setLoading(false)
+          }
+
           const list: Array<{ id: number; title: string }> = [
             { title: 'All', id: 1 }
           ]
@@ -164,10 +167,34 @@ export function AppointmentsListScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    let fullName = ''
+    if (memberData.firstname) {
+      fullName += memberData.firstname.trim() + ' '
+    }
+    if (memberData.lastname) {
+      fullName += memberData.lastname.trim()
+    }
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/circleDetails', {
+        fullName,
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
 
   useEffect(() => {
-    getDoctorFacilities()
+    getDoctorFacilities(true)
     getAppointmentDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
 
   async function getFilteredList(list: any, filter: any) {
@@ -280,7 +307,7 @@ export function AppointmentsListScreen() {
       } else {
         selectedType = 'Facility Appointment'
       }
-      getDoctorFacilities()
+      getDoctorFacilities(false)
     } else {
       selectedType = 'All'
       reset({
@@ -288,22 +315,17 @@ export function AppointmentsListScreen() {
       })
     }
   }
-  async function cancelClicked() {
-    setIsAddAppointment(false)
-  }
-  async function createUpdateAppointment() {
-    console.log('in createUpdateAppointment')
-  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Appointments" memberData={memberData} />
       <View className="flex-row ">
         <TouchableOpacity
           onPress={() => {
             setIsFilter(false)
             setIsShowFilter(!isShowFilter)
           }}
-          className="w-[75%] flex-row"
+          className="w-[40%] flex-row"
         >
           <Typography className=" ml-10 mt-7 text-[14px] font-bold text-black">
             {currentFilter}
@@ -315,6 +337,7 @@ export function AppointmentsListScreen() {
             color={'black'}
           />
         </TouchableOpacity>
+        <View className="w-[35%]" />
         {getUserPermission(appointmentPrivileges).createPermission ? (
           <View className=" mt-[20] self-center">
             <TouchableOpacity
@@ -504,13 +527,13 @@ export function AppointmentsListScreen() {
       ) : (
         <View />
       )}
-      {appointmentsList.length > 0 ? (
+      {isDataReceived && appointmentsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
           {appointmentsList.map((data: any, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/appointmentDetails', {
                       appointmentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
@@ -639,16 +662,6 @@ export function AppointmentsListScreen() {
       {isDataReceived && appointmentsList.length === 0 ? (
         <View className="flex-1 items-center justify-center self-center">
           <Typography className="font-bold">{`No ${currentFilter !== 'All' ? currentFilter : ''} appointments`}</Typography>
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddAppointment ? (
-        <View className="mt-2 h-full w-full items-center self-center">
-          <AddEditAppointment
-            createUpdateAppointment={createUpdateAppointment}
-            cancelClicked={cancelClicked}
-          />
         </View>
       ) : (
         <View />

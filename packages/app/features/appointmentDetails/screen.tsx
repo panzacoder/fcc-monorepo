@@ -1,9 +1,16 @@
 'use client'
 import _ from 'lodash'
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, Linking } from 'react-native'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  Linking,
+  BackHandler
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
@@ -27,10 +34,10 @@ import {
   CANCEL_TRANSPORTATION_REQUEST,
   SEND_CALENDAR_INVITE
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -46,7 +53,7 @@ let notePrivileges = {}
 let transportationPrivileges = {}
 export function AppointmentDetailsScreen() {
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
@@ -92,45 +99,49 @@ export function AppointmentDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.APPOINTMENTNOTE
                 ? data.data.domainObjectPrivileges.APPOINTMENTNOTE
-                : {}
+                : data.data.domainObjectPrivileges.AppointmentNote
+                  ? data.data.domainObjectPrivileges.AppointmentNote
+                  : {}
               transportationPrivileges = data.data.domainObjectPrivileges
                 .APPOINTMENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                : {}
+                : data.data.domainObjectPrivileges.AppointmentTransportation
+                  ? data.data.domainObjectPrivileges.AppointmentTransportation
+                  : {}
             }
             if (
               data.data.appointmentWithPreviousAppointment &&
               data.data.appointmentWithPreviousAppointment.appointment
             ) {
-              setAppointmentDetails(
+              let details =
                 data.data.appointmentWithPreviousAppointment.appointment
-              )
+              setAppointmentDetails(details)
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .noteList
               ) {
-                setNotesList(
+                let notesList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .noteList
-                )
+                setNotesList(notesList)
               }
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .reminderList
               ) {
-                setRemindersList(
+                let reminderList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .reminderList
-                )
+                setRemindersList(reminderList)
               }
               if (
                 data.data.appointmentWithPreviousAppointment.appointment
                   .transportationList
               ) {
-                setTransportationList(
+                let transportationList =
                   data.data.appointmentWithPreviousAppointment.appointment
                     .transportationList
-                )
+                setTransportationList(transportationList)
               }
             }
             if (isFromCreateThread) {
@@ -155,9 +166,25 @@ export function AppointmentDetailsScreen() {
     },
     []
   )
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/appointmentsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getAppointmentDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let doctorFacilityName = '',
@@ -195,6 +222,10 @@ export function AppointmentDetailsScreen() {
       appointmentDetails.doctorLocation &&
       appointmentDetails.doctorLocation.doctor
     ) {
+      if (appointmentDetails.doctorLocation.doctor.salutation) {
+        doctorFacilityName +=
+          appointmentDetails.doctorLocation.doctor.salutation + '. '
+      }
       if (appointmentDetails.doctorLocation.doctor.firstName) {
         doctorFacilityName += appointmentDetails.doctorLocation.doctor.firstName
       }
@@ -376,6 +407,7 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/appointmentsList', {
               memberData: JSON.stringify(memberData)
@@ -459,6 +491,7 @@ export function AppointmentDetailsScreen() {
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
     setLoading(true)
+    setIsShowTransportation(false)
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -671,11 +704,11 @@ export function AppointmentDetailsScreen() {
         {isIcon ? (
           <Feather
             onPress={() => {
-              if (title === 'Phone:' && value !== '') {
+              if (title === 'Phone' && value !== '') {
                 Linking.openURL(`tel:${value}`)
-              } else if (title === 'Email:' && value !== '') {
+              } else if (title === 'Email' && value !== '') {
                 Linking.openURL(`mailto:${value}`)
-              } else if (title === 'Website:' && value !== '') {
+              } else if (title === 'Website' && value !== '') {
                 Linking.openURL(`http://${getWebsite(value)}`)
               }
             }}
@@ -690,16 +723,15 @@ export function AppointmentDetailsScreen() {
       </View>
     )
   }
-  async function refreshPage() {
-    console.log('in refreshPage')
-  }
+
   return (
     <View className="flex-1 ">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
-        <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+        <View className=" h-full w-full flex-1 py-2">
           <ScrollView persistentScrollbar={true} className="flex-1">
-            <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+            <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View style={{ justifyContent: 'flex-end' }} className="flex-row">
                 {getUserPermission(appointmentPrivileges).createPermission ? (
                   <Button
@@ -707,7 +739,7 @@ export function AppointmentDetailsScreen() {
                     title="Create Similar"
                     variant="border"
                     onPress={() => {
-                      router.replace(
+                      router.push(
                         formatUrl('/circles/addEditAppointment', {
                           memberData: JSON.stringify(memberData),
                           appointmentDetails:
@@ -747,33 +779,33 @@ export function AppointmentDetailsScreen() {
               </View>
               <View className=" w-full flex-row items-center">
                 <View className="mt-2 w-full flex-row">
-                  <Typography className="font-400 max-w-[65%] text-[15px] text-[#86939e]">
+                  <Typography className="font-400 max-w-[50%] text-[15px] text-black">
                     {doctorFacilityName}
                   </Typography>
                   <View className="ml-2 h-[25] w-[2px] bg-[#86939e] " />
-                  <Typography className="font-400 text-primary ml-2 max-w-[30%] text-[15px] ">
+                  <Typography className="font-400 text-primary ml-2 text-[15px] ">
                     {specialist}
                   </Typography>
                 </View>
               </View>
               {phone !== '' ? (
-                getDetailsView('Phone:', phone, true, 'phone')
+                getDetailsView('Phone', phone, true, 'phone')
               ) : (
                 <View />
               )}
 
               {email !== '' ? (
-                getDetailsView('Email:', email, true, 'mail')
+                getDetailsView('Email', email, true, 'mail')
               ) : (
                 <View />
               )}
               {website !== '' ? (
-                getDetailsView('Website:', website, true, 'globe')
+                getDetailsView('Website', website, true, 'globe')
               ) : (
                 <View />
               )}
               {websiteUser !== '' ? (
-                getDetailsView('Username:', websiteUser, false, 'copy')
+                getDetailsView('Username', websiteUser, false, 'copy')
               ) : (
                 <View />
               )}
@@ -785,10 +817,10 @@ export function AppointmentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getDetailsView('Date:', apptDate, false, '')}
-              {getDetailsView('Purpose:', purpose, false, '')}
-              {getDetailsView('Status:', status, false, '')}
-              {getDetailsView('Description:', description, false, '')}
+              {getDetailsView('Date', apptDate, false, '')}
+              {getDetailsView('Purpose', purpose, false, '')}
+              {getDetailsView('Status', status, false, '')}
+              {getDetailsView('Description', description, false, '')}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(appointmentPrivileges).createPermission ||
                 getUserPermission(appointmentPrivileges).updatePermission ||
@@ -1077,7 +1109,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="mt-[20] h-full w-full">
           <AddEditNote
             component={'Appointment'}
             noteData={noteData}
@@ -1089,7 +1121,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="mt-[20] h-full w-full">
           <AddEditReminder
             component={'Appointment'}
             reminderData={reminderData}
@@ -1101,10 +1133,13 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isAddTransportation ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-[95%] w-full">
           <AddEditTransport
             component={'Appointment'}
             transportData={transportationData}
+            date={
+              appointmentDetails.date ? appointmentDetails.date : new Date()
+            }
             appointmentId={appointmentDetails.id}
             cancelClicked={cancelClicked}
             createUpdateTransportation={createUpdateTransportation}
@@ -1114,7 +1149,7 @@ export function AppointmentDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

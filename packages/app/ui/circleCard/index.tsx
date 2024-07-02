@@ -4,7 +4,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { googleMapOpenUrl } from 'app/ui/utils'
 
@@ -37,6 +37,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
       <TouchableOpacity
         className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
+          router.dismiss(1)
           router.push(
             formatUrl('/circles/circleDetails', {
               fullName,
@@ -123,15 +124,17 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
               <View />
             )}
           </View>
-          <View className={iconStyle}>
+          <TouchableOpacity
+            onPress={() => {
+              googleMapOpenUrl(memberData.address)
+            }}
+            className={iconStyle}
+          >
             {memberData.address ? (
               <View className="flex-row">
                 <Feather
-                  onPress={() => {
-                    googleMapOpenUrl(memberData.address)
-                  }}
                   className="mt-1"
-                  name={'map-pin'}
+                  name={'navigation'}
                   size={25}
                   color={'black'}
                 />
@@ -139,7 +142,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             ) : (
               <View />
             )}
-          </View>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     </View>

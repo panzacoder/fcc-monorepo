@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
@@ -28,7 +29,7 @@ import {
   DELETE_EVENT,
   UPDATE_EVENT_STATUS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -38,7 +39,7 @@ import { AddEditReminder } from 'app/ui/addEditReminder'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { AddEditTransport } from 'app/ui/addEditTransport'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -66,7 +67,7 @@ export function EventDetailsScreen() {
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -92,20 +93,24 @@ export function EventDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            // console.log('data', JSON.stringify(data.data))
+            console.log('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
               eventPrivileges = data.data.domainObjectPrivileges.Event
                 ? data.data.domainObjectPrivileges.Event
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.EVENTNOTE
                 ? data.data.domainObjectPrivileges.EVENTNOTE
-                : {}
+                : data.data.domainObjectPrivileges.EventNote
+                  ? data.data.domainObjectPrivileges.EventNote
+                  : {}
               transportationPrivileges = data.data.domainObjectPrivileges
                 .EVENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
-                : {}
+                : data.data.domainObjectPrivileges.EventTransportation
+                  ? data.data.domainObjectPrivileges.EventTransportation
+                  : {}
             }
-
+            console.log('data.data.event', JSON.stringify(data.data.event))
             setEventDetails(data.data.event ? data.data.event : {})
             if (data.data.event.status) {
               setEventStatus(data.data.event.status.status)
@@ -141,10 +146,25 @@ export function EventDetailsScreen() {
     },
     []
   )
-
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/eventsList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getEventDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let eventDate = '',
@@ -164,6 +184,9 @@ export function EventDetailsScreen() {
     }
     if (eventDetails.location) {
       eventAddress = eventDetails.location
+    }
+    if (eventDetails.description) {
+      description = eventDetails.description
     }
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
@@ -466,6 +489,7 @@ export function EventDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/eventsList', {
               memberData: JSON.stringify(memberData)
@@ -563,9 +587,11 @@ export function EventDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
+      <PtsBackHeader title="Event Details" memberData={memberData} />
+
+      <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+          <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
               {getUserPermission(eventPrivileges).createPermission ? (
                 <Button
@@ -605,13 +631,13 @@ export function EventDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[95%] text-[15px] text-black">
                   {event}
                 </Typography>
               </View>
-              {getDetailsView('Date:', eventDate)}
-              {getDetailsView('Status:', status)}
-              {getDetailsView('Description:', description)}
+              {getDetailsView('Date', eventDate)}
+              {getDetailsView('Status', status)}
+              {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(eventPrivileges).createPermission ||
                 getUserPermission(eventPrivileges).updatePermission ||
@@ -881,7 +907,7 @@ export function EventDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Event'}
             noteData={noteData}
@@ -893,7 +919,7 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditReminder
             component={'Event'}
             reminderData={reminderData}
@@ -905,9 +931,10 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isAddTransportation ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditTransport
             component={'Event'}
+            date={eventDetails.date ? eventDetails.date : ''}
             transportData={transportationData}
             appointmentId={eventDetails.id}
             cancelClicked={cancelClicked}
@@ -918,7 +945,7 @@ export function EventDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}

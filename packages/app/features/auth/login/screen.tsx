@@ -5,6 +5,7 @@ import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
+// import AsyncStorage from '@react-native-async-storage/async-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
@@ -16,7 +17,7 @@ import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
 import store from 'app/redux/store'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
 
@@ -26,7 +27,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { formatUrl } from 'app/utils/format-url'
-
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
   password: z.string().min(1, { message: 'Password is required' })
@@ -40,8 +40,12 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: 'sachaudhari0704@gmail.com',
-      password: 'Shubh@m27'
+      // email: 'sachaudhari0704@gmail.com',
+      // password: 'Shubh@m27'
+      email: 'pritipatilfcc@gmail.com',
+      password: 'Priti@123'
+      // email: '',
+      // password: ''
     },
     resolver: zodResolver(schema)
   })
@@ -94,7 +98,17 @@ export function LoginScreen() {
               })
             )
           }
-          router.replace('/home')
+          // try {
+          //   let loginDetails = {
+          //     email: formData.email,
+          //     password: formData.password
+          //   }
+          //   const jsonValue = JSON.stringify(loginDetails)
+          //   await AsyncStorage.setItem('loginDetails', jsonValue)
+          // } catch (e) {
+          //   // saving error
+          // }
+          router.push('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))
         } else {

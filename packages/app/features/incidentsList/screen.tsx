@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -11,9 +12,9 @@ import { Button } from 'app/ui/button'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_INCIDENTS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
@@ -38,7 +39,7 @@ export function IncidentsListScreen() {
   const [incidentsList, setIncidentsList] = useState([]) as any
   const header = store.getState().headerState.header
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const { control, handleSubmit, reset } = useForm({
@@ -96,8 +97,33 @@ export function IncidentsListScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    let fullName = ''
+    if (memberData.firstname) {
+      fullName += memberData.firstname.trim() + ' '
+    }
+    if (memberData.lastname) {
+      fullName += memberData.lastname.trim()
+    }
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/circleDetails', {
+        fullName,
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
+
   useEffect(() => {
     getIncidentDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
 
   function filterEvents(formData: Schema) {
@@ -135,11 +161,12 @@ export function IncidentsListScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Incidents" memberData={memberData} />
       <View className="flex-row">
         <View className="w-[75%]" />
 
         {getUserPermission(incidentsPrivileges).createPermission ? (
-          <View className="mt-5 self-center">
+          <View className="self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
@@ -156,7 +183,7 @@ export function IncidentsListScreen() {
         ) : (
           <View />
         )}
-        <View className="mt-5 self-center">
+        <View className="self-center">
           <TouchableOpacity
             onPress={() => {
               setIsFilter(!isFilter)
@@ -232,7 +259,7 @@ export function IncidentsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/incidentDetails', {
                       incidentDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)
@@ -244,15 +271,23 @@ export function IncidentsListScreen() {
               >
                 <View className="w-[90%] flex-row">
                   <View>
-                    <View className="my-2 flex-row">
-                      <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                    {/* <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%] text-[16px]">
                         {data.title ? data.title : ''}
                       </Typography>
                       <View className="">
-                        <Typography className="font-bold text-black">
+                        <Typography className="font-bold text-black w-[45%] max-w-[45%]">
                           {data.type ? data.type : ''}
                         </Typography>
                       </View>
+                    </View> */}
+                    <View className="w-full flex-row">
+                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%]">
+                        {data.title ? data.title : ''}
+                      </Typography>
+                      <Typography className="font-400 mr-5 w-[40%] max-w-[40%] text-right text-black">
+                        {data.type ? data.type : ''}
+                      </Typography>
                     </View>
                     <View className="flex-row">
                       <Typography className="font-400 ml-5 w-full text-black">

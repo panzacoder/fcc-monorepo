@@ -1,17 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import { Alert, View } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import _ from 'lodash'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { Stack } from 'expo-router'
 import {
   BASE_URL,
   CREATE_INCIDENT,
@@ -25,33 +26,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 let incidentType: any = ''
-let selectedDate: any = new Date()
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter incident title' })
@@ -61,23 +35,52 @@ export function AddEditIncidentScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const staticData: any = store.getState().staticDataState.staticData
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
   const [isLoading, setLoading] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
   let incidentDetails = item.incidentDetails
     ? JSON.parse(item.incidentDetails)
     : {}
+  const [selectedDate, setSelectedDate] = useState(
+    incidentDetails.date ? incidentDetails.date : new Date()
+  )
+  const [key, setKey] = useState(0)
   // console.log('incidentDetails', JSON.stringify(incidentDetails))
   const onSelection = (date: any) => {
-    selectedDate = date
-    console.log('selectedAddress', JSON.stringify(selectedAddress))
+    setSelectedDate(date)
+    setKey(Math.random())
   }
   if (!_.isEmpty(incidentDetails) && !isLoading) {
     incidentType = incidentDetails.type ? incidentDetails.type : ''
-    selectedDate = incidentDetails.date ? incidentDetails.date : new Date()
   }
   const incidentTypeList = staticData.incidentTypeList.map(
     (data: any, index: any) => {
@@ -100,11 +103,43 @@ export function AddEditIncidentScreen() {
     },
     resolver: zodResolver(schema)
   })
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    if (_.isEmpty(incidentDetails)) {
+      router.push(
+        formatUrl('/circles/incidentsList', {
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.replace(
+        formatUrl('/circles/incidentDetails', {
+          incidentDetails: JSON.stringify(incidentDetails),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    return true
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
+  }, [])
+
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -120,7 +155,6 @@ export function AddEditIncidentScreen() {
         selectedAddress.address.state.country.name = value.name
         selectedAddress.address.state.country.code = value.code
         selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
         selectedAddress.address.state.country.description = value.description
       }
       if (index === 5) {
@@ -132,10 +166,11 @@ export function AddEditIncidentScreen() {
         selectedAddress.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        // selectedAddress = value
+        setSelectedAddress(value)
       }
-      console.log('value', JSON.stringify(value))
-      console.log('index', JSON.stringify(index))
+      // console.log('value', JSON.stringify(value))
+      // console.log('index', JSON.stringify(index))
       console.log('selectedAddress1', JSON.stringify(selectedAddress))
     }
   }
@@ -169,10 +204,16 @@ export function AddEditIncidentScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           //   console.log('addEditIncident', JSON.stringify(data.data))
-          let details = _.isEmpty(incidentDetails)
-            ? data.data.incident
-            : data.data
-          router.replace(
+          let details =
+            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+              ? data.data.incident
+              : data.data
+          if (_.isEmpty(incidentDetails)) {
+            router.dismiss(1)
+          } else {
+            router.dismiss(2)
+          }
+          router.push(
             formatUrl('/circles/incidentDetails', {
               incidentDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
@@ -194,76 +235,78 @@ export function AddEditIncidentScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title:
-            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
-              ? 'Add Incident'
-              : 'Edit Incident Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-      <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
-        <View className="w-full">
-          <PtsDateTimePicker
-            currentData={selectedDate}
-            onSelection={onSelection}
+      <PtsBackHeader
+        title={
+          _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+            ? 'Add Incident'
+            : 'Edit Incident Details'
+        }
+        memberData={{}}
+      />
+      <SafeAreaView>
+        <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
+          <View key={key} className="w-full self-center">
+            <PtsDateTimePicker
+              currentData={selectedDate}
+              onSelection={onSelection}
+            />
+          </View>
+          <View className="mt-2 w-full self-center">
+            <PtsComboBox
+              currentData={incidentType}
+              listData={incidentTypeList}
+              onSelection={onSelectionIncidentType}
+              placeholderValue={'Incident Type'}
+            />
+          </View>
+          <View className="my-2 w-full flex-row self-center">
+            <ControlledTextField
+              control={control}
+              name="title"
+              placeholder={'Title*'}
+              className="w-full bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <View className="w-full flex-row self-center">
+            <ControlledTextField
+              control={control}
+              name="description"
+              placeholder={'Description'}
+              className="w-full bg-white"
+              autoCapitalize="none"
+            />
+          </View>
+          <LocationDetails
+            component={'AddEditIncident'}
+            data={
+              !_.isEmpty(incidentDetails) && incidentDetails.location
+                ? incidentDetails.location
+                : {}
+            }
+            setAddressObject={setAddressObject}
           />
-        </View>
-        <View className="mt-2 w-[95%] self-center">
-          <PtsComboBox
-            currentData={incidentType}
-            listData={incidentTypeList}
-            onSelection={onSelectionIncidentType}
-            placeholderValue={'Incident Type'}
-          />
-        </View>
-        <View className="my-2 w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="title"
-            placeholder={'Title*'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <View className="w-full flex-row justify-center">
-          <ControlledTextField
-            control={control}
-            name="description"
-            placeholder={'Description'}
-            className="w-[95%] bg-white"
-            autoCapitalize="none"
-          />
-        </View>
-        <LocationDetails
-          component={'AddEditIncident'}
-          data={
-            !_.isEmpty(incidentDetails) && incidentDetails.location
-              ? incidentDetails.location
-              : {}
-          }
-          setAddressObject={setAddressObject}
-        />
-        <View className="my-2 mb-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            leadingIcon="x"
-            variant="default"
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Button
-            className="ml-5 bg-[#287CFA]"
-            title={'Save'}
-            leadingIcon="save"
-            variant="default"
-            onPress={handleSubmit(addEditIncident)}
-          />
-        </View>
-      </ScrollView>
+          <View className="my-2 mb-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title={'Cancel'}
+              leadingIcon="x"
+              variant="default"
+              onPress={() => {
+                router.back()
+              }}
+            />
+            <Button
+              className="ml-5 bg-[#287CFA]"
+              title={'Save'}
+              leadingIcon="save"
+              variant="default"
+              onPress={handleSubmit(addEditIncident)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

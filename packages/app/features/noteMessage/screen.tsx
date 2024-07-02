@@ -1,23 +1,18 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  Alert,
-  TouchableOpacity,
-  SafeAreaView,
-  TextInput,
-  ScrollView
-} from 'react-native'
-// import { ScrollView } from 'app/ui/scroll-view'
+import { View, Alert, TouchableOpacity, TextInput } from 'react-native'
+import { ScrollView } from 'app/ui/scroll-view'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import store from 'app/redux/store'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {
   BASE_URL,
@@ -44,11 +39,11 @@ export function NoteMessageScreen() {
   const [threadDetails, setThreadDetails] = useState({}) as any
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let noteData = item.noteData !== undefined ? JSON.parse(item.noteData) : {}
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  console.log('noteData', JSON.stringify(noteData))
+  // console.log('noteData', JSON.stringify(noteData))
 
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
@@ -273,134 +268,134 @@ export function NoteMessageScreen() {
   }
   //unable to set some styling with nativewind, so used 'style' props instead.
   return (
-    <SafeAreaView className="h-full flex-1">
+    <View className=" flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Note Message" memberData={memberData} />
       <Typography className="mt-5 text-left text-[16px] font-bold">
         {threadDetails.subject ? threadDetails.subject : ''}
       </Typography>
-      <View
-        style={{
-          backgroundColor: '#005476',
-          borderTopLeftRadius: 5,
-          borderTopRightRadius: 5
-        }}
-        className="w-full flex-row items-center py-2"
-      >
-        <ScrollView horizontal={true} className="w-[85%] max-w-[85%] flex-row">
-          {participantsList.map((data: any, index: number) => {
-            return (
-              <View key={index} className="ml-2">
-                <TouchableOpacity
-                  onPress={() => {
-                    // console.log('fullName', data.participantName)
-                    if (data.participantName) {
-                      Alert.alert('', data.participantName)
-                    }
-                  }}
-                >
-                  <PtsNameInitials
-                    fullName={data.participantName ? data.participantName : ''}
-                  />
-                </TouchableOpacity>
-              </View>
-            )
-          })}
-        </ScrollView>
-        {threadDetails.isCreatedByUser ? (
-          <View>
-            <Feather
-              className="mr-2"
-              name={'user-plus'}
-              size={20}
-              color={'white'}
-              onPress={() => {
-                getThreadParticipants()
-                setIsMessageThread(true)
-              }}
-            />
-          </View>
-        ) : (
-          <View />
-        )}
-      </View>
-      {/* <Image
-        src={require('app/assets/window.png')}
-        className="mt-[5px] h-[70%] w-full self-center"
-        resizeMode={'cover'}
-        alt="logo"
-      /> */}
-      <ScrollView
-        automaticallyAdjustKeyboardInsets={true}
-        className="h-[70%] max-h-[70%] w-full bg-[#e0d8d0]"
-      >
-        {messageList.map((data: any, index: number) => {
-          if (data.sender !== userDetails.id) {
-            return (
-              <View
-                className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
-                key={index}
-              >
-                <Typography style={{ color: '#30649c' }} className="">
-                  {data.senderName ? data.senderName : ''}
-                </Typography>
-                <Typography className="">
-                  {data.body ? data.body.trim() : ''}
-                </Typography>
-                <Typography style={{ fontSize: 8 }} className="text-right">
-                  {data.createdOn
-                    ? formatTimeToUserLocalTime(data.createdOn)
-                    : ''}
-                </Typography>
-              </View>
-            )
-          } else {
-            return (
-              <View
-                className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
-                key={index}
-              >
-                <Typography className="">
-                  {data.body ? data.body : ''}
-                </Typography>
-                <Typography style={{ fontSize: 8 }} className="text-right">
-                  {data.createdOn
-                    ? formatTimeToUserLocalTime(data.createdOn)
-                    : ''}
-                </Typography>
-              </View>
-            )
-          }
-        })}
-      </ScrollView>
-      <View className="absolute bottom-0 my-1 flex-row items-center">
-        <View className="w-[85%] self-center">
-          <TextInput
-            defaultValue={message}
-            placeholder={'Type a message'}
-            className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
-            onChangeText={(value) => {
-              setMessage(value)
-            }}
-          />
-        </View>
-        <View className="ml-2 self-center">
-          <TouchableOpacity
-            className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
-            onPress={() => {}}
+      <SafeAreaView className="flex-1">
+        <View
+          style={{
+            backgroundColor: '#005476',
+            borderTopLeftRadius: 5,
+            borderTopRightRadius: 5
+          }}
+          className="w-full flex-row items-center py-2"
+        >
+          <ScrollView
+            horizontal={true}
+            className="w-[85%] max-w-[85%] flex-row"
           >
-            <Feather
-              className=""
-              name={'send'}
-              size={20}
-              color={'white'}
-              onPress={() => {
-                updateMessageThread()
-              }}
-            />
-          </TouchableOpacity>
+            {participantsList.map((data: any, index: number) => {
+              return (
+                <View key={index} className="ml-2">
+                  <TouchableOpacity
+                    onPress={() => {
+                      // console.log('fullName', data.participantName)
+                      if (data.participantName) {
+                        Alert.alert('', data.participantName)
+                      }
+                    }}
+                  >
+                    <PtsNameInitials
+                      fullName={
+                        data.participantName ? data.participantName : ''
+                      }
+                    />
+                  </TouchableOpacity>
+                </View>
+              )
+            })}
+          </ScrollView>
+          {threadDetails.isCreatedByUser ? (
+            <View>
+              <Feather
+                className="mr-2"
+                name={'user-plus'}
+                size={20}
+                color={'white'}
+                onPress={() => {
+                  getThreadParticipants()
+                  setIsMessageThread(true)
+                }}
+              />
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
-      </View>
-      {/* </View> */}
+        <View className="h-[90%] w-full bg-[#e0d8d0]">
+          <ScrollView className="max-h-[90%]">
+            {messageList.map((data: any, index: number) => {
+              if (data.sender !== userDetails.id) {
+                return (
+                  <View
+                    className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
+                    key={index}
+                  >
+                    <Typography style={{ color: '#30649c' }} className="">
+                      {data.senderName ? data.senderName : ''}
+                    </Typography>
+                    <Typography className="">
+                      {data.body ? data.body.trim() : ''}
+                    </Typography>
+                    <Typography style={{ fontSize: 8 }} className="text-right">
+                      {data.createdOn
+                        ? formatTimeToUserLocalTime(data.createdOn)
+                        : ''}
+                    </Typography>
+                  </View>
+                )
+              } else {
+                return (
+                  <View
+                    className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
+                    key={index}
+                  >
+                    <Typography className="">
+                      {data.body ? data.body : ''}
+                    </Typography>
+                    <Typography style={{ fontSize: 8 }} className="text-right">
+                      {data.createdOn
+                        ? formatTimeToUserLocalTime(data.createdOn)
+                        : ''}
+                    </Typography>
+                  </View>
+                )
+              }
+            })}
+          </ScrollView>
+          <View className=" my-1 flex-row items-center">
+            <View className="w-[85%] self-center">
+              <TextInput
+                defaultValue={message}
+                placeholder={'Type a message'}
+                className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
+                onChangeText={(value) => {
+                  setMessage(value)
+                }}
+              />
+            </View>
+            <View className="ml-2 self-center">
+              <TouchableOpacity
+                className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
+                onPress={() => {}}
+              >
+                <Feather
+                  className=""
+                  name={'send'}
+                  size={20}
+                  color={'white'}
+                  onPress={() => {
+                    updateMessageThread()
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </SafeAreaView>
       {isMessageThread ? (
         <View className="mt-2 h-[90%] w-full">
           <AddMessageThread
@@ -415,6 +410,6 @@ export function NoteMessageScreen() {
       ) : (
         <View />
       )}
-    </SafeAreaView>
+    </View>
   )
 }

@@ -4,6 +4,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getAddressFromObject } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import {
   BASE_URL,
   GET_TRANSPORTATION_MEMBER_LIST,
@@ -34,27 +35,28 @@ const schema = z.object({
   postalCode: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let selectedDate: any = new Date()
+let countryIndex = 97
+let stateIndex = -1
 export const AddEditTransport = ({
   component,
   transportData,
+  date,
   appointmentId,
   cancelClicked,
   createUpdateTransportation
 }) => {
-  let countryIndex = 97
-  let stateIndex = -1
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const staticData: any = store.getState().staticDataState.staticData
   const [isLoading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(
+    !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
+  )
+  const [key, setKey] = useState(0)
   const [memberList, setMemberList] = useState([]) as any
   const [memberListFull, setMemberListFull] = useState([]) as any
-  if (!_.isEmpty(transportData)) {
-    selectedDate = new Date(transportData.date)
-  }
-  // console.log('transportData', JSON.stringify(transportData))
-
+  const memberAddress: any =
+    store.getState().currentMemberAddress.currentMemberAddress
   useEffect(() => {
     async function getMemberList() {
       setLoading(true)
@@ -102,8 +104,8 @@ export const AddEditTransport = ({
       description: '',
       member: _.isEmpty(transportData) ? -1 : 1,
       addressLine: '',
-      state: _.isEmpty(transportData) ? stateIndex : 0,
-      country: _.isEmpty(transportData) ? countryIndex : 0,
+      state: _.isEmpty(transportData) ? stateIndex : 1,
+      country: _.isEmpty(transportData) ? countryIndex : 1,
       city: '',
       postalCode: ''
     },
@@ -134,13 +136,25 @@ export const AddEditTransport = ({
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          let statesList: Array<{ id: number; title: string }> =
-            data.data.stateList.map(({ name, id }: Response, index: any) => {
-              return {
-                title: name,
-                id: index + 1
-              }
-            })
+          let stateName = ''
+          if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+            stateName = memberAddress.state.name ? memberAddress.state.name : ''
+          }
+          let statesList: Array<{ id: number; title: string }> = []
+          data.data.stateList.map(({ name, id }: Response, index: any) => {
+            if (name === stateName) {
+              stateIndex = index + 1
+              reset({
+                state: stateIndex
+              })
+            }
+            let object = {
+              title: name,
+              id: index + 1
+            }
+            statesList.push(object)
+          })
+
           setStatesList(statesList)
           setStatesListFull(data.data.stateList || [])
         } else {
@@ -158,8 +172,8 @@ export const AddEditTransport = ({
     let dataObject = {} as any
     let url = ''
     if (_.isEmpty(transportData)) {
-      let stateObject = statesListFull[formData.state]
-      let countryObject: object = staticData.countryList[formData.country]
+      let stateObject = statesListFull[formData.state - 1]
+      let countryObject: object = staticData.countryList[formData.country - 1]
 
       let address = {
         line: formData.addressLine,
@@ -172,8 +186,8 @@ export const AddEditTransport = ({
         transportation: {
           date: selectedDate,
           description: formData.description,
-          accompany: memberListFull[formData.member].memberId
-            ? memberListFull[formData.member].memberId
+          accompany: memberListFull[formData.member - 1].memberId
+            ? memberListFull[formData.member - 1].memberId
             : '',
           accompanyType: {
             type: 'Family Member'
@@ -225,8 +239,9 @@ export const AddEditTransport = ({
     createUpdateTransportation(url, dataObject)
   }
   const onSelection = (date: any) => {
-    selectedDate = date
-    console.log('selectedDate', selectedDate)
+    setSelectedDate(date)
+    setKey(Math.random())
+    // console.log('selectedDate', '' + selectedDate)
   }
 
   async function setSelectedStateChange(value: any) {
@@ -285,143 +300,141 @@ export const AddEditTransport = ({
     }
   }
   return (
-    <View className="my-5 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5">
+    <View
+      key={key}
+      className="my-5 mt-0 h-[90%] w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5"
+    >
       <PtsLoader loading={isLoading} />
       <Typography className="self-center font-bold">{`${_.isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
-      <ScrollView className="my-2 w-full">
-        {_.isEmpty(transportData) ? (
-          <View>
-            <View className="w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="member"
-                label="Acompany by*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={memberList}
-                onChangeValue={setAcompanyChange}
-              />
-            </View>
-            <View className="my-2">
-              <PtsDateTimePicker
-                currentData={
-                  transportData.date ? transportData.date : new Date()
-                }
-                onSelection={onSelection}
-              />
-            </View>
+      <SafeAreaView>
+        <ScrollView className="my-2 w-full">
+          {_.isEmpty(transportData) ? (
+            <View>
+              <View className="w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="member"
+                  label="Acompany by*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={memberList}
+                  onChangeValue={setAcompanyChange}
+                />
+              </View>
+              <View className="my-2 w-[95%] self-center">
+                <PtsDateTimePicker
+                  currentData={selectedDate}
+                  onSelection={onSelection}
+                />
+              </View>
 
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="description"
-                placeholder={'Description'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="description"
+                  placeholder={'Description'}
+                  className="w-[95%] bg-white"
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="addressLine"
+                  placeholder={'Address Line'}
+                  className="w-[95%] bg-white"
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="country"
+                  label="Country*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={countryList}
+                  onChangeValue={setSelectedCountryChange}
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center">
+                <ControlledDropdown
+                  control={control}
+                  name="state"
+                  label="State*"
+                  className="w-[95%] bg-white"
+                  maxHeight={300}
+                  list={statesList}
+                  onChangeValue={setSelectedStateChange}
+                />
+              </View>
+              <View className="my-2 w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="city"
+                  placeholder={'City'}
+                  className="w-[95%] bg-white"
+                />
+              </View>
+              <View className=" w-full flex-row justify-center gap-2">
+                <ControlledTextField
+                  control={control}
+                  name="postalCode"
+                  placeholder={'Zip Code'}
+                  className="w-[95%] bg-white"
+                  keyboard={'number-pad'}
+                />
+              </View>
             </View>
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="addressLine"
-                placeholder={'Address Line'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
+          ) : (
+            <View>
+              {getDetailsView(
+                'Acompany',
+                transportData.accompanyName ? transportData.accompanyName : '',
+                false,
+                ''
+              )}
+              <View className="my-2 w-[95%] self-center">
+                <PtsDateTimePicker
+                  currentData={selectedDate}
+                  onSelection={onSelection}
+                />
+              </View>
+              {getDetailsView(
+                'Description',
+                transportData.description ? transportData.description : '',
+                false,
+                ''
+              )}
+              {getDetailsView(
+                'Address',
+                transportData.address
+                  ? getAddressFromObject(transportData.address)
+                  : '',
+                false,
+                ''
+              )}
             </View>
-            <View className="my-2 w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="country"
-                label="Country*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={countryList}
-                onChangeValue={setSelectedCountryChange}
-              />
-            </View>
-            <View className="my-2 w-full flex-row justify-center">
-              <ControlledDropdown
-                control={control}
-                name="state"
-                label="State*"
-                className="w-[95%] bg-white"
-                maxHeight={300}
-                list={statesList}
-                onChangeValue={setSelectedStateChange}
-              />
-            </View>
-            <View className="my-2 w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="city"
-                placeholder={'City'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
-            </View>
-            <View className=" w-full flex-row justify-center gap-2">
-              <ControlledTextField
-                control={control}
-                name="postalCode"
-                placeholder={'Zip Code'}
-                className="w-[95%] bg-white"
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-        ) : (
-          <View>
-            {getDetailsView(
-              'Acompany',
-              transportData.accompanyName ? transportData.accompanyName : '',
-              false,
-              ''
-            )}
-            <View className="my-2">
-              <PtsDateTimePicker
-                currentData={
-                  transportData.date ? transportData.date : new Date()
-                }
-                onSelection={onSelection}
-              />
-            </View>
-            {getDetailsView(
-              'Description',
-              transportData.description ? transportData.description : '',
-              false,
-              ''
-            )}
-            {getDetailsView(
-              'Address',
-              transportData.address
-                ? getAddressFromObject(transportData.address)
-                : '',
-              false,
-              ''
-            )}
-          </View>
-        )}
+          )}
 
-        <View className="mt-5 flex-row justify-center">
-          <Button
-            className="bg-[#86939e]"
-            title="Cancel"
-            variant="default"
-            leadingIcon="x"
-            onPress={() => {
-              cancelClicked()
-            }}
-          />
-          <Button
-            className="ml-5"
-            title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
-            variant="default"
-            leadingIcon="save"
-            onPress={handleSubmit(createUpdateTransport)}
-          />
-        </View>
-      </ScrollView>
+          <View className="mt-5 flex-row justify-center">
+            <Button
+              className="bg-[#86939e]"
+              title="Cancel"
+              variant="default"
+              leadingIcon="x"
+              onPress={() => {
+                cancelClicked()
+              }}
+            />
+            <Button
+              className="ml-5"
+              title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
+              variant="default"
+              leadingIcon="save"
+              onPress={handleSubmit(createUpdateTransport)}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   )
 }

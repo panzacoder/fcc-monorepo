@@ -2,8 +2,8 @@
 
 import { View, ScrollView } from 'react-native'
 import { Typography } from 'app/ui/typography'
-import { Feather } from 'app/ui/icons'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function FaqScreen() {
   const router = useRouter()
   let titleStyle = 'font-400 w-[95%] text-[15px] text-[#1A1A1A] font-bold'
@@ -18,19 +18,8 @@ export function FaqScreen() {
   }
   return (
     <View className="flex-1">
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.replace('/home')
-          }}
-        />
-        <Typography className=" flex-1 text-center text-lg font-bold">
-          {'FAQ'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="FAQ" memberData={{}} />
       </View>
       <ScrollView className="mt-5 w-[95%] self-center rounded-[5px] border-[1px] border-gray-400">
         <Typography className="font-400 my-2 text-center">

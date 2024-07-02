@@ -18,17 +18,13 @@ import {
   GET_FILTER_CONSOLIDATED_DETAILS
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import {
-  getFullDateForCalendar,
-  formatTimeToUserLocalTime,
-  convertTimeToUserLocalTime
-} from 'app/ui/utils'
+import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
   CalendarView,
   CalendarViewInput
-} from '../../ui/addEditPrescription/calendar-view'
+} from '../../features/addEditPrescription/calendar-view'
 const schema = z.object({
   typeIndex: z.number()
 })
@@ -363,7 +359,7 @@ export function ConsolidatedViewScreen() {
             data.type === 'Doctor Appointment' ||
             data.type === 'Facility Appointment'
           ) {
-            router.replace(
+            router.push(
               formatUrl('/circles/appointmentDetails', {
                 appointmentDetails: JSON.stringify(data),
                 memberData: JSON.stringify(memberData)

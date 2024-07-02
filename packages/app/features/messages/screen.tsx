@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, Pressable } from 'react-native'
+import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
@@ -18,17 +19,16 @@ import {
   GET_THREAD_PARTICIPANTS,
   CREATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-let messagePrivileges = {}
-
 export function MessagesScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [messagePrivileges, setMessagePrivileges] = useState({})
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
@@ -36,7 +36,7 @@ export function MessagesScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [messagesList, setMessagesList] = useState([]) as any
   const [messagesListFull, setMessagesListFull] = useState([]) as any
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -56,9 +56,13 @@ export function MessagesScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('data', JSON.stringify(data.data.eventList))
             if (data.data.domainObjectPrivileges) {
-              messagePrivileges = data.data.domainObjectPrivileges.MESSAGETHREAD
-                ? data.data.domainObjectPrivileges.MESSAGETHREAD
-                : {}
+              setMessagePrivileges(
+                data.data.domainObjectPrivileges.MESSAGETHREAD
+                  ? data.data.domainObjectPrivileges.MESSAGETHREAD
+                  : data.data.domainObjectPrivileges.MessageThread
+                    ? data.data.domainObjectPrivileges.MessageThread
+                    : {}
+              )
             }
             setMessagesList(data.data.threadList ? data.data.threadList : [])
             setMessagesListFull(
@@ -200,8 +204,9 @@ export function MessagesScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
+      <PtsBackHeader title="Messages" memberData={memberData} />
       <View className="flex-row ">
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             setIsShowFilter(!isShowFilter)
           }}
@@ -216,17 +221,17 @@ export function MessagesScreen() {
             size={25}
             color={'black'}
           />
-        </Pressable>
+        </TouchableOpacity>
         {getUserPermission(messagePrivileges).createPermission ? (
           <View className="mt-[20] self-center">
-            <Pressable
+            <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
               onPress={() => {
                 getThreadParticipants()
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         ) : (
           <View />
@@ -235,7 +240,7 @@ export function MessagesScreen() {
 
       {isShowFilter ? (
         <View className="ml-5 w-[40%]">
-          <Pressable
+          <TouchableOpacity
             className={`${currentFilter === 'All' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('All')
@@ -244,8 +249,8 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-t-[1px] border-gray-400 p-1 text-center font-normal">
               {'All'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'General' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('General')
@@ -254,8 +259,8 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'General'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Appointment' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Appointment')
@@ -264,8 +269,8 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Appointment'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Incident' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Incident')
@@ -274,8 +279,8 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Incident'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Purchase' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Purchase')
@@ -284,8 +289,8 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Purchase'}
             </Typography>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             className={`${currentFilter === 'Event' ? 'bg-[#c9e6b1]' : 'bg-white'}`}
             onPress={() => {
               setFilteredList('Event')
@@ -294,7 +299,7 @@ export function MessagesScreen() {
             <Typography className="border-b-[1px] border-l-[1px] border-r-[1px] border-gray-400 p-1 text-center font-normal">
               {'Event'}
             </Typography>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ) : (
         <View />
@@ -303,7 +308,7 @@ export function MessagesScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {messagesList.map((data: any, index: number) => {
             return (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   router.push(
                     formatUrl('/circles/noteMessage', {
@@ -374,7 +379,7 @@ export function MessagesScreen() {
                     <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             )
           })}
         </ScrollView>

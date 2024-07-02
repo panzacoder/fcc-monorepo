@@ -1,19 +1,18 @@
 'use client'
 import _ from 'lodash'
 import { useState, useCallback, useEffect } from 'react'
-import { View, Alert } from 'react-native'
+import { View, Alert, BackHandler } from 'react-native'
+import { SafeAreaView } from 'app/ui/safe-area-view'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
-import { Stack } from 'expo-router'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
   GET_STATES_AND_TIMEZONES,
   CREATE_DOCTOR_LOCATION,
-  DELETE_DOCTOR_LOCATION,
   CREATE_FACILITY_LOCATION,
-  DELETE_FACILITY_LOCATION,
   UPDATE_FACILITY_LOCATION,
   UPDATE_DOCTOR_LOCATION
 } from 'app/utils/urlConstants'
@@ -21,43 +20,50 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
 import { consoleData } from 'app/ui/utils'
+import {
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  removeAllSpecialCharFromString
+} from 'app/ui/utils'
 const schema = z.object({
   locationName: z.string().min(1, { message: 'Location name is required' }),
   address: z.string(),
   city: z.string(),
   postalCode: z.string(),
-  phone: z.string(),
   fax: z.string(),
   website: z.string(),
   state: z.number().min(0, { message: 'State is required' }),
   country: z.number().min(0, { message: 'Country is required' })
+})
+const phoneSchema = z.object({
+  phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
 // let statesList = []
 let countryIndex = -1
 let stateIndex = -1
 export function AddEditLocationScreen() {
+  let locationPhone = ''
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('header', JSON.stringify(header))
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let locationDetails = item.locationDetails
     ? JSON.parse(item.locationDetails)
     : {}
 
-  // console.log('locationDetails', JSON.stringify(locationDetails))
+  console.log('locationDetails', JSON.stringify(locationDetails))
   let details = item.details ? JSON.parse(item.details) : {}
-  // console.log('details', JSON.stringify(details))
+  console.log('details', JSON.stringify(details))
   const [isLoading, setLoading] = useState(false)
   const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
@@ -118,7 +124,25 @@ export function AddEditLocationScreen() {
         console.log(error)
       })
   }, [])
-
+  function handleBackButtonClick() {
+    router.dismiss(1)
+    if (item.component === 'Doctor') {
+      router.push(
+        formatUrl('/circles/doctorDetails', {
+          doctorDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    } else {
+      router.push(
+        formatUrl('/circles/facilityDetails', {
+          facilityDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+    return true
+  }
   useEffect(() => {
     async function setCountryState() {
       let countryName = ''
@@ -147,6 +171,13 @@ export function AddEditLocationScreen() {
       await getStates(countryId)
     }
     setCountryState()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -156,10 +187,7 @@ export function AddEditLocationScreen() {
       postalCode: !_.isEmpty(locationDetails)
         ? locationDetails.address.zipCode
         : '',
-      phone:
-        !_.isEmpty(locationDetails) && locationDetails.phone
-          ? locationDetails.phone
-          : '',
+
       fax:
         !_.isEmpty(locationDetails) && locationDetails.fax
           ? locationDetails.fax
@@ -173,74 +201,30 @@ export function AddEditLocationScreen() {
     },
     resolver: zodResolver(schema)
   })
+  const { control: control1, reset: reset1 } = useForm({
+    defaultValues: {
+      phone:
+        !_.isEmpty(locationDetails) && locationDetails.phone
+          ? locationDetails.phone
+          : ''
+    },
+    resolver: zodResolver(phoneSchema)
+  })
   async function setSelectedCountryChange(value: any) {
     let countryId = ''
     if (value) {
-      countryId = staticData.countryList[value.id - 1].id
-        ? staticData.countryList[value.id - 1].id
-        : 101
-      await getStates(countryId)
+      if (!isLoading) {
+        countryId = staticData.countryList[value.id - 1].id
+          ? staticData.countryList[value.id - 1].id
+          : 101
+        await getStates(countryId)
+      }
     } else {
       setStatesList([])
       setStatesListFull([])
     }
   }
-  async function deleteLocation() {
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
-    if (item.component === 'Doctor') {
-      url = `${BASE_URL}${DELETE_DOCTOR_LOCATION}`
-      dataObject = {
-        header: header,
-        doctorLocation: {
-          id: locationDetails.id ? locationDetails.id : '',
-          doctor: {
-            id: locationDetails.doctorFacilityId
-              ? locationDetails.doctorFacilityId
-              : ''
-          }
-        }
-      }
-    } else {
-      url = `${BASE_URL}${DELETE_FACILITY_LOCATION}`
-      dataObject = {
-        header: header,
-        facilityLocation: {
-          id: locationDetails.id ? locationDetails.id : '',
-          facility: {
-            id: locationDetails.doctorFacilityId
-              ? locationDetails.doctorFacilityId
-              : ''
-          }
-        }
-      }
-    }
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details: any = data.data ? JSON.stringify(data.data) : {}
-          if (item.component === 'Doctor') {
-            router.replace(
-              formatUrl('/circles/doctorDetails', {
-                doctorDetails: details,
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          } else {
-            router.back()
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error)
-      })
-  }
   async function addUpdateLocation(formData: Schema) {
     setLoading(true)
     let stateObject = statesListFull[formData.state - 1]
@@ -252,7 +236,7 @@ export function AddEditLocationScreen() {
       nickName: formData.locationName,
       fax: formData.fax,
       website: formData.website,
-      phone: formData.phone,
+      phone: removeAllSpecialCharFromString(locationPhone),
       address: {
         id: '',
         line: formData.address,
@@ -328,10 +312,12 @@ export function AddEditLocationScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
+          router.dismiss(1)
           if (item.component === 'Doctor') {
             let details: any = data.data.doctor
               ? JSON.stringify(data.data.doctor)
               : {}
+
             router.replace(
               formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
@@ -339,7 +325,17 @@ export function AddEditLocationScreen() {
               })
             )
           } else {
-            router.back()
+            // router.back()
+            let details: any = data.data.facility
+              ? JSON.stringify(data.data.facility)
+              : {}
+
+            router.replace(
+              formatUrl('/circles/facilityDetails', {
+                facilityDetails: details,
+                memberData: JSON.stringify(memberData)
+              })
+            )
           }
         } else {
           Alert.alert('', data.message)
@@ -353,139 +349,123 @@ export function AddEditLocationScreen() {
   }
   return (
     <View className="flex-1">
-      <Stack.Screen
-        options={{
-          title: _.isEmpty(locationDetails)
-            ? 'Add Location'
-            : 'Edit Location Details'
-        }}
-      />
       <PtsLoader loading={isLoading} />
-
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
-        <ScrollView persistentScrollbar={true} className="flex-1">
-          <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-            <View className="my-2 w-full">
-              <View className="flex w-full gap-2">
-                <ControlledTextField
-                  control={control}
-                  name="locationName"
-                  placeholder="Location Name"
-                  className="w-full"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="address"
-                  placeholder="Address"
-                  className="w-full"
-                />
-                <ControlledDropdown
-                  control={control}
-                  name="country"
-                  label="Country"
-                  maxHeight={300}
-                  defaultValue={
-                    countryIndex !== -1 && countryList[countryIndex - 1]
-                      ? countryList[countryIndex - 1]?.title
-                      : ''
-                  }
-                  list={countryList}
-                  onChangeValue={setSelectedCountryChange}
-                />
-                <ControlledDropdown
-                  control={control}
-                  name="state"
-                  label="State*"
-                  defaultValue={
-                    stateIndex !== -1 && statesList[stateIndex - 1]
-                      ? statesList[stateIndex - 1].title
-                      : ''
-                  }
-                  maxHeight={300}
-                  list={statesList}
-                />
-                <View className="w-full flex-row gap-2">
+      <PtsBackHeader
+        title={
+          _.isEmpty(locationDetails) ? 'Add Location' : 'Edit Location Details'
+        }
+        memberData={memberData}
+      />
+      <View className="h-full w-full flex-1 py-2 ">
+        <SafeAreaView>
+          <ScrollView persistentScrollbar={true} className="flex-1">
+            <View className="border-primary w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
+              <View className="my-2 w-full">
+                <View className="flex w-full gap-2">
                   <ControlledTextField
                     control={control}
-                    name="city"
-                    placeholder={'City'}
-                    className="w-[50%]"
+                    name="locationName"
+                    placeholder="Location Name"
+                    className="w-full"
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="address"
+                    placeholder="Address"
+                    className="w-full"
+                  />
+                  <ControlledDropdown
+                    control={control}
+                    name="country"
+                    label="Country"
+                    maxHeight={300}
+                    defaultValue={
+                      countryIndex !== -1 && countryList[countryIndex - 1]
+                        ? countryList[countryIndex - 1]?.title
+                        : ''
+                    }
+                    list={countryList}
+                    onChangeValue={setSelectedCountryChange}
+                  />
+                  <ControlledDropdown
+                    control={control}
+                    name="state"
+                    label="State*"
+                    defaultValue={
+                      stateIndex !== -1 && statesList[stateIndex - 1]
+                        ? statesList[stateIndex - 1].title
+                        : ''
+                    }
+                    maxHeight={300}
+                    list={statesList}
+                  />
+                  <View className="w-full flex-row gap-2">
+                    <ControlledTextField
+                      control={control}
+                      name="city"
+                      placeholder={'City'}
+                      className="w-[50%]"
+                      autoCapitalize="none"
+                    />
+                    <ControlledTextField
+                      control={control}
+                      name="postalCode"
+                      placeholder="Postal Code"
+                      className="w-[48%]"
+                    />
+                  </View>
+                  <ControlledTextField
+                    control={control1}
+                    name="phone"
+                    placeholder={'Phone'}
+                    className="w-full"
+                    keyboard="number-pad"
+                    onChangeText={(value) => {
+                      locationPhone =
+                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+
+                      reset1({
+                        phone: locationPhone
+                      })
+                    }}
+                  />
+                  <ControlledTextField
+                    control={control}
+                    name="fax"
+                    placeholder={'Fax'}
+                    className="w-full"
                     autoCapitalize="none"
                   />
                   <ControlledTextField
                     control={control}
-                    name="postalCode"
-                    placeholder="Postal Code"
-                    className="w-[48%]"
+                    name="website"
+                    placeholder={'Website'}
+                    className="w-full"
+                    autoCapitalize="none"
                   />
                 </View>
-                <ControlledTextField
-                  control={control}
-                  name="phone"
-                  placeholder={'Phone'}
-                  className="w-full"
-                  keyboard="number-pad"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="fax"
-                  placeholder={'Fax'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
-                <ControlledTextField
-                  control={control}
-                  name="website"
-                  placeholder={'Website'}
-                  className="w-full"
-                  autoCapitalize="none"
-                />
-              </View>
-              <View className="mt-5 flex-row justify-center">
-                <Button
-                  className="bg-[#86939e]"
-                  title="Cancel"
-                  variant="default"
-                  leadingIcon="x"
-                  onPress={() => {
-                    router.back()
-                  }}
-                />
-                <Button
-                  className="ml-5"
-                  title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
-                  variant="default"
-                  leadingIcon="save"
-                  onPress={handleSubmit(addUpdateLocation)}
-                />
+                <View className="mt-5 flex-row justify-center">
+                  <Button
+                    className="bg-[#86939e]"
+                    title="Cancel"
+                    variant="default"
+                    leadingIcon="x"
+                    onPress={() => {
+                      router.back()
+                    }}
+                  />
+                  <Button
+                    className="ml-5"
+                    title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
+                    variant="default"
+                    leadingIcon="save"
+                    onPress={handleSubmit(addUpdateLocation)}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-          {!_.isEmpty(locationDetails) ? (
-            <View className="mx-5 my-5">
-              <Button
-                className=""
-                title="Delete"
-                variant="borderRed"
-                onPress={() => {
-                  Alert.alert(
-                    'Are you sure about deleting Location?',
-                    'It cannot be recovered once deleted.',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => deleteLocation()
-                      },
-                      { text: 'Cancel', onPress: () => {} }
-                    ]
-                  )
-                }}
-              />
-            </View>
-          ) : (
-            <View />
-          )}
-        </ScrollView>
+          </ScrollView>
+        </SafeAreaView>
       </View>
     </View>
   )

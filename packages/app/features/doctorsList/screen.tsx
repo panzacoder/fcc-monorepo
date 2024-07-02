@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_MEMBER_DOCTORS } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 let doctorPrivileges = {}
 export function DoctorsListScreen() {
@@ -23,7 +24,7 @@ export function DoctorsListScreen() {
   const [currentFilter, setCurrentFilter] = useState('Active')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
   useEffect(() => {
@@ -84,6 +85,7 @@ export function DoctorsListScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
+        <PtsBackHeader title="Doctors" memberData={memberData} />
         <View className="flex-row ">
           <TouchableOpacity
             onPress={() => {
@@ -170,7 +172,7 @@ export function DoctorsListScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  router.replace(
+                  router.push(
                     formatUrl('/circles/doctorDetails', {
                       doctorDetails: JSON.stringify(data),
                       memberData: JSON.stringify(memberData)

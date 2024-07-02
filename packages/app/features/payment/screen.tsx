@@ -26,8 +26,8 @@ import {
   PAYMENT_GET_PAYMENT_CONFIG,
   PAYMENT_SUCCESS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
+import { useRouter } from 'expo-router'
 import RNIap, {
   InAppPurchase,
   PurchaseError,
@@ -78,7 +78,7 @@ export function PaymentsScreen() {
   const [email, setEmail] = useState('')
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let planDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
   // console.log('planDetails', JSON.stringify(planDetails))
@@ -554,7 +554,7 @@ export function PaymentsScreen() {
         <View className="my-2 max-h-[95%] w-[95%] self-center rounded-[10px] border-[1px] border-[#e0deda] bg-white ">
           <View className="flex-row">
             <Typography className="m-2 ml-5 text-[16px] font-bold">
-              {'Order Total:'}
+              {'Order Total'}
             </Typography>
             <Typography className="m-2 ml-10 text-[16px]">
               {`$ ${planDetails.price ? planDetails.price : ''}`}

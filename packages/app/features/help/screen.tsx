@@ -1,9 +1,10 @@
 'use client'
 
 import { View, ScrollView } from 'react-native'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function HelpScreen() {
   const router = useRouter()
   let textStyle = 'my-2 w-[95%] text-[16px] text-black'
@@ -22,15 +23,6 @@ export function HelpScreen() {
     return (
       <View className="ml-5 w-[90%] flex-row">
         <View className="my-4 mr-5 h-[10px] w-[10px] rounded-full bg-black" />
-        <Typography className={textStyle}>{value}</Typography>
-      </View>
-    )
-  }
-  function getBullletTextWithTitle(title: string, value: string) {
-    return (
-      <View className="ml-5 w-[90%] flex-row">
-        <View className="my-4 mr-5 h-[10px] w-[10px] rounded-full bg-black" />
-        <Typography className={titleStyle}>{title}</Typography>
         <Typography className={textStyle}>{value}</Typography>
       </View>
     )
@@ -65,26 +57,15 @@ export function HelpScreen() {
   }
   return (
     <View className="flex-1">
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.back()
-          }}
-        />
-        <Typography className="ml-[5px] flex-1 text-[18px] font-bold">
-          {'Help'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title="Help" memberData={{}} />
       </View>
-      <ScrollView>
+      <ScrollView className="mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[0.5px] border-gray-400">
         <Typography className="text-primary my-2 text-center text-[20px] font-bold">
           {'Family Care Circle Document'}
         </Typography>
         <Typography className="text-primary my-2 ml-5 text-[16px] font-bold">
-          {'Family Care Circle:'}
+          {'Family Care Circle'}
         </Typography>
         {getTextView(
           'Family Care Circle is group of Caregivers taking care of one person called Member. Communication around appointments, transportation needs, and incidents help providethe best care possible along with reducing stress for the Caregivers. '

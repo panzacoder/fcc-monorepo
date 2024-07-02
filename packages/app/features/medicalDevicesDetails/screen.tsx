@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import { AddEditMedicalDevice } from 'app/ui/addEditMedicalDevice'
 import moment from 'moment'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -23,19 +23,16 @@ import {
   DELETE_MEDICAL_DEVICE,
   DELETE_MEDICAL_DEVICE_REMINDER,
   CREATE_MEDICAL_DEVICE_REMINDER,
-  UPDATE_MEDICAL_DEVICE_REMINDER,
-  UPDATE_MEDICAL_DEVICE,
-  CREATE_MEDICAL_DEVICE
+  UPDATE_MEDICAL_DEVICE_REMINDER
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
-import { Location } from 'app/ui/location'
+import { useLocalSearchParams } from 'expo-router'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
 import { AddEditNote } from 'app/ui/addEditNote'
 import { AddEditReminder } from 'app/ui/addEditReminder'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'solito/navigation'
+import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -47,11 +44,9 @@ export function MedicalDevicesDetailsScreen() {
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
-  const [isCreateSimilar, setIsCreateSimilar] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
   const [reminderData, setReminderData] = useState({})
   const [remindersList, setRemindersList] = useState([])
-  const [isAddDevice, setIsAddDevice] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [participantsList, setParticipantsList] = useState([]) as any
   const [isShowNotes, setIsShowNotes] = useState(false)
@@ -59,7 +54,7 @@ export function MedicalDevicesDetailsScreen() {
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -90,7 +85,9 @@ export function MedicalDevicesDetailsScreen() {
                 : {}
               notePrivileges = data.data.domainObjectPrivileges.PURCHASENOTE
                 ? data.data.domainObjectPrivileges.PURCHASENOTE
-                : {}
+                : data.data.domainObjectPrivileges.PurchaseNote
+                  ? data.data.domainObjectPrivileges.PurchaseNote
+                  : {}
             }
 
             setMedicalDevicesDetails(
@@ -125,9 +122,25 @@ export function MedicalDevicesDetailsScreen() {
     []
   )
 
+  function handleBackButtonClick() {
+    router.dismiss(2)
+    router.push(
+      formatUrl('/circles/medicalDevicesList', {
+        memberData: JSON.stringify(memberData)
+      })
+    )
+    return true
+  }
   useEffect(() => {
     if (!isAddNote) {
       getMedicalDevicesDetails(false, noteData)
+    }
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
     }
   }, [])
   let medicalDeviceDate = '',
@@ -272,49 +285,8 @@ export function MedicalDevicesDetailsScreen() {
     setIsAddNote(false)
     setIsAddReminder(false)
     setIsMessageThread(false)
-    setIsAddDevice(false)
   }
-  async function createUpdateMedicalDevice(object: any) {
-    console.log('in createUpdateMedicalDevice', JSON.stringify(object))
-    setLoading(true)
-    let url = ''
-    url = !isCreateSimilar
-      ? `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
-      : `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
-    let dataObject: any = {
-      header: header,
-      purchase: {
-        date: object.date ? object.date : '',
-        description: object.description ? object.description : '',
-        type: object.selectedType ? object.selectedType : '',
-        isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        doctor: {
-          id: object.doctorId ? object.doctorId : ''
-        }
-      }
-    }
-    if (!isCreateSimilar) {
-      dataObject.purchase.id = medicalDevicesDetails.id
-        ? medicalDevicesDetails.id
-        : ''
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsAddDevice(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   const editNote = (noteData: any) => {
     // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
@@ -462,6 +434,7 @@ export function MedicalDevicesDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           // console.log('createDoctor', JSON.stringify(data))
+          router.dismiss(2)
           router.push(
             formatUrl('/circles/medicalDevicesList', {
               memberData: JSON.stringify(memberData)
@@ -515,8 +488,9 @@ export function MedicalDevicesDetailsScreen() {
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="absolute top-[0] h-full w-full flex-1 py-2 ">
-        <ScrollView persistentScrollbar={true} className="flex-1">
+      <PtsBackHeader title="Medical Device Details" memberData={memberData} />
+      <View className=" h-full w-full flex-1 py-2 ">
+        <ScrollView className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
               {getUserPermission(medicalDevicePrivileges).createPermission ? (
@@ -525,8 +499,17 @@ export function MedicalDevicesDetailsScreen() {
                   title="Create Similar"
                   variant="border"
                   onPress={() => {
-                    setIsCreateSimilar(true)
-                    setIsAddDevice(true)
+                    // setIsCreateSimilar(true)
+                    // setIsAddDevice(true)
+                    router.push(
+                      formatUrl('/circles/addEditMedicalDevice', {
+                        memberData: JSON.stringify(memberData),
+                        medicalDeviceDetails: JSON.stringify(
+                          medicalDevicesDetails
+                        ),
+                        isFromCreateSimilar: 'true'
+                      })
+                    )
                   }}
                 />
               ) : (
@@ -538,8 +521,16 @@ export function MedicalDevicesDetailsScreen() {
                   title="Edit"
                   variant="border"
                   onPress={() => {
-                    setIsCreateSimilar(false)
-                    setIsAddDevice(true)
+                    // setIsCreateSimilar(false)
+                    // setIsAddDevice(true)
+                    router.push(
+                      formatUrl('/circles/addEditMedicalDevice', {
+                        memberData: JSON.stringify(memberData),
+                        medicalDeviceDetails: JSON.stringify(
+                          medicalDevicesDetails
+                        )
+                      })
+                    )
                   }}
                 />
               ) : (
@@ -548,22 +539,14 @@ export function MedicalDevicesDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="flex-row">
-                <Typography className=" font-400 w-[80%] text-[15px] text-[#86939e]">
+                <Typography className=" font-400 w-[80%] text-[15px] text-black">
                   {medicalDevice}
                 </Typography>
               </View>
-              {getDetailsView('Date:', medicalDeviceDate)}
-              {getDetailsView('Purchase Type:', type)}
-              {getDetailsView('Prescribed By:', prescriber)}
-              {getDetailsView('Description:', description)}
-            </View>
-          </View>
-          <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-            <Typography className="font-[15px] font-bold text-[#287CFA]">
-              {'Location Details'}
-            </Typography>
-            <View className="w-full">
-              <Location data={deviceAddress}></Location>
+              {getDetailsView('Date', medicalDeviceDate)}
+              {getDetailsView('Purchase Type', type)}
+              {getDetailsView('Prescribed By', prescriber)}
+              {getDetailsView('Description', description)}
             </View>
           </View>
 
@@ -717,7 +700,7 @@ export function MedicalDevicesDetailsScreen() {
         </ScrollView>
       </View>
       {isAddNote ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditNote
             component={'Medical Device'}
             noteData={noteData}
@@ -729,7 +712,7 @@ export function MedicalDevicesDetailsScreen() {
         <View />
       )}
       {isAddRemider ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddEditReminder
             component={'Medical Device'}
             reminderData={reminderData}
@@ -741,7 +724,7 @@ export function MedicalDevicesDetailsScreen() {
         <View />
       )}
       {isMessageThread ? (
-        <View className="h-full w-full justify-center self-center">
+        <View className="h-full w-full">
           <AddMessageThread
             participantsList={participantsList}
             noteData={noteData}
@@ -749,18 +732,6 @@ export function MedicalDevicesDetailsScreen() {
             isParticipantSelected={isParticipantSelected}
             createMessageThread={createMessageThread}
             isUpdateParticipants={false}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddDevice ? (
-        <View className="h-full w-full justify-center self-center">
-          <AddEditMedicalDevice
-            medicalDeviceDetails={medicalDevicesDetails}
-            cancelClicked={cancelClicked}
-            createUpdateMedicalDevice={createUpdateMedicalDevice}
-            memberData={memberData}
           />
         </View>
       ) : (

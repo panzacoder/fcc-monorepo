@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 export default function Facilities() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Facilities' }} />
+      <Stack.Screen options={{ title: 'Facilities', headerShown: false }} />
       <FacilitiesListScreen />
     </>
   )

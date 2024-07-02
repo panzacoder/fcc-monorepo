@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, ScrollView, Linking, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Alert,
+  ScrollView,
+  Linking,
+  TouchableOpacity
+} from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
@@ -16,8 +22,8 @@ import {
   UPDATE_MEMBER_AUTHORIZED_CAREGIVER,
   UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS
 } from 'app/utils/urlConstants'
-import { useParams } from 'solito/navigation'
-import { useRouter } from 'solito/navigation'
+import { useLocalSearchParams } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
@@ -27,17 +33,20 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
-  getAddressFromObject
+  getAddressFromObject,
+  removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { LocationDetails } from 'app/ui/locationDetails'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
+const phoneSchema = z.object({
+  phone: z.string()
+})
 const profileSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
-  email: z.string().min(1, { message: 'Email is required' }),
-  phone: z.string()
+  email: z.string().min(1, { message: 'Email is required' })
 })
 export type Schema = z.infer<typeof schema>
 export type ProfileSchema = z.infer<typeof profileSchema>
@@ -71,6 +80,7 @@ let selectedAddress: any = {
   }
 }
 export function MemberProfileScreen() {
+  let memberPhone = ''
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [memberDetails, setMemberDetails] = useState({}) as any
@@ -79,7 +89,7 @@ export function MemberProfileScreen() {
   const [isUpdateAddress, setIsUpdateAddress] = useState(false)
   const [isFromSelfCircle, setIsFromSelfCircle] = useState(false)
   const header = store.getState().headerState.header
-  const item = useParams<any>()
+  const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
@@ -88,12 +98,16 @@ export function MemberProfileScreen() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      email: '',
-      phone: ''
+      email: ''
     },
     resolver: zodResolver(profileSchema)
   })
-
+  const { control: control2, reset: reset2 } = useForm({
+    defaultValues: {
+      phone: ''
+    },
+    resolver: zodResolver(phoneSchema)
+  })
   const { handleSubmit: handleSubmit1, control: control1 } = useForm({
     defaultValues: {
       password: ''
@@ -120,8 +134,12 @@ export function MemberProfileScreen() {
           reset({
             firstName: member.firstName ? member.firstName : '',
             lastName: member.lastName ? member.lastName : '',
-            email: !isMemberWithoutEmail && member.email ? member.email : '',
-            phone: member.phone ? member.phone : ''
+            email: !isMemberWithoutEmail && member.email ? member.email : ''
+          })
+          reset2({
+            phone: member.phone
+              ? convertPhoneNumberToUsaPhoneNumberFormat(member.phone)
+              : ''
           })
         } else {
           Alert.alert('', data.message)
@@ -151,8 +169,10 @@ export function MemberProfileScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.shortDescription = value
         selectedAddress.nickName = value
+      }
+      if (index === 7) {
+        selectedAddress.shortDescription = value
       }
       if (index === 1) {
         selectedAddress.address.line = value
@@ -233,7 +253,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -257,7 +277,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -282,7 +302,7 @@ export function MemberProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          router.replace('/home')
+          router.back()
         } else {
           Alert.alert('', data.message)
         }
@@ -339,7 +359,7 @@ export function MemberProfileScreen() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phone: formData.phone,
+        phone: removeAllSpecialCharFromString(memberPhone),
         isMemberUpdate: true
       }
     }
@@ -404,11 +424,17 @@ export function MemberProfileScreen() {
           className="w-[95%] self-center"
         />
         <ControlledTextField
-          control={control}
+          control={control2}
           name="phone"
           placeholder={'Phone'}
           className="w-[95%] self-center"
-          keyboard='number-pad'
+          keyboard="number-pad"
+          onChangeText={(value) => {
+            memberPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+            reset2({
+              phone: memberPhone
+            })
+          }}
         />
         <ControlledTextField
           name="email"
@@ -455,7 +481,7 @@ export function MemberProfileScreen() {
           }
           setAddressObject={setAddressObject}
         />
-        <View className="my-2 mb-5 flex-row self-center ">
+        <View className="my-2 mb-10 flex-row self-center ">
           <Button
             className="bg-[#86939e]"
             title={'Cancel'}
