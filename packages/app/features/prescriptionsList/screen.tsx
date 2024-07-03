@@ -322,7 +322,7 @@ export function PrescriptionsListScreen() {
             <ControlledDropdown
               control={control}
               name="typeIndex"
-              label="All"
+              label="Type"
               maxHeight={300}
               list={typesList}
               className="w-[45%]"
@@ -340,7 +340,7 @@ export function PrescriptionsListScreen() {
             <ControlledDropdown
               control={control}
               name="prescribedIndex"
-              label="All"
+              label="Prescribed by"
               maxHeight={300}
               list={doctorList}
               className="w-[45%]"
@@ -349,7 +349,7 @@ export function PrescriptionsListScreen() {
             <ControlledDropdown
               control={control}
               name="pharmacyIndex"
-              label="All"
+              label="Pharmacy"
               maxHeight={300}
               list={pharmacyList}
               className="ml-5 w-[45%]"

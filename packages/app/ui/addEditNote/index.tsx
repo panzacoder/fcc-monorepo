@@ -71,8 +71,8 @@ export const AddEditNote = ({
     occuranceList = staticData.purchaseOccuranceList.map(
       (data: any, index: any) => {
         return {
-          label: data.occurance,
-          value: index + 1
+          title: data.occurance,
+          id: index + 1
         }
       }
     )
@@ -83,10 +83,6 @@ export const AddEditNote = ({
       formData.occurrenceIndex !== -1
         ? occuranceList[formData.occurrenceIndex - 1]?.title
         : ''
-          ? formData.occurrenceIndex !== -1
-            ? occuranceList[formData.occurrenceIndex - 1]?.title
-            : ''
-          : ''
     createUpdateNote(occurance, formData.note, formData.title, noteData)
   }
   async function setOccuranceChange(value: any) {

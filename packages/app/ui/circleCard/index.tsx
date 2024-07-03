@@ -74,11 +74,13 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
         <View className="ml-5 flex-row self-center">
           <View className={iconStyle}>
             {requestsForMemberLength > 0 ? (
-              <View className="flex-row">
+              <TouchableOpacity
+                onPress={() => {
+                  hideCirclesView(true, index, false)
+                }}
+                className="flex-row"
+              >
                 <Feather
-                  onPress={() => {
-                    hideCirclesView(true, index, false)
-                  }}
                   className="mt-1"
                   name={'bell'}
                   size={25}
@@ -93,18 +95,20 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
                 >
                   {requestsForMemberLength}
                 </Typography>
-              </View>
+              </TouchableOpacity>
             ) : (
               <View />
             )}
           </View>
           <View className={iconStyle}>
             {sharingInfoRequestsLength > 0 ? (
-              <View className="flex-row">
+              <TouchableOpacity
+                onPress={() => {
+                  hideCirclesView(true, index, true)
+                }}
+                className="flex-row"
+              >
                 <Feather
-                  onPress={() => {
-                    hideCirclesView(true, index, true)
-                  }}
                   className="mt-1"
                   name={'file-text'}
                   size={25}
@@ -119,7 +123,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
                 >
                   {sharingInfoRequestsLength}
                 </Typography>
-              </View>
+              </TouchableOpacity>
             ) : (
               <View />
             )}
@@ -134,7 +138,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
               <View className="flex-row">
                 <Feather
                   className="mt-1"
-                  name={'navigation'}
+                  name={'corner-up-right'}
                   size={25}
                   color={'black'}
                 />

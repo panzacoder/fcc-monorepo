@@ -32,9 +32,6 @@ const schema = z.object({
   description: z.string().min(1, { message: 'Required' })
 })
 export type Schema = z.infer<typeof schema>
-let prescribedBy: any = ''
-let selectedType: any = ''
-let selectedPrescriberIndex: any = -1
 let doctorList: Array<{ id: number; title: string }> = []
 export function AddEditMedicalDeviceScreen() {
   const item = useLocalSearchParams<any>()
@@ -52,8 +49,13 @@ export function AddEditMedicalDeviceScreen() {
     medicalDeviceDetails.date ? medicalDeviceDetails.date : new Date()
   )
   const [key, setKey] = useState(0)
+  const [selectedPrescriberIndex, setSelectedPrescriberIndex] = useState(-1)
   const [doctorListFull, setDoctorListFull] = useState([]) as any
   const [isLoading, setLoading] = useState(false)
+  const [prescribedBy, setPrescribedBy] = useState('')
+  const [selectedType, setSelectedType] = useState(
+    medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
+  )
   const [isPrescribed, setIsPrescribed] = useState(
     !_.isEmpty(medicalDeviceDetails)
       ? medicalDeviceDetails.isPrescribedBy
@@ -81,8 +83,8 @@ export function AddEditMedicalDeviceScreen() {
                 medicalDeviceDetails.doctor &&
                 data.id === medicalDeviceDetails.doctor.id
               ) {
-                selectedPrescriberIndex = index + 1
-                prescribedBy = data.doctorName
+                setSelectedPrescriberIndex(index + 1)
+                setPrescribedBy(data.doctorName)
                 reset({
                   prescriberIndex: selectedPrescriberIndex
                 })
@@ -105,9 +107,6 @@ export function AddEditMedicalDeviceScreen() {
   }, [])
 
   // console.log('medicalDeviceDetails', JSON.stringify(medicalDeviceDetails))
-  if (!_.isEmpty(medicalDeviceDetails)) {
-    selectedType = medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
-  }
   const typesList = staticData.purchaseTypeList.map((data: any, index: any) => {
     return {
       label: data.type
@@ -193,7 +192,7 @@ export function AddEditMedicalDeviceScreen() {
       })
   }
   const onSelectionType = (data: any) => {
-    selectedType = data
+    setSelectedType(data)
     // console.log('purpose1', purpose)
   }
   const onSelection = (date: any) => {
@@ -263,7 +262,7 @@ export function AddEditMedicalDeviceScreen() {
                   defaultValue={
                     !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''
                   }
-                  onChangeValue={setPrescriberChange}
+                  // onChangeValue={setPrescriberChange}
                 />
               ) : (
                 <View />

@@ -300,9 +300,11 @@ export function AppointmentsListScreen() {
   }
   async function setSelectedTypeChange(value: any) {
     if (value) {
-      if (value === 0) {
+      let id = value.id - 1
+      console.log('value', JSON.stringify(value))
+      if (id === 0) {
         selectedType = 'All'
-      } else if (value === 1) {
+      } else if (id === 1) {
         selectedType = 'Doctor Appointment'
       } else {
         selectedType = 'Facility Appointment'
@@ -379,7 +381,7 @@ export function AppointmentsListScreen() {
             <ControlledDropdown
               control={control}
               name="typeIndex"
-              label="All"
+              label="Appointment Type"
               maxHeight={300}
               list={typesList}
               className="w-[95%] self-center"
@@ -388,7 +390,7 @@ export function AppointmentsListScreen() {
             <ControlledDropdown
               control={control}
               name="doctorFacilityIndex"
-              label="All"
+              label="Doctor/Facility"
               maxHeight={300}
               list={doctorFacilityList}
               className="mt-2 w-[95%] self-center"
@@ -399,7 +401,7 @@ export function AppointmentsListScreen() {
             <ControlledDropdown
               control={control}
               name="monthIndex"
-              label="All"
+              label="Month"
               maxHeight={300}
               list={monthsList}
               className="w-[45%]"
@@ -408,7 +410,7 @@ export function AppointmentsListScreen() {
             <ControlledDropdown
               control={control}
               name="yearIndex"
-              label="All"
+              label="Year"
               maxHeight={300}
               list={yearList}
               className="ml-5 w-[45%]"

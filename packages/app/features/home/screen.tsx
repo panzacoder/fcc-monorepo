@@ -7,7 +7,9 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
+import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
+import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -20,11 +22,22 @@ import {
 } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { TabsHeader } from 'app/ui/tabs-header'
+const schema = z.object({
+  rejectReason: z.string().min(1, { message: 'Enter reject reason' })
+})
+export type Schema = z.infer<typeof schema>
 export function HomeScreen() {
+  const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
+  const [transportRequestData, setTransportRequestData] = useState({}) as any
+  const [isRejectTransportRequest, setIsRejectTransportRequest] =
+    useState(false)
   const [transportMemberName, setTransportMemberName] = useState('')
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
     useState(false)
@@ -32,6 +45,12 @@ export function HomeScreen() {
   const [isDataReceived, setDataReceived] = useState(false)
   const [memberList, setMemberList] = useState([])
   const [transportationList, setTransportationList] = useState([])
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      rejectReason: ''
+    },
+    resolver: zodResolver(schema)
+  })
   const getMemberDetails = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_WEEK_DETAILS}`
@@ -101,27 +120,20 @@ export function HomeScreen() {
         console.log(error)
       })
   }
-  async function approveRejectTrasportRequest(
-    transportData: any,
-    isApprove: any
-  ) {
+  async function approveRejectTrasportRequest(transportData: any) {
     setLoading(true)
     let url = ''
     if (transportData.type === 'Event') {
-      url = isApprove
-        ? `${BASE_URL}${EVENT_ACCEPT_TRANSPORTATION_REQUEST}`
-        : `${BASE_URL}${EVENT_REJECT_TRANSPORTATION_REQUEST}`
+      url = `${BASE_URL}${EVENT_ACCEPT_TRANSPORTATION_REQUEST}`
     } else {
-      url = isApprove
-        ? `${BASE_URL}${APPROVE_TRANSPORT}`
-        : `${BASE_URL}${REJECT_TRANSPORT}`
+      url = `${BASE_URL}${APPROVE_TRANSPORT}`
     }
     let dataObject = {
       header: header,
       transportationVo: {
         id: transportData.id ? transportData.id : '',
         reason: '',
-        isApprove: isApprove
+        isApprove: true
       }
     }
     CallPostService(url, dataObject)
@@ -185,7 +197,7 @@ export function HomeScreen() {
                     title={'Accept'}
                     variant="default"
                     onPress={() => {
-                      // approveRejectTrasportRequest(data, true)
+                      approveRejectTrasportRequest(data)
                     }}
                   />
                   <Button
@@ -194,6 +206,9 @@ export function HomeScreen() {
                     variant="default"
                     onPress={() => {
                       // approveRejectTrasportRequest(data, false)
+                      setTransportRequestData(data)
+                      setIsRejectTransportRequest(true)
+                      setIsShowTransportationRequests(false)
                     }}
                   />
                 </View>
@@ -201,6 +216,81 @@ export function HomeScreen() {
             )
           })}
         </ScrollView>
+      </View>
+    )
+  }
+  async function rejectRequest(formData: Schema) {
+    setLoading(true)
+    let url = ''
+    if (transportRequestData.type === 'Event') {
+      url = `${BASE_URL}${EVENT_REJECT_TRANSPORTATION_REQUEST}`
+    } else {
+      url = `${BASE_URL}${REJECT_TRANSPORT}`
+    }
+    let dataObject = {
+      header: header,
+      transportationVo: {
+        id: transportRequestData.id ? transportRequestData.id : '',
+        reason: formData.rejectReason,
+        isApprove: false
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          setIsRejectTransportRequest(false)
+          getMemberDetails()
+        } else {
+          Alert.alert('', data.message)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  const shwoRejectModal = () => {
+    return (
+      <View className="my-2 max-h-[90%] w-full self-center rounded-[15px] border-[1px] border-[#e0deda] bg-white ">
+        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
+          <Typography className=" w-[85%] self-center text-center font-bold text-white">{``}</Typography>
+          <View className="mr-[30] flex-row justify-end self-center">
+            <TouchableOpacity
+              className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
+              onPress={() => {
+                setIsRejectTransportRequest(false)
+              }}
+            >
+              <Feather name={'x'} size={25} className="color-primary" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View className="my-2 w-[95%] self-center">
+          <ControlledTextField
+            control={control}
+            name="rejectReason"
+            placeholder={'Reject reason'}
+            className=" bg-white"
+            autoCapitalize="none"
+          />
+        </View>
+        <View className="my-2 flex-row justify-center">
+          <Button
+            className="bg-[#5ACC6C]"
+            title={'Reject'}
+            variant="default"
+            onPress={handleSubmit(rejectRequest)}
+          />
+          <Button
+            className="ml-5 bg-[#c43416]"
+            title={'Cancel'}
+            variant="default"
+            onPress={() => {
+              setIsRejectTransportRequest(false)
+            }}
+          />
+        </View>
       </View>
     )
   }
@@ -233,26 +323,51 @@ export function HomeScreen() {
                 </Typography>
               </View>
             </View>
-            <ScrollView persistentScrollbar={true} className="m-2 flex-1">
-              {memberList.map((data: any, index: number) => {
-                return (
-                  <View key={index}>
-                    <CardView
-                      data={JSON.stringify(data)}
-                      trasportationClicked={trasportationClicked}
-                    ></CardView>
-                  </View>
-                )
-              })}
-            </ScrollView>
+            {memberList.length > 0 ? (
+              <ScrollView persistentScrollbar={true} className="m-2 flex-1">
+                {memberList.map((data: any, index: number) => {
+                  return (
+                    <View key={index}>
+                      <CardView
+                        data={JSON.stringify(data)}
+                        trasportationClicked={trasportationClicked}
+                      ></CardView>
+                    </View>
+                  )
+                })}
+              </ScrollView>
+            ) : (
+              <View className="w-[95%]">
+                <Typography className="w-full self-center p-5 text-center font-bold">
+                  {
+                    'Looks like your week has no appointments/events. Will you like to go through app?'
+                  }
+                </Typography>
+                <Button
+                  className="bg-primary w-[50%] self-center"
+                  title={'Go to circles'}
+                  variant="default"
+                  onPress={() => {
+                    router.push('/circles')
+                  }}
+                />
+              </View>
+            )}
           </View>
         ) : (
           <View />
         )}
       </View>
       {isShowTransportationRequests ? (
-        <View className="absolute top-[100] w-[95%] self-center">
+        <View className="absolute top-[100] h-[75%] w-[95%] self-center">
           {showRequestModal()}
+        </View>
+      ) : (
+        <View />
+      )}
+      {isRejectTransportRequest ? (
+        <View className="absolute top-[100] h-[75%] w-[95%] self-center">
+          {shwoRejectModal()}
         </View>
       ) : (
         <View />
