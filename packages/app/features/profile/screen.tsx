@@ -699,7 +699,7 @@ export function ProfileScreen() {
 
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  return (
+  return ( 
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="mt-[25px]">

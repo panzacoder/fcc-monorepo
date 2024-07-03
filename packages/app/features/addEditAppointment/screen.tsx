@@ -444,85 +444,88 @@ export function AddEditAppointmentScreen() {
         memberData={memberData}
       />
       <SafeAreaView>
-        {/* <View className="h-full w-full flex-1 py-2 "> */}
-        <ScrollView className="mt-5 h-[90%] w-full flex-1 rounded-[5px] border-[1px] border-gray-400 p-2 py-2">
-          <View className="mt-5 w-full items-center">
-            <ControlledDropdown
-              control={control}
-              name="appointmentType"
-              label="Appointment Type*"
-              defaultValue={
-                typeIndex !== -1
-                  ? typeIndex === 1
-                    ? 'Doctor Appointmet'
-                    : 'Facility Appointmet'
-                  : ''
-              }
-              maxHeight={300}
-              list={typesList}
-              className=""
-              onChangeValue={setSelectedTypeChange}
-            />
-            {isShowDoctorFacilityDropdown && isDataReceived ? (
+        <ScrollView className="my-5 ">
+          <View className="bg-card w-full justify-center gap-2 rounded-2xl border border-gray-400 p-5 px-4">
+            <View className="mt-2 w-full items-center">
               <ControlledDropdown
                 control={control}
-                name="doctoFacilityIndex"
-                label={selectedDoctorFacility === 1 ? 'Doctor*' : 'Facility*'}
-                defaultValue={''}
+                name="appointmentType"
+                label="Appointment Type*"
+                defaultValue={
+                  typeIndex !== -1
+                    ? typeIndex === 1
+                      ? 'Doctor Appointmet'
+                      : 'Facility Appointmet'
+                    : ''
+                }
                 maxHeight={300}
-                list={doctorFacilityList}
-                className="mt-2 "
-                onChangeValue={selectedDoctorFacilityChange}
+                list={typesList}
+                className=""
+                onChangeValue={setSelectedTypeChange}
               />
-            ) : (
-              <View />
-            )}
-          </View>
+              {isShowDoctorFacilityDropdown && isDataReceived ? (
+                <ControlledDropdown
+                  control={control}
+                  name="doctoFacilityIndex"
+                  label={selectedDoctorFacility === 1 ? 'Doctor*' : 'Facility*'}
+                  defaultValue={''}
+                  maxHeight={300}
+                  list={doctorFacilityList}
+                  className="mt-2 "
+                  onChangeValue={selectedDoctorFacilityChange}
+                />
+              ) : (
+                <View />
+              )}
+            </View>
 
-          <View className="mt-2 w-full">
-            <PtsDateTimePicker
-              currentData={selectedDate}
-              onSelection={onSelection}
-            />
-          </View>
-          <View className="my-2 w-full flex-row justify-center">
-            <ControlledTextField
-              control={control}
-              name="description"
-              placeholder={'Description'}
-              className=" bg-white"
-              autoCapitalize="none"
-            />
-          </View>
-          <View className="mt-1 w-full self-center">
-            <PtsComboBox
-              currentData={purpose}
-              listData={purposeList}
-              onSelection={onSelectionPurpose}
-              placeholderValue={'Purpose'}
-            />
-          </View>
-          <View className="mt-5 flex-row justify-center">
-            <Button
-              className="bg-[#86939e]"
-              title={'Cancel'}
-              leadingIcon="x"
-              variant="default"
-              onPress={() => {
-                router.back()
-              }}
-            />
-            <Button
-              className="ml-5 bg-[#287CFA]"
-              title={
-                _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
-                  ? 'Create'
-                  : 'Save'
-              }
-              leadingIcon="save"
-              variant="default"
-              onPress={handleSubmit(addEditAppointment)}
-            />
+            <View className="mt-2 w-full">
+              <PtsDateTimePicker
+                currentData={selectedDate}
+                onSelection={onSelection}
+              />
+            </View>
+            <View className="my-2 w-full flex-row justify-center">
+              <ControlledTextField
+                control={control}
+                name="description"
+                placeholder={'Description'}
+                className=" bg-white"
+                autoCapitalize="none"
+              />
+            </View>
+            <View className="mt-1 w-full self-center">
+              <PtsComboBox
+                currentData={purpose}
+                listData={purposeList}
+                onSelection={onSelectionPurpose}
+                placeholderValue={'Purpose'}
+              />
+            </View>
+            <View className="mt-5 flex-row justify-center">
+              <Button
+                className="bg-[#86939e]"
+                title={'Cancel'}
+                leadingIcon="x"
+                variant="default"
+                onPress={() => {
+                  router.back()
+                }}
+              />
+              <Button
+                className="ml-5 bg-[#287CFA]"
+                title={
+                  _.isEmpty(appointmentDetails) ||
+                  isFromCreateSimilar === 'true'
+                    ? 'Create'
+                    : 'Save'
+                }
+                leadingIcon="save"
+                variant="default"
+                onPress={handleSubmit(addEditAppointment)}
+              />
+            </View>
+            <View />
           </View>
         </ScrollView>
       </SafeAreaView>

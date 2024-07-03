@@ -70,7 +70,12 @@ export const PtsBackHeader = ({ title, memberData }) => {
       title === 'Appointments' ||
       title === 'Events' ||
       title === 'Incidents' ||
-      title === 'Doctors'
+      title === 'Doctors' ||
+      title === 'Caregivers' ||
+      title === 'Facilities' ||
+      title === 'Prescriptions' ||
+      title === 'Medical Devices'||
+      title === 'Messages'
     ) {
       let fullName = ''
       if (memberData.firstname) {

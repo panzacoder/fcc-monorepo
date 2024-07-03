@@ -205,7 +205,7 @@ export function IncidentsListScreen() {
             <ControlledDropdown
               control={control}
               name="monthIndex"
-              label="All"
+              label="Month"
               maxHeight={300}
               list={monthsList}
               className="w-[45%]"
@@ -214,7 +214,7 @@ export function IncidentsListScreen() {
             <ControlledDropdown
               control={control}
               name="yearIndex"
-              label="All"
+              label="Year"
               maxHeight={300}
               list={yearList}
               className="ml-5 w-[45%]"

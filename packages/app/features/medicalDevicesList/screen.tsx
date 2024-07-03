@@ -186,7 +186,7 @@ export function MedicalDevicesListScreen() {
             <ControlledDropdown
               control={control}
               name="monthIndex"
-              label="All"
+              label="Month"
               maxHeight={300}
               list={monthsList}
               className=" w-[45%]"
@@ -195,7 +195,7 @@ export function MedicalDevicesListScreen() {
             <ControlledDropdown
               control={control}
               name="yearIndex"
-              label="All"
+              label="Year"
               maxHeight={300}
               list={yearList}
               className="ml-2 w-[45%]"

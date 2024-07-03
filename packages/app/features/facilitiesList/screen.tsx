@@ -166,55 +166,59 @@ export function FacilitiesListScreen() {
       ) : (
         <View />
       )}
-      <ScrollView className="m-2 w-full self-center">
-        {facilityList.map((data: any, index: number) => {
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                router.push(
-                  formatUrl('/circles/facilityDetails', {
-                    facilityDetails: JSON.stringify(data),
-                    memberData: JSON.stringify(memberData)
-                  })
-                )
-              }}
-              key={index}
-              className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
-            >
-              <View className="w-[95%] flex-row">
-                <View>
-                  <View className="my-2 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[40%]">
-                      {data.name ? data.name : ''}
-                    </Typography>
+      {isDataReceived ? (
+        <ScrollView className="m-2 w-full self-center">
+          {facilityList.map((data: any, index: number) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/facilityDetails', {
+                      facilityDetails: JSON.stringify(data),
+                      memberData: JSON.stringify(memberData)
+                    })
+                  )
+                }}
+                key={index}
+                className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+              >
+                <View className="w-[95%] flex-row">
+                  <View>
+                    <View className="my-2 flex-row">
+                      <Typography className="text-primary font-400 ml-5 w-[40%]">
+                        {data.name ? data.name : ''}
+                      </Typography>
 
-                    <Typography className="ml-5 mr-5 w-[45%] text-right">
-                      {data.type ? data.type : ''}
-                    </Typography>
-                  </View>
-                  <View className="flex-row">
-                    <View className="w-[70%]">
-                      <Typography className="ml-5 ">
-                        {data.locations ? data.locations : ''}
+                      <Typography className="ml-5 mr-5 w-[45%] text-right">
+                        {data.type ? data.type : ''}
                       </Typography>
                     </View>
-                    <View className="self-center text-center">
-                      <Typography
-                        className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
-                      >
-                        {data.status ? data.status : ''}
-                      </Typography>
+                    <View className="flex-row">
+                      <View className="w-[70%]">
+                        <Typography className="ml-5 ">
+                          {data.locations ? data.locations : ''}
+                        </Typography>
+                      </View>
+                      <View className="self-center text-center">
+                        <Typography
+                          className={`ml-2 rounded-[20px] px-5 py-1 text-right ${data.status.toLowerCase() === 'active' ? "bg-['#83D991']" : "bg-['#ffcccb']"}`}
+                        >
+                          {data.status ? data.status : ''}
+                        </Typography>
+                      </View>
                     </View>
                   </View>
+                  <View className=" ml-[-10] self-center">
+                    <Feather name={'chevron-right'} size={20} color={'black'} />
+                  </View>
                 </View>
-                <View className=" ml-[-10] self-center">
-                  <Feather name={'chevron-right'} size={20} color={'black'} />
-                </View>
-              </View>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      ) : (
+        <View />
+      )}
     </View>
   )
 }

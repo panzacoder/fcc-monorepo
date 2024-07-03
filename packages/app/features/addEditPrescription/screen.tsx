@@ -35,9 +35,6 @@ const schema = z.object({
   notes: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let prescribedBy: any = ''
-let selectedPharmacy: any = ''
-let selectedTypeIndex: any = -1
 export function AddEditPrescriptionScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
@@ -55,6 +52,13 @@ export function AddEditPrescriptionScreen() {
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [calenderClickedCount, setCalenderClickedCount] = useState(0)
   const [isLoading, setLoading] = useState(false)
+  const [prescribedBy, setPrescribedBy] = useState(
+    prescriptionDetails.doctorName ? prescriptionDetails.doctorName : ''
+  )
+  const [selectedPharmacy, setSelectedPharmacy] = useState(
+    prescriptionDetails.pharmacy ? prescriptionDetails.pharmacy : ''
+  )
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(-1)
   const [prescribedDate, setPrescribedDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
       ? getFullDateForCalendar(
@@ -90,14 +94,6 @@ export function AddEditPrescriptionScreen() {
   )
   const staticData: any = store.getState().staticDataState.staticData
   // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
-  if (!_.isEmpty(prescriptionDetails)) {
-    prescribedBy = prescriptionDetails.doctorName
-      ? prescriptionDetails.doctorName
-      : ''
-    selectedPharmacy = prescriptionDetails.pharmacy
-      ? prescriptionDetails.pharmacy
-      : ''
-  }
   type TypeResponse = {
     id: number
     type: string
@@ -108,7 +104,7 @@ export function AddEditPrescriptionScreen() {
       ({ type, id }: TypeResponse, index: any) => {
         if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
           if (prescriptionDetails.type.type === type) {
-            selectedTypeIndex = index + 1
+            setSelectedTypeIndex(index + 1)
           }
         }
         return {
@@ -180,6 +176,7 @@ export function AddEditPrescriptionScreen() {
         endDate: object.endDate ? object.endDate : '',
         instructions: object.instructions ? object.instructions : '',
         notes: object.notes ? object.notes : '',
+        strength: object.strength ? object.strength : '',
         pharmacy: object.selectedPharmacy ? object.selectedPharmacy : '',
         doctorName: object.prescribedBy ? object.prescribedBy : '',
         facilityid: facilityId,
@@ -220,7 +217,7 @@ export function AddEditPrescriptionScreen() {
       })
   }
   async function callCreateUpdatePrescription(formData: Schema) {
-    // console.log('in callCreateUpdatePrescription')
+    // console.log('in callCreateUpdatePrescription', formData.strength)
     let type = staticData.medicineTypeList[formData.typeIndex - 1].id
     let object = {
       type: type,
@@ -238,11 +235,11 @@ export function AddEditPrescriptionScreen() {
     createUpdatePrescription(object)
   }
   const onSelectionPrescriber = (data: any) => {
-    prescribedBy = data
+    setPrescribedBy(data)
     // console.log('purpose1', purpose)
   }
   const onSelectionPharmacy = (data: any) => {
-    selectedPharmacy = data
+    setSelectedPharmacy(data)
     // console.log('purpose1', purpose)
   }
 

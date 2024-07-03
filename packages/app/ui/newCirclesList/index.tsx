@@ -36,7 +36,9 @@ export const NewCirclesList = ({
             <View key={index}>
               <View className="mx-3 mt-2 flex-row">
                 <Typography className="w-[95%] font-bold">
-                  {data.caregivername ? data.caregivername : ''}
+                  {data.requestraisedby === 'FM'
+                    ? data.caregivername
+                    : data.membername}
                   <Typography className="font-normal">{` ${sentence} `}</Typography>
                   <Typography className="font-bold">{`${data.role ? data.role : ''}.`}</Typography>
                 </Typography>

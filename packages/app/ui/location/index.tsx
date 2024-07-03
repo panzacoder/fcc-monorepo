@@ -180,7 +180,7 @@ export function Location(data: any) {
         >
           <Feather
             className="self-center "
-            name={'navigation'}
+            name={'corner-up-right'}
             size={20}
             color={'white'}
           />

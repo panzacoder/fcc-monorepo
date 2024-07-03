@@ -779,11 +779,11 @@ export function AppointmentDetailsScreen() {
               </View>
               <View className=" w-full flex-row items-center">
                 <View className="mt-2 w-full flex-row">
-                  <Typography className="font-400 max-w-[50%] text-[15px] text-black">
+                  <Typography className="max-w-[50%] text-[16px] font-bold text-black">
                     {doctorFacilityName}
                   </Typography>
-                  <View className="ml-2 h-[25] w-[2px] bg-[#86939e] " />
-                  <Typography className="font-400 text-primary ml-2 text-[15px] ">
+                  <View className="ml-2 h-[25] w-[2px]  bg-[#86939e]" />
+                  <Typography className="font-400 text-primary ml-2 text-[16px] max-w-[50%]">
                     {specialist}
                   </Typography>
                 </View>
