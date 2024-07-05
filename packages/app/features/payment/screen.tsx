@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   ScrollView
 } from 'react-native'
-import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
@@ -17,6 +16,7 @@ import { Typography } from 'app/ui/typography'
 import store from 'app/redux/store'
 import { getAddressFromObject } from 'app/ui/utils'
 import { CallPostService } from 'app/utils/fetchServerData'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   APPLE_SUCCESS_PAYMENT_FOR_OUR_SERVER,
   BASE_URL,
@@ -456,19 +456,8 @@ export function PaymentsScreen() {
   return (
     <SafeAreaView className="flex-1">
       <PtsLoader loading={isLoading} />
-      <View className="ml-5 mt-[40px] flex-row">
-        <Feather
-          className="mt-1"
-          name={'arrow-left'}
-          size={20}
-          color={'black'}
-          onPress={() => {
-            router.back()
-          }}
-        />
-        <Typography className=" ml-[5px] flex-1 text-[16px] font-bold">
-          {'Payment'}
-        </Typography>
+      <View className="mt-[25px]">
+        <PtsBackHeader title={'Payment'} memberData={{}} />
       </View>
       <ScrollView>
         <View className="my-2 max-h-[95%] w-[95%] self-center rounded-[10px] border-[1px] border-[#e0deda] bg-white ">

@@ -50,9 +50,9 @@ export function CircleEmailSection() {
   }
   return (
     <>
-      <Divider className="bg-muted mt-6" />
-      <View className="flex flex-row items-center gap-2">
-        <Typography variant="h5" className="basis-1/2">
+      <Divider className="bg-muted mt-2" />
+      <View className="flex items-center">
+        <Typography variant="h5" className="w-[95%]">
           {`Do you want ${firstName} to manage their circle?`}
         </Typography>
         <ManagedSwitch

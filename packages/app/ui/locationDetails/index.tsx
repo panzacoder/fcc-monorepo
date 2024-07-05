@@ -179,15 +179,12 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   }, [])
 
   let locationData = data ? data : {}
+  // console.log('locationData', JSON.stringify(locationData))
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
         !_.isEmpty(locationData) && locationData.nickName
           ? locationData.nickName
-          : '',
-      shortName:
-        !_.isEmpty(locationData) && locationData.shortName
-          ? locationData.shortName
           : '',
       line:
         !_.isEmpty(locationData) && locationData.address.line
@@ -217,8 +214,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
       shortName:
-        !_.isEmpty(locationData) && locationData.shortName
-          ? locationData.shortName
+        !_.isEmpty(locationData) && locationData.shortDescription
+          ? locationData.shortDescription
           : ''
     },
     resolver: zodResolver(schema1)

@@ -87,6 +87,7 @@ export function HomeScreen() {
   useEffect(() => {
     getMemberDetails()
   }, [])
+
   async function trasportationClicked(memberData: any) {
     // console.log('trasportationClicked', JSON.stringify(memberData))
     let fullName = ''

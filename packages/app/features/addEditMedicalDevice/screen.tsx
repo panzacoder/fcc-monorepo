@@ -83,10 +83,11 @@ export function AddEditMedicalDeviceScreen() {
                 medicalDeviceDetails.doctor &&
                 data.id === medicalDeviceDetails.doctor.id
               ) {
-                setSelectedPrescriberIndex(index + 1)
+                let prescribedIndex = index + 1
+                setSelectedPrescriberIndex(prescribedIndex)
                 setPrescribedBy(data.doctorName)
                 reset({
-                  prescriberIndex: selectedPrescriberIndex
+                  prescriberIndex: prescribedIndex
                 })
               }
             }

@@ -91,7 +91,7 @@ export function AppointmentDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            // console.log('appointmentInfo', '' + JSON.stringify(data.data))
+            console.log('appointmentInfo', '' + JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
               appointmentPrivileges = data.data.domainObjectPrivileges
                 .Appointment
@@ -783,7 +783,7 @@ export function AppointmentDetailsScreen() {
                     {doctorFacilityName}
                   </Typography>
                   <View className="ml-2 h-[25] w-[2px]  bg-[#86939e]" />
-                  <Typography className="font-400 text-primary ml-2 text-[16px] max-w-[50%]">
+                  <Typography className="font-400 text-primary ml-2 max-w-[50%] text-[16px]">
                     {specialist}
                   </Typography>
                 </View>
@@ -1136,6 +1136,9 @@ export function AppointmentDetailsScreen() {
         <View className="h-[95%] w-full">
           <AddEditTransport
             component={'Appointment'}
+            address={
+              doctorFacilityAddress.address ? doctorFacilityAddress.address : {}
+            }
             transportData={transportationData}
             date={
               appointmentDetails.date ? appointmentDetails.date : new Date()

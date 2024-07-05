@@ -23,8 +23,6 @@ import {
   CANCEL_SUBSCRIPTION,
   DELETE_ACCOUNT,
   CHECK_VALID_CREDENTIAL,
-  UPDATE_PROFILE,
-  UPDATE_MEMBER_ADDRESS,
   UPDATE_SPONSOR_CODE
 } from 'app/utils/urlConstants'
 import { Button } from 'app/ui/button'
@@ -37,61 +35,22 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
-  removeAllSpecialCharFromString,
   getAddressFromObject,
   getFullDateForCalendar
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LocationDetails } from 'app/ui/locationDetails'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
-})
-const phoneSchema = z.object({
-  phone: z.string()
 })
 const sponsorSchema = z.object({
   sponsorCode: z.string().min(1, { message: 'Sponsor code is required' })
 })
-const profileSchema = z.object({
-  firstName: z.string().min(1, { message: 'First name is required' }),
-  lastName: z.string().min(1, { message: 'Last name is required' }),
-  email: z.string().min(1, { message: 'Email is required' })
-})
+
 export type Schema = z.infer<typeof schema>
 export type SponsorSchema = z.infer<typeof sponsorSchema>
-export type ProfileSchema = z.infer<typeof profileSchema>
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    },
-    timezone: {
-      id: ''
-    }
-  }
-}
+
 let isShowRenewButton = false
 export function ProfileScreen() {
-  let userPhone = ''
   const header = store.getState().headerState.header
   const userProfile = store.getState().userProfileState.header
   // console.log('userProfile', JSON.stringify(userProfile))
@@ -99,8 +58,6 @@ export function ProfileScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowOrderList, setIsShowOrderList] = useState(false)
   const [isShowSponsorship, setIsShowSponsorship] = useState(false)
-  const [isUpdateProfile, setIsUpdateProfile] = useState(false)
-  const [isUpdateAddress, setIsUpdateAddress] = useState(false)
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
   const [isAutoSubscription, setIsAutoSubscription] = useState(false)
   const [isSubscribedUser, setISubscribedUser] = useState(false)
@@ -109,14 +66,6 @@ export function ProfileScreen() {
   const [userSubscription, setUserSubscription] = useState({}) as any
   const [memberDetails, setMemberDetails] = useState({}) as any
   const [orderList, setOrderList] = useState([])
-  const { control, handleSubmit, reset } = useForm({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: ''
-    },
-    resolver: zodResolver(profileSchema)
-  })
 
   const { handleSubmit: handleSubmit1, control: control1 } = useForm({
     defaultValues: {
@@ -134,12 +83,6 @@ export function ProfileScreen() {
     },
     resolver: zodResolver(sponsorSchema)
   })
-  const { control: control3, reset: reset2 } = useForm({
-    defaultValues: {
-      phone: ''
-    },
-    resolver: zodResolver(phoneSchema)
-  })
   const getUserProfile = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_USER_PROFILE}`
@@ -150,12 +93,16 @@ export function ProfileScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let appUser = data.data.appuser ? data.data.appuser : {}
+          console.log('data.data.member', JSON.stringify(data.data.member))
           setAppuserDetails(appUser)
-          setMemberDetails(data.data.member ? data.data.member : {})
-          setOrderList(data.data.orderList ? data.data.orderList : [])
-          setUserSubscription(
-            data.data.userSubscription ? data.data.userSubscription : {}
-          )
+          let member = data.data.member ? data.data.member : {}
+          setMemberDetails(member)
+          let orders = data.data.orderList ? data.data.orderList : []
+          setOrderList(orders)
+          let subscription = data.data.userSubscription
+            ? data.data.userSubscription
+            : {}
+          setUserSubscription(subscription)
           // console.log(
           //   'data.data.userSubscription',
           //   JSON.stringify(data.data.userSubscription)
@@ -230,16 +177,6 @@ export function ProfileScreen() {
             }
           }
           setIsShowAlerts(true)
-          reset({
-            firstName: appUser.firstName ? appUser.firstName : '',
-            lastName: appUser.lastName ? appUser.lastName : '',
-            email: appUser.email ? appUser.email : ''
-          })
-          reset2({
-            phone: appUser.phone
-              ? convertPhoneNumberToUsaPhoneNumberFormat(appUser.phone)
-              : ''
-          })
         } else {
           Alert.alert('', data.message)
         }
@@ -294,32 +231,7 @@ export function ProfileScreen() {
       })
     )
   }
-  async function updateAddress() {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_MEMBER_ADDRESS}`
-    let dataObject = {
-      header: header,
-      memberVo: {
-        id: memberDetails.id ? memberDetails.id : '',
-        isMemberUpdate: true,
-        address: selectedAddress.address
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsUpdateAddress(false)
-          getUserProfile()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   async function cancelSubscriptionButtonClicked() {
     setLoading(true)
     let url = `${BASE_URL}${CANCEL_SUBSCRIPTION}`
@@ -341,35 +253,7 @@ export function ProfileScreen() {
         console.log('error', error)
       })
   }
-  async function updateProfile(formData: ProfileSchema) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_PROFILE}`
-    let dataObject = {
-      header: header,
-      memberVo: {
-        id: memberDetails.id ? memberDetails.id : '',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: removeAllSpecialCharFromString(userPhone),
-        isMemberUpdate: true
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsUpdateProfile(false)
-          getUserProfile()
-        } else {
-          setLoading(false)
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log('error', error)
-      })
-  }
+
   async function saveSponsorCode(formData: SponsorSchema) {
     // console.log('formData', formData.sponsorCode)
     setLoading(true)
@@ -556,150 +440,8 @@ export function ProfileScreen() {
       </View>
     )
   }
-  const showUpdateLocationModal = () => {
-    return (
-      <View className="my-2 max-h-[95%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] bg-white ">
-        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
-          <Typography className=" w-full self-center text-center font-bold text-white">{``}</Typography>
-        </View>
-        <LocationDetails
-          component={'Profile'}
-          data={
-            memberDetails.address
-              ? {
-                  address: memberDetails.address
-                }
-              : {}
-          }
-          setAddressObject={setAddressObject}
-        />
-        <View className="my-2 mb-10 flex-row self-center ">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            variant="default"
-            leadingIcon="x"
-            onPress={() => {
-              setIsUpdateAddress(false)
-            }}
-          />
-          <Button
-            className="ml-5 bg-[#066f72]"
-            title={'Save'}
-            variant="default"
-            leadingIcon="save"
-            onPress={() => {
-              updateAddress()
-            }}
-          />
-        </View>
-      </View>
-    )
-  }
-  const showProfileUpdateModal = () => {
-    return (
-      <View className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] bg-white ">
-        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
-          <Typography className=" w-full self-center text-center font-bold text-white">{``}</Typography>
-        </View>
-        <ControlledTextField
-          control={control}
-          name="firstName"
-          placeholder={'First Name'}
-          className="w-[95%] self-center"
-          autoCapitalize="none"
-        />
-        <ControlledTextField
-          control={control}
-          name="lastName"
-          placeholder="Last Name*"
-          className="w-[95%] self-center"
-        />
-        <ControlledTextField
-          control={control3}
-          name="phone"
-          placeholder={'Phone'}
-          className="w-[95%] self-center"
-          keyboard="number-pad"
-          onChangeText={(value) => {
-            userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
-            reset2({
-              phone: userPhone
-            })
-          }}
-        />
-        <ControlledTextField
-          name="email"
-          className="w-[95%] self-center"
-          control={control}
-          placeholder={'Email*'}
-          autoCapitalize="none"
-        />
-        <View className="my-5 flex-row self-center pb-5 ">
-          <Button
-            className="bg-[#86939e]"
-            title={'Cancel'}
-            variant="default"
-            leadingIcon="x"
-            onPress={() => {
-              setIsUpdateProfile(false)
-            }}
-          />
-          <Button
-            className="ml-5 bg-[#066f72]"
-            title={'Save'}
-            variant="default"
-            leadingIcon="save"
-            onPress={handleSubmit(updateProfile)}
-          />
-        </View>
-      </View>
-    )
-  }
-  async function setAddressObject(value: any, index: any) {
-    if (value) {
-      if (index === 0) {
-        selectedAddress.nickName = value
-      }
-      if (index === 7) {
-        selectedAddress.shortDescription = value
-      }
-      if (index === 1) {
-        selectedAddress.address.line = value
-      }
-      if (index === 2) {
-        selectedAddress.address.city = value
-      }
-      if (index === 3) {
-        selectedAddress.address.zipCode = value
-      }
-      if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
-        selectedAddress.address.state.country.description = value.description
-      }
-      if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
-      }
-      if (index === 6) {
-        selectedAddress = value
-      }
-      if (index === 7) {
-        selectedAddress.address.timezone.id = value.id
-      }
-    }
 
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
-  }
-  return ( 
+  return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="mt-[25px]">
@@ -712,12 +454,20 @@ export function ProfileScreen() {
               <Typography className="ml-2 w-[85%] self-center font-bold">
                 {'User Profile'}
               </Typography>
-              <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+              <TouchableOpacity
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/editUserProfile', {
+                      component: 'Profile',
+                      userDetails: JSON.stringify(appuserDetails),
+                      memberDetails: JSON.stringify(memberDetails)
+                    })
+                  )
+                }}
+                className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+              >
                 <Feather
                   className=""
-                  onPress={() => {
-                    setIsUpdateProfile(true)
-                  }}
                   name={'edit-2'}
                   size={15}
                   color={'white'}
@@ -774,12 +524,19 @@ export function ProfileScreen() {
               <Typography className="ml-2 w-[85%] self-center font-bold">
                 {'Address'}
               </Typography>
-              <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
+              <TouchableOpacity
+                onPress={() => {
+                  router.push(
+                    formatUrl('/circles/editUserAddress', {
+                      component: 'Profile',
+                      memberDetails: JSON.stringify(memberDetails)
+                    })
+                  )
+                }}
+                className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]"
+              >
                 <Feather
                   className=""
-                  onPress={() => {
-                    setIsUpdateAddress(true)
-                  }}
                   name={'edit-2'}
                   size={15}
                   color={'white'}
@@ -1036,20 +793,6 @@ export function ProfileScreen() {
           {isShowDeleteModal ? (
             <View className="absolute top-[100] w-[95%] flex-1 self-center">
               {showDeleteModal()}
-            </View>
-          ) : (
-            <View />
-          )}
-          {isUpdateProfile ? (
-            <View className="absolute top-[50] w-[95%] self-center">
-              {showProfileUpdateModal()}
-            </View>
-          ) : (
-            <View />
-          )}
-          {isUpdateAddress ? (
-            <View className="absolute top-[50] w-[95%] self-center">
-              {showUpdateLocationModal()}
             </View>
           ) : (
             <View />

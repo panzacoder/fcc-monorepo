@@ -23,10 +23,12 @@ export type JoinCircleProps =
       id: number
     }
   | {
-      email: string
+      email: string,
+      caregiverFname: string
     }
 
 export async function joinCircle(props: JoinCircleProps) {
+  console.log('props', JSON.stringify(props))
   return await fetchData<JoinCircleReturnType>({
     route: JOIN_CIRCLE,
     data: { memberVo: { props } }

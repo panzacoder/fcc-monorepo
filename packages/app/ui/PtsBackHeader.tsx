@@ -63,7 +63,7 @@ export const PtsBackHeader = ({ title, memberData }) => {
           memberData: JSON.stringify(memberData)
         })
       )
-    } else if (title === 'Circle Details') {
+    } else if (title === 'Circle Details' || title === 'Profile') {
       router.dismissAll()
       router.push('/home')
     } else if (
@@ -74,7 +74,7 @@ export const PtsBackHeader = ({ title, memberData }) => {
       title === 'Caregivers' ||
       title === 'Facilities' ||
       title === 'Prescriptions' ||
-      title === 'Medical Devices'||
+      title === 'Medical Devices' ||
       title === 'Messages'
     ) {
       let fullName = ''

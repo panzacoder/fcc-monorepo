@@ -631,7 +631,7 @@ export function EventDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-black">
+                <Typography className=" font-bold w-[95%] text-[15px] text-black">
                   {event}
                 </Typography>
               </View>
@@ -934,6 +934,11 @@ export function EventDetailsScreen() {
         <View className="h-full w-full">
           <AddEditTransport
             component={'Event'}
+            address={
+              eventDetails.location && eventDetails.location.address
+                ? eventDetails.location.address
+                : {}
+            }
             date={eventDetails.date ? eventDetails.date : ''}
             transportData={transportationData}
             appointmentId={eventDetails.id}
