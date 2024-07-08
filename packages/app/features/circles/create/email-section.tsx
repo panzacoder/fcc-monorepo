@@ -42,7 +42,7 @@ export function CircleEmailSection() {
   ) => {
     const circle = await findCircle(formFields)
     if (circle) {
-      setValue('circleExists', true)
+      setValue('circleExists', circle)
     }
   }
   if (!firstName || !lastName) {

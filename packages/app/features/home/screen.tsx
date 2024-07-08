@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -84,8 +84,19 @@ export function HomeScreen() {
         console.log(error)
       })
   }, [])
+  function handleBackButtonClick() {
+    BackHandler.exitApp()
+    return true
+  }
   useEffect(() => {
     getMemberDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
 
   async function trasportationClicked(memberData: any) {
@@ -341,7 +352,7 @@ export function HomeScreen() {
               <View className="w-[95%]">
                 <Typography className="w-full self-center p-5 text-center font-bold">
                   {
-                    'Looks like your week has no appointments/events. Will you like to go through app?'
+                    'Looks like your week has no appointments/events. Go to Your Circles.'
                   }
                 </Typography>
                 <Button
