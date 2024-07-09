@@ -406,7 +406,8 @@ export function CirclesListScreen() {
         <TouchableOpacity
           className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
           onPress={() => {
-            router.push('/circles/create')
+            // router.push('/circles/create')
+            router.push('/circles/createCircle')
           }}
         >
           <Feather name={'plus'} size={25} className="color-primary" />

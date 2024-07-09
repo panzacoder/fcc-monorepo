@@ -7,6 +7,7 @@ export const PtsBackHeader = ({ title, memberData }) => {
   const router = useRouter()
   const navigation = useNavigation()
   async function goToScreen(title: any) {
+    console.log('title', title)
     if (title === 'Appointment Details') {
       router.dismiss(2)
       router.push(
@@ -49,6 +50,17 @@ export const PtsBackHeader = ({ title, memberData }) => {
           memberData: JSON.stringify(memberData)
         })
       )
+    } else if (title === 'Edit Location Details ') {
+      router.dismiss(2)
+      if (memberData.component === 'Profile') {
+        router.push(formatUrl('/profile', {}))
+      } else {
+        router.push(
+          formatUrl('/memberProfile', {
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
     } else if (title === 'Prescription Details') {
       router.dismiss(2)
       router.push(

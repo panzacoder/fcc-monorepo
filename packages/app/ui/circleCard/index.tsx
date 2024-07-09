@@ -145,7 +145,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
                   className="mt-1"
                   name={'truck'}
                   size={25}
-                  color={'black'}
+                  color={'#cf8442'}
                 />
 
                 <Typography

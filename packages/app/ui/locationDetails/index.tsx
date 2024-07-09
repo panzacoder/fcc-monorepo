@@ -278,7 +278,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   return (
     <View className="w-full self-center py-2">
       <View className="w-full">
-        {component !== 'Profile' && component !== 'SignUp' ? (
+        {component !== 'Profile' &&
+        component !== 'SignUp' &&
+        component !== 'CreateCircle' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledTextField
               control={control}
@@ -298,7 +300,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         ) : (
           <View />
         )}
-        {component !== 'Profile' && component !== 'SignUp' ? (
+        {component !== 'Profile' &&
+        component !== 'SignUp' &&
+        component !== 'CreateCircle' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledTextField
               control={control1}
@@ -383,7 +387,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             }}
           />
         </View>
-        {component === 'Profile' || component === 'SignUp' ? (
+        {component === 'Profile' ||
+        component === 'SignUp' ||
+        component === 'CreateCircle' ? (
           <View className="w-full self-center">
             <ControlledDropdown
               control={control}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Alert, View, TouchableOpacity } from 'react-native'
+import { Alert, View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -89,9 +89,21 @@ export function CircleDetailsScreen() {
         console.log('error', error)
       })
   }, [])
+  function handleBackButtonClick() {
+    router.dismissAll()
+    router.push('/home')
+    return true
+  }
   useEffect(() => {
     getMemberMenus()
     getMemberDetails()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick
+      )
+    }
   }, [])
   return (
     <View className=" flex-1">

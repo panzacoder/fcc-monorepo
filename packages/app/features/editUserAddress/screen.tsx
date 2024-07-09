@@ -7,6 +7,7 @@ import store from 'app/redux/store'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { formatUrl } from 'app/utils/format-url'
+import _ from 'lodash'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -56,6 +57,14 @@ export function EditUserAddressScreen() {
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  if (_.isEmpty(memberData)) {
+    let object = {
+      member: memberDetails.memberId ? memberDetails.memberId : '',
+      component: item.component ? item.component : ''
+    }
+    memberData = object
+  }
+  console.log('memberData', JSON.stringify(memberData))
   useEffect(() => {}, [])
   async function setAddressObject(value: any, index: any) {
     if (value) {
@@ -104,7 +113,7 @@ export function EditUserAddressScreen() {
     setLoading(true)
     let url = ''
     url =
-      item.comonent === 'Profile'
+      item.component === 'Profile'
         ? `${BASE_URL}${UPDATE_MEMBER_ADDRESS}`
         : `${BASE_URL}${UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS}`
     let dataObject = {
@@ -119,7 +128,7 @@ export function EditUserAddressScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           router.dismiss(2)
-          if (item.comonent === 'Profile') {
+          if (item.component === 'Profile') {
             router.push('/profile')
           } else {
             router.push(
@@ -141,7 +150,7 @@ export function EditUserAddressScreen() {
   }
   return (
     <View className="flex-1">
-      <PtsBackHeader title="Edit Location Details" memberData={{}} />
+      <PtsBackHeader title="Edit Location Details " memberData={memberData} />
       <PtsLoader loading={isLoading} />
       <SafeAreaView>
         <ScrollView className="mt-5 rounded-[5px] border-[1px] border-gray-400 p-2">
@@ -164,7 +173,7 @@ export function EditUserAddressScreen() {
               leadingIcon="x"
               onPress={() => {
                 router.dismiss(2)
-                if (item.comonent === 'Profile') {
+                if (item.component === 'Profile') {
                   router.push('/profile')
                 } else {
                   router.push(

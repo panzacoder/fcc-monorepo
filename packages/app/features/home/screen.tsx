@@ -357,7 +357,7 @@ export function HomeScreen() {
                 </Typography>
                 <Button
                   className="bg-primary w-[50%] self-center"
-                  title={'Go to circles'}
+                  title={'Ok'}
                   variant="default"
                   onPress={() => {
                     router.push('/circles')

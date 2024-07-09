@@ -46,6 +46,9 @@ export function EditUserProfileScreen() {
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   // console.log('memberData', JSON.stringify(item.memberData))
+  if (!_.isEmpty(userDetails)) {
+    userPhone = userDetails.phone ? userDetails.phone : ''
+  }
   useEffect(() => {}, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
