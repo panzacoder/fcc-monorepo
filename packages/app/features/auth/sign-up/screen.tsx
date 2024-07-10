@@ -26,7 +26,6 @@ const schema = addressSchema
   .extend({
     firstName: z.string().min(1, { message: 'First Name is required' }),
     lastName: z.string().min(1, { message: 'Last Name is required' }),
-    phone: z.string(),
     email: z.string().min(1, { message: 'Email is required' }).email(),
     password: z
       .string()

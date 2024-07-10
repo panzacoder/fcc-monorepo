@@ -10,7 +10,7 @@ export function CircleNameSection() {
     <View className="flex items-start gap-2">
       <View className="flex-row items-center gap-2 pb-2">
         <Feather name={'info'} size={20} className="color-primary" />
-        <Typography className="">
+        <Typography className="w-[95%]">
           {'Circles organize caregiving details for an individual.'}
         </Typography>
       </View>

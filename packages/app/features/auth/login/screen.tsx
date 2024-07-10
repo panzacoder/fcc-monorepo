@@ -132,7 +132,7 @@ export function LoginScreen() {
               title="Sign up"
               variant="link"
               onPress={() => {
-                router.push('/sign-up')
+                router.push('/signUp')
               }}
               className="pt-0"
             />

@@ -490,7 +490,7 @@ export function EventsListScreen() {
                                 ? '#cf8442'
                                 : data.transportationStatus === 'Rejected'
                                   ? 'red'
-                                  : 'green'
+                                  : '#4DA529'
                             }
                           />
                         </View>

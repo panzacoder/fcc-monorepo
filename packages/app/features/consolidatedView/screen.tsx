@@ -476,7 +476,7 @@ export function ConsolidatedViewScreen() {
                     ? '#cf8442'
                     : data.transportationStatus === 'Rejected'
                       ? 'red'
-                      : 'black'
+                      : '#4DA529'
                 }
               />
             </View>

@@ -35,7 +35,7 @@ export function FacilityDetailsScreen() {
   let facilityInfo = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
-    console.log('facilityInfo',JSON.stringify(facilityInfo))
+  console.log('facilityInfo', JSON.stringify(facilityInfo))
   const [isLoading, setLoading] = useState(false)
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
@@ -486,7 +486,7 @@ export function FacilityDetailsScreen() {
                                   ? '#cf8442'
                                   : data.transportationStatus === 'Rejected'
                                     ? 'red'
-                                    : 'black'
+                                    : '#4DA529'
                               }
                             />
                           </View>
@@ -538,7 +538,7 @@ export function FacilityDetailsScreen() {
         </ScrollView>
       </View>
       {isShareFacility ? (
-        <View className="h-full w-full mt-[20px]">
+        <View className="mt-[20px] h-full w-full">
           <ShareDoctorFacility
             cancelClicked={cancelClicked}
             shareDoctorFacility={shareFacility}

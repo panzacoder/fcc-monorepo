@@ -7,6 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getMonthsListOnly } from 'app/ui/utils'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -357,29 +358,26 @@ export function PlansScreen() {
                 </View>
               )
             })}
-            {!isRenewPlan ? (
-              <View />
-            ) : (
-              <ControlledDropdown
-                className="my-[10px] w-[80%] self-center"
-                control={control}
-                name={'planIndex'}
-                label={''}
-                maxHeight={300}
-                list={planNames}
-                onChangeValue={(data) => {
-                  if (data) {
-                    let selectedIndex = _.find(
-                      plansList,
-                      (e) => e.plantype === data.title
-                    )
-                    // console.log('selectedIndex', JSON.stringify(selectedIndex))
-                    setSelectedPlanId(selectedIndex.id)
-                    setSelectedPlanIndex(Number(data.id))
-                  }
-                }}
-              />
-            )}
+
+            <ControlledDropdown
+              className="my-[10px] w-[80%] self-center"
+              control={control}
+              name={'planIndex'}
+              label={''}
+              maxHeight={300}
+              list={planNames}
+              onChangeValue={(data) => {
+                if (data) {
+                  let selectedIndex = _.find(
+                    plansList,
+                    (e) => e.plantype === data.title
+                  )
+                  // console.log('selectedIndex', JSON.stringify(selectedIndex))
+                  setSelectedPlanId(selectedIndex.id)
+                  setSelectedPlanIndex(Number(data.id))
+                }
+              }}
+            />
 
             <Button
               className={`my-[10px] self-center ${isFromUpgradePlan ? 'w-[50%]' : 'w-[40%]'}    ${colorSet[selectedPlanIndex].headingBackground}`}
@@ -602,19 +600,8 @@ export function PlansScreen() {
     <View className="flex-1">
       <View className="">
         <PtsLoader loading={isLoading} />
-        <View className="ml-5 mt-[40px] flex-row">
-          <Feather
-            className="mt-1"
-            name={'arrow-left'}
-            size={20}
-            color={'black'}
-            onPress={() => {
-              router.back()
-            }}
-          />
-          <Typography className=" ml-[5px] flex-1 text-[18px] font-bold">
-            {'Plans'}
-          </Typography>
+        <View className="mt-[25px]">
+          <PtsBackHeader title={'Plans'} memberData={{}} />
         </View>
         {!isShowCardModal && !isAddCard ? (
           <ScrollView>

@@ -39,12 +39,14 @@ let countryIndex = 97
 let stateIndex = -1
 export const AddEditTransport = ({
   component,
+  address,
   transportData,
   date,
   appointmentId,
   cancelClicked,
   createUpdateTransportation
 }) => {
+  console.log('address', JSON.stringify(address))
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const staticData: any = store.getState().staticDataState.staticData
@@ -103,11 +105,11 @@ export const AddEditTransport = ({
     defaultValues: {
       description: '',
       member: _.isEmpty(transportData) ? -1 : 1,
-      addressLine: '',
+      addressLine: !_.isEmpty(address) && address.line ? address.line : '',
       state: _.isEmpty(transportData) ? stateIndex : 1,
       country: _.isEmpty(transportData) ? countryIndex : 1,
-      city: '',
-      postalCode: ''
+      city: !_.isEmpty(address) && address.city ? address.city : '',
+      postalCode: !_.isEmpty(address) && address.zipCode ? address.zipCode : ''
     },
     resolver: zodResolver(schema)
   })
@@ -117,13 +119,27 @@ export const AddEditTransport = ({
     id: number
     name: string
   }
-  const countryList: Array<{ id: number; title: string }> =
-    staticData.countryList.map(({ name, id }: Response, index: any) => {
-      return {
-        title: name,
-        id: index + 1
-      }
-    })
+  let countryName = ''
+  if (!_.isEmpty(address)) {
+    countryName = address.state.country.name ? address.state.country.name : ''
+  } else {
+    if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+      countryName = memberAddress.state.country.name
+        ? memberAddress.state.country.name
+        : ''
+    }
+  }
+  const countryList: Array<{ id: number; title: string }> = []
+  staticData.countryList.map(({ name, id }: Response, index: any) => {
+    if (name === countryName) {
+      countryIndex = index + 1
+    }
+    let object = {
+      title: name,
+      id: index + 1
+    }
+    countryList.push(object)
+  })
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
@@ -137,14 +153,22 @@ export const AddEditTransport = ({
         setLoading(false)
         if (data.status === 'SUCCESS') {
           let stateName = ''
-          if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
-            stateName = memberAddress.state.name ? memberAddress.state.name : ''
+          if (!_.isEmpty(address)) {
+            stateName = address.state.name ? address.state.name : ''
+          } else {
+            if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+              stateName = memberAddress.state.name
+                ? memberAddress.state.name
+                : ''
+            }
           }
+
           let statesList: Array<{ id: number; title: string }> = []
           data.data.stateList.map(({ name, id }: Response, index: any) => {
             if (name === stateName) {
               stateIndex = index + 1
               reset({
+                country: countryIndex,
                 state: stateIndex
               })
             }
@@ -244,13 +268,6 @@ export const AddEditTransport = ({
     // console.log('selectedDate', '' + selectedDate)
   }
 
-  async function setSelectedStateChange(value: any) {
-    if (value === null) {
-      reset({
-        state: -1
-      })
-    }
-  }
   async function setSelectedCountryChange(value: any) {
     if (value) {
       let countryId = staticData.countryList[value.id - 1].id
@@ -292,13 +309,7 @@ export const AddEditTransport = ({
       </View>
     )
   }
-  async function setAcompanyChange(value: any) {
-    if (value === null) {
-      reset({
-        member: -1
-      })
-    }
-  }
+
   return (
     <View
       key={key}
@@ -318,7 +329,6 @@ export const AddEditTransport = ({
                   className="w-[95%] bg-white"
                   maxHeight={300}
                   list={memberList}
-                  onChangeValue={setAcompanyChange}
                 />
               </View>
               <View className="my-2 w-[95%] self-center">
@@ -363,7 +373,6 @@ export const AddEditTransport = ({
                   className="w-[95%] bg-white"
                   maxHeight={300}
                   list={statesList}
-                  onChangeValue={setSelectedStateChange}
                 />
               </View>
               <View className="my-2 w-full flex-row justify-center gap-2">

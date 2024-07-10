@@ -58,7 +58,7 @@ export function AddEditPrescriptionScreen() {
   const [selectedPharmacy, setSelectedPharmacy] = useState(
     prescriptionDetails.pharmacy ? prescriptionDetails.pharmacy : ''
   )
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(-1)
+
   const [prescribedDate, setPrescribedDate] = useState(
     !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
       ? getFullDateForCalendar(
@@ -99,12 +99,13 @@ export function AddEditPrescriptionScreen() {
     type: string
   }
   //dropdown is not working for 0 as id, so we started id from 1
+  let typeIndex = -1
   let typesList: Array<{ id: number; title: string }> =
     staticData.medicineTypeList.map(
       ({ type, id }: TypeResponse, index: any) => {
         if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
           if (prescriptionDetails.type.type === type) {
-            setSelectedTypeIndex(index + 1)
+            typeIndex = index + 1
           }
         }
         return {
@@ -113,6 +114,7 @@ export function AddEditPrescriptionScreen() {
         }
       }
     )
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(typeIndex)
   const { control, handleSubmit } = useForm({
     defaultValues: {
       typeIndex: selectedTypeIndex,

@@ -4,6 +4,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
+import { Image } from 'app/ui/image'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { googleMapOpenUrl } from 'app/ui/utils'
@@ -21,13 +22,17 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   }
   let sharingInfoRequestsLength = 0
   let requestsForMemberLength = 0
+  let transportationRequests = 0
   if (memberData.sharingInfoRequests) {
     sharingInfoRequestsLength = memberData.sharingInfoRequests.length
+  }
+  if (memberData.transportationRequests) {
+    transportationRequests = memberData.transportationRequests.length
   }
   if (memberData.requestsForMember) {
     requestsForMemberLength = memberData.requestsForMember.length
   }
-  let iconStyle = 'mt-1 w-[33%] items-center'
+  let iconStyle = 'mt-1 w-[25%] items-center'
   let textStyle =
     'ml-[-5px] h-[20px] w-[20px] rounded-[10px] bg-[#5ACC6C] text-center font-bold text-white'
 
@@ -76,7 +81,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             {requestsForMemberLength > 0 ? (
               <TouchableOpacity
                 onPress={() => {
-                  hideCirclesView(true, index, false)
+                  hideCirclesView(true, index, false, false)
                 }}
                 className="flex-row"
               >
@@ -89,7 +94,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
 
                 <Typography
                   onPress={() => {
-                    hideCirclesView(true, index, false)
+                    hideCirclesView(true, index, false, false)
                   }}
                   className={textStyle}
                 >
@@ -104,7 +109,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             {sharingInfoRequestsLength > 0 ? (
               <TouchableOpacity
                 onPress={() => {
-                  hideCirclesView(true, index, true)
+                  hideCirclesView(true, index, true, false)
                 }}
                 className="flex-row"
               >
@@ -117,11 +122,39 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
 
                 <Typography
                   onPress={() => {
-                    hideCirclesView(true, index, true)
+                    hideCirclesView(true, index, true, false)
                   }}
                   className={textStyle}
                 >
                   {sharingInfoRequestsLength}
+                </Typography>
+              </TouchableOpacity>
+            ) : (
+              <View />
+            )}
+          </View>
+          <View className={iconStyle}>
+            {transportationRequests > 0 ? (
+              <TouchableOpacity
+                onPress={() => {
+                  hideCirclesView(true, index, false, true)
+                }}
+                className="flex-row"
+              >
+                <Feather
+                  className="mt-1"
+                  name={'truck'}
+                  size={25}
+                  color={'#cf8442'}
+                />
+
+                <Typography
+                  onPress={() => {
+                    hideCirclesView(true, index, false, true)
+                  }}
+                  className={textStyle}
+                >
+                  {transportationRequests}
                 </Typography>
               </TouchableOpacity>
             ) : (
@@ -136,11 +169,13 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
           >
             {memberData.address ? (
               <View className="flex-row">
-                <Feather
-                  className="mt-1"
-                  name={'corner-up-right'}
-                  size={25}
-                  color={'black'}
+                <Image
+                  className=""
+                  src={require('app/assets/direction.jpg')}
+                  width={30}
+                  height={30}
+                  contentFit={'contain'}
+                  alt="logo"
                 />
               </View>
             ) : (

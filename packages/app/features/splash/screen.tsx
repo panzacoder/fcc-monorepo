@@ -121,7 +121,7 @@ export function SplashScreen() {
           <AccentButton title="Log in" onPress={() => router.push('/login')} />
           <AccentButton
             title="Sign up"
-            onPress={() => router.push('/sign-up')}
+            onPress={() => router.push('/signUp')}
           />
         </View>
       ) : (

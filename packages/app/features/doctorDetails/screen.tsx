@@ -527,7 +527,7 @@ export function DoctorDetailsScreen() {
                                   ? '#cf8442'
                                   : data.transportationStatus === 'Rejected'
                                     ? 'red'
-                                    : 'black'
+                                    : '#4DA529'
                               }
                             />
                           </View>
@@ -579,7 +579,7 @@ export function DoctorDetailsScreen() {
         </ScrollView>
       </View>
       {isShareDoctor ? (
-        <View className="h-full w-full mt-[20px]">
+        <View className="mt-[20px] h-full w-full">
           <ShareDoctorFacility
             cancelClicked={cancelClicked}
             shareDoctorFacility={shareDoctor}

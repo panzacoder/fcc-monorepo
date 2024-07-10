@@ -114,6 +114,19 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 })
               }
             })
+          } else {
+            if (component === 'SignUp') {
+              let newTimeZone = moment.tz.guess()
+              data.data.timeZoneList.map((data: any, index: any) => {
+                if (data.name === newTimeZone) {
+                  timeZoneIndex = index + 1
+                  reset({
+                    timeZone: timeZoneIndex
+                  })
+                }
+              })
+              setAddressObject(timeZoneListFull[timeZoneIndex - 1], 8)
+            }
           }
           setIsDataReceived(true)
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
@@ -158,6 +171,11 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       let newTimeZone = moment.tz.guess()
       const countryObject = ct.getCountriesForTimezone(newTimeZone)
       countryName = countryObject[0]?.name ? countryObject[0].name : ''
+      staticData.countryList.map(async (data: any, index: any) => {
+        if (data.name === countryName) {
+          setAddressObject(staticData.countryList[index], 4)
+        }
+      })
     }
     staticData.countryList.map(async (data: any, index: any) => {
       if (data.name === countryName) {
@@ -179,15 +197,12 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   }, [])
 
   let locationData = data ? data : {}
+  // console.log('locationData', JSON.stringify(locationData))
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
         !_.isEmpty(locationData) && locationData.nickName
           ? locationData.nickName
-          : '',
-      shortName:
-        !_.isEmpty(locationData) && locationData.shortName
-          ? locationData.shortName
           : '',
       line:
         !_.isEmpty(locationData) && locationData.address.line
@@ -217,8 +232,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
       shortName:
-        !_.isEmpty(locationData) && locationData.shortName
-          ? locationData.shortName
+        !_.isEmpty(locationData) && locationData.shortDescription
+          ? locationData.shortDescription
           : ''
     },
     resolver: zodResolver(schema1)
@@ -257,19 +272,21 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   async function setSelectedTimeZoneChange(value: any) {
     // console.log('value', JSON.stringify(value))
     if (value) {
-      setAddressObject(timeZoneListFull[value.id - 1], 7)
+      setAddressObject(timeZoneListFull[value.id - 1], 8)
     }
   }
   return (
     <View className="w-full self-center py-2">
       <View className="w-full">
-        {component !== 'Profile' ? (
+        {component !== 'Profile' &&
+        component !== 'SignUp' &&
+        component !== 'CreateCircle' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledTextField
               control={control}
               name="locationName"
               placeholder={'Location Name'}
-              className="w-full bg-white"
+              className="w-full"
               onChangeText={(text) => {
                 setAddressObject(text, 0)
                 let shortName = text.substring(0, 10)
@@ -283,13 +300,15 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         ) : (
           <View />
         )}
-        {component !== 'Profile' ? (
+        {component !== 'Profile' &&
+        component !== 'SignUp' &&
+        component !== 'CreateCircle' ? (
           <View className="mt-2 w-full flex-row justify-center">
             <ControlledTextField
               control={control1}
               name="shortName"
               placeholder={'Short Name'}
-              className="w-full bg-white"
+              className="w-full"
               onChangeText={(text) => {
                 // console.log('text', text)
                 setAddressObject(text, 7)
@@ -305,7 +324,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="line"
             placeholder={'Address'}
-            className="w-full bg-white"
+            className="w-full"
             onChangeText={(text) => {
               console.log('text', text)
               setAddressObject(text, 1)
@@ -348,7 +367,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="city"
             placeholder={'City'}
-            className="w-full bg-white"
+            className="w-full"
             onChangeText={(text) => {
               // console.log('text', text)
               setAddressObject(text, 2)
@@ -360,7 +379,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="postalCode"
             placeholder={'Postal Code'}
-            className="w-full bg-white"
+            className="w-full"
             keyboard="number-pad"
             onChangeText={(text) => {
               // console.log('text', text)
@@ -368,7 +387,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             }}
           />
         </View>
-        {component === 'Profile' ? (
+        {component === 'Profile' ||
+        component === 'SignUp' ||
+        component === 'CreateCircle' ? (
           <View className="w-full self-center">
             <ControlledDropdown
               control={control}
