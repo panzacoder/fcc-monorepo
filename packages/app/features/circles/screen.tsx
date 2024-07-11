@@ -32,6 +32,7 @@ import { useForm } from 'react-hook-form'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
@@ -85,6 +86,7 @@ export function CirclesListScreen() {
   }, [])
   useEffect(() => {
     getMemberDetails()
+    store.dispatch(currentMemberAddressAction.setMemberAddress({}))
   }, [])
   async function acceptNewRequest(data: any) {
     acceptRejectMemberRequest(data, true)

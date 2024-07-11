@@ -8,25 +8,31 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL } from 'app/utils/urlConstants'
+import {
+  BASE_URL,
+  FIND_CIRCLE,
+  JOIN_CIRCLE,
+  CREATE_CIRCLE,
+  CREATE_CIRCLE_NO_EMAIL
+} from 'app/utils/urlConstants'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { Button } from 'app/ui/button'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { Feather } from 'app/ui/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 const schema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
-  email: z.string().min(1, { message: 'Email is required' }),
-  phone: z.string()
+  phone: z.string().optional()
 })
 const emailSchema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
+let email = ''
+let timeZoneId = ''
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -56,11 +62,11 @@ let selectedAddress: any = {
 export type Schema = z.infer<typeof schema>
 export function CreateCircleScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
+  const [isCircleExists, setIsCircleExists] = useState(false)
+  const [circleDetails, setCircleDetails] = useState({}) as any
   const [isYesNoClicked, setIsYesNoClicked] = useState(true)
   const [isFirstTime, setIsFirstTime] = useState(true)
   const header = store.getState().headerState.header
-  const item = useLocalSearchParams<any>()
   const router = useRouter()
 
   useEffect(() => {}, [])
@@ -68,7 +74,6 @@ export function CreateCircleScreen() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      email: '',
       phone: ''
     },
     resolver: zodResolver(schema)
@@ -115,9 +120,96 @@ export function CreateCircleScreen() {
       if (index === 6) {
         selectedAddress = value
       }
+      if (index === 8) {
+        timeZoneId = value.id
+      }
     }
 
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
+  }
+  async function findCircle(email: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${FIND_CIRCLE}`
+    let dataObject = {
+      header: header,
+      member: {
+        email: email
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          console.log('data', JSON.stringify(data))
+          setIsCircleExists(data.data !== null ? true : false)
+          setCircleDetails(data.data !== null ? data.data : {})
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function sendRequest() {
+    setLoading(true)
+    let url = `${BASE_URL}${JOIN_CIRCLE}`
+    let dataObject = {
+      header: header,
+      memberVo: {
+        id: circleDetails.id ? circleDetails.id : ''
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          router.dismissAll()
+          router.replace('/circles')
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  async function createCircle(formData: Schema) {
+    setLoading(true)
+    let url = ''
+    url = isYesNoClicked
+      ? `${BASE_URL}${CREATE_CIRCLE}`
+      : `${BASE_URL}${CREATE_CIRCLE_NO_EMAIL}`
+    selectedAddress.address.timezone = {
+      id: timeZoneId
+    }
+    let dataObject = {
+      header: header,
+      memberVo: {
+        id: '',
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        email: isYesNoClicked ? email : null,
+        address: selectedAddress.address
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        setLoading(false)
+        if (data.status === 'SUCCESS') {
+          router.dismissAll()
+          router.replace('/circles')
+        } else {
+          Alert.alert('', data.message)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
   }
   return (
     <View className="flex-1">
@@ -151,7 +243,7 @@ export function CreateCircleScreen() {
                   title={'Yes'}
                   variant="default"
                   onPress={() => {
-                    reset({
+                    reset1({
                       email: ''
                     })
                     setIsFirstTime(false)
@@ -163,11 +255,13 @@ export function CreateCircleScreen() {
                   title={'No'}
                   variant="default"
                   onPress={() => {
-                    reset({
+                    reset1({
                       email: 'default'
                     })
                     setIsFirstTime(false)
                     setIsYesNoClicked(false)
+                    setCircleDetails({})
+                    setIsCircleExists(false)
                   }}
                 />
               </View>
@@ -176,83 +270,116 @@ export function CreateCircleScreen() {
                   <Typography className="text-primary ml-1 mt-2 font-bold">
                     {'Member Details'}
                   </Typography>
-                  <View className="mt-2 w-full flex-row gap-2">
-                    {isYesNoClicked ? (
-                      <ControlledTextField
-                        control={contro1}
-                        name="email"
-                        placeholder={'Email*'}
-                        className="flex-1"
-                      />
-                    ) : (
-                      <View />
-                    )}
+                  {!isCircleExists ? (
+                    <View>
+                      <View className="mt-2 w-full flex-row gap-2">
+                        {isYesNoClicked ? (
+                          <ControlledTextField
+                            control={contro1}
+                            name="email"
+                            placeholder={'Email*'}
+                            autoCapitalize="none"
+                            className="flex-1"
+                            onChangeText={(text) => {
+                              email = text
+                            }}
+                            onBlur={() => {
+                              if (email !== '') {
+                                findCircle(email)
+                              }
+                            }}
+                          />
+                        ) : (
+                          <View />
+                        )}
 
-                    <ControlledTextField
-                      control={control}
-                      name="phone"
-                      placeholder="Phone"
-                      className="flex-1"
-                    />
-                  </View>
-                  <View className="mt-2 w-full flex-row gap-2">
-                    <ControlledTextField
-                      control={control}
-                      name="firstName"
-                      placeholder={'First Name*'}
-                      className="flex-1"
-                    />
-                    <ControlledTextField
-                      control={control}
-                      name="lastName"
-                      placeholder="Last Name*"
-                      className="flex-1"
-                    />
-                  </View>
-                  <Typography className="text-primary ml-1 mt-2 font-bold">
-                    {'Address'}
-                  </Typography>
-                  <View className="flex-1">
-                    <LocationDetails
-                      component={'CreateCircle'}
-                      data={{}}
-                      setAddressObject={setAddressObject}
-                    />
-                  </View>
-                  <View className="flex-1 self-center">
+                        <ControlledTextField
+                          control={control}
+                          name="phone"
+                          placeholder="Phone"
+                          className="flex-1"
+                        />
+                      </View>
+                      <View className="mt-2 w-full flex-row gap-2">
+                        <ControlledTextField
+                          control={control}
+                          name="firstName"
+                          placeholder={'First Name*'}
+                          className="flex-1"
+                        />
+                        <ControlledTextField
+                          control={control}
+                          name="lastName"
+                          placeholder="Last Name*"
+                          className="flex-1"
+                        />
+                      </View>
+                      <Typography className="text-primary ml-1 mt-2 font-bold">
+                        {'Address'}
+                      </Typography>
+                      <View className="flex-1">
+                        <LocationDetails
+                          component={'CreateCircle'}
+                          data={{}}
+                          setAddressObject={setAddressObject}
+                        />
+                      </View>
+                    </View>
+                  ) : (
+                    <View>
+                      <View className="mt-2 flex-row">
+                        <Typography className="w-[25%] font-bold">
+                          {'Name'}
+                        </Typography>
+                        <Typography className="font-400 max-w-[70%]">{`${circleDetails.firstName ? circleDetails.firstName : ''} ${circleDetails.lastName ? circleDetails.lastName : ''}`}</Typography>
+                      </View>
+                      <View className="mt-2 flex-row">
+                        <Typography className="w-[25%] font-bold">
+                          {'Email'}
+                        </Typography>
+                        <Typography className="font-400 max-w-[70%]">{`${circleDetails.email ? circleDetails.email : ''}`}</Typography>
+                      </View>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View />
+              )}
+              {!isFirstTime ? (
+                <View className="mb-10 flex-1 self-center">
+                  {!isCircleExists || !isYesNoClicked ? (
                     <Button
-                      className={`rounded-[10px] bg-[#5ACC6C] px-5`}
+                      className={`rounded-[10px] bg-[#5ACC6C] px-1`}
                       title={'I am an authorized caregiver'}
                       variant="default"
-                      onPress={() => {}}
+                      onPress={handleSubmit(createCircle)}
                     />
-                    {isYesNoClicked ? (
-                      <Button
-                        className={`mt-4 rounded-[10px] bg-[#ef6603] px-5`}
-                        title={'Send request to member'}
-                        variant="default"
-                        onPress={() => {
-                          reset({
-                            email: ''
-                          })
-                          setIsFirstTime(false)
-                          setIsYesNoClicked(true)
-                        }}
-                      />
-                    ) : (
-                      <View />
-                    )}
+                  ) : (
+                    <View />
+                  )}
 
+                  {isYesNoClicked ? (
                     <Button
-                      className={`my-4 rounded-[10px] bg-[#86939e] px-5`}
-                      title={'Cancel'}
+                      className={`mt-4 rounded-[10px] bg-[#ef6603] px-1 `}
+                      title={'Send request to member'}
                       variant="default"
                       onPress={() => {
-                        router.dismiss(2)
-                        router.replace('/circles')
+                        sendRequest()
                       }}
                     />
-                  </View>
+                  ) : (
+                    <View />
+                  )}
+
+                  <Button
+                    className={`my-4 rounded-[10px] bg-[#86939e] px-1`}
+                    title={'Cancel'}
+                    variant="default"
+                    onPress={() => {
+                      router.dismissAll()
+                      router.replace('/circles')
+                    }}
+                  />
                 </View>
               ) : (
                 <View />

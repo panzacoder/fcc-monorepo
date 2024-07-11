@@ -6,6 +6,7 @@ import store from 'app/redux/store'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import PtsLoader from 'app/ui/PtsLoader'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_STATES_AND_TIMEZONES } from 'app/utils/urlConstants'
@@ -33,12 +34,14 @@ let timeZoneIndex = -1
 export const LocationDetails = ({ component, data, setAddressObject }) => {
   const [statesList, setStateslist] = useState([]) as any
   const [timezonesList, setTimezonesList] = useState([]) as any
+  const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const staticData: any = store.getState().staticDataState.staticData
   const memberAddress: any =
     store.getState().currentMemberAddress.currentMemberAddress
   // console.log('memberAddress', JSON.stringify(memberAddress))
   const getStates = useCallback(async (countryId: any) => {
+    setLoading(true)
     let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
     let dataObject = {
       country: {
@@ -75,9 +78,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
                 stateIndex = index + 1
-                reset({
-                  state: stateIndex
-                })
               }
             })
             let timeZoneName = locationData.address.timezone.name
@@ -86,9 +86,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === timeZoneName) {
                 timeZoneIndex = index + 1
-                reset({
-                  timeZone: timeZoneIndex
-                })
               }
             })
           } else if (!_.isEmpty(memberAddress)) {
@@ -98,20 +95,15 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
                 stateIndex = index + 1
-                reset({
-                  state: stateIndex
-                })
               }
             })
+
             let timeZoneName = memberAddress.timezone.name
               ? memberAddress.timezone.name
               : ''
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === timeZoneName) {
                 timeZoneIndex = index + 1
-                reset({
-                  timeZone: timeZoneIndex
-                })
               }
             })
           } else {
@@ -120,15 +112,18 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               data.data.timeZoneList.map((data: any, index: any) => {
                 if (data.name === newTimeZone) {
                   timeZoneIndex = index + 1
-                  reset({
-                    timeZone: timeZoneIndex
-                  })
                 }
               })
               setAddressObject(timeZoneListFull[timeZoneIndex - 1], 8)
             }
           }
+          reset({
+            state: stateIndex,
+            timeZone: timeZoneIndex
+          })
+          setLoading(false)
           setIsDataReceived(true)
+
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
         } else {
           Alert.alert('', data.message)
@@ -156,7 +151,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       countryName = memberAddress.state.country.name
         ? memberAddress.state.country.name
         : ''
-      console.log('memberAddress', JSON.stringify(memberAddress))
       memberAddress.line = ''
       memberAddress.city = ''
       memberAddress.zipCode = ''
@@ -180,8 +174,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     staticData.countryList.map(async (data: any, index: any) => {
       if (data.name === countryName) {
         countryIndex = index + 1
-
-        // setIsRender(!isRender)
         reset({
           country: countryIndex
         })
@@ -195,9 +187,9 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   useEffect(() => {
     setCountryState()
   }, [])
-
   let locationData = data ? data : {}
   // console.log('locationData', JSON.stringify(locationData))
+
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
@@ -253,7 +245,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     let countryId = ''
     if (value) {
       if (isDataReceived) {
-        console.log('value', JSON.stringify(value))
         setAddressObject(staticData.countryList[value.id - 1], 4)
         countryId = staticData.countryList[value.id - 1].id
           ? staticData.countryList[value.id - 1].id
@@ -275,8 +266,10 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       setAddressObject(timeZoneListFull[value.id - 1], 8)
     }
   }
+
   return (
     <View className="w-full self-center py-2">
+      <PtsLoader loading={isLoading} />
       <View className="w-full">
         {component !== 'Profile' &&
         component !== 'SignUp' &&

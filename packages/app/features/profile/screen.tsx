@@ -551,8 +551,8 @@ export function ProfileScreen() {
             )}
             {getDetailsView(
               'Timezone',
-              memberDetails.timezone
-                ? `${memberDetails.timezone.name} (${memberDetails.timezone.abbreviation})`
+              memberDetails.address.timezone
+                ? `${memberDetails.address.timezone.name} (${memberDetails.address.timezone.abbreviation})`
                 : ''
             )}
           </View>

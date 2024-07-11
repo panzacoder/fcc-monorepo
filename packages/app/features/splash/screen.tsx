@@ -6,7 +6,7 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState } from 'react'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
-// import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getUserDeviceInformation } from 'app/utils/device'
 import headerAction from 'app/redux/header/headerAction'
@@ -24,22 +24,20 @@ export function SplashScreen() {
   const [isShowButtons, setIsShowButtons] = useState(false)
   const getUsernamePassword = useCallback(async () => {
     setLoading(true)
-    // try {
-    //   let loginDetails: any = await AsyncStorage.getItem('loginDetails')
-    //   loginDetails = loginDetails != null ? JSON.parse(loginDetails) : null
-    //   if (loginDetails !== null) {
-    //     login(loginDetails.email, loginDetails.password)
-    //   } else {
-    //     setIsShowButtons(true)
-    //     setLoading(false)
-    //   }
-    // } catch (e) {
-    //   // error reading value
-    //   setIsShowButtons(true)
-    //   setLoading(false)
-    // }
-    setIsShowButtons(true)
-    setLoading(false)
+    try {
+      let loginDetails: any = await AsyncStorage.getItem('loginDetails')
+      loginDetails = loginDetails != null ? JSON.parse(loginDetails) : null
+      if (loginDetails !== null) {
+        login(loginDetails.email, loginDetails.password)
+      } else {
+        setIsShowButtons(true)
+        setLoading(false)
+      }
+    } catch (e) {
+      // error reading value
+      setIsShowButtons(true)
+      setLoading(false)
+    }
   }, [])
   useEffect(() => {
     getUsernamePassword()

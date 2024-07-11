@@ -31,6 +31,7 @@ import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import * as Clipboard from 'expo-clipboard'
 let doctorPrivileges = {}
 export function DoctorDetailsScreen() {
   const header = store.getState().headerState.header
@@ -120,13 +121,16 @@ export function DoctorDetailsScreen() {
 
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 text-[16px] font-bold text-[#1A1A1A]'
-  function iconPressed(title: any, value: any) {
+  async function iconPressed(title: any, value: any) {
     if (title === 'Phone' && value !== '') {
       Linking.openURL(`tel:${value}`)
     } else if (title === 'Email' && value !== '') {
       Linking.openURL(`mailto:${value}`)
     } else if (title === 'Website' && value !== '') {
       Linking.openURL(`http://${getWebsite(value)}`)
+    } else if (title === 'Username' && value !== '') {
+      await Clipboard.setStringAsync(value)
+      Alert.alert('', 'Username copied to clipborad')
     }
   }
   function getDetailsView(
@@ -295,7 +299,7 @@ export function DoctorDetailsScreen() {
                 getDetailsView(
                   'Username',
                   doctorDetails.websiteuser,
-                  false,
+                  true,
                   'copy'
                 )
               ) : (

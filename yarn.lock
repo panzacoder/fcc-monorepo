@@ -4426,6 +4426,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-async-storage/async-storage@npm:1.21.0":
+  version: 1.21.0
+  resolution: "@react-native-async-storage/async-storage@npm:1.21.0"
+  dependencies:
+    merge-options: "npm:^3.0.4"
+  peerDependencies:
+    react-native: ^0.0.0-0 || >=0.60 <1.0
+  checksum: 10/7860faaa0ddb849ba4019f48fba90cffea686fb8a29813379ff38af8d635d4d8e7841735c2ba53b7788fb54312f157338e5630a768e9b2339dc33c4f5b316ca7
+  languageName: node
+  linkType: hard
+
 "@react-native-async-storage/async-storage@npm:^1.23.1":
   version: 1.23.1
   resolution: "@react-native-async-storage/async-storage@npm:1.23.1"
@@ -11397,12 +11408,14 @@ __metadata:
   resolution: "expo-app@workspace:apps/expo"
   dependencies:
     "@babel/core": "npm:^7.24.3"
+    "@react-native-async-storage/async-storage": "npm:1.21.0"
     "@react-native-community/datetimepicker": "npm:7.6.4"
     "@react-navigation/drawer": "npm:^6.6.15"
     "@types/react": "npm:^18.2.67"
     "@types/react-native-calendar-picker": "npm:^8"
     app: "workspace:*"
     expo: "npm:^50.0.14"
+    expo-clipboard: "npm:~5.0.1"
     expo-dev-client: "npm:~3.3.11"
     expo-device: "npm:^5.9.3"
     expo-image: "npm:~1.10.6"
@@ -11447,6 +11460,15 @@ __metadata:
   version: 2.7.0
   resolution: "expo-checkbox@npm:2.7.0"
   checksum: 10/7591030d37142cb256d899ceb3ceb157a922ac6c0463059cf8e0881d21133bbcf5df7439c36cf6fea74bada1cda471fb874cae26bf5f7796a1c20b6fd71a5ea4
+  languageName: node
+  linkType: hard
+
+"expo-clipboard@npm:~5.0.1":
+  version: 5.0.1
+  resolution: "expo-clipboard@npm:5.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/d3ac75dddcc4c453ae6268ccc63814b333fb81ea4b565c0a02baae1b422dc9c1da581412aa166cf6e1fe82e1660cd0d698f7a11209b5daf013df61a4d60652cc
   languageName: node
   linkType: hard
 
@@ -11984,7 +12006,7 @@ __metadata:
     react-native-blob-util: "npm:^0.19.9"
     react-native-calendar-picker: "npm:^8.0.2"
     react-native-calendars: "npm:^1.1304.1"
-    react-native-iap: "npm:10.1.3"
+    react-native-iap: "npm:^12.15.1"
     react-native-pdf: "npm:^6.7.5"
     redux-devtools-extension: "npm:^2.13.9"
     turbo: "npm:^1.13.0"
@@ -18181,13 +18203,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-iap@npm:10.1.3":
-  version: 10.1.3
-  resolution: "react-native-iap@npm:10.1.3"
+"react-native-iap@npm:^12.15.1":
+  version: 12.15.1
+  resolution: "react-native-iap@npm:12.15.1"
   peerDependencies:
+    expo: ">=47.0.0"
     react: ">=16.13.1"
     react-native: ">=0.65.1"
-  checksum: 10/d83541de103aa9788919dc642cbb61a58037c2b423c3ebe6d82dfd1e74dc53ca1b95d59f852cd3b954d04963ddcdb856903b24cb1b358f596727725497c3edcb
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 10/92115cde6e6b85cc42bd00cbd692d439049cafcf8ccf6768f81f49a29b5cbff0688883b9cbfcda5d2346e652c32c602b8846f4e17ffd0b79252e19bff61a665d
   languageName: node
   linkType: hard
 
