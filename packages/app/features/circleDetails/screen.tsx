@@ -28,7 +28,14 @@ export function CircleDetailsScreen() {
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
   )
-  // console.log('memberData', JSON.stringify(memberData))
+
+  if (item.component) {
+    memberData.component = item.component
+  } else {
+    memberData.component = ''
+  }
+  // console.log('component', item.component ? item.component : '')
+  console.log('memberData', JSON.stringify(memberData))
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
     todayAppt =
@@ -108,7 +115,7 @@ export function CircleDetailsScreen() {
   return (
     <View className=" flex-1">
       <PtsLoader loading={isLoading} />
-      <PtsBackHeader title="Circle Details" memberData={{}} />
+      <PtsBackHeader title="Circle Details" memberData={memberData} />
       <View className="mt-5">
         <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
       </View>

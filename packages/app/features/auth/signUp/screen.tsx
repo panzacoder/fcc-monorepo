@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Component, useState } from 'react'
 import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { Button } from 'app/ui/button'
@@ -18,10 +18,11 @@ import { CheckBox } from 'react-native-elements'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
+let firstName = ''
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -222,6 +223,9 @@ export function SignUpScreen() {
               onSubmitEditing={() => {
                 setFocus('lastName')
               }}
+              onChangeText={(text) => {
+                firstName = text
+              }}
             />
             <ControlledTextField
               name="lastName"
@@ -306,7 +310,15 @@ export function SignUpScreen() {
             <Typography>{' and '}</Typography>
             <Typography
               onPress={() => {
-                router.push('/privacyPolicy')
+                let signUpData = {
+                  firstName: firstName
+                }
+                router.push(
+                  formatUrl('/privacyPolicy', {
+                    component: 'SignUp',
+                    signUpData: JSON.stringify(signUpData)
+                  })
+                )
               }}
               className="text-primary font-bold"
             >
