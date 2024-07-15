@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
+import messaging from '@react-native-firebase/messaging'
 import {
   BASE_URL,
   GET_WEEK_DETAILS,
@@ -88,7 +89,29 @@ export function HomeScreen() {
     BackHandler.exitApp()
     return true
   }
+  const getFcmToken = async () => {
+    const fcmToken = await messaging().getToken()
+    if (fcmToken) {
+      console.log(fcmToken)
+      console.log('Your Firebase Token is:', fcmToken)
+      Alert.alert('', 'Your Firebase Token is:' + fcmToken)
+    } else {
+      console.log('Failed', 'No Token Recived')
+      Alert.alert('Failed', 'No Token Recived')
+    }
+  }
+  const getToken = useCallback(async () => {
+    const authStatus = await messaging().requestPermission()
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    if (enabled) {
+      getFcmToken()
+      console.log('Authorization status:', authStatus)
+    }
+  }, [])
   useEffect(() => {
+    getToken()
     getMemberDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
