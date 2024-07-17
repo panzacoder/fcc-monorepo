@@ -6,6 +6,7 @@ export const BASE_URL =
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
 export const USER_LOGOUT = 'userms/logout'
+export const UPDATE_FCM_TOKEN = 'userms/updateFcmToken';
 export const CREATE_ACCOUNT = 'regms/create'
 export const FORGOT_PASSWORD = 'userms/forgetPassword'
 export const RESET_PASSWORD = 'userms/resetPassword'

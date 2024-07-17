@@ -127,10 +127,12 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           // console.log('setStateslistFull', JSON.stringify(statesListFull))
         } else {
           Alert.alert('', data.message)
+          setLoading(false)
         }
       })
       .catch((error) => {
         console.log(error)
+        setLoading(false)
       })
   }, [])
   const setCountryState = useCallback(async () => {

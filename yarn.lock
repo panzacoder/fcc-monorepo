@@ -3336,6 +3336,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ide/backoff@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@ide/backoff@npm:1.0.0"
+  checksum: 10/05860fd05952c83e7bc2f23e5f25b9301a60d99254ee4a8d63f5907da0f908af9db718c9027dd2cdaec8203fa05e9dd6afaca767e7e69cefd0a0eef33d9a17ea
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -8327,6 +8334,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"badgin@npm:^1.1.5":
+  version: 1.2.3
+  resolution: "badgin@npm:1.2.3"
+  checksum: 10/14465ad87d9e949e825120db14fc351d39ba66a51396ae4fede2a55505ddc75c7d1a30ac28f2583896e76ed76ddb725a2038f9d7fe9404c0abc038bad58b1e53
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -11466,6 +11480,7 @@ __metadata:
     expo-linear-gradient: "npm:~12.7.2"
     expo-linking: "npm:~6.2.2"
     expo-localization: "npm:^14.8.3"
+    expo-notifications: "npm:~0.27.8"
     expo-router: "npm:~3.4.8"
     expo-splash-screen: "npm:~0.26.4"
     expo-status-bar: "npm:~1.11.1"
@@ -11484,6 +11499,15 @@ __metadata:
     typescript: "npm:^5.4.3"
   languageName: unknown
   linkType: soft
+
+"expo-application@npm:~5.8.0":
+  version: 5.8.4
+  resolution: "expo-application@npm:5.8.4"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/21ec1d8d08978079590d3a85814e9af063a0faafba6c5c1c88667448aeb887b28e5f275df2b757fe59f30d8484d556327b559f9ee85bc7f34a3acd5d35c83874
+  languageName: node
+  linkType: hard
 
 "expo-asset@npm:~9.0.2":
   version: 9.0.2
@@ -11699,6 +11723,24 @@ __metadata:
   dependencies:
     invariant: "npm:^2.2.4"
   checksum: 10/9c0dd3e6e9e6a218e6f41142e46e2a2e7c2a65937fdd061c8cac90f8bbf933088b9abb2cdf97f6833b9483911ebeca5ec8a5779c6933420291eedeaafbeb44bb
+  languageName: node
+  linkType: hard
+
+"expo-notifications@npm:~0.27.8":
+  version: 0.27.8
+  resolution: "expo-notifications@npm:0.27.8"
+  dependencies:
+    "@expo/image-utils": "npm:^0.4.0"
+    "@ide/backoff": "npm:^1.0.0"
+    abort-controller: "npm:^3.0.0"
+    assert: "npm:^2.0.0"
+    badgin: "npm:^1.1.5"
+    expo-application: "npm:~5.8.0"
+    expo-constants: "npm:~15.4.0"
+    fs-extra: "npm:^9.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/62dd2947228c5dc25b7abff8c3b2d94c27093675bba7fab3c615daa666d3ba863d24adc1559af6382f5191b50d7d5f7955dfa332f70d1b693691c5f2a5a4bb6d
   languageName: node
   linkType: hard
 

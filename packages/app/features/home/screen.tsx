@@ -1,7 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  BackHandler,
+  Platform
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -19,7 +25,8 @@ import {
   REJECT_TRANSPORT,
   APPROVE_TRANSPORT,
   EVENT_ACCEPT_TRANSPORTATION_REQUEST,
-  EVENT_REJECT_TRANSPORTATION_REQUEST
+  EVENT_REJECT_TRANSPORTATION_REQUEST,
+  UPDATE_FCM_TOKEN
 } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
@@ -27,11 +34,32 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TabsHeader } from 'app/ui/tabs-header'
+
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
+import Constants from 'expo-constants'
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false
+  })
+})
+
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
 export type Schema = z.infer<typeof schema>
 export function HomeScreen() {
+  const [expoPushToken, setExpoPushToken] = useState('')
+  const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
+    []
+  )
+  const [notification, setNotification] = useState<
+    Notifications.Notification | undefined
+  >(undefined)
+  const notificationListener = useRef<Notifications.Subscription>()
+  const responseListener = useRef<Notifications.Subscription>()
   const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
@@ -92,14 +120,43 @@ export function HomeScreen() {
   const getFcmToken = async () => {
     const fcmToken = await messaging().getToken()
     if (fcmToken) {
-      console.log(fcmToken)
       console.log('Your Firebase Token is:', fcmToken)
-      Alert.alert('', 'Your Firebase Token is:' + fcmToken)
+      updateFcmToken(fcmToken)
     } else {
       console.log('Failed', 'No Token Recived')
-      Alert.alert('Failed', 'No Token Recived')
     }
   }
+  async function updateFcmToken(fcmToken: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${UPDATE_FCM_TOKEN}`
+    let dataObject = {
+      header: header,
+      appuserVo: {
+        fcmToken: fcmToken
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+        } else {
+          Alert.alert('', data.message)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  const handleFcmMessage = useCallback(async () => {
+    messaging().setBackgroundMessageHandler((message) => {
+      console.log('in setBackgroundMessageHandler', JSON.stringify(message))
+    })
+    messaging().onMessage((message: any) => {
+      console.log('Notification recieved ' + JSON.stringify(message))
+      schedulePushNotification(message)
+    })
+  }, [])
   const getToken = useCallback(async () => {
     const authStatus = await messaging().requestPermission()
     const enabled =
@@ -110,9 +167,97 @@ export function HomeScreen() {
       console.log('Authorization status:', authStatus)
     }
   }, [])
+  async function registerForPushNotificationsAsync() {
+    let token: any
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C'
+      })
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync()
+      let finalStatus = existingStatus
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync()
+        finalStatus = status
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!')
+        return
+      }
+      // Learn more about projectId:
+      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+      // EAS projectId is used here.
+      try {
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId
+        if (!projectId) {
+          throw new Error('Project ID not found')
+        }
+        token = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId
+          })
+        ).data
+        console.log(token)
+      } catch (e) {
+        token = `${e}`
+      }
+    } else {
+      alert('Must use physical device for Push Notifications')
+    }
+
+    return token
+  }
+  async function schedulePushNotification(message: any) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: message.notification.title,
+        body: message.notification.body,
+        data: { data: 'goes here', test: { test1: 'more data' } }
+      },
+      trigger: { seconds: 2 }
+    })
+  }
   useEffect(() => {
     getToken()
     getMemberDetails()
+
+    handleFcmMessage()
+
+    registerForPushNotificationsAsync().then(
+      (token) => token && setExpoPushToken(token)
+    )
+    if (Platform.OS === 'android') {
+      Notifications.getNotificationChannelsAsync().then((value) =>
+        setChannels(value ?? [])
+      )
+    }
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification)
+      })
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response)
+      })
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        )
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current)
+    }
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(

@@ -460,9 +460,11 @@ export function CirclesListScreen() {
       {isShowPrivacyPolicy ? (
         <View className="w-full ">
           <PrivacyPolicy
+            address={{}}
             cancelClicked={cancelClicked}
             acceptClicked={acceptNewRequest}
             data={requestData}
+            component={'Circles'}
           />
         </View>
       ) : (

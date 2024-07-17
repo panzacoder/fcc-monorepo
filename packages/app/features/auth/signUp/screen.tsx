@@ -10,6 +10,8 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
 import { CardHeader } from '../card-header'
 import { CardView } from 'app/ui/layouts/card-view'
+import { PrivacyPolicy } from 'app/ui/privacyPolicy'
+import { TermsAndConditions } from 'app/ui/termsAndConditions'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
@@ -22,7 +24,6 @@ import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
-let firstName = ''
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -39,7 +40,7 @@ let selectedAddress: any = {
       snum: '',
       id: '',
       country: {
-        name: '',
+        name: 'India',
         code: '',
         namecode: '',
         isoCode: '',
@@ -83,6 +84,11 @@ export function SignUpScreen() {
   let userPhone = ''
   const [isLoading, setLoading] = useState(false)
   const [timeZone, setTimeZone] = useState('')
+  const [address, setAddress] = useState({})
+  const [isShowPrivacyPolicy, setIsShowPrivacyPolicy] = useState(false)
+  const [isShowTerms, setIsShowTerms] = useState(false)
+  const [isHideSignUpView, setIsHideSignUpView] = useState(false)
+  const [isFirstTimeView, setIsFirstTimeView] = useState(true)
   const [isTandCAccepted, setIsTandCAccepted] = useState(false)
 
   const formMethods = useForm<Schema>({
@@ -188,151 +194,177 @@ export function SignUpScreen() {
         console.log('timeZone', tz)
       }
     }
-
+    setAddress(selectedAddress)
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
+  async function acceptNewRequest(data: any) {}
+  const cancelClicked = (address: any) => {
+    setAddress(address)
+    setIsShowPrivacyPolicy(false)
+    setIsShowTerms(false)
+    setIsHideSignUpView(false)
+  }
   return (
-    <CardView scroll>
-      <CardHeader
-        actionSlot={
-          <View className="flex flex-1 flex-col items-end">
-            <Typography className="text-right">
-              {'Already a member?'}
-            </Typography>
-            <Button
-              title="Log in"
-              variant="link"
-              onPress={() => {
-                router.push('/login')
-              }}
-              className="p-0"
-            />
-          </View>
-        }
-      />
+    <View className="flex-1">
+      {!isHideSignUpView || isFirstTimeView ? (
+        <CardView scroll>
+          <CardHeader
+            actionSlot={
+              <View className="flex flex-1 flex-col items-end">
+                <Typography className="text-right">
+                  {'Already a member?'}
+                </Typography>
+                <Button
+                  title="Log in"
+                  variant="link"
+                  onPress={() => {
+                    router.push('/login')
+                  }}
+                  className="p-0"
+                />
+              </View>
+            }
+          />
 
-      <PtsLoader loading={isLoading} />
-      <View className="my-5 flex flex-shrink justify-end gap-y-4">
-        <View className="flex w-full gap-2">
-          <View className="flex w-full flex-row justify-between gap-2">
-            <ControlledTextField
-              name="firstName"
-              control={control}
-              className="flex-1"
-              placeholder={'First Name*'}
-              onSubmitEditing={() => {
-                setFocus('lastName')
-              }}
-              onChangeText={(text) => {
-                firstName = text
-              }}
-            />
-            <ControlledTextField
-              name="lastName"
-              control={control}
-              className="flex-1"
-              placeholder={'Last Name*'}
-              onSubmitEditing={() => {
-                setFocus('email')
-              }}
+          <PtsLoader loading={isLoading} />
+          <View className="my-5 flex flex-shrink justify-end gap-y-4">
+            <View className="flex w-full gap-2">
+              <View className="flex w-full flex-row justify-between gap-2">
+                <ControlledTextField
+                  name="firstName"
+                  control={control}
+                  className="flex-1"
+                  placeholder={'First Name*'}
+                  onSubmitEditing={() => {
+                    setFocus('lastName')
+                  }}
+                />
+                <ControlledTextField
+                  name="lastName"
+                  control={control}
+                  className="flex-1"
+                  placeholder={'Last Name*'}
+                  onSubmitEditing={() => {
+                    setFocus('email')
+                  }}
+                />
+              </View>
+              <ControlledTextField
+                name="email"
+                control={control}
+                placeholder={'Email Address*'}
+                autoCapitalize="none"
+                onSubmitEditing={() => {
+                  setFocus('phone')
+                }}
+              />
+              <ControlledTextField
+                name="phone"
+                control={control1}
+                placeholder={'Phone'}
+                keyboard={'numeric'}
+                onSubmitEditing={() => {
+                  setFocus('password')
+                }}
+                onChangeText={(value) => {
+                  userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+                  reset1({
+                    phone: userPhone
+                  })
+                }}
+              />
+              <ControlledSecureField
+                name="password"
+                control={control}
+                placeholder="Password*"
+                onSubmitEditing={() => {
+                  setFocus('confirmPassword')
+                }}
+              />
+              <ControlledSecureField
+                name="confirmPassword"
+                control={control}
+                placeholder="Confirm Password*"
+                onSubmitEditing={() => {}}
+              />
+              <LocationDetails
+                component={'SignUp'}
+                data={address}
+                setAddressObject={setAddressObject}
+              />
+            </View>
+            <View className="flex flex-row items-center justify-center">
+              <Controller
+                name="acceptTc"
+                control={control}
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <CheckBox
+                    checked={value}
+                    checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
+                    onPress={() => {
+                      onChange(!value)
+                      setIsTandCAccepted(!value)
+                    }}
+                    className="flex-shrink"
+                  />
+                )}
+              />
+              <Typography className="flex-1">
+                {'I accept the'}
+                <Typography
+                  className="text-primary font-bold"
+                  onPress={() => {
+                    setIsFirstTimeView(false)
+                    setIsShowTerms(true)
+                    setIsHideSignUpView(true)
+                  }}
+                >
+                  {' Terms and Conditions'}
+                </Typography>
+                <Typography>{' and '}</Typography>
+                <Typography
+                  onPress={() => {
+                    setIsFirstTimeView(false)
+                    setIsShowPrivacyPolicy(true)
+                    setIsHideSignUpView(true)
+                  }}
+                  className="text-primary font-bold"
+                >
+                  {'Privacy Policy.'}
+                </Typography>
+              </Typography>
+            </View>
+            <Button
+              onPress={handleSubmit(submitRegistration)}
+              className="w-full"
+              title="Sign Up"
+              disabled={!isTandCAccepted}
             />
           </View>
-          <ControlledTextField
-            name="email"
-            control={control}
-            placeholder={'Email Address*'}
-            autoCapitalize="none"
-            onSubmitEditing={() => {
-              setFocus('phone')
-            }}
-          />
-          <ControlledTextField
-            name="phone"
-            control={control1}
-            placeholder={'Phone'}
-            keyboard={'numeric'}
-            onSubmitEditing={() => {
-              setFocus('password')
-            }}
-            onChangeText={(value) => {
-              userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
-              reset1({
-                phone: userPhone
-              })
-            }}
-          />
-          <ControlledSecureField
-            name="password"
-            control={control}
-            placeholder="Password*"
-            onSubmitEditing={() => {
-              setFocus('confirmPassword')
-            }}
-          />
-          <ControlledSecureField
-            name="confirmPassword"
-            control={control}
-            placeholder="Confirm Password*"
-            onSubmitEditing={() => {}}
-          />
-          <LocationDetails
-            component={'SignUp'}
+        </CardView>
+      ) : (
+        <View />
+      )}
+      {isShowPrivacyPolicy ? (
+        <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
+          <PrivacyPolicy
+            address={address}
+            cancelClicked={cancelClicked}
+            acceptClicked={acceptNewRequest}
             data={{}}
-            setAddressObject={setAddressObject}
+            component={'SignUp'}
           />
         </View>
-        <View className="flex flex-row items-center justify-center">
-          <Controller
-            name="acceptTc"
-            control={control}
-            render={({ field: { onChange, value }, fieldState }) => (
-              <CheckBox
-                checked={value}
-                checkedColor={fieldState.invalid ? 'red' : '#6493d9'}
-                onPress={() => {
-                  onChange(!value)
-                  setIsTandCAccepted(!value)
-                }}
-                className="flex-shrink"
-              />
-            )}
-          />
-          <Typography className="flex-1">
-            {'I accept the'}
-            <Typography
-              className="text-primary font-bold"
-              onPress={() => {
-                router.push('/termsAndConditions')
-              }}
-            >
-              {' Terms and Conditions'}
-            </Typography>
-            <Typography>{' and '}</Typography>
-            <Typography
-              onPress={() => {
-                let signUpData = {
-                  firstName: firstName
-                }
-                router.push(
-                  formatUrl('/privacyPolicy', {
-                    component: 'SignUp',
-                    signUpData: JSON.stringify(signUpData)
-                  })
-                )
-              }}
-              className="text-primary font-bold"
-            >
-              {'Privacy Policy.'}
-            </Typography>
-          </Typography>
+      ) : (
+        <View />
+      )}
+      {isShowTerms ? (
+        <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
+          <TermsAndConditions  address={address} cancelClicked={cancelClicked} />
         </View>
-        <Button
-          onPress={handleSubmit(submitRegistration)}
-          className="w-full"
-          title="Sign Up"
-          disabled={!isTandCAccepted}
-        />
-      </View>
-    </CardView>
+      ) : (
+        <View />
+      )}
+    </View>
   )
 }
