@@ -1,7 +1,8 @@
 'use client'
 
 import { AccentButton } from 'app/ui/accent-button'
-import { View, Text, Alert } from 'react-native'
+import { View, Text, Alert, ToastAndroid } from 'react-native'
+import _ from 'lodash'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState } from 'react'
@@ -19,6 +20,8 @@ import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
+import messaging from '@react-native-firebase/messaging'
+let notificationData = {} as any
 export function SplashScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isShowButtons, setIsShowButtons] = useState(false)
@@ -34,14 +37,125 @@ export function SplashScreen() {
         setLoading(false)
       }
     } catch (e) {
-      // error reading value
       setIsShowButtons(true)
       setLoading(false)
     }
   }, [])
-  useEffect(() => {
-    getUsernamePassword()
+  const getNotificationData = useCallback(async () => {
+    try {
+      await messaging()
+        .getInitialNotification()
+        .then((notification: any) => {
+          if (notification) {
+            notificationData = notification
+          }
+        })
+
+      await messaging().onNotificationOpenedApp((remoteMessage: any) => {
+        if (remoteMessage) {
+          notificationData = remoteMessage
+        }
+      })
+      getUsernamePassword()
+    } catch (err) {
+      getUsernamePassword()
+    }
+
   }, [])
+
+  useEffect(() => {
+    getNotificationData()
+  }, [])
+  async function navigateToNotification() {
+    if (
+      !_.isEmpty(notificationData.data) &&
+      notificationData.data !== undefined
+    ) {
+      let notificationType = notificationData.data.MessageType
+        ? notificationData.data.MessageType
+        : ''
+      let memberData = {
+        member:
+          notificationData.data && notificationData.data.MemberId
+            ? notificationData.data.MemberId
+            : '',
+        firstname: '',
+        lastname: ''
+      }
+      let details = {
+        id:
+          notificationData.data && notificationData.data.DomainObjectId
+            ? notificationData.data.DomainObjectId
+            : ''
+      }
+      if (
+        String(notificationType).toLowerCase() ===
+        String('Appointment Reminder').toLowerCase()
+      ) {
+        router.push(
+          formatUrl('/circles/appointmentDetails', {
+            appointmentDetails: JSON.stringify(details),
+            memberData: JSON.stringify(memberData),
+            isFromNotification: 'true'
+          })
+        )
+      } else if (
+        String(notificationType).toLowerCase() ===
+        String('Purchase Reminder').toLowerCase()
+      ) {
+        router.push(
+          formatUrl('/circles/medicalDeviceDetails', {
+            medicalDevicesDetails: JSON.stringify(details),
+            memberData: JSON.stringify(memberData),
+            isFromNotification: 'true'
+          })
+        )
+      } else if (
+        String(notificationType).toLowerCase() ===
+        String('Event Reminder').toLowerCase()
+      ) {
+        router.push(
+          formatUrl('/circles/eventDetails', {
+            eventDetails: JSON.stringify(details),
+            memberData: JSON.stringify(memberData),
+            isFromNotification: 'true'
+          })
+        )
+      } else if (
+        String(notificationType).toLowerCase() ===
+          String('General').toLowerCase() ||
+        String(notificationType).toLowerCase() ===
+          String('Appointment').toLowerCase() ||
+        String(notificationType).toLowerCase() ===
+          String('General').toLowerCase() ||
+        String(notificationType).toLowerCase() ===
+          String('Incident').toLowerCase() ||
+        String(notificationType).toLowerCase() ===
+          String('Purchase').toLowerCase()
+      ) {
+        router.push(
+          formatUrl('/circles/messages', {
+            memberData: JSON.stringify(memberData),
+            isFromNotification: 'true'
+          })
+        )
+      } else if (
+        String(notificationType).toLowerCase() ===
+        'Member Request'.toLowerCase()
+      ) {
+        router.push(
+          formatUrl('/circles/caregiversList', {
+            memberData: JSON.stringify(memberData),
+            isFromNotification: 'true'
+          })
+        )
+      } else {
+        router.push('/home')
+      }
+    } else {
+      router.push('/home')
+    }
+  }
   async function login(email: any, password: any) {
     setLoading(true)
     let deviceInfo = await getUserDeviceInformation()
@@ -90,7 +204,7 @@ export function SplashScreen() {
               })
             )
           }
-          router.push('/home')
+          navigateToNotification()
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: email }))
         } else {

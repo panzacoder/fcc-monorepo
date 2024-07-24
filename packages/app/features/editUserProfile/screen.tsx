@@ -51,7 +51,6 @@ export function EditUserProfileScreen() {
   if (!_.isEmpty(userDetails)) {
     userPhone = userDetails.phone ? userDetails.phone : ''
   }
-  useEffect(() => {}, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName:

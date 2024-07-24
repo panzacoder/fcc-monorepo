@@ -6,8 +6,10 @@ import {
   Alert,
   TouchableOpacity,
   BackHandler,
-  Platform
+  Platform,
+  ToastAndroid
 } from 'react-native'
+import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -16,6 +18,7 @@ import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { formatUrl } from 'app/utils/format-url'
 import { CallPostService } from 'app/utils/fetchServerData'
 import messaging from '@react-native-firebase/messaging'
 import {
@@ -49,15 +52,13 @@ Notifications.setNotificationHandler({
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
+
 export type Schema = z.infer<typeof schema>
 export function HomeScreen() {
   const [expoPushToken, setExpoPushToken] = useState('')
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  const [notification, setNotification] = useState<
-    Notifications.Notification | undefined
-  >(undefined)
   const notificationListener = useRef<Notifications.Subscription>()
   const responseListener = useRef<Notifications.Subscription>()
   const router = useRouter()
@@ -80,7 +81,7 @@ export function HomeScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const getMemberDetails = useCallback(async () => {
+  const getWeekDetails = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_WEEK_DETAILS}`
     let dataObject = {
@@ -149,11 +150,10 @@ export function HomeScreen() {
       })
   }
   const handleFcmMessage = useCallback(async () => {
-    messaging().setBackgroundMessageHandler((message) => {
-      console.log('in setBackgroundMessageHandler', JSON.stringify(message))
+    await messaging().setBackgroundMessageHandler(async (message: any) => {
+      schedulePushNotification(message)
     })
-    messaging().onMessage((message: any) => {
-      console.log('Notification recieved ' + JSON.stringify(message))
+    await messaging().onMessage((message: any) => {
       schedulePushNotification(message)
     })
   }, [])
@@ -191,9 +191,6 @@ export function HomeScreen() {
         alert('Failed to get push token for push notification!')
         return
       }
-      // Learn more about projectId:
-      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-      // EAS projectId is used here.
       try {
         const projectId =
           Constants?.expoConfig?.extra?.eas?.projectId ??
@@ -217,21 +214,25 @@ export function HomeScreen() {
     return token
   }
   async function schedulePushNotification(message: any) {
+    Notifications.dismissAllNotificationsAsync()
     await Notifications.scheduleNotificationAsync({
       content: {
         title: message.notification.title,
         body: message.notification.body,
-        data: { data: 'goes here', test: { test1: 'more data' } }
+        data: {
+          MessageType: message.data.MessageType,
+          notificationData: message
+        }
       },
       trigger: { seconds: 2 }
     })
   }
+
   useEffect(() => {
     getToken()
-    getMemberDetails()
+    getWeekDetails()
 
     handleFcmMessage()
-
     registerForPushNotificationsAsync().then(
       (token) => token && setExpoPushToken(token)
     )
@@ -240,30 +241,112 @@ export function HomeScreen() {
         setChannels(value ?? [])
       )
     }
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification)
-      })
+    async function redirect(notification: any) {
+      notification = notification.request.content
+      if (
+        !_.isEmpty(notification.data.notificationData) &&
+        notification.data.notificationData !== undefined
+      ) {
+        let notificationType = notification.data.MessageType
+          ? notification.data.MessageType
+          : ''
+        let notificationData = notification.data.notificationData
+          ? notification.data.notificationData
+          : {}
+        let memberData = {
+          member:
+            notificationData.data && notificationData.data.MemberId
+              ? notificationData.data.MemberId
+              : '',
+          firstname: user.memberName ? user.memberName.split(' ')[0] : '',
+          lastname: user.memberName ? user.memberName.split(' ')[1] : ''
+        }
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response)
-      })
-
-    return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        )
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current)
+        let details = {
+          id:
+            notificationData.data && notificationData.data.DomainObjectId
+              ? notificationData.data.DomainObjectId
+              : ''
+        }
+        if (
+          String(notificationType).toLowerCase() ===
+          String('Appointment Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/appointmentDetails', {
+              appointmentDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          String('Purchase Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/medicalDeviceDetails', {
+              medicalDevicesDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          String('Event Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/eventDetails', {
+              eventDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+            String('General').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Appointment').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('General').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Incident').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Purchase').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/messages', {
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          'Member Request'.toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/caregiversList', {
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else {
+          router.push('/home')
+        }
+      }
     }
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response: any) => {
+        // Alert.alert('notification response', JSON.stringify(response))
+        redirect(response.notification)
+      }
+    )
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
         'hardwareBackPress',
         handleBackButtonClick
       )
+      subscription.remove()
     }
   }, [])
 
@@ -320,7 +403,7 @@ export function HomeScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setIsShowTransportationRequests(false)
-          getMemberDetails()
+          getWeekDetails()
         } else {
           Alert.alert('', data.message)
         }
@@ -419,7 +502,7 @@ export function HomeScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setIsRejectTransportRequest(false)
-          getMemberDetails()
+          getWeekDetails()
         } else {
           Alert.alert('', data.message)
           setLoading(false)

@@ -8,6 +8,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import store from 'app/redux/store'
+import { Image } from 'app/ui/image'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -176,13 +177,21 @@ export function Location(data: any) {
             let addressString = getAddressFromObject(locationData.address)
             googleMapOpenUrl(addressString)
           }}
-          className={`${touchStyle} ml-5`}
+          className={`${touchStyle} ml-5 bg-white`}
         >
-          <Feather
+          {/* <Feather
             className="self-center "
             name={'corner-up-right'}
             size={20}
             color={'white'}
+          /> */}
+          <Image
+            className=""
+            src={require('app/assets/direction.jpg')}
+            width={35}
+            height={35}
+            contentFit={'contain'}
+            alt="logo"
           />
         </TouchableOpacity>
       </View>

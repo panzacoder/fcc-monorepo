@@ -1,12 +1,20 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, TextInput } from 'react-native'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  TextInput,
+  ToastAndroid
+} from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
+import messaging from '@react-native-firebase/messaging'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
+import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -26,6 +34,13 @@ import {
   UPDATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
 import { AddMessageThread } from 'app/ui/addMessageThread'
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 export function NoteMessageScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
@@ -126,7 +141,17 @@ export function NoteMessageScreen() {
         console.log(error)
       })
   }, [])
+  const handleFcmMessage = useCallback(async () => {
+    Notifications.setNotificationHandler(null)
+    await messaging().setBackgroundMessageHandler(async (message: any) => {
+      getNoteDetails()
+    })
+    await messaging().onMessage((message: any) => {
+      getNoteDetails()
+    })
+  }, [])
   useEffect(() => {
+    handleFcmMessage()
     getNoteDetails()
   }, [])
 

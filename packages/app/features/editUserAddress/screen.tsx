@@ -50,7 +50,6 @@ let selectedAddress: any = {
 }
 export function EditUserAddressScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const header = store.getState().headerState.header
   const item = useLocalSearchParams<any>()
   const router = useRouter()
@@ -65,7 +64,6 @@ export function EditUserAddressScreen() {
     memberData = object
   }
   console.log('memberData', JSON.stringify(memberData))
-  useEffect(() => {}, [])
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {

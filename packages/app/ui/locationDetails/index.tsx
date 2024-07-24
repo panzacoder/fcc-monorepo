@@ -27,13 +27,13 @@ const schema1 = z.object({
 export type Schema = z.infer<typeof schema>
 export type Schema1 = z.infer<typeof schema1>
 let statesListFull = []
+let statesList: Array<{ id: number; title: string }> = []
+let timezonesList: Array<{ id: number; title: string }> = []
 let timeZoneListFull = []
 let countryIndex = -1
 let stateIndex = -1
 let timeZoneIndex = -1
 export const LocationDetails = ({ component, data, setAddressObject }) => {
-  const [statesList, setStateslist] = useState([]) as any
-  const [timezonesList, setTimezonesList] = useState([]) as any
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const staticData: any = store.getState().staticDataState.staticData
@@ -51,7 +51,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          let statesList: Array<{ id: number; title: string }> =
+          let stateList: Array<{ id: number; title: string }> =
             data.data.stateList.map(({ name, id }: Response, index: any) => {
               return {
                 title: name,
@@ -65,8 +65,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 id: index + 1
               }
             })
-          setStateslist(statesList)
-          setTimezonesList(timeZoneList)
+          statesList = stateList
+          timezonesList = timeZoneList
           statesListFull = data.data.stateList ? data.data.stateList : []
           timeZoneListFull = data.data.timeZoneList
             ? data.data.timeZoneList
@@ -214,8 +214,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
           ? countryIndex
           : 97,
-      state:
-        !_.isEmpty(locationData) || !_.isEmpty(memberAddress) ? stateIndex : -1,
+      state: stateIndex,
       timeZone:
         !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
           ? timeZoneIndex
@@ -254,7 +253,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         await getStates(countryId)
       }
     } else {
-      setStateslist([])
+      statesList = []
     }
   }
   async function setSelectedStateChange(value: any) {
@@ -332,11 +331,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="country"
             label="Country*"
             maxHeight={300}
-            // defaultValue={
-            //   countryIndex !== -1 && countryList[countryIndex - 1]
-            //     ? countryList[countryIndex - 1]?.title
-            //     : ''
-            // }
             list={countryList}
             onChangeValue={setSelectedCountryChange}
           />
@@ -346,11 +340,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             control={control}
             name="state"
             label="State*"
-            defaultValue={
-              stateIndex !== -1 && statesList[stateIndex - 1]
-                ? statesList[stateIndex - 1].title
-                : ''
-            }
             maxHeight={300}
             list={statesList}
             onChangeValue={setSelectedStateChange}
@@ -390,11 +379,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               control={control}
               name="timeZone"
               label="Timezone*"
-              defaultValue={
-                timeZoneIndex !== -1 && timezonesList[timeZoneIndex - 1]
-                  ? timezonesList[timeZoneIndex - 1].title
-                  : ''
-              }
               maxHeight={300}
               list={timezonesList}
               onChangeValue={setSelectedTimeZoneChange}

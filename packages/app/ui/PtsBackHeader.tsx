@@ -3,8 +3,10 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
+import store from 'app/redux/store'
 export const PtsBackHeader = ({ title, memberData }) => {
   const router = useRouter()
+  const user = store.getState().userProfileState.header
   async function goToScreen(title: any) {
     if (title === 'Appointment Details') {
       router.dismiss(2)
@@ -94,17 +96,10 @@ export const PtsBackHeader = ({ title, memberData }) => {
       title === 'Medical Devices' ||
       title === 'Messages'
     ) {
-      let fullName = ''
-      if (memberData.firstname) {
-        fullName += memberData.firstname.trim() + ' '
-      }
-      if (memberData.lastname) {
-        fullName += memberData.lastname.trim()
-      }
+
       router.dismiss(2)
       router.push(
         formatUrl('/circles/circleDetails', {
-          fullName,
           memberData: JSON.stringify(memberData)
         })
       )
