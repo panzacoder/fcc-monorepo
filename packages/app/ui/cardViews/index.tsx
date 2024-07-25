@@ -1,11 +1,17 @@
 import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
+import {
+  getFullDateForCalendar,
+  getNameInitials,
+  getColorSet
+} from 'app/ui/utils'
+import store from 'app/redux/store'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 export const CardView = ({ data, trasportationClicked }) => {
   const router = useRouter()
+  let memberNamesList: any = store.getState().memberNames.memberNamesList
   let memberData = data ? JSON.parse(data) : {}
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'
@@ -91,23 +97,7 @@ export const CardView = ({ data, trasportationClicked }) => {
       eventText += memberData.upcomingEvent.location
     }
   }
-  async function transportClicked() {
-    console.log('transportClicked')
-  }
-  const showRequestModal = () => {
-    return (
-      <View
-        style={{
-          backgroundColor: 'white'
-        }}
-        className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda] "
-      >
-        <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
-          <Typography className=" w-full self-center text-center font-bold text-white">{`Transportation`}</Typography>
-        </View>
-      </View>
-    )
-  }
+  let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||
@@ -116,7 +106,9 @@ export const CardView = ({ data, trasportationClicked }) => {
         <View className="m-auto flex-1 ">
           <View className="rounded-2xl bg-white px-2 pt-5">
             <View className="flex-row">
-              <View className="bg-primary h-[40px] w-[40px] items-center justify-center rounded-[20px]">
+              <View
+                className={`h-[40px] w-[40px] items-center justify-center rounded-[20px] ${backgroundColor}`}
+              >
                 <Typography className="self-center text-[19px] text-white">
                   {getNameInitials(fullName)}
                 </Typography>

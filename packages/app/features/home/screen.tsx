@@ -37,7 +37,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TabsHeader } from 'app/ui/tabs-header'
-
+import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import Constants from 'expo-constants'
@@ -59,11 +59,19 @@ export function HomeScreen() {
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  const notificationListener = useRef<Notifications.Subscription>()
-  const responseListener = useRef<Notifications.Subscription>()
+  let memberNamesList: any =
+    store.getState().memberNames.memberNamesList !== undefined
+      ? store.getState().memberNames.memberNamesList
+      : []
   const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
+
+  let fullName = user.memberName ? user.memberName : ''
+  if (memberNamesList.includes(fullName) === false) {
+    memberNamesList.push(fullName)
+  }
+  store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
@@ -92,6 +100,14 @@ export function HomeScreen() {
         if (data.status === 'SUCCESS') {
           let memberList = data.data.memberList ? data.data.memberList : []
           setMemberList(memberList)
+
+          memberList.map((data: any) => {
+            let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+            if (memberNamesList.includes(fullName) === false) {
+              memberNamesList.push(fullName)
+            }
+          })
+          store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           let sentence = ''
           sentence +=
             data.data.upcomingAppointmentCount &&
@@ -561,7 +577,13 @@ export function HomeScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="">
-        <TabsHeader />
+        {isDataReceived ? (
+          <View>
+            <TabsHeader />
+          </View>
+        ) : (
+          <View />
+        )}
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">
