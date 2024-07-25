@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { View, Alert, TouchableOpacity, Pressable } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -11,6 +11,7 @@ import { COLORS } from 'app/utils/colors'
 import store from 'app/redux/store'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { AddMessageThread } from 'app/ui/addMessageThread'
+import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
@@ -25,6 +26,7 @@ import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 export function MessagesScreen() {
   const header = store.getState().headerState.header
+  let memberNamesList: any = store.getState().memberNames.memberNamesList
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -165,6 +167,14 @@ export function MessagesScreen() {
             object.isSelected = false
             return object
           })
+
+          // data.data.map((data: any) => {
+          //   let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+          //   if (memberNamesList.includes(fullName) === false) {
+          //     memberNamesList.push(fullName)
+          //   }
+          // })
+          // store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           setParticipantsList(list)
           setIsMessageThread(true)
         } else {
@@ -308,7 +318,7 @@ export function MessagesScreen() {
         <ScrollView className="m-2 mx-5 w-full self-center">
           {messagesList.map((data: any, index: number) => {
             return (
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
                   router.push(
                     formatUrl('/circles/noteMessage', {
@@ -364,6 +374,13 @@ export function MessagesScreen() {
                     >
                       {data.participantDetailsList.map(
                         (data: any, index: number) => {
+                          let fullName = data.name ? data.name : ''
+                          if (memberNamesList.includes(fullName) === false) {
+                            memberNamesList.push(fullName)
+                            store.dispatch(
+                              memberNamesAction.setMemberNames(memberNamesList)
+                            )
+                          }
                           return (
                             <View key={index} className="ml-2">
                               <PtsNameInitials
@@ -379,7 +396,7 @@ export function MessagesScreen() {
                     <Feather name={'chevron-right'} size={20} color={'black'} />
                   </View>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             )
           })}
         </ScrollView>

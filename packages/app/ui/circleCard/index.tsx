@@ -1,16 +1,18 @@
-import { View, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity, Pressable } from 'react-native'
 import { useState } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { getNameInitials } from 'app/ui/utils'
+import { getNameInitials, getColorSet } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Image } from 'app/ui/image'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { googleMapOpenUrl } from 'app/ui/utils'
+import store from 'app/redux/store'
 
 export const CircleCard = ({ data, index, hideCirclesView }) => {
   const router = useRouter()
+  let memberNamesList: any = store.getState().memberNames.memberNamesList
   const [isLoading, setLoading] = useState(false)
   const memberData = data
   let fullName = ''
@@ -35,11 +37,11 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   let iconStyle = 'mt-1 w-[25%] items-center'
   let textStyle =
     'ml-[-5px] h-[20px] w-[20px] rounded-[10px] bg-[#5ACC6C] text-center font-bold text-white'
-
+  let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
-      <TouchableOpacity
+      <Pressable
         className={`mt-3 w-full self-center rounded-[10px] border-[2px] bg-white py-2 ${memberData.role === 'My Circle' || memberData.role === 'AuthorizedCaregiver' ? 'border-[#287CFA]' : 'border-[#3DC4C4]'}`}
         onPress={() => {
           router.dismiss(1)
@@ -54,7 +56,9 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
       >
         <View className="flex-row">
           <View className="flex-1 flex-row">
-            <View className="bg-primary ml-5 h-[40px] w-[40px] items-center justify-center rounded-[20px]">
+            <View
+              className={`ml-5 h-[40px] w-[40px] items-center justify-center rounded-full ${backgroundColor}`}
+            >
               <Typography className="self-center text-[19px] text-white">
                 {getNameInitials(fullName)}
               </Typography>
@@ -184,7 +188,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             )}
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   )
 }
