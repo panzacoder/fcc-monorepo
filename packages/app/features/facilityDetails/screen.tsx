@@ -11,6 +11,7 @@ import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import * as Clipboard from 'expo-clipboard'
 import {
   BASE_URL,
   GET_FACILITY_DETAILS,
@@ -69,7 +70,10 @@ export function FacilityDetailsScreen() {
                 : {}
             }
             setFacilityDetails(data.data.facilityWithAppointment.facility || {})
-
+            // console.log(
+            //   'facilityWithAppointment',
+            //   JSON.stringify(data.data.facilityWithAppointment.facility)
+            // )
             setLocationList(
               data.data.facilityWithAppointment &&
                 data.data.facilityWithAppointment.facility.facilityLocationList
@@ -178,6 +182,10 @@ export function FacilityDetailsScreen() {
       </View>
     )
   }
+  async function copyToClipboard(value: any) {
+    await Clipboard.setStringAsync(value)
+    Alert.alert('', 'Username copied to clipborad')
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -225,28 +233,41 @@ export function FacilityDetailsScreen() {
                 'Description',
                 facilityDetails.description ? facilityDetails.description : ''
               )}
-              {facilityDetails.website !== '' ? (
+              {facilityDetails.website !== null &&
+              facilityDetails.website !== '' ? (
                 <View className="mt-2 w-[95%] flex-row">
                   <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
                     {'Facility Portal'}
                   </Typography>
                   <Typography className="font-400 text-primary w-[70%] text-[16px] underline">
-                    {facilityDetails.website ? facilityDetails.website : ''}
+                    {facilityDetails.website}
                   </Typography>
                 </View>
               ) : (
                 <View />
               )}
-              {facilityDetails.websiteuser !== '' ? (
+              {facilityDetails.websiteuser !== null &&
+              facilityDetails.websiteuser !== '' ? (
                 <View className="mt-2 w-[95%] flex-row">
                   <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
                     {'Portal Username'}
                   </Typography>
-                  <Typography className="font-400 text-primary w-[70%] text-[16px]">
-                    {facilityDetails.websiteuser
-                      ? facilityDetails.websiteuser
-                      : ''}
+                  <Typography className="font-400 text-primary w-[60%] text-[16px]">
+                    {facilityDetails.websiteuser}
                   </Typography>
+                  <TouchableOpacity
+                    className=""
+                    onPress={() => {
+                      copyToClipboard(facilityDetails.websiteuser)
+                    }}
+                  >
+                    <Feather
+                      className=""
+                      name={'copy'}
+                      size={20}
+                      color={'black'}
+                    />
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <View />

@@ -46,7 +46,8 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
           router.push(
             formatUrl('/circles/circleDetails', {
               fullName,
-              memberData: JSON.stringify(memberData)
+              memberData: JSON.stringify(memberData),
+              component: 'Circles'
             })
           )
         }}

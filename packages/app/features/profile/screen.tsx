@@ -93,7 +93,6 @@ export function ProfileScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let appUser = data.data.appuser ? data.data.appuser : {}
-          console.log('data.data.member', JSON.stringify(data.data.member))
           setAppuserDetails(appUser)
           let member = data.data.member ? data.data.member : {}
           setMemberDetails(member)
@@ -551,8 +550,8 @@ export function ProfileScreen() {
             )}
             {getDetailsView(
               'Timezone',
-              memberDetails.timezone
-                ? `${memberDetails.timezone.name} (${memberDetails.timezone.abbreviation})`
+              memberDetails.address.timezone
+                ? `${memberDetails.address.timezone.name} (${memberDetails.address.timezone.abbreviation})`
                 : ''
             )}
           </View>

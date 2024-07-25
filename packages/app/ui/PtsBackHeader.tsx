@@ -1,13 +1,13 @@
 import { View, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { useRouter, useNavigation } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
+import store from 'app/redux/store'
 export const PtsBackHeader = ({ title, memberData }) => {
   const router = useRouter()
-  const navigation = useNavigation()
+  const user = store.getState().userProfileState.header
   async function goToScreen(title: any) {
-    console.log('title', title)
     if (title === 'Appointment Details') {
       router.dismiss(2)
       router.push(
@@ -75,7 +75,14 @@ export const PtsBackHeader = ({ title, memberData }) => {
           memberData: JSON.stringify(memberData)
         })
       )
-    } else if (title === 'Circle Details' || title === 'Profile') {
+    } else if (title === 'Circle Details') {
+      router.dismissAll()
+      if (memberData.component === 'Circles') {
+        router.push('/circles')
+      } else {
+        router.push('/home')
+      }
+    } else if (title === 'Profile') {
       router.dismissAll()
       router.push('/home')
     } else if (
@@ -89,20 +96,16 @@ export const PtsBackHeader = ({ title, memberData }) => {
       title === 'Medical Devices' ||
       title === 'Messages'
     ) {
-      let fullName = ''
-      if (memberData.firstname) {
-        fullName += memberData.firstname.trim() + ' '
-      }
-      if (memberData.lastname) {
-        fullName += memberData.lastname.trim()
-      }
+
       router.dismiss(2)
       router.push(
         formatUrl('/circles/circleDetails', {
-          fullName,
           memberData: JSON.stringify(memberData)
         })
       )
+    } else if (title === 'Privacy Policy') {
+      router.dismissAll()
+      router.push('/signUp')
     } else {
       router.back()
     }

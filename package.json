@@ -27,7 +27,6 @@
     "chromatic": "npx chromatic --project-token=chpt_0d90c7462008c0a --build-script-name=web:sb:build"
   },
   "resolutions": {
-    "react-native-reanimated": "3.6.2",
     "@react-native/assets-registry@npm:0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch",
     "@react-native/assets-registry@npm:~0.73.1": "patch:@react-native/assets-registry@npm%3A0.73.1#~/.yarn/patches/@react-native-assets-registry-npm-0.73.1-6ddee188d1.patch"
   },
@@ -36,15 +35,14 @@
     "**/expo-router/**"
   ],
   "packageManager": "yarn@4.1.1",
-  "version": "",
+  "version": "1.0",
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@stripe/stripe-react-native": "0.28.0",
-    "expo-secure-store": "~12.8.1",
     "react-native-blob-util": "^0.19.9",
     "react-native-calendar-picker": "^8.0.2",
     "react-native-calendars": "^1.1304.1",
-    "react-native-iap": "10.1.3",
+    "react-native-iap": "^12.15.1",
     "react-native-pdf": "^6.7.5"
   }
 }

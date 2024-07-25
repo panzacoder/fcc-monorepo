@@ -1,7 +1,15 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  BackHandler,
+  Platform,
+  ToastAndroid
+} from 'react-native'
+import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -10,7 +18,9 @@ import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import { formatUrl } from 'app/utils/format-url'
 import { CallPostService } from 'app/utils/fetchServerData'
+import messaging from '@react-native-firebase/messaging'
 import {
   BASE_URL,
   GET_WEEK_DETAILS,
@@ -18,7 +28,8 @@ import {
   REJECT_TRANSPORT,
   APPROVE_TRANSPORT,
   EVENT_ACCEPT_TRANSPORTATION_REQUEST,
-  EVENT_REJECT_TRANSPORTATION_REQUEST
+  EVENT_REJECT_TRANSPORTATION_REQUEST,
+  UPDATE_FCM_TOKEN
 } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
@@ -26,11 +37,30 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TabsHeader } from 'app/ui/tabs-header'
+
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
+import Constants from 'expo-constants'
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false
+  })
+})
+
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
+
 export type Schema = z.infer<typeof schema>
 export function HomeScreen() {
+  const [expoPushToken, setExpoPushToken] = useState('')
+  const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
+    []
+  )
+  const notificationListener = useRef<Notifications.Subscription>()
+  const responseListener = useRef<Notifications.Subscription>()
   const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
@@ -51,7 +81,7 @@ export function HomeScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const getMemberDetails = useCallback(async () => {
+  const getWeekDetails = useCallback(async () => {
     setLoading(true)
     let url = `${BASE_URL}${GET_WEEK_DETAILS}`
     let dataObject = {
@@ -88,14 +118,235 @@ export function HomeScreen() {
     BackHandler.exitApp()
     return true
   }
+  const getFcmToken = async () => {
+    const fcmToken = await messaging().getToken()
+    if (fcmToken) {
+      console.log('Your Firebase Token is:', fcmToken)
+      updateFcmToken(fcmToken)
+    } else {
+      console.log('Failed', 'No Token Recived')
+    }
+  }
+  async function updateFcmToken(fcmToken: any) {
+    setLoading(true)
+    let url = `${BASE_URL}${UPDATE_FCM_TOKEN}`
+    let dataObject = {
+      header: header,
+      appuserVo: {
+        fcmToken: fcmToken
+      }
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+        } else {
+          Alert.alert('', data.message)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }
+  const handleFcmMessage = useCallback(async () => {
+    await messaging().setBackgroundMessageHandler(async (message: any) => {
+      schedulePushNotification(message)
+    })
+    await messaging().onMessage((message: any) => {
+      schedulePushNotification(message)
+    })
+  }, [])
+  const getToken = useCallback(async () => {
+    const authStatus = await messaging().requestPermission()
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    if (enabled) {
+      getFcmToken()
+      console.log('Authorization status:', authStatus)
+    }
+  }, [])
+  async function registerForPushNotificationsAsync() {
+    let token: any
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C'
+      })
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync()
+      let finalStatus = existingStatus
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync()
+        finalStatus = status
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!')
+        return
+      }
+      try {
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId
+        if (!projectId) {
+          throw new Error('Project ID not found')
+        }
+        token = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId
+          })
+        ).data
+        console.log(token)
+      } catch (e) {
+        token = `${e}`
+      }
+    } else {
+      alert('Must use physical device for Push Notifications')
+    }
+
+    return token
+  }
+  async function schedulePushNotification(message: any) {
+    Notifications.dismissAllNotificationsAsync()
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: message.notification.title,
+        body: message.notification.body,
+        data: {
+          MessageType: message.data.MessageType,
+          notificationData: message
+        }
+      },
+      trigger: { seconds: 2 }
+    })
+  }
+
   useEffect(() => {
-    getMemberDetails()
+    getToken()
+    getWeekDetails()
+
+    handleFcmMessage()
+    registerForPushNotificationsAsync().then(
+      (token) => token && setExpoPushToken(token)
+    )
+    if (Platform.OS === 'android') {
+      Notifications.getNotificationChannelsAsync().then((value) =>
+        setChannels(value ?? [])
+      )
+    }
+    async function redirect(notification: any) {
+      notification = notification.request.content
+      if (
+        !_.isEmpty(notification.data.notificationData) &&
+        notification.data.notificationData !== undefined
+      ) {
+        let notificationType = notification.data.MessageType
+          ? notification.data.MessageType
+          : ''
+        let notificationData = notification.data.notificationData
+          ? notification.data.notificationData
+          : {}
+        let memberData = {
+          member:
+            notificationData.data && notificationData.data.MemberId
+              ? notificationData.data.MemberId
+              : '',
+          firstname: user.memberName ? user.memberName.split(' ')[0] : '',
+          lastname: user.memberName ? user.memberName.split(' ')[1] : ''
+        }
+
+        let details = {
+          id:
+            notificationData.data && notificationData.data.DomainObjectId
+              ? notificationData.data.DomainObjectId
+              : ''
+        }
+        if (
+          String(notificationType).toLowerCase() ===
+          String('Appointment Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/appointmentDetails', {
+              appointmentDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          String('Purchase Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/medicalDeviceDetails', {
+              medicalDevicesDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          String('Event Reminder').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/eventDetails', {
+              eventDetails: JSON.stringify(details),
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+            String('General').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Appointment').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('General').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Incident').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Purchase').toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/messages', {
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else if (
+          String(notificationType).toLowerCase() ===
+          'Member Request'.toLowerCase()
+        ) {
+          router.push(
+            formatUrl('/circles/caregiversList', {
+              memberData: JSON.stringify(memberData),
+              isFromNotification: 'true'
+            })
+          )
+        } else {
+          router.push('/home')
+        }
+      }
+    }
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response: any) => {
+        // Alert.alert('notification response', JSON.stringify(response))
+        redirect(response.notification)
+      }
+    )
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
         'hardwareBackPress',
         handleBackButtonClick
       )
+      subscription.remove()
     }
   }, [])
 
@@ -152,7 +403,7 @@ export function HomeScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setIsShowTransportationRequests(false)
-          getMemberDetails()
+          getWeekDetails()
         } else {
           Alert.alert('', data.message)
         }
@@ -251,7 +502,7 @@ export function HomeScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           setIsRejectTransportRequest(false)
-          getMemberDetails()
+          getWeekDetails()
         } else {
           Alert.alert('', data.message)
           setLoading(false)

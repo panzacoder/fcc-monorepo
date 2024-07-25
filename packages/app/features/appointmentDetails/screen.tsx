@@ -32,7 +32,8 @@ import {
   RESEND_TRANSPORTATION_REQUEST,
   DELETE_TRANSPORTATION,
   CANCEL_TRANSPORTATION_REQUEST,
-  SEND_CALENDAR_INVITE
+  SEND_CALENDAR_INVITE,
+  GET_MEMBER_DETAILS
 } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
@@ -58,10 +59,13 @@ export function AppointmentDetailsScreen() {
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
+  const [memberData, setMemberData] = useState(
+    item.memberData ? JSON.parse(item.memberData) : {}
+  )
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isAddTransportation, setIsAddTransportation] = useState(false)
@@ -91,7 +95,7 @@ export function AppointmentDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            console.log('appointmentInfo', '' + JSON.stringify(data.data))
+            // console.log('appointmentInfo', '' + JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
               appointmentPrivileges = data.data.domainObjectPrivileges
                 .Appointment
@@ -175,10 +179,38 @@ export function AppointmentDetailsScreen() {
     )
     return true
   }
+  const getMemberDetails = useCallback(async () => {
+    let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
+    let dataObject = {
+      header: header
+    }
+    CallPostService(url, dataObject)
+      .then(async (data: any) => {
+        if (data.status === 'SUCCESS') {
+          data.data.memberList.map((data: any, index: any) => {
+            if (memberData.member === data.member) {
+              setMemberData(data)
+              console.log('setMemberData', JSON.stringify(data))
+            }
+          })
+        } else {
+          Alert.alert('', data.message)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+      })
+  }, [])
   useEffect(() => {
+    if (item.isFromNotification && item.isFromNotification === 'true') {
+      getMemberDetails()
+    }
     if (!isAddNote) {
       getAppointmentDetails(false, noteData)
     }
+
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(

@@ -9,6 +9,7 @@ import _ from 'lodash'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { Button } from 'app/ui/button'
+import userProfileAction from 'app/redux/userProfile/userProfileAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
@@ -37,6 +38,7 @@ const profileSchema = z.object({
 export type ProfileSchema = z.infer<typeof profileSchema>
 export function EditUserProfileScreen() {
   let userPhone = ''
+  const user = store.getState().userProfileState.header
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const header = store.getState().headerState.header
@@ -49,7 +51,6 @@ export function EditUserProfileScreen() {
   if (!_.isEmpty(userDetails)) {
     userPhone = userDetails.phone ? userDetails.phone : ''
   }
-  useEffect(() => {}, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName:
@@ -96,6 +97,11 @@ export function EditUserProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          console.log('datatat ', JSON.stringify(data))
+          let fullName = data.data.firstName ? data.data.firstName : ''
+          fullName += data.data.lastName ? ' ' + data.data.lastName : ''
+          user.memberName = fullName
+          store.dispatch(userProfileAction.setUserProfile(user))
           router.dismiss(2)
           if (item.component === 'Profile') {
             router.push('/profile')

@@ -3,7 +3,13 @@ import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
 import { Button } from 'app/ui/button'
-export const PrivacyPolicy = ({ cancelClicked, acceptClicked, data }) => {
+export const PrivacyPolicy = ({
+  address,
+  cancelClicked,
+  acceptClicked,
+  data,
+  component
+}) => {
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
   let valueStyle = 'font-400 ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
@@ -19,14 +25,14 @@ export const PrivacyPolicy = ({ cancelClicked, acceptClicked, data }) => {
     return newUrl
   }
   return (
-    <View className="my-2 h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda]">
+    <View className="h-[90%] w-[95%] flex-1 self-center rounded-[15px] border-[1px] border-[#e0deda] ">
       <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
         <Typography className=" w-[85%] self-center text-center font-bold text-white">{`Privacy Policy`}</Typography>
         <View className="mr-[30] flex-row justify-end self-center">
           <TouchableOpacity
             className="h-[30px] w-[30px] items-center justify-center rounded-full bg-white"
             onPress={() => {
-              cancelClicked()
+              cancelClicked(address)
             }}
           >
             <Feather name={'x'} size={25} className="color-primary" />
@@ -102,24 +108,28 @@ export const PrivacyPolicy = ({ cancelClicked, acceptClicked, data }) => {
             'This Privacy Policy applies to all site visitors, customers, and all other users of the application. By using the application, you agree to this Privacy Policy, without modification, and acknowledge reading it.'
           )}
         </ScrollView>
-        <View className="flex-row justify-center self-center">
-          <Button
-            className=" mt-[15px] bg-[#ef6603]"
-            title={'Accept'}
-            variant="default"
-            onPress={() => {
-              acceptClicked(data)
-            }}
-          />
-          <Button
-            className="ml-5 mt-[15px] bg-[#86939e]"
-            title={'Decline'}
-            variant="default"
-            onPress={() => {
-              cancelClicked()
-            }}
-          />
-        </View>
+        {component !== 'SignUp' ? (
+          <View className="flex-row justify-center self-center">
+            <Button
+              className=" mt-[15px] bg-[#ef6603]"
+              title={'Accept'}
+              variant="default"
+              onPress={() => {
+                acceptClicked(data)
+              }}
+            />
+            <Button
+              className="ml-5 mt-[15px] bg-[#86939e]"
+              title={'Decline'}
+              variant="default"
+              onPress={() => {
+                cancelClicked()
+              }}
+            />
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
     </View>
   )
