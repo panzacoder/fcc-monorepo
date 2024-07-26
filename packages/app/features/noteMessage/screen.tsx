@@ -38,9 +38,9 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+    shouldSetBadge: false
+  })
+})
 export function NoteMessageScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
@@ -395,6 +395,7 @@ export function NoteMessageScreen() {
             <View className="w-[85%] self-center">
               <TextInput
                 defaultValue={message}
+                multiline={true}
                 placeholder={'Type a message'}
                 className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
                 onChangeText={(value) => {
