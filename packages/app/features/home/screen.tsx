@@ -258,6 +258,10 @@ export function HomeScreen() {
       )
     }
     async function redirect(notification: any) {
+      // ToastAndroid.show(
+      //   'notification ' + JSON.stringify(notification),
+      //   ToastAndroid.SHORT
+      // )
       notification = notification.request.content
       if (
         !_.isEmpty(notification.data.notificationData) &&
@@ -327,12 +331,22 @@ export function HomeScreen() {
           String(notificationType).toLowerCase() ===
             String('Incident').toLowerCase() ||
           String(notificationType).toLowerCase() ===
-            String('Purchase').toLowerCase()
+            String('Purchase').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Event').toLowerCase()
         ) {
+          
+        let noteData = {
+          id:
+            notificationData.data && notificationData.data.MsgThreadId
+              ? notificationData.data.MsgThreadId
+              : ''
+        }
           router.push(
-            formatUrl('/circles/messages', {
+            formatUrl('/circles/noteMessage', {
+              component: notificationType,
               memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              noteData: JSON.stringify(noteData)
             })
           )
         } else if (
