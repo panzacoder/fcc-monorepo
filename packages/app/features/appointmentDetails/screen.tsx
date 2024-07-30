@@ -204,9 +204,7 @@ export function AppointmentDetailsScreen() {
       })
   }, [])
   useEffect(() => {
-    if (item.isFromNotification && item.isFromNotification === 'true') {
-      getMemberDetails()
-    }
+    getMemberDetails()
     if (!isAddNote) {
       getAppointmentDetails(false, noteData)
     }
