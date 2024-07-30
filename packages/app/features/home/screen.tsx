@@ -258,10 +258,6 @@ export function HomeScreen() {
       )
     }
     async function redirect(notification: any) {
-      // ToastAndroid.show(
-      //   'notification ' + JSON.stringify(notification),
-      //   ToastAndroid.SHORT
-      // )
       notification = notification.request.content
       if (
         !_.isEmpty(notification.data.notificationData) &&
@@ -295,8 +291,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -306,8 +301,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/medicalDeviceDetails', {
               medicalDevicesDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -317,8 +311,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/eventDetails', {
               eventDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -335,16 +328,15 @@ export function HomeScreen() {
           String(notificationType).toLowerCase() ===
             String('Event').toLowerCase()
         ) {
-          
-        let noteData = {
-          id:
-            notificationData.data && notificationData.data.MsgThreadId
-              ? notificationData.data.MsgThreadId
-              : ''
-        }
+          let noteData = {
+            id:
+              notificationData.data && notificationData.data.MsgThreadId
+                ? Number(notificationData.data.MsgThreadId)
+                : ''
+          }
           router.push(
             formatUrl('/circles/noteMessage', {
-              component: notificationType,
+              component: 'General',
               memberData: JSON.stringify(memberData),
               noteData: JSON.stringify(noteData)
             })
@@ -355,8 +347,7 @@ export function HomeScreen() {
         ) {
           router.push(
             formatUrl('/circles/caregiversList', {
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else {

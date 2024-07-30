@@ -4,10 +4,9 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getNameInitials, getColorSet } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
-import { Image } from 'app/ui/image'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { googleMapOpenUrl } from 'app/ui/utils'
+
 import store from 'app/redux/store'
 
 export const CircleCard = ({ data, index, hideCirclesView }) => {
@@ -24,13 +23,26 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   }
   let sharingInfoRequestsLength = 0
   let requestsForMemberLength = 0
-  let transportationRequests = 0
+
   if (memberData.sharingInfoRequests) {
     sharingInfoRequestsLength = memberData.sharingInfoRequests.length
   }
-  if (memberData.transportationRequests) {
-    transportationRequests = memberData.transportationRequests.length
-  }
+  let eventTransporationCount = 0,
+    appointmentTransportationCount = 0,
+    totalTransportationCount = 0
+  memberData.transportationRequests.map((data: any) => {
+    if (data.type === 'Appointment') {
+      appointmentTransportationCount = data.count
+    } else {
+      eventTransporationCount = data.count
+    }
+  })
+  totalTransportationCount =
+    appointmentTransportationCount + eventTransporationCount
+  let unreadMessages = 0
+  memberData.unreadMessages.map((data: any) => {
+    unreadMessages += data.unreadMessageCount
+  })
   if (memberData.requestsForMember) {
     requestsForMemberLength = memberData.requestsForMember.length
   }
@@ -139,7 +151,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             )}
           </View>
           <View className={iconStyle}>
-            {transportationRequests > 0 ? (
+            {totalTransportationCount > 0 ? (
               <TouchableOpacity
                 onPress={() => {
                   hideCirclesView(true, index, false, true)
@@ -159,14 +171,32 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
                   }}
                   className={textStyle}
                 >
-                  {transportationRequests}
+                  {totalTransportationCount}
                 </Typography>
               </TouchableOpacity>
             ) : (
               <View />
             )}
           </View>
-          <TouchableOpacity
+          <View className={iconStyle}>
+            {unreadMessages > 0 ? (
+              <View className="flex-row">
+                <Feather
+                  className="mt-1"
+                  name={'message-circle'}
+                  size={25}
+                  color={'black'}
+                />
+
+                <Typography onPress={() => {}} className={textStyle}>
+                  {unreadMessages}
+                </Typography>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          {/* <TouchableOpacity
             onPress={() => {
               googleMapOpenUrl(memberData.address)
             }}
@@ -186,7 +216,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
             ) : (
               <View />
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </Pressable>
     </View>
