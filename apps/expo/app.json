@@ -16,7 +16,7 @@
     },
     "platforms": ["ios", "android"],
     "ios": {
-      "bundleIdentifier": "com.familycarecircle.fccmobileapp"
+      "bundleIdentifier": "app.familycarecircle.fcc"
     },
     "android": {
       "package": "com.familycarecircle.fccmobileapp",
