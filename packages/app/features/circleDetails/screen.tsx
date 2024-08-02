@@ -36,6 +36,10 @@ export function CircleDetailsScreen() {
   }
   // console.log('component', item.component ? item.component : '')
   console.log('memberData', JSON.stringify(memberData))
+  let unreadMessages = 0
+  memberData.unreadMessages.map((data: any) => {
+    unreadMessages += data.unreadMessageCount
+  })
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
     todayAppt =
@@ -136,11 +140,10 @@ export function CircleDetailsScreen() {
               <Typography className=" ml-2 flex w-[75%] rounded text-[18px] font-bold text-black">
                 {'Messages'}
               </Typography>
-              {memberData.unreadMessages &&
-              memberData.unreadMessages.length > 0 ? (
+              {unreadMessages > 0 ? (
                 <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
                   <Typography className="self-center text-center font-bold text-white">
-                    {memberData.unreadMessages.length}
+                    {unreadMessages}
                   </Typography>
                 </View>
               ) : (
@@ -213,20 +216,11 @@ export function CircleDetailsScreen() {
             </Typography>
             {memberData.recentIncident ? (
               <View className="flex-row">
-                <Typography className="ml-2 flex w-[75%] self-center rounded text-[14px] text-black">
+                <Typography className="ml-2 flex w-[85%] self-center rounded text-[14px] text-black">
                   {memberData.recentIncident.title
                     ? memberData.recentIncident.title
                     : ''}
                 </Typography>
-                {memberData.recentIncident.incidentcount > 0 ? (
-                  <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                    <Typography className="self-center text-center font-bold text-white">
-                      {memberData.recentIncident.incidentcount}
-                    </Typography>
-                  </View>
-                ) : (
-                  <View className="w-[10%]" />
-                )}
 
                 <View />
               </View>

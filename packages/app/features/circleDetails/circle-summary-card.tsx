@@ -9,6 +9,8 @@ import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { Image } from 'app/ui/image'
+import { googleMapOpenUrl } from 'app/ui/utils'
 
 cssInterop(LinearGradient, {
   className: { target: 'style' }
@@ -34,19 +36,42 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <TouchableOpacity
-          className=""
-          onPress={() => {
-            router.push(
-              formatUrl('/memberProfile', {
-                memberData: JSON.stringify(memberData),
-                userDetails: JSON.stringify(userDetails)
-              })
-            )
-          }}
-        >
-          <Feather name={'settings'} size={20} color={'white'} />
-        </TouchableOpacity>
+        <View className="flex-row gap-5">
+          <TouchableOpacity
+            onPress={() => {
+              googleMapOpenUrl(memberData.address)
+            }}
+            className=""
+          >
+            {memberData.address ? (
+              <View className="flex-row">
+                <Image
+                  className=""
+                  src={require('app/assets/direction1.png')}
+                  width={25}
+                  height={25}
+                  contentFit={'cover'}
+                  alt="logo"
+                />
+              </View>
+            ) : (
+              <View />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            className=""
+            onPress={() => {
+              router.push(
+                formatUrl('/memberProfile', {
+                  memberData: JSON.stringify(memberData),
+                  userDetails: JSON.stringify(userDetails)
+                })
+              )
+            }}
+          >
+            <Feather name={'settings'} size={20} color={'white'} />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity
         onPress={() => {
@@ -83,7 +108,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
           <View>
             <View className="mt-5 flex-row self-center">
               <Button
-                className="px-3 w-[30%]"
+                className="w-[30%] px-3"
                 title="Caregivers"
                 leadingIcon="pocket"
                 onPress={() => {
@@ -95,7 +120,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3 w-[30%]"
+                className="ml-2 w-[30%] px-3"
                 title="Doctors"
                 leadingIcon="briefcase"
                 onPress={() => {
@@ -107,7 +132,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3 w-[30%]"
+                className="ml-2 w-[30%] px-3"
                 title="Facilities"
                 leadingIcon="home"
                 onPress={() => {
@@ -122,7 +147,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
 
             <View className="mt-5 flex-row self-center">
               <Button
-                className="px-3 w-[45%]"
+                className="w-[45%] px-3"
                 title="Prescriptions"
                 leadingIcon="thermometer"
                 onPress={() => {
@@ -134,7 +159,7 @@ export function CircleSummaryCard({ memberData, userDetails }) {
                 }}
               />
               <Button
-                className="ml-2 px-3 w-[45%]"
+                className="ml-2 w-[45%] px-3"
                 title="Medical Devices"
                 leadingIcon="watch"
                 onPress={() => {
