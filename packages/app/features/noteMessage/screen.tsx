@@ -18,7 +18,7 @@ import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
-import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
@@ -44,15 +44,14 @@ Notifications.setNotificationHandler({
 export function NoteMessageScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const [message, setMessage] = useState('')
   const [isMessageThread, setIsMessageThread] = useState(false)
-  const [participantsList, setParticipantsList] = useState([]) as any
-  const [messageList, setMessageList] = useState([]) as any
+  const [participantsList, setParticipantsList] = useState(null) as any
+  const [messageList, setMessageList] = useState(null) as any
   const [threadParticipantsList, setThreadParticipantsList] = useState(
     []
   ) as any
-  const [threadDetails, setThreadDetails] = useState({}) as any
+  const [threadDetails, setThreadDetails] = useState(null) as any
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
   const item = useLocalSearchParams<any>()
@@ -64,10 +63,8 @@ export function NoteMessageScreen() {
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
-  // console.log('noteData', JSON.stringify(noteData))
   const getNoteDetails = useCallback(async () => {
     setLoading(true)
-    setIsDataReceived(false)
     let url = ''
     let dataObject = {} as any
     if (item.component === 'General') {
@@ -119,7 +116,16 @@ export function NoteMessageScreen() {
               messageThread.participantList !== null
                 ? messageThread.participantList
                 : []
-            setParticipantsList(participantList)
+            let list: any[] = []
+            participantList.map((data: any) => {
+              if (data.participantName) {
+                let object = {
+                  participantName: data.participantName
+                }
+                list.push(object)
+              }
+            })
+            setParticipantsList(list)
           }
           if (
             item.component === 'Medical Device' &&
@@ -131,21 +137,29 @@ export function NoteMessageScreen() {
               ? data.data.purchaseNote.messageThread
               : {}
             setThreadDetails(messageThread)
-            let messageList = data.data.purchaseNote.messageThread.messageList
-              ? data.data.purchaseNote.messageThread.messageList
+            let messageList = messageThread.messageList
+              ? messageThread.messageList
               : []
             setMessageList(messageList)
-            let participantList = data.data.purchaseNote.messageThread
-              .participantList
-              ? data.data.purchaseNote.messageThread.participantList
+            let participantList = messageThread.participantList
+              ? messageThread.participantList
               : []
-            setParticipantsList(participantList)
+            let list: any[] = []
+            participantList.map((data: any) => {
+              if (data.participantName) {
+                let object = {
+                  participantName: data.participantName
+                }
+                list.push(object)
+              }
+            })
+            setParticipantsList(list)
           }
+          setLoading(false)
         } else {
+          setLoading(false)
           Alert.alert('', data.message)
         }
-        setIsDataReceived(true)
-        setLoading(false)
       })
       .catch((error) => {
         setLoading(false)
@@ -153,13 +167,15 @@ export function NoteMessageScreen() {
       })
   }, [])
   const handleFcmMessage = useCallback(async () => {
-    Notifications.setNotificationHandler(null)
-    await messaging().setBackgroundMessageHandler(async (message: any) => {
-      getNoteDetails()
-    })
-    await messaging().onMessage((message: any) => {
-      getNoteDetails()
-    })
+    try {
+      Notifications.setNotificationHandler(null)
+      await messaging().setBackgroundMessageHandler(async (message: any) => {
+        getNoteDetails()
+      })
+      await messaging().onMessage((message: any) => {
+        getNoteDetails()
+      })
+    } catch (e) {}
   }, [])
   useEffect(() => {
     getNoteDetails()
@@ -182,12 +198,10 @@ export function NoteMessageScreen() {
           : ''
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants', JSON.stringify(data.data))
           const list = data.data.map((data: any, index: any) => {
             let object = data
             let isParticipant = false
@@ -214,7 +228,6 @@ export function NoteMessageScreen() {
     threadParticipantsList[index].isSelected =
       !threadParticipantsList[index].isSelected
     setIsRender(!isRender)
-    console.log('threadParticipantsList', threadParticipantsList)
     setThreadParticipantsList(threadParticipantsList)
   }
   const cancelClicked = () => {
@@ -249,7 +262,6 @@ export function NoteMessageScreen() {
         participantList: list
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
@@ -285,7 +297,6 @@ export function NoteMessageScreen() {
           messageList: list
         }
       }
-      // console.log('dataObject', JSON.stringify(dataObject))
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           setLoading(false)
@@ -302,16 +313,21 @@ export function NoteMessageScreen() {
         })
     }
   }
-  //unable to set some styling with nativewind, so used 'style' props instead.
   return (
     <View className=" flex-1">
       <PtsLoader loading={isLoading} />
-      <PtsBackHeader title="Note Message" memberData={memberData} />
-
-      <Typography className="mt-5 text-left text-[16px] font-bold">
-        {threadDetails.subject ? threadDetails.subject : ''}
-      </Typography>
-
+      {isValidObject(memberData) ? (
+        <PtsBackHeader title="Note Message" memberData={memberData} />
+      ) : (
+        <View />
+      )}
+      {isValidObject(threadDetails) ? (
+        <Typography className="mt-5 text-left text-[16px] font-bold">
+          {threadDetails.subject ? threadDetails.subject : ''}
+        </Typography>
+      ) : (
+        <View />
+      )}
       <SafeAreaView className="flex-1">
         <View
           style={{
@@ -321,25 +337,27 @@ export function NoteMessageScreen() {
           }}
           className="w-full flex-row items-center py-2"
         >
-          {isDataReceived ? (
+          {isValidObject(participantsList) && participantsList.length > 0 ? (
             <ScrollView
               horizontal={true}
               className="w-[85%] max-w-[85%] flex-row"
             >
-              {participantsList.map((data: any, index: number) => {
+              {participantsList.map((participant: any, index: number) => {
                 return (
                   <View key={index} className="ml-2">
                     <TouchableOpacity
                       onPress={() => {
                         // console.log('fullName', data.participantName)
-                        if (data.participantName) {
-                          Alert.alert('', data.participantName)
+                        if (participant.participantName) {
+                          Alert.alert('', participant.participantName)
                         }
                       }}
                     >
                       <PtsNameInitials
                         fullName={
-                          data.participantName ? data.participantName : ''
+                          participant.participantName
+                            ? participant.participantName
+                            : ''
                         }
                       />
                     </TouchableOpacity>
@@ -350,117 +368,111 @@ export function NoteMessageScreen() {
           ) : (
             <View />
           )}
-          {isDataReceived ? (
-            <View>
-              {threadDetails.isCreatedByUser ? (
-                <View>
-                  <Feather
-                    className="mr-2"
-                    name={'user-plus'}
-                    size={20}
-                    color={'white'}
-                    onPress={() => {
-                      getThreadParticipants()
-                      setIsMessageThread(true)
-                    }}
-                  />
-                </View>
-              ) : (
-                <View />
-              )}
-            </View>
-          ) : (
-            <View />
-          )}
+          <View>
+            {isValidObject(threadDetails) &&
+            true === threadDetails.isCreatedByUser ? (
+              <View>
+                <Feather
+                  className="mr-2"
+                  name={'user-plus'}
+                  size={20}
+                  color={'white'}
+                  onPress={() => {
+                    getThreadParticipants()
+                    setIsMessageThread(true)
+                  }}
+                />
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
         </View>
-        <View className="h-[90%] w-full bg-[#e0d8d0]">
-          {isDataReceived ? (
-            <ScrollView className="max-h-[90%]">
-              {messageList.map((data: any, index: number) => {
-                if (data.sender !== userDetails.id) {
-                  return (
-                    <View
-                      className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
-                      key={index}
-                    >
-                      <Typography style={{ color: '#30649c' }} className="">
-                        {data.senderName ? data.senderName : ''}
-                      </Typography>
-                      <Typography className="">
-                        {data.body ? data.body.trim() : ''}
-                      </Typography>
-                      <Typography
-                        style={{ fontSize: 8 }}
-                        className="text-right"
+        <View className=" h-[90%] w-full bg-[#e0d8d0]">
+          {isValidObject(messageList) && messageList.length > 0 ? (
+            <ScrollView className="max-h-[90%] ">
+              {messageList.map((message: any, index: number) => {
+                if (isValidObject(userDetails) && isValidObject(message)) {
+                  if (message.sender !== userDetails.id) {
+                    return (
+                      <View
+                        className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
+                        key={index}
                       >
-                        {data.createdOn
-                          ? formatTimeToUserLocalTime(data.createdOn)
-                          : ''}
-                      </Typography>
-                    </View>
-                  )
-                } else {
-                  return (
-                    <View
-                      className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
-                      key={index}
-                    >
-                      <Typography className="">
-                        {data.body ? data.body : ''}
-                      </Typography>
-                      <Typography
-                        style={{ fontSize: 8 }}
-                        className="text-right"
+                        <Typography style={{ color: '#30649c' }} className="">
+                          {message.senderName ? message.senderName : ''}
+                        </Typography>
+                        <Typography className="">
+                          {message.body ? message.body.trim() : ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: 8 }}
+                          className="text-right"
+                        >
+                          {message.createdOn
+                            ? formatTimeToUserLocalTime(message.createdOn)
+                            : ''}
+                        </Typography>
+                      </View>
+                    )
+                  } else {
+                    return (
+                      <View
+                        className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
+                        key={index}
                       >
-                        {data.createdOn
-                          ? formatTimeToUserLocalTime(data.createdOn)
-                          : ''}
-                      </Typography>
-                    </View>
-                  )
+                        <Typography className="">
+                          {message.body ? message.body : ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: 8 }}
+                          className="text-right"
+                        >
+                          {message.createdOn
+                            ? formatTimeToUserLocalTime(message.createdOn)
+                            : ''}
+                        </Typography>
+                      </View>
+                    )
+                  }
                 }
               })}
             </ScrollView>
           ) : (
             <View />
           )}
-          {isDataReceived ? (
-            <View className=" my-1 flex-row items-center">
-              <View className="w-[85%] self-center">
-                <TextInput
-                  defaultValue={message}
-                  multiline={true}
-                  placeholder={'Type a message'}
-                  className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
-                  onChangeText={(value) => {
-                    setMessage(value)
+          <View className=" my-1 flex-row items-center">
+            <View className="w-[85%] self-center">
+              <TextInput
+                defaultValue={message}
+                multiline={true}
+                placeholder={'Type a message'}
+                className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
+                onChangeText={(value) => {
+                  setMessage(value)
+                }}
+              />
+            </View>
+            <View className="ml-2 self-center">
+              <TouchableOpacity
+                className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
+                onPress={() => {}}
+              >
+                <Feather
+                  className=""
+                  name={'send'}
+                  size={20}
+                  color={'white'}
+                  onPress={() => {
+                    updateMessageThread()
                   }}
                 />
-              </View>
-              <View className="ml-2 self-center">
-                <TouchableOpacity
-                  className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
-                  onPress={() => {}}
-                >
-                  <Feather
-                    className=""
-                    name={'send'}
-                    size={20}
-                    color={'white'}
-                    onPress={() => {
-                      updateMessageThread()
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             </View>
-          ) : (
-            <View />
-          )}
+          </View>
         </View>
       </SafeAreaView>
-
-      {isMessageThread ? (
+      {true === isMessageThread ? (
         <View className="mt-2 h-[90%] w-full">
           <AddMessageThread
             participantsList={threadParticipantsList}

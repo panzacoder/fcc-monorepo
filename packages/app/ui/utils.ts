@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import moment, { MomentInput } from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
 import store from '../redux/store'
-
+import _ from 'lodash'
 export const DATE_CONSTANT = {
   FULL_DATE: 'DD MMM YYYY hh:mm A'
   // FULL_DATE: 'MMM DD, YYYY'
@@ -263,6 +263,16 @@ export const getColorSet = (index: any) => {
     'bg-[#D9534F]'
   ]
   return colorsList[index]
+}
+export const isValidObject = (input?: object) => {
+  if (
+    input &&
+    input !== undefined &&
+    Object.getOwnPropertyNames(input).length > 0
+  ) {
+    return true
+  }
+  return false
 }
 export const getNameInitials = (fullName?: string) => {
   let fullNameStr = fullName?.split(' ') || []

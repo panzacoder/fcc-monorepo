@@ -100,7 +100,7 @@ export function HomeScreen() {
         if (data.status === 'SUCCESS') {
           let memberList = data.data.memberList ? data.data.memberList : []
           setMemberList(memberList)
-
+          console.log('memberList', JSON.stringify(memberList))
           memberList.map((data: any) => {
             let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
             if (memberNamesList.includes(fullName) === false) {
@@ -135,13 +135,15 @@ export function HomeScreen() {
     return true
   }
   const getFcmToken = async () => {
-    const fcmToken = await messaging().getToken()
-    if (fcmToken) {
-      console.log('Your Firebase Token is:', fcmToken)
-      updateFcmToken(fcmToken)
-    } else {
-      console.log('Failed', 'No Token Recived')
-    }
+    try {
+      const fcmToken = await messaging().getToken()
+      if (fcmToken) {
+        console.log('Your Firebase Token is:', fcmToken)
+        updateFcmToken(fcmToken)
+      } else {
+        console.log('Failed', 'No Token Recived')
+      }
+    } catch (e) {}
   }
   async function updateFcmToken(fcmToken: any) {
     setLoading(true)
@@ -166,22 +168,26 @@ export function HomeScreen() {
       })
   }
   const handleFcmMessage = useCallback(async () => {
-    await messaging().setBackgroundMessageHandler(async (message: any) => {
-      schedulePushNotification(message)
-    })
-    await messaging().onMessage((message: any) => {
-      schedulePushNotification(message)
-    })
+    try {
+      await messaging().setBackgroundMessageHandler(async (message: any) => {
+        schedulePushNotification(message)
+      })
+      await messaging().onMessage((message: any) => {
+        schedulePushNotification(message)
+      })
+    } catch (e) {}
   }, [])
   const getToken = useCallback(async () => {
-    const authStatus = await messaging().requestPermission()
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
-    if (enabled) {
-      getFcmToken()
-      console.log('Authorization status:', authStatus)
-    }
+    try {
+      const authStatus = await messaging().requestPermission()
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+      if (enabled) {
+        getFcmToken()
+        console.log('Authorization status:', authStatus)
+      }
+    } catch (e) {}
   }, [])
   async function registerForPushNotificationsAsync() {
     let token: any

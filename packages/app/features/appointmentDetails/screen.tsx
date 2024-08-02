@@ -36,7 +36,10 @@ import {
   GET_MEMBER_DETAILS
 } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
-import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import {
+  formatTimeToUserLocalTime,
+  convertPhoneNumberToUsaPhoneNumberFormat
+} from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
@@ -267,7 +270,9 @@ export function AppointmentDetailsScreen() {
         specialist = appointmentDetails.doctorLocation.doctor.specialist
       }
       if (appointmentDetails.doctorLocation.doctor.phone) {
-        phone = appointmentDetails.doctorLocation.doctor.phone
+        phone = convertPhoneNumberToUsaPhoneNumberFormat(
+          appointmentDetails.doctorLocation.doctor.phone
+        )
       }
       if (appointmentDetails.doctorLocation.doctor.email) {
         email = appointmentDetails.doctorLocation.doctor.email
@@ -289,7 +294,9 @@ export function AppointmentDetailsScreen() {
         specialist = appointmentDetails.facilityLocation.facility.type
       }
       if (appointmentDetails.facilityLocation.facility.phone) {
-        phone = appointmentDetails.facilityLocation.facility.phone
+        phone = convertPhoneNumberToUsaPhoneNumberFormat(
+          appointmentDetails.facilityLocation.facility.phone
+        )
       }
       if (appointmentDetails.facilityLocation.facility.email) {
         email = appointmentDetails.facilityLocation.facility.email

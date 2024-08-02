@@ -42,27 +42,31 @@ export function SplashScreen() {
     }
   }, [])
   const getNotificationData = useCallback(async () => {
-    await messaging()
-      .getInitialNotification()
-      .then((notification: any) => {
-        if (notification) {
-          notificationData = notification
+    try {
+      await messaging()
+        .getInitialNotification()
+        .then((notification: any) => {
+          if (notification) {
+            notificationData = notification
+          }
+        })
+
+      await messaging().onNotificationOpenedApp((remoteMessage: any) => {
+        if (remoteMessage) {
+          notificationData = remoteMessage
         }
       })
-
-    await messaging().onNotificationOpenedApp((remoteMessage: any) => {
-      if (remoteMessage) {
-        notificationData = remoteMessage
-      }
-    })
-    getUsernamePassword()
+      getUsernamePassword()
+    } catch (e) {
+      getUsernamePassword()
+    }
   }, [])
 
   useEffect(() => {
-    // getNotificationData()
-    getUsernamePassword()
+    getNotificationData()
+    // getUsernamePassword()
   }, [])
-  async function navigateToNotification(header: any) {
+  async function navigateToNotification() {
     if (
       !_.isEmpty(notificationData.data) &&
       notificationData.data !== undefined
@@ -133,7 +137,7 @@ export function SplashScreen() {
               : ''
         } as object
         router.push(
-          formatUrl('/circles/noteMessage', {
+          formatUrl('/circles/notificationNoteMessage', {
             component: 'General',
             memberData: JSON.stringify(memberData),
             noteData: JSON.stringify(noteData)
@@ -205,7 +209,7 @@ export function SplashScreen() {
               })
             )
           }
-          navigateToNotification(data.data.header)
+          navigateToNotification()
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: email }))
         } else {
