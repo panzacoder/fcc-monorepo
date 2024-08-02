@@ -32,6 +32,7 @@
     "moti": "^0.28.1",
     "nativewind": "^4.0.36",
     "react-hook-form": "^7.51.0",
+    "react-native": "0.73.6",
     "react-native-autocomplete-dropdown": "^3.1.4",
     "react-native-calendar-picker": "^8.0.2",
     "react-native-calendars": "^1.1304.1",

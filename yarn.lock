@@ -12751,7 +12751,7 @@ __metadata:
     prettier: "npm:^3.2.5"
     prettier-plugin-tailwindcss: "npm:^0.5.12"
     react: "npm:18.2.0"
-    react-native: "npm:0.73.6"
+    react-dom: "npm:18.2.0"
     turbo: "npm:^1.13.0"
     typescript: "npm:^5.4.3"
   languageName: unknown
@@ -18816,7 +18816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:latest":
+"react-dom@npm:18.2.0, react-dom@npm:latest":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
   dependencies:
