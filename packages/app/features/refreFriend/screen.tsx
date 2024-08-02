@@ -69,7 +69,7 @@ export function ReferFriendScreen() {
           {'Spread the word, Share the care.'}
         </Typography>
         <Typography className="m-3 w-[95%] text-[16px]">
-          {`Invite your friends and relatives to the Family of caregivers who takes care of family members. While you enjoy and take benefits of this easy and helpful website, Why keep just for yourself, PASS US ON. Share FCC with the people in your life.\n\nWe have made it easy, just type email address or share through Facebook, Twitter, LinkedIn, Whatsapp.`}
+          {`Invite your friends and relatives to the Family of caregivers who takes care of family members. While you enjoy and take benefits of this easy and helpful website, Why keep just for yourself, PASS US ON. Share Family Care Circle with the people in your life.\n\nWe have made it easy, just type email address or share through Facebook, Twitter, LinkedIn, Whatsapp.`}
         </Typography>
       </View>
       <ControlledTextField

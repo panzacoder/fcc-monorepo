@@ -307,7 +307,7 @@ export function CreateCircleScreen() {
         <ScrollView>
           <Typography className="m-2">
             {
-              'As the Authorized Care Giver, you will have administrative rights to govern all activity associated with the creation of the Family Care Circle. FCC understands the sensitive nature of this information and with your help, this information will only be shared with the caregivers you approve on behalf of '
+              'As the Authorized Care Giver, you will have administrative rights to govern all activity associated with the creation of the Family Care Circle. We understand the sensitive nature of this information and with your help, this information will only be shared with the caregivers you approve on behalf of '
             }
 
             <Typography className="text-primary font-bold">
@@ -348,7 +348,7 @@ export function CreateCircleScreen() {
         <ScrollView>
           <Typography className="m-2">
             {
-              'As the Authorized Care Giver, you will have administrative rights to govern all activity associated with the creation of the Family Care Circle. FCC understands the sensitive nature of this information and with your help, this information will only be shared with the caregivers you approve on behalf of '
+              'As the Authorized Care Giver, you will have administrative rights to govern all activity associated with the creation of the Family Care Circle. We understands the sensitive nature of this information and with your help, this information will only be shared with the caregivers you approve on behalf of '
             }
 
             <Typography className="text-primary font-bold">
@@ -394,7 +394,7 @@ export function CreateCircleScreen() {
                   </Typography>
                   <Typography className="mt-2 w-[95%] font-bold">
                     {
-                      'Does your loved one or friend (future FCC member) have an email address?'
+                      'Does your loved one or friend have an email address?'
                     }
                   </Typography>
                 </View>

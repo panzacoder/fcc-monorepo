@@ -27,12 +27,12 @@ export function FaqScreen() {
         </Typography>
         {getDetailsView(
           '1.  What are the key benefits of using Family Care Circle ?',
-          'FCC will improve communication between multiple Caregivers of a loved one. Appointment tracking helps in keeping up with Notes, Pre-Appointment Labs, Post,Appointment Notes, Instructions and Transportation needs. Here are a few examples of how FCC can help with caregiving.\n\n Request a Family Member or Caregiver in the Family Circle to help with Transportation. Send a quick update to all Family Members about a recent appointment.Make a quick note with date and location about a Fall or other incident for quick reference. Quickly review historical data to answer questions like "When was the last time Mom fell?'
+          'Family Care Circle will improve communication between multiple Caregivers of a loved one. Appointment tracking helps in keeping up with Notes, Pre-Appointment Labs, Post,Appointment Notes, Instructions and Transportation needs. Here are a few examples of how FCC can help with caregiving.\n\n Request a Family Member or Caregiver in the Family Circle to help with Transportation. Send a quick update to all Family Members about a recent appointment.Make a quick note with date and location about a Fall or other incident for quick reference. Quickly review historical data to answer questions like "When was the last time Mom fell?'
         )}
 
         {getDetailsView(
           '2.   What is the difference between a Member and a Family Member?',
-          'A Member is the focal point of the Family Circle. All information (appointments, incidents, communication, and notes) within the Family Care Circle is focused on the Member. Family Members are the Caregivers of the Member. FCC is focused on successful communication between all Caregivers by tracking key information and having it readily available to all.'
+          'A Member is the focal point of the Family Circle. All information (appointments, incidents, communication, and notes) within the Family Care Circle is focused on the Member. Family Members are the Caregivers of the Member. Family Care Circle is focused on successful communication between all Caregivers by tracking key information and having it readily available to all.'
         )}
         {getDetailsView(
           '3.  What is the role of an Authorized Caregiver?',
@@ -40,7 +40,7 @@ export function FaqScreen() {
         )}
         {getDetailsView(
           '4.  What is the difference between the role of Admin and Family Member?',
-          'Admins are in complete control of FCC and are allowed to expand the Family Circle by inviting others to join. They also have the ability to update & delete Family Members and Caregivers.\n\nFamily Members can create notes, appointments, incidents, and transportation request. Notes can be sent within multiple segments of FCC and are only seen by the users the note is addressed to.'
+          'Admins are in complete control of the Circle and are allowed to expand the Family Circle by inviting others to join. They also have the ability to update & delete Family Members and Caregivers.\n\nFamily Members can create notes, appointments, incidents, and transportation request. Notes can be sent within multiple segments of FCC and are only seen by the users the note is addressed to.'
         )}
         {getDetailsView(
           '5.  How many Family Care Circles can a family member be part of?',
@@ -49,7 +49,7 @@ export function FaqScreen() {
 
         {getDetailsView(
           '6.  Why does Family Care Circle require a Family Member to have an email address and phone number?',
-          'Email messaging gives Family Care Circle a method to send notifications outside of the application. FCC will also use this gateway to Invite Family Members to join a Family Care Circle, to communicate notes and reminders between Family Members when needed.'
+          'Email messaging gives Family Care Circle a method to send notifications outside of the application. Family Care Circle will also use this gateway to invite Family Members to join a Family Care Circle, to communicate notes and reminders between Family Members when needed.'
         )}
         {getDetailsView(
           '7.  What if a member or Family Member does not have an email address?',
@@ -73,7 +73,7 @@ export function FaqScreen() {
         )}
         {getDetailsView(
           '12.  How secure is my data?',
-          'FCC implements current security practices and will continue to maintain the latest updates to keep your information secure.'
+          'Family Care Circle implements current security practices and will continue to maintain the latest updates to keep your information secure.'
         )}
         {getDetailsView(
           '13.  How do I inactivate a Member’s Family Circle account?',

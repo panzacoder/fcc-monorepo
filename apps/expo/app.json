@@ -29,7 +29,6 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app",
       "expo-secure-store",
       "expo-localization",
       [
