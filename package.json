@@ -42,7 +42,6 @@
     "react-native-blob-util": "^0.19.9",
     "react-native-calendar-picker": "^8.0.2",
     "react-native-calendars": "^1.1304.1",
-    "react-native-iap": "^12.15.1",
-    "react-native-pdf": "^6.7.5"
+    "react-native-iap": "12.15.1"
   }
 }
