@@ -17,9 +17,7 @@ import { Card } from 'app/ui/card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, JOIN_CIRCLE } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
-import { joinCircle } from 'app/data/circle/join'
 import { ModalScreen } from 'app/ui/modal-screen'
-import { Schema } from 'zod'
 
 export function CreateCircle() {
   const router = useRouter()
@@ -93,7 +91,6 @@ export function CreateCircle() {
   return (
     <AutocompleteDropdownContextProvider headerOffset={insets.top}>
       <SafeAreaView>
-        <ScrollView>
           <FormProvider {...formMethods}>
             <ModalScreen title="Create a Circle">
               <CircleNameSection />
@@ -134,7 +131,6 @@ export function CreateCircle() {
               )}
             </ModalScreen>
           </FormProvider>
-        </ScrollView>
       </SafeAreaView>
     </AutocompleteDropdownContextProvider>
   )
