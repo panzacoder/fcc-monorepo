@@ -52,11 +52,19 @@ export const AddMessageThread = ({
         ) : (
           <View />
         )}
+        {participantsList.length > 0 ? (
+          <View>
+            <Typography className="ml-3 mt-2 font-bold">
+              {"Caregivers' List"}
+            </Typography>
+            <View className="mt-1 h-[1px] w-full bg-gray-400" />
+          </View>
+        ) : (
+          <Typography className="font-400 ml-3 mt-5 text-center">
+            {'Please add caregivers to get started'}
+          </Typography>
+        )}
 
-        <Typography className="ml-3 mt-2 font-bold">
-          {"Caregivers' List"}
-        </Typography>
-        <View className="mt-1 h-[1px] w-full bg-gray-400" />
         <ScrollView className="h-[60%] max-h-[60%]">
           {participantsList.map((data: any, index: number) => {
             return (

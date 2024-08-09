@@ -57,14 +57,14 @@ export function SplashScreen() {
         }
       })
       getUsernamePassword()
-    } catch (err) {
+    } catch (e) {
       getUsernamePassword()
     }
-
   }, [])
 
   useEffect(() => {
     getNotificationData()
+    // getUsernamePassword()
   }, [])
   async function navigateToNotification() {
     if (
@@ -81,7 +81,7 @@ export function SplashScreen() {
             : '',
         firstname: '',
         lastname: ''
-      }
+      } as object
       let details = {
         id:
           notificationData.data && notificationData.data.DomainObjectId
@@ -95,8 +95,7 @@ export function SplashScreen() {
         router.push(
           formatUrl('/circles/appointmentDetails', {
             appointmentDetails: JSON.stringify(details),
-            memberData: JSON.stringify(memberData),
-            isFromNotification: 'true'
+            memberData: JSON.stringify(memberData)
           })
         )
       } else if (
@@ -106,8 +105,7 @@ export function SplashScreen() {
         router.push(
           formatUrl('/circles/medicalDeviceDetails', {
             medicalDevicesDetails: JSON.stringify(details),
-            memberData: JSON.stringify(memberData),
-            isFromNotification: 'true'
+            memberData: JSON.stringify(memberData)
           })
         )
       } else if (
@@ -117,8 +115,7 @@ export function SplashScreen() {
         router.push(
           formatUrl('/circles/eventDetails', {
             eventDetails: JSON.stringify(details),
-            memberData: JSON.stringify(memberData),
-            isFromNotification: 'true'
+            memberData: JSON.stringify(memberData)
           })
         )
       } else if (
@@ -133,10 +130,17 @@ export function SplashScreen() {
         String(notificationType).toLowerCase() ===
           String('Purchase').toLowerCase()
       ) {
+        let noteData = {
+          id:
+            notificationData.data && notificationData.data.MsgThreadId
+              ? Number(notificationData.data.MsgThreadId)
+              : ''
+        } as object
         router.push(
-          formatUrl('/circles/messages', {
+          formatUrl('/circles/notificationNoteMessage', {
+            component: 'General',
             memberData: JSON.stringify(memberData),
-            isFromNotification: 'true'
+            noteData: JSON.stringify(noteData)
           })
         )
       } else if (
@@ -145,8 +149,7 @@ export function SplashScreen() {
       ) {
         router.push(
           formatUrl('/circles/caregiversList', {
-            memberData: JSON.stringify(memberData),
-            isFromNotification: 'true'
+            memberData: JSON.stringify(memberData)
           })
         )
       } else {
@@ -170,8 +173,8 @@ export function SplashScreen() {
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
-        setLoading(false)
         if (data.status === 'SUCCESS') {
+          await store.dispatch(headerAction.setHeader(data.data.header))
           let subscriptionDetailsobject = {
             subscriptionEndDate: data.data.subscriptionEndDate || '',
             days: data.data.days || '',
@@ -179,24 +182,26 @@ export function SplashScreen() {
             expiringSubscription: data.data.expiringSubscription
           }
           data.data.header.timezone = moment.tz.guess()
-          store.dispatch(headerAction.setHeader(data.data.header))
-          store.dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
-          store.dispatch(
+
+          await store.dispatch(
+            userProfileAction.setUserProfile(data.data.appuserVo)
+          )
+          await store.dispatch(
             subscriptionAction.setSubscription(data.data.userSubscription)
           )
-          store.dispatch(
+          await store.dispatch(
             userSubscriptionAction.setSubscriptionDetails(
               subscriptionDetailsobject
             )
           )
-          store.dispatch(
+          await store.dispatch(
             sponsorAction.setSponsor({
               sponsorDetails: data.data.sponsorUser,
               sponsorShipDetails: data.data.sponsorship
             })
           )
           if (data.data.commercialsDetails) {
-            store.dispatch(
+            await store.dispatch(
               paidAdAction.setPaidAd({
                 commercialsDetails: data.data.commercialsDetails.commercials,
                 commercialPageMappings:
@@ -210,6 +215,7 @@ export function SplashScreen() {
         } else {
           Alert.alert('', data.message)
         }
+        setLoading(false)
       })
       .catch((error) => {
         setLoading(false)

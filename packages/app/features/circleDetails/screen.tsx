@@ -19,12 +19,18 @@ import {
   GET_MEMBER_MENUS,
   GET_MEMBER_DETAILS
 } from 'app/utils/urlConstants'
+let isMessages = false,
+  isAppointments = false,
+  isIncidents = false,
+  isEvents = false
 export function CircleDetailsScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
   const item = useLocalSearchParams<any>()
   const [isLoading, setLoading] = useState(false)
+  const [isDataReceived, setIsDataReceived] = useState(false)
+  const [menuList, setMenuList] = useState(null)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
   )
@@ -36,6 +42,10 @@ export function CircleDetailsScreen() {
   }
   // console.log('component', item.component ? item.component : '')
   console.log('memberData', JSON.stringify(memberData))
+  let unreadMessages = 0
+  memberData.unreadMessages.map((data: any) => {
+    unreadMessages += data.unreadMessageCount
+  })
   let todayAppt = ''
   if (memberData.upcomingAppointment) {
     todayAppt =
@@ -61,6 +71,7 @@ export function CircleDetailsScreen() {
           Alert.alert('', data.message)
         }
         setLoading(false)
+        setIsDataReceived(true)
       })
       .catch((error) => {
         setLoading(false)
@@ -85,6 +96,22 @@ export function CircleDetailsScreen() {
                 data.data.member.address
               )
             )
+            let menuList = data.data.member.menuList
+              ? data.data.member.menuList
+              : []
+            menuList.map((data: any, index: any) => {
+              if (data.menuid === 'MyAppointments') {
+                isAppointments = true
+              } else if (data.menuid === 'MyCommunications') {
+                isMessages = true
+              } else if (data.menuid === 'MyEvents') {
+                isEvents = true
+              } else if (data.menuid === 'MyIncidents') {
+                isIncidents = true
+              }
+            })
+            console.log('menuList', JSON.stringify(menuList))
+            setMenuList(menuList)
           }
         } else {
           Alert.alert('', data.message)
@@ -116,185 +143,208 @@ export function CircleDetailsScreen() {
     <View className=" flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader title="Circle Details" memberData={memberData} />
-      <View className="mt-5">
-        <CircleSummaryCard memberData={memberData} userDetails={userDetails} />
-      </View>
-      <ScrollView className=" flex-1">
-        <TouchableOpacity
-          onPress={() => {
-            router.push(
-              formatUrl('/circles/messages', {
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }}
-          className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
-        >
-          <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
-          <View className="py-5">
-            <View className="w-full flex-row">
-              <Typography className=" ml-2 flex w-[75%] rounded text-[18px] font-bold text-black">
-                {'Messages'}
-              </Typography>
-              {memberData.unreadMessages &&
-              memberData.unreadMessages.length > 0 ? (
-                <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                  <Typography className="self-center text-center font-bold text-white">
-                    {memberData.unreadMessages.length}
+    <ScrollView className=" flex-1">
+      {menuList && isDataReceived ? (
+        <View className="mt-5">
+          <CircleSummaryCard
+            menuList={menuList}
+            memberData={memberData}
+            userDetails={userDetails}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+      {isDataReceived ? (
+        <View className=" flex-1">
+          {isMessages ? (
+            <TouchableOpacity
+              onPress={() => {
+                router.push(
+                  formatUrl('/circles/messages', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }}
+              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+            >
+              <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+              <View className="py-5">
+                <View className="w-full flex-row">
+                  <Typography className=" ml-2 flex w-[75%] rounded text-[18px] font-bold text-black">
+                    {'Messages'}
                   </Typography>
+                  {unreadMessages > 0 ? (
+                    <View className="bg-primary ml-2 p-1 w-8 h-8 rounded-full">
+                      <Typography className="self-center  text-center font-bold text-white">
+                        {unreadMessages}
+                      </Typography>
+                    </View> )
+                    : null
+                  }
                 </View>
-              ) : (
-                <View />
-              )}
-            </View>
-          </View>
-          <View
-            style={{ position: 'absolute', right: 5 }}
-            className=" self-center"
-          >
-            <Feather name={'chevron-right'} size={20} color={'black'} />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            router.push(
-              formatUrl('/circles/appointmentsList', {
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }}
-          className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
-        >
-          <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
-          <View className="py-5">
-            <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
-              {'Appointments'}
-            </Typography>
-            <View className="flex-row">
-              <Typography className=" ml-2 flex w-[75%] min-w-[75%] rounded text-[14px] text-black">
-                {memberData.upcomingAppointment
-                  ? todayAppt
-                  : 'No upcoming appointments'}
-              </Typography>
-              {memberData.upcomingAppointment?.upcomingCount > 0 ? (
-                <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                  <Typography className="self-center text-center font-bold text-white">
-                    {memberData.upcomingAppointment.upcomingCount}
-                  </Typography>
-                </View>
-              ) : (
-                <View className="w-[10%]" />
-              )}
-              <View />
-            </View>
-          </View>
-          <View
-            style={{ position: 'absolute', right: 5 }}
-            className=" self-center"
-          >
-            <Feather name={'chevron-right'} size={20} color={'black'} />
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            router.push(
-              formatUrl('/circles/incidentsList', {
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }}
-          className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
-        >
-          <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
-          <View className="py-5">
-            <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
-              {'Incidents'}
-            </Typography>
-            {memberData.recentIncident ? (
-              <View className="flex-row">
-                <Typography className="ml-2 flex w-[75%] self-center rounded text-[14px] text-black">
-                  {memberData.recentIncident.title
-                    ? memberData.recentIncident.title
-                    : ''}
+                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
+                  {memberData.unreadMessages.length > 0
+                    ? memberData.unreadMessages[0].message
+                    : 'No new messages'}
                 </Typography>
-                {memberData.recentIncident.incidentcount > 0 ? (
-                  <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                    <Typography className="self-center text-center font-bold text-white">
-                      {memberData.recentIncident.incidentcount}
+              </View>
+              <View
+                style={{ position: 'absolute', right: 5 }}
+                className=" self-center"
+              >
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+          {isAppointments ? (
+            <TouchableOpacity
+              onPress={() => {
+                router.push(
+                  formatUrl('/circles/appointmentsList', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }}
+              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+            >
+              <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+              <View className="py-5">
+                <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
+                  {'Appointments'}
+                </Typography>
+                <View className="flex-row">
+                  <Typography className=" ml-2 flex w-[75%] min-w-[75%] rounded text-[14px] text-black">
+                    {memberData.upcomingAppointment
+                      ? todayAppt
+                      : 'No upcoming appointments'}
+                  </Typography>
+                  {memberData.upcomingAppointment?.upcomingCount > 0 ? (
+                    <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
+                      <Typography className="self-center text-center font-bold text-white">
+                        {memberData.upcomingAppointment.upcomingCount}
+                      </Typography>
+                    </View>
+                  ) : (
+                    <View className="w-[10%]" />
+                  )}
+                  <View />
+                </View>
+              </View>
+              <View
+                style={{ position: 'absolute', right: 5 }}
+                className=" self-center"
+              >
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+          {isIncidents ? (
+            <TouchableOpacity
+              onPress={() => {
+                router.push(
+                  formatUrl('/circles/incidentsList', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }}
+              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+            >
+              <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+              <View className="py-5">
+                <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
+                  {'Incidents'}
+                </Typography>
+                {memberData.recentIncident ? (
+                  <View className="flex-row">
+                    <Typography className="ml-2 flex w-[85%] self-center rounded text-[14px] text-black">
+                      {memberData.recentIncident.title
+                        ? memberData.recentIncident.title
+                        : ''}
                     </Typography>
+
+                    <View />
                   </View>
                 ) : (
-                  <View className="w-[10%]" />
-                )}
-
-                <View />
-              </View>
-            ) : (
-              <View className="flex-row">
-                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
-                  {'No recent incidents'}
-                </Typography>
-              </View>
-            )}
-          </View>
-          <View
-            style={{ position: 'absolute', right: 5 }}
-            className=" self-center"
-          >
-            <Feather name={'chevron-right'} size={20} color={'black'} />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            router.push(
-              formatUrl('/circles/eventsList', {
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }}
-          className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
-        >
-          <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
-          <View className="py-5">
-            <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
-              {'Events'}
-            </Typography>
-            {memberData.upcomingEvent ? (
-              <View className="flex-row">
-                <Typography className="ml-2 flex w-[75%] self-center rounded text-[14px] text-black">
-                  {memberData.upcomingEvent.title
-                    ? memberData.upcomingEvent.title
-                    : ''}
-                </Typography>
-                {memberData.upcomingEvent.upcomingCount > 0 ? (
-                  <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
-                    <Typography className="self-center text-center font-bold text-white">
-                      {memberData.upcomingEvent.upcomingCount}
+                  <View className="flex-row">
+                    <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
+                      {'No recent incidents'}
                     </Typography>
                   </View>
-                ) : (
-                  <View className="w-[10%]" />
                 )}
-
-                <View />
               </View>
-            ) : (
-              <View className="flex-row">
-                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
-                  {'No recent events'}
+              <View
+                style={{ position: 'absolute', right: 5 }}
+                className=" self-center"
+              >
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+          {isEvents ? (
+            <TouchableOpacity
+              onPress={() => {
+                router.push(
+                  formatUrl('/circles/eventsList', {
+                    memberData: JSON.stringify(memberData)
+                  })
+                )
+              }}
+              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+            >
+              <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
+              <View className="py-5">
+                <Typography className=" ml-2 flex rounded text-[18px] font-bold text-black">
+                  {'Events'}
                 </Typography>
+                {memberData.upcomingEvent ? (
+                  <View className="flex-row">
+                    <Typography className="ml-2 flex w-[75%] self-center rounded text-[14px] text-black">
+                      {memberData.upcomingEvent.title
+                        ? memberData.upcomingEvent.title
+                        : ''}
+                    </Typography>
+                    {memberData.upcomingEvent.upcomingCount > 0 ? (
+                      <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
+                        <Typography className="self-center text-center font-bold text-white">
+                          {memberData.upcomingEvent.upcomingCount}
+                        </Typography>
+                      </View>
+                    ) : (
+                      <View className="w-[10%]" />
+                    )}
+
+                    <View />
+                  </View>
+                ) : (
+                  <View className="flex-row">
+                    <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
+                      {'No recent events'}
+                    </Typography>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-          <View
-            style={{ position: 'absolute', right: 5 }}
-            className=" self-center"
-          >
-            <Feather name={'chevron-right'} size={20} color={'black'} />
-          </View>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+              <View
+                style={{ position: 'absolute', right: 5 }}
+                className=" self-center"
+              >
+                <Feather name={'chevron-right'} size={20} color={'black'} />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+        </View>
+      ) : (
+        <View />
+      )}
+    </ScrollView>
+        </View >
   )
 }

@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import moment, { MomentInput } from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
 import store from '../redux/store'
-
+import _ from 'lodash'
 export const DATE_CONSTANT = {
   FULL_DATE: 'DD MMM YYYY hh:mm A'
   // FULL_DATE: 'MMM DD, YYYY'
@@ -231,6 +231,48 @@ export const formatTimeToUserLocalTime = (time: any) => {
   } else {
     return getFullDate(moment(time).utc(true))
   }
+}
+export const getColorSet = (index: any) => {
+  let colorsList = [
+    'bg-[#A2416B]',
+    'bg-[#000080]',
+    'bg-[#65d48a]',
+    'bg-[#99627A]',
+    'bg-[#536fa3]',
+    'bg-[#800000]',
+    'bg-[#2C2891]',
+    'bg-[#009DAE]',
+    'bg-[#7b631c]',
+    'bg-[#8843F2]',
+    'bg-[#9A0680]',
+    'bg-[#146356]',
+    'bg-[#A86464]',
+    'bg-[#EA5455]',
+    'bg-[#0A2647]',
+    'bg-[#b055cc]',
+    'bg-[#495579]',
+    'bg-[#600090]',
+    'bg-[#68B984]',
+    'bg-[#3FA796]',
+    'bg-[#600090]',
+    'bg-[#069A8E]',
+    'bg-[#9A86A4]',
+    'bg-[#0093AB]',
+    'bg-[#00C897]',
+    'bg-[#3E497A]',
+    'bg-[#D9534F]'
+  ]
+  return colorsList[index]
+}
+export const isValidObject = (input?: object) => {
+  if (
+    input &&
+    input !== undefined &&
+    Object.getOwnPropertyNames(input).length > 0
+  ) {
+    return true
+  }
+  return false
 }
 export const getNameInitials = (fullName?: string) => {
   let fullNameStr = fullName?.split(' ') || []

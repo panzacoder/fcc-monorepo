@@ -14,9 +14,13 @@
       "resizeMode": "cover",
       "backgroundColor": "#287CFA"
     },
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
-      "bundleIdentifier": "com.familycarecircle.fccmobileapp"
+      "bundleIdentifier": "com.familycarecircle.fccmobileapp",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "com.familycarecircle.fccmobileapp",
@@ -29,7 +33,14 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      ["expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }],
+      "expo-localization"
     ]
   }
 }

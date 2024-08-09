@@ -538,8 +538,7 @@ export function AppointmentsListScreen() {
                   router.push(
                     formatUrl('/circles/appointmentDetails', {
                       appointmentDetails: JSON.stringify(data),
-                      memberData: JSON.stringify(memberData),
-                      isFromNotification: 'true'
+                      memberData: JSON.stringify(memberData)
                     })
                   )
                 }}

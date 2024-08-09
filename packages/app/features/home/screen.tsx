@@ -37,7 +37,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TabsHeader } from 'app/ui/tabs-header'
-
+import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import Constants from 'expo-constants'
@@ -59,11 +59,19 @@ export function HomeScreen() {
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  const notificationListener = useRef<Notifications.Subscription>()
-  const responseListener = useRef<Notifications.Subscription>()
+  let memberNamesList: any =
+    store.getState().memberNames.memberNamesList !== undefined
+      ? store.getState().memberNames.memberNamesList
+      : []
   const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
+
+  let fullName = user.memberName ? user.memberName : ''
+  if (memberNamesList.includes(fullName) === false) {
+    memberNamesList.push(fullName)
+  }
+  store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
@@ -92,6 +100,14 @@ export function HomeScreen() {
         if (data.status === 'SUCCESS') {
           let memberList = data.data.memberList ? data.data.memberList : []
           setMemberList(memberList)
+          console.log('memberList', JSON.stringify(memberList))
+          memberList.map((data: any) => {
+            let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+            if (memberNamesList.includes(fullName) === false) {
+              memberNamesList.push(fullName)
+            }
+          })
+          store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           let sentence = ''
           sentence +=
             data.data.upcomingAppointmentCount &&
@@ -119,13 +135,15 @@ export function HomeScreen() {
     return true
   }
   const getFcmToken = async () => {
-    const fcmToken = await messaging().getToken()
-    if (fcmToken) {
-      console.log('Your Firebase Token is:', fcmToken)
-      updateFcmToken(fcmToken)
-    } else {
-      console.log('Failed', 'No Token Recived')
-    }
+    try {
+      const fcmToken = await messaging().getToken()
+      if (fcmToken) {
+        console.log('Your Firebase Token is:', fcmToken)
+        updateFcmToken(fcmToken)
+      } else {
+        console.log('Failed', 'No Token Recived')
+      }
+    } catch (e) {}
   }
   async function updateFcmToken(fcmToken: any) {
     setLoading(true)
@@ -150,22 +168,26 @@ export function HomeScreen() {
       })
   }
   const handleFcmMessage = useCallback(async () => {
-    await messaging().setBackgroundMessageHandler(async (message: any) => {
-      schedulePushNotification(message)
-    })
-    await messaging().onMessage((message: any) => {
-      schedulePushNotification(message)
-    })
+    try {
+      await messaging().setBackgroundMessageHandler(async (message: any) => {
+        schedulePushNotification(message)
+      })
+      await messaging().onMessage((message: any) => {
+        schedulePushNotification(message)
+      })
+    } catch (e) {}
   }, [])
   const getToken = useCallback(async () => {
-    const authStatus = await messaging().requestPermission()
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
-    if (enabled) {
-      getFcmToken()
-      console.log('Authorization status:', authStatus)
-    }
+    try {
+      const authStatus = await messaging().requestPermission()
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+      if (enabled) {
+        getFcmToken()
+        console.log('Authorization status:', authStatus)
+      }
+    } catch (e) {}
   }, [])
   async function registerForPushNotificationsAsync() {
     let token: any
@@ -275,8 +297,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/appointmentDetails', {
               appointmentDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -286,8 +307,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/medicalDeviceDetails', {
               medicalDevicesDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -297,8 +317,7 @@ export function HomeScreen() {
           router.push(
             formatUrl('/circles/eventDetails', {
               eventDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else if (
@@ -311,12 +330,21 @@ export function HomeScreen() {
           String(notificationType).toLowerCase() ===
             String('Incident').toLowerCase() ||
           String(notificationType).toLowerCase() ===
-            String('Purchase').toLowerCase()
+            String('Purchase').toLowerCase() ||
+          String(notificationType).toLowerCase() ===
+            String('Event').toLowerCase()
         ) {
+          let noteData = {
+            id:
+              notificationData.data && notificationData.data.MsgThreadId
+                ? Number(notificationData.data.MsgThreadId)
+                : ''
+          }
           router.push(
-            formatUrl('/circles/messages', {
+            formatUrl('/circles/noteMessage', {
+              component: 'General',
               memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              noteData: JSON.stringify(noteData)
             })
           )
         } else if (
@@ -325,8 +353,7 @@ export function HomeScreen() {
         ) {
           router.push(
             formatUrl('/circles/caregiversList', {
-              memberData: JSON.stringify(memberData),
-              isFromNotification: 'true'
+              memberData: JSON.stringify(memberData)
             })
           )
         } else {
@@ -561,7 +588,13 @@ export function HomeScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <View className="">
-        <TabsHeader />
+        {isDataReceived ? (
+          <View>
+            <TabsHeader />
+          </View>
+        ) : (
+          <View />
+        )}
         <View className="flex-row">
           <View>
             <Typography className="font-400 ml-[30] text-[16px]">

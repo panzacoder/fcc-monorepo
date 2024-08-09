@@ -215,10 +215,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           ? countryIndex
           : 97,
       state: stateIndex,
-      timeZone:
-        !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
-          ? timeZoneIndex
-          : -1
+      timeZone: timeZoneIndex
     },
     resolver: zodResolver(schema)
   })
@@ -250,6 +247,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         countryId = staticData.countryList[value.id - 1].id
           ? staticData.countryList[value.id - 1].id
           : 101
+        stateIndex = -1
+        timeZoneIndex = -1
         await getStates(countryId)
       }
     } else {

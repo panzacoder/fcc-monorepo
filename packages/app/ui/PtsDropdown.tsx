@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { cn } from './utils'
 import {
   AutocompleteDropdown,
+  AutocompleteDropdownContextProvider,
   AutocompleteDropdownProps
 } from 'react-native-autocomplete-dropdown'
 
@@ -64,7 +65,6 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
 
   const valueObject = dataSet.find((item) => item.id === value)
 
-  // console.log('value', value)
   return (
     <View className="flex">
       {label && (
@@ -81,6 +81,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           initialValue={valueObject}
           ref={ref}
           emptyResultText={emptyResultText}
+          direction="down"
           key={`dropdown-${label}`}
           inputContainerStyle={{
             backgroundColor: 'transparent',

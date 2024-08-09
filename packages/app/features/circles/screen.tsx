@@ -27,6 +27,7 @@ import {
 import { useRouter } from 'expo-router'
 import { SharedContactList } from 'app/ui/sharedContactList'
 import { NewCirclesList } from 'app/ui/newCirclesList'
+import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import { PrivacyPolicy } from 'app/ui/privacyPolicy'
 import { useForm } from 'react-hook-form'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -39,6 +40,7 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 export function CirclesListScreen() {
   const router = useRouter()
+  let memberNamesList: any = store.getState().memberNames.memberNamesList
   const header = store.getState().headerState.header
   const [isLoading, setLoading] = useState(false)
   const [isShowSharedContacts, setIsShowSharedContacts] = useState(false)
@@ -54,6 +56,7 @@ export function CirclesListScreen() {
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
   const [newCirclesList, setNewCirclesList] = useState([])
+  const [isDataReceived, setDataReceived] = useState(false)
   const [transportationList, setTransportationList] = useState([])
   const [transportMemberName, setTransportMemberName] = useState('')
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
@@ -73,7 +76,16 @@ export function CirclesListScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          setMemberList(data.data.memberList ? data.data.memberList : [])
+          let memberList = data.data.memberList ? data.data.memberList : []
+          setMemberList(memberList)
+          memberList.map((data: any) => {
+            let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+            if (memberNamesList.includes(fullName) === false) {
+              memberNamesList.push(fullName)
+            }
+          })
+          store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
+          setDataReceived(true)
         } else {
           Alert.alert('', data.message)
         }
@@ -408,14 +420,14 @@ export function CirclesListScreen() {
         <TouchableOpacity
           className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
           onPress={() => {
-            // router.push('/circles/create')
-            router.push('/circles/createCircle')
+            router.push('/circles/create')
           }}
         >
           <Feather name={'plus'} size={25} className="color-primary" />
         </TouchableOpacity>
+
       </View>
-      {!isHideCirclesView ? (
+      {isDataReceived && !isHideCirclesView ? (
         <ScrollView className="z-10">
           {memberList.map((data: any, index: number) => {
             return (

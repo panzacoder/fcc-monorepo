@@ -9,13 +9,37 @@ import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { Image } from 'app/ui/image'
+import { googleMapOpenUrl } from 'app/ui/utils'
 
 cssInterop(LinearGradient, {
   className: { target: 'style' }
 })
-export function CircleSummaryCard({ memberData, userDetails }) {
+export function CircleSummaryCard({ menuList, memberData, userDetails }) {
   const router = useRouter()
   const [isSeeMore, setSeeMore] = useState(true)
+  // const [isCaregiver, setIsCaregiver] = useState(false)
+  let isCaregiver = false,
+    isDoctor = false,
+    isFacility = false,
+    isPrescription = false,
+    isMedicalDevice = false,
+    isCalendar = false
+  menuList.map((data: any, index: any) => {
+    if (data.menuid === 'MyCaregivers') {
+      isCaregiver = true
+    } else if (data.menuid === 'MyDoctors') {
+      isDoctor = true
+    } else if (data.menuid === 'MyFacilities') {
+      isFacility = true
+    } else if (data.menuid === 'MyPrescriptions') {
+      isPrescription = true
+    } else if (data.menuid === 'MyPurchases') {
+      isMedicalDevice = true
+    } else if (data.menuid === 'MyCalendar') {
+      isCalendar = true
+    }
+  })
 
   const fullName =
     memberData.firstname.trim() + ' ' + memberData.lastname.trim()
@@ -34,27 +58,52 @@ export function CircleSummaryCard({ memberData, userDetails }) {
             {fullName}
           </Typography>
         </View>
-        <TouchableOpacity
-          className=""
-          onPress={() => {
-            router.push(
-              formatUrl('/memberProfile', {
-                memberData: JSON.stringify(memberData),
-                userDetails: JSON.stringify(userDetails)
-              })
-            )
-          }}
-        >
-          <Feather name={'settings'} size={20} color={'white'} />
-        </TouchableOpacity>
+        <View className="flex-row gap-5">
+          <TouchableOpacity
+            onPress={() => {
+              googleMapOpenUrl(memberData.address)
+            }}
+            className=""
+          >
+            {memberData.address ? (
+              <View className="flex-row">
+                <Image
+                  className=""
+                  src={require('app/assets/direction1.png')}
+                  width={25}
+                  height={25}
+                  contentFit={'cover'}
+                  alt="logo"
+                />
+              </View>
+            ) : (
+              <View />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            className=""
+            onPress={() => {
+              router.push(
+                formatUrl('/memberProfile', {
+                  memberData: JSON.stringify(memberData),
+                  userDetails: JSON.stringify(userDetails)
+                })
+              )
+            }}
+          >
+            <Feather name={'settings'} size={20} color={'white'} />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity
         onPress={() => {
-          router.push(
-            formatUrl('/circles/calendar', {
-              memberData: JSON.stringify(memberData)
-            })
-          )
+          if (isCalendar) {
+            router.push(
+              formatUrl('/circles/calendar', {
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          }
         }}
       >
         <TodayCard memberData={memberData} userDetails={userDetails} />
@@ -82,69 +131,89 @@ export function CircleSummaryCard({ memberData, userDetails }) {
         {isSeeMore ? (
           <View>
             <View className="mt-5 flex-row self-center">
-              <Button
-                className="px-3 w-[30%]"
-                title="Caregivers"
-                leadingIcon="pocket"
-                onPress={() => {
-                  router.push(
-                    formatUrl('/circles/caregiversList', {
-                      memberData: JSON.stringify(memberData)
-                    })
-                  )
-                }}
-              />
-              <Button
-                className="ml-2 px-3 w-[30%]"
-                title="Doctors"
-                leadingIcon="briefcase"
-                onPress={() => {
-                  router.push(
-                    formatUrl('/circles/doctorsList', {
-                      memberData: JSON.stringify(memberData)
-                    })
-                  )
-                }}
-              />
-              <Button
-                className="ml-2 px-3 w-[30%]"
-                title="Facilities"
-                leadingIcon="home"
-                onPress={() => {
-                  router.push(
-                    formatUrl('/circles/facilitiesList', {
-                      memberData: JSON.stringify(memberData)
-                    })
-                  )
-                }}
-              />
+              {isCaregiver ? (
+                <Button
+                  className="w-[35%] px-3"
+                  title="Caregivers"
+                  leadingIcon="pocket"
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/circles/caregiversList', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                  }}
+                />
+              ) : (
+                <View />
+              )}
+              {isDoctor ? (
+                <Button
+                  className="ml-2 w-[30%] px-3"
+                  title="Doctors"
+                  leadingIcon="briefcase"
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/circles/doctorsList', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                  }}
+                />
+              ) : (
+                <View />
+              )}
+              {isFacility ? (
+                <Button
+                  className="ml-2 w-[30%] px-3"
+                  title="Facilities"
+                  leadingIcon="home"
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/circles/facilitiesList', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                  }}
+                />
+              ) : (
+                <View />
+              )}
             </View>
 
             <View className="mt-5 flex-row self-center">
-              <Button
-                className="px-3 w-[45%]"
-                title="Prescriptions"
-                leadingIcon="thermometer"
-                onPress={() => {
-                  router.push(
-                    formatUrl('/circles/prescriptionsList', {
-                      memberData: JSON.stringify(memberData)
-                    })
-                  )
-                }}
-              />
-              <Button
-                className="ml-2 px-3 w-[45%]"
-                title="Medical Devices"
-                leadingIcon="watch"
-                onPress={() => {
-                  router.push(
-                    formatUrl('/circles/medicalDevicesList', {
-                      memberData: JSON.stringify(memberData)
-                    })
-                  )
-                }}
-              />
+              {isPrescription ? (
+                <Button
+                  className="w-[45%] px-3"
+                  title="Prescriptions"
+                  leadingIcon="thermometer"
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/circles/prescriptionsList', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                  }}
+                />
+              ) : (
+                <View />
+              )}
+              {isMedicalDevice ? (
+                <Button
+                  className="ml-2 w-[45%] px-3"
+                  title="Medical Devices"
+                  leadingIcon="watch"
+                  onPress={() => {
+                    router.push(
+                      formatUrl('/circles/medicalDevicesList', {
+                        memberData: JSON.stringify(memberData)
+                      })
+                    )
+                  }}
+                />
+              ) : (
+                <View />
+              )}
             </View>
           </View>
         ) : (
