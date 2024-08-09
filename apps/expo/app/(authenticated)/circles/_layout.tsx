@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router/stack'
 
 import { StackHeader } from 'app/ui/stack-header'
+import { Platform } from 'react-native'
 
 export default function Root() {
   return (
@@ -16,7 +17,7 @@ export default function Root() {
       <Stack.Screen
         name="create"
         options={{
-          headerShown: false,
+          headerShown: Platform.OS !== 'ios',
           title: 'Create Circle',
           presentation: 'modal',
           contentStyle: { backgroundColor: 'white' }
