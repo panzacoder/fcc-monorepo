@@ -11,12 +11,12 @@ import { ControlledTextField } from './controlled-field'
 import * as z from 'zod'
 
 export const addressSchema = z.object({
-  address: z.string().min(1, { message: 'Address is required' }),
-  city: z.string().min(1, { message: 'City is required' }),
+  address: z.string(),
+  city: z.string(),
   country: z.number().min(1, { message: 'Country is required' }),
   state: z.number().min(1, { message: 'State is required' }),
   timezone: z.number().min(1, { message: 'Timezone is required' }),
-  postalCode: z.string().min(1, { message: 'Postal Code is required' })
+  postalCode: z.string()
   // countryObject: z.object({
   //   name: z.string(),
   //   code: z.string(),
