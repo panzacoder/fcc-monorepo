@@ -20,7 +20,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.familycarecircle.fccmobileapp",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "com.familycarecircle.fccmobileapp",
@@ -34,6 +34,12 @@
     "plugins": [
       "expo-router",
       "@react-native-firebase/app",
+      ["expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }],
       "expo-localization"
     ]
   }

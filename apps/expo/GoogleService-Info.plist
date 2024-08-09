@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>521569837847-19c83mcfngncrq1qffneq4dq90tt3mrr.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.521569837847-19c83mcfngncrq1qffneq4dq90tt3mrr</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBjhNTB9ex-vGzOPbI1vXRGXWqfHspiCZI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>521569837847</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.familycarecircle.fcc</string>
+	<key>PROJECT_ID</key>
+	<string>fcc-a4c51</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fcc-a4c51.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:521569837847:ios:4b0d5906beb12af0e30d52</string>
+</dict>
+</plist>
