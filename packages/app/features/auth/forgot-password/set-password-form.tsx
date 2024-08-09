@@ -108,12 +108,14 @@ export function SetPasswordForm({
           name="password"
           control={control}
           placeholder="Password*"
+          textContentType="newPassword"
         />
 
         <ControlledSecureField
           name="confirmPassword"
           control={control}
           placeholder="Confirm Password*"
+          textContentType="password"
         />
 
         <View className="flex flex-row justify-end gap-4">
