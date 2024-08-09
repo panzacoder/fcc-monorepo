@@ -503,7 +503,7 @@ export function PaymentsScreen() {
           <View className="w-full flex-row">
             <View className="w-[80%] flex-row">
               <Typography className="my-1 ml-5 font-bold ">
-                {`FCC Subscription -`}
+                {`Family Care Circle Subscription -`}
               </Typography>
               <Typography className="text-primary my-1 ml-2 font-bold">
                 {`${planDetails.plantype ? planDetails.plantype : ''}`}

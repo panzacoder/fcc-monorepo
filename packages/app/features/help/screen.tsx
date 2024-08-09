@@ -119,13 +119,13 @@ export function HelpScreen() {
         )}
         {getPointTextView(
           `Accept Request to create a Circle for you: `,
-          `If you received a message to join Family Care Circle from a Family Caregiver. At this point, you would approve the creation of the Circle focused on your care. Please accept the request. Once you accept, you and the Family Caregiver will  be given Admin rights and privileges to use FCC to its full potential.`
+          `If you received a message to join Family Care Circle from a Family Caregiver. At this point, you would approve the creation of the Circle focused on your care. Please accept the request. Once you accept, you and the Family Caregiver will  be given Admin rights and privileges to use the app to its full potential.`
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-[#ef6603]">
           {'Home Page '}
         </Typography>
         {getTextView(
-          'The FCC Home page will show you all Circles you are included in as Member or Caregiver. These Circles are represented as cards with show upcoming events highlighted. Select which Circle you would like to open and begin to view or create doctors, facilities, and appointments depending on your assigned role. You can log incidents or purchases along with Communicate between Family Members. \n\nWith the button, you can start a new Family Circle for another loved one. You will need to provide valid email id, phone number, first name and last name before sending the request with the button. The loved one will receive an email for the request. They will need to go to the link provided in the email and register for Family Care Circle. Authentication processes are required for all first-time users. Once they login to the app they will be able to accept the Request. \n\nNotification requests will appear for Member/Caregiver requests from others.\n\nAttention notifications appear on the Home page for every Circle highlighting upcoming Appointments, Transportation Requests, Communications, and Incidents.'
+          'The Home page will show you all Circles you are included in as Member or Caregiver. These Circles are represented as cards with show upcoming events highlighted. Select which Circle you would like to open and begin to view or create doctors, facilities, and appointments depending on your assigned role. You can log incidents or purchases along with Communicate between Family Members. \n\nWith the button, you can start a new Family Circle for another loved one. You will need to provide valid email id, phone number, first name and last name before sending the request with the button. The loved one will receive an email for the request. They will need to go to the link provided in the email and register for Family Care Circle. Authentication processes are required for all first-time users. Once they login to the app they will be able to accept the Request. \n\nNotification requests will appear for Member/Caregiver requests from others.\n\nAttention notifications appear on the Home page for every Circle highlighting upcoming Appointments, Transportation Requests, Communications, and Incidents.'
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-[#ef6603]">
           {'User Profile: '}
@@ -137,11 +137,11 @@ export function HelpScreen() {
         )}
         {getPointTextView(
           `Billing: `,
-          `This tab gives information about your current subscription plan and allows to renew/purchase after current cycle ends allowing for an ad free FCC experience. If User cancels a renewal, it will end after the current subscription cycle ends returning to using FCC with Ads.`
+          `This tab gives information about your current subscription plan and allows to renew/purchase after current cycle ends allowing for an ad free experience. If User cancels a renewal, it will end after the current subscription cycle ends returning to using FCC with Ads.`
         )}
         {getPointTextView(
           `Sponsorship: `,
-          `Usually, there are kind sponsors who wants to sponsor FCC subscription for their customers, employees, families, or relatives as a token of love and care. Sponsors will provide Sponsor Codes to be entered into the Sponsorship tab and press Save button allowing for an ad free FCC experience.`
+          `Usually, there are kind sponsors who wants to sponsor a subscription for their customers, employees, families, or relatives as a token of love and care. Sponsors will provide Sponsor Codes to be entered into the Sponsorship tab and press Save button allowing for an ad free FCC experience.`
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-[#ef6603]">
           {'Caregiver Circle of Family Members '}
@@ -163,7 +163,7 @@ export function HelpScreen() {
           'Not Yet Registered - The list of Caregivers who have received your Invitation Request, but their Registration with the Family Care Circle App is still pending. You may want to help them thru the registration and authentication process.'
         )}
         {getTextView(
-          `By clicking on any name on the list, you can see details of the caregiver. As an Admin, you can change status of Caregiver as Active/Inactive. Active Caregivers will be able to see activities in the circle. Inactive Caregivers will be in the list for historical reasons but will not able to see the activities in the circle. Inactive Caregivers Home page views will only show Family Care Circles in which they are active.\n\nAs in all list views withing FCC, Filter functionality is available:\n\nName- Search by Name of Caregiver.\n\nEmail – Search by the email id of the Caregiver.\n\nRole – Search by the Role (Admin, Family Member) of the Caregiver\n\nMember Status- Search By putting Member Status (Active, Inactive)\n\nAlso, you can search any member with the above functionality from a common "Search icon".`
+          `By clicking on any name on the list, you can see details of the caregiver. As an Admin, you can change status of Caregiver as Active/Inactive. Active Caregivers will be able to see activities in the circle. Inactive Caregivers will be in the list for historical reasons but will not able to see the activities in the circle. Inactive Caregivers Home page views will only show Family Care Circles in which they are active.\n\nAs in all list views withing the app, Filter functionality is available:\n\nName- Search by Name of Caregiver.\n\nEmail – Search by the email id of the Caregiver.\n\nRole – Search by the Role (Admin, Family Member) of the Caregiver\n\nMember Status- Search By putting Member Status (Active, Inactive)\n\nAlso, you can search any member with the above functionality from a common "Search icon".`
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-[#ef6603]">
           {'My Calendar'}
@@ -212,7 +212,7 @@ export function HelpScreen() {
           {'Creating Reminders: '}
         </Typography>
         {getTextView(
-          `Reminders can be added for future Appointments. Click + button to add Reminder. An email will be sent to you, along with a notification will appear within FCC. `
+          `Reminders can be added for future Appointments. Click + button to add Reminder. An email will be sent to you, along with a notification will appear within the app. `
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-black">
           {'Reference Appointment: '}
@@ -224,7 +224,7 @@ export function HelpScreen() {
           {'Transportation Request: '}
         </Typography>
         {getTextView(
-          `Select “Is Transportation Required” and send a request to any Family Member or Friend asking for help. You may also start a request within the Transportation tab by selecting the + button to start the request.\n\nA Transportation Request for Appointment with Caregivers will include adding Transportation Details, cross check the default Date-Time and Location. Select a caregiver or send the request to multiple caregivers requesting them to Accompany the member. Add a Description for the Transportation Request and Send Request . The Caregiver(s) you selected will get an email regarding the Transportation request and a notification will appear within the FCC Home screen. The caregiver can “Accept” or “Reject” the Transportation Request. If request is Rejected, caregiver will have to specify the reason for rejection to help understand why they are not available. `
+          `Select “Is Transportation Required” and send a request to any Family Member or Friend asking for help. You may also start a request within the Transportation tab by selecting the + button to start the request.\n\nA Transportation Request for Appointment with Caregivers will include adding Transportation Details, cross check the default Date-Time and Location. Select a caregiver or send the request to multiple caregivers requesting them to Accompany the member. Add a Description for the Transportation Request and Send Request . The Caregiver(s) you selected will get an email regarding the Transportation request and a notification will appear within the Home screen. The caregiver can “Accept” or “Reject” the Transportation Request. If request is Rejected, caregiver will have to specify the reason for rejection to help understand why they are not available. `
         )}
         <Typography className="my-2 ml-5 text-[16px] font-bold text-black">
           {'Mark Complete or Cancelled: '}
