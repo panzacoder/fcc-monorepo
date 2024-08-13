@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   View,
   Alert,
   TouchableOpacity,
   BackHandler,
   Platform,
-  ToastAndroid
 } from 'react-native'
 import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -589,9 +588,7 @@ export function HomeScreen() {
       <PtsLoader loading={isLoading} />
       <View className="">
         {isDataReceived ? (
-          <View>
-            <TabsHeader />
-          </View>
+          <TabsHeader />
         ) : (
           <View />
         )}

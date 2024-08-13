@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:521569837847:android:c0d97df329d08368e30d52",
         "android_client_info": {
-          "package_name": "com.familycarecircle.fccmobileapp"
+          "package_name": "app.familycarecircle.fcc"
         }
       },
       "oauth_client": [
