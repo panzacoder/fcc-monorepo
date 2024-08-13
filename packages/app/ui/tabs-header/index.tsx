@@ -73,9 +73,9 @@ export const TabsHeader = ({}) => {
       })
   }
   return (
-    <View style={{ zIndex: 3 }}>
+    <View style={{ zIndex: 100 }}>
       <PtsLoader loading={isLoading} />
-      <View className="absolute right-0 top-0 w-1/4 flex-row justify-end gap-2">
+      <View className="absolute right-0 top-0 w-1/4 flex-row justify-end gap-2 z-50">
         {user.memberName && (
           <PtsNameInitials className="" fullName={user.memberName} />
         )}
