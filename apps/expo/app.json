@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fcc",
+    "name": "Family Care Circle",
     "slug": "fcc-native",
     "owner": "family-care-circle",
     "version": "1.0.0",
@@ -19,11 +19,11 @@
       "android"
     ],
     "ios": {
-      "bundleIdentifier": "com.familycarecircle.fccmobileapp",
+      "bundleIdentifier": "app.familycarecircle.fcc",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "package": "com.familycarecircle.fccmobileapp",
+      "package": "app.familycarecircle.fcc",
       "googleServicesFile": "./google-services.json"
     },
     "extra": {
