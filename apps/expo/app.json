@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Family Care Circle",
+    "description": "Caregiving is hard. Don't do it alone.",
     "slug": "fcc-native",
     "owner": "family-care-circle",
     "version": "1.0.0",
