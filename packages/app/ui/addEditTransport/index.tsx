@@ -35,7 +35,7 @@ const schema = z.object({
   postalCode: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let countryIndex = 97
+let countryIndex = -1
 let stateIndex = -1
 export const AddEditTransport = ({
   component,

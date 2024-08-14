@@ -196,7 +196,7 @@ export function AddEditLocationScreen() {
         !_.isEmpty(locationDetails) && locationDetails.website
           ? locationDetails.website
           : '',
-      country: !_.isEmpty(locationDetails) ? countryIndex : 97,
+      country: !_.isEmpty(locationDetails) ? countryIndex : -1,
       state: !_.isEmpty(locationDetails) ? stateIndex : -1
     },
     resolver: zodResolver(schema)
