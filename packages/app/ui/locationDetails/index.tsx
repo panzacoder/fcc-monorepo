@@ -213,7 +213,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       country:
         !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
           ? countryIndex
-          : 97,
+          : -1,
       state: stateIndex,
       timeZone: timeZoneIndex
     },
