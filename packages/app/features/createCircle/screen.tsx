@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { View, Alert } from 'react-native'
+import { View, Alert, Platform } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -15,6 +15,7 @@ import {
   CREATE_CIRCLE,
   CREATE_CIRCLE_NO_EMAIL
 } from 'app/utils/urlConstants'
+import { Feather } from 'app/ui/icons'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
@@ -22,6 +23,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
+import * as Contacts from 'expo-contacts'
 const schema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
@@ -370,7 +372,21 @@ export function CreateCircleScreen() {
       </View>
     )
   }
-
+  async function getContactsList() {
+    // setLoading(true)
+    console.log('getContactsList')
+    const { status } = await Contacts.requestPermissionsAsync()
+    if (status === 'granted') {
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.Emails]
+      })
+      console.log('data', data)
+      if (data.length > 0) {
+        const contact = data[0]
+        Alert.alert('contact', JSON.stringify(contact))
+      }
+    }
+  }
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
@@ -453,12 +469,22 @@ export function CreateCircleScreen() {
                           ) : (
                             <View />
                           )}
-
+                        </View>
+                        <View className="flex-row">
                           <ControlledTextField
                             control={control}
                             name="phone"
                             placeholder="Phone"
                             className="flex-1"
+                          />
+                          <Feather
+                            onPress={() => {
+                              getContactsList()
+                            }}
+                            className="ml-2 mt-5 self-center"
+                            name={'book'}
+                            size={20}
+                            color={'#1a7088'}
                           />
                         </View>
                         <View className="mt-2 w-full flex-row gap-2">

@@ -91,6 +91,7 @@ export function CreateCircle() {
   return (
     <AutocompleteDropdownContextProvider headerOffset={insets.top}>
       <SafeAreaView>
+        <ScrollView>
           <FormProvider {...formMethods}>
             <ModalScreen title="Create a Circle">
               <CircleNameSection />
@@ -131,6 +132,7 @@ export function CreateCircle() {
               )}
             </ModalScreen>
           </FormProvider>
+        </ScrollView>
       </SafeAreaView>
     </AutocompleteDropdownContextProvider>
   )

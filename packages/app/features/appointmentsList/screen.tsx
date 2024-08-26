@@ -200,7 +200,7 @@ export function AppointmentsListScreen() {
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
     // console.log('filter', filter)
-    if (filter === 'Open Items') {
+    if (filter === 'Open Items' || filter === 'Upcoming') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
       list = _.orderBy(list, (x) => x.date, 'desc')

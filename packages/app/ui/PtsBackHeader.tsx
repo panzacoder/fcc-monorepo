@@ -96,16 +96,12 @@ export const PtsBackHeader = ({ title, memberData }) => {
       title === 'Medical Devices' ||
       title === 'Messages'
     ) {
-
       router.dismiss(2)
       router.push(
         formatUrl('/circles/circleDetails', {
           memberData: JSON.stringify(memberData)
         })
       )
-    } else if (title === 'Privacy Policy') {
-      router.dismissAll()
-      router.push('/signUp')
     } else {
       router.back()
     }
