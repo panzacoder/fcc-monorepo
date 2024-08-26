@@ -29,7 +29,6 @@ const schema = z.object({
   typeIndex: z.number()
 })
 let selectedType = 'All'
-let typesList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
 let weekFirstLastDays = [] as any
 let weekDayListDates = [] as any
 let weekDayUtcDates = [] as any
@@ -58,6 +57,7 @@ export function ConsolidatedViewScreen() {
   const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [typesList, setTypesList] = useState([]) as any
   const [selectedDate, setSelectedDate] = useState(
     getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
   )
@@ -167,13 +167,16 @@ export function ConsolidatedViewScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          let list: object[] = [{ id: 1, title: 'All' }]
+
           data.data.filterOptionTypes.map((data: any, index: any) => {
             let object = {
               title: data,
               id: index + 2
             }
-            typesList.push(object)
+            list.push(object)
           })
+          setTypesList(list)
         } else {
           Alert.alert('', data.message)
         }
