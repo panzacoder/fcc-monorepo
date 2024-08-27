@@ -72,6 +72,7 @@ export function HomeScreen() {
   }
   store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
+  const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
@@ -101,6 +102,13 @@ export function HomeScreen() {
           setMemberList(memberList)
           console.log('memberList', JSON.stringify(memberList))
           memberList.map((data: any) => {
+            if (
+              data.upcomingAppointment ||
+              data.recentIncident ||
+              data.upcomingEvent
+            ) {
+              setIsWeekDataAvailable(true)
+            }
             let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
             if (memberNamesList.includes(fullName) === false) {
               memberNamesList.push(fullName)
@@ -588,7 +596,9 @@ export function HomeScreen() {
       <PtsLoader loading={isLoading} />
       <View className="">
         {isDataReceived ? (
-          <TabsHeader />
+          <View>
+            <TabsHeader />
+          </View>
         ) : (
           <View />
         )}
@@ -607,16 +617,20 @@ export function HomeScreen() {
             className={`border-primary bg-card mx-[10px] mt-[30] h-[85%] w-full self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
-              <View>
-                <Typography className="mt-[10] text-[20px] font-bold text-black">
-                  {'Your Week'}
-                </Typography>
-                <Typography className="font-400 text-[16px]">
-                  {upcomingSentence}
-                </Typography>
-              </View>
+              {isWeekDataAvailable ? (
+                <View>
+                  <Typography className="mt-[10] text-[20px] font-bold text-black">
+                    {'Your Week'}
+                  </Typography>
+                  <Typography className="font-400 text-[16px]">
+                    {upcomingSentence}
+                  </Typography>
+                </View>
+              ) : (
+                <View className="mt-[10]" />
+              )}
             </View>
-            {memberList.length > 0 ? (
+            {memberList.length > 0 && isWeekDataAvailable ? (
               <ScrollView persistentScrollbar={true} className="m-2 flex-1">
                 {memberList.map((data: any, index: number) => {
                   return (

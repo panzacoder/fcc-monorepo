@@ -196,7 +196,7 @@ export function AddEditLocationScreen() {
         !_.isEmpty(locationDetails) && locationDetails.website
           ? locationDetails.website
           : '',
-      country: !_.isEmpty(locationDetails) ? countryIndex : -1,
+      country: !_.isEmpty(locationDetails) ? countryIndex : 97,
       state: !_.isEmpty(locationDetails) ? stateIndex : -1
     },
     resolver: zodResolver(schema)
@@ -219,10 +219,11 @@ export function AddEditLocationScreen() {
           : 101
         await getStates(countryId)
       }
-    } else {
-      setStatesList([])
-      setStatesListFull([])
-    }
+    } 
+    // else {
+    //   setStatesList([])
+    //   setStatesListFull([])
+    // }
   }
 
   async function addUpdateLocation(formData: Schema) {

@@ -8,6 +8,7 @@ import subscriptionReducer from './userSubscription/subscriptionReducer'
 import subscriptionDetailsReducer from './userSubscriptionDetails/userSubscriptionReducer'
 import currentMemberAddressReducer from './curenMemberAddress/currentMemberAddressReducer'
 import memberNamesReducer from './memberNames/memberNamesReducer'
+import messageListReducer from './messageList/messageListReducer'
 
 const appReducer = combineReducers({
   headerState: headerReducer,
@@ -18,7 +19,8 @@ const appReducer = combineReducers({
   subscriptionState: subscriptionReducer,
   subscriptionDetailsState: subscriptionDetailsReducer,
   currentMemberAddress: currentMemberAddressReducer,
-  memberNames: memberNamesReducer
+  memberNames: memberNamesReducer,
+  messageList: messageListReducer
 })
 
 const rootReducer = (state: any, action: any) => {
