@@ -9,26 +9,48 @@ export const PtsBackHeader = ({ title, memberData }) => {
   const user = store.getState().userProfileState.header
   async function goToScreen(title: any) {
     if (title === 'Appointment Details') {
-      router.dismiss(2)
-      router.push(
-        formatUrl('/circles/appointmentsList', {
-          memberData: JSON.stringify(memberData)
-        })
-      )
+      console.log('memberData', JSON.stringify(memberData))
+      if (
+        memberData.isFromConsolidatedView !== undefined &&
+        memberData.isFromConsolidatedView == 'true'
+      ) {
+        router.back()
+      } else {
+        router.dismiss(2)
+        router.push(
+          formatUrl('/circles/appointmentsList', {
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
     } else if (title === 'Event Details') {
-      router.dismiss(2)
-      router.push(
-        formatUrl('/circles/eventsList', {
-          memberData: JSON.stringify(memberData)
-        })
-      )
+      if (
+        memberData.isFromConsolidatedView !== undefined &&
+        memberData.isFromConsolidatedView == 'true'
+      ) {
+        router.back()
+      } else {
+        router.dismiss(2)
+        router.push(
+          formatUrl('/circles/eventsList', {
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
     } else if (title === 'Incident Details') {
-      router.dismiss(2)
-      router.push(
-        formatUrl('/circles/incidentsList', {
-          memberData: JSON.stringify(memberData)
-        })
-      )
+      if (
+        memberData.isFromConsolidatedView !== undefined &&
+        memberData.isFromConsolidatedView == 'true'
+      ) {
+        router.back()
+      } else {
+        router.dismiss(2)
+        router.push(
+          formatUrl('/circles/incidentsList', {
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
     } else if (title === 'Caregiver Details' || title === 'Edit Caregiver') {
       router.dismiss(3)
       router.push(

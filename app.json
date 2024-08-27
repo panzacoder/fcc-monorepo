@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "81c4d21b-9728-4c21-9a64-81552f25c9e4"
+      }
+    },
+    "android": {
+      "package": "app.familycarecircle.fcc"
+    }
+  }
+}

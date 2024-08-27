@@ -51,6 +51,7 @@ export function EventDetailsScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
+  const [key, setKey] = useState(0)
   const [eventStatus, setEventStatus] = useState('')
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -416,6 +417,7 @@ export function EventDetailsScreen() {
           // setTransportationData(data.data ? data.data : {})
           setIsAddReminder(false)
           setRemindersList(data.data ? data.data : [])
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -631,7 +633,7 @@ export function EventDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-bold w-[95%] text-[15px] text-black">
+                <Typography className=" w-[95%] text-[15px] font-bold text-black">
                   {event}
                 </Typography>
               </View>
@@ -798,7 +800,7 @@ export function EventDetailsScreen() {
             </View>
 
             {remindersList.length > 0 && isShowReminder ? (
-              <ScrollView className="">
+              <ScrollView key={key} className="">
                 {remindersList.map((data: any, index: number) => {
                   return (
                     <View key={index}>

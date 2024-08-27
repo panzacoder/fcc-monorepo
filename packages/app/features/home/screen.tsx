@@ -217,7 +217,7 @@ export function HomeScreen() {
         finalStatus = status
       }
       if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!')
+        alert('Please give permissions for sending notifications.')
         return
       }
       try {

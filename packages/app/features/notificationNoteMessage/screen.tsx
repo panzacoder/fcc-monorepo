@@ -6,7 +6,8 @@ import {
   Alert,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
+  Keyboard
 } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
@@ -113,8 +114,17 @@ export function NotificationNoteMessageScreen() {
     setIsRender(!isRender)
   }
   useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        this.scrollView.scrollToEnd({ animated: true })
+      }
+    )
     getNoteDetails()
     handleFcmMessage()
+    return () => {
+      keyboardDidShowListener.remove()
+    }
   }, [])
 
   async function updateMessageThread() {

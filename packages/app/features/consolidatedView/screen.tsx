@@ -50,7 +50,7 @@ export function ConsolidatedViewScreen() {
   const userDetails = store.getState().userProfileState.header
   let memberData = {
     member: userDetails.memberId ? userDetails.memberId : ''
-  }
+  } as any
   const [isLoading, setLoading] = useState(false)
   const [memberActivityList, setMemberActivityList] = useState([]) as any
 
@@ -358,6 +358,7 @@ export function ConsolidatedViewScreen() {
     return (
       <TouchableOpacity
         onPress={() => {
+          memberData.isFromConsolidatedView='true'
           if (
             data.type === 'Doctor Appointment' ||
             data.type === 'Facility Appointment'

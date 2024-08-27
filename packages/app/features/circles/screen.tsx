@@ -47,6 +47,7 @@ export function CirclesListScreen() {
   const [isShowNewCircles, setIsShowNewCircles] = useState(false)
   const [isShowPrivacyPolicy, setIsShowPrivacyPolicy] = useState(false)
   const [roleUid, setRoleUid] = useState('')
+  const [key, setKey] = useState(0)
   const [requestData, setRequestData] = useState({})
   const [isHideCirclesView, setIsHideCirclesView] = useState(false)
 
@@ -86,6 +87,7 @@ export function CirclesListScreen() {
           })
           store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           setDataReceived(true)
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -104,7 +106,7 @@ export function CirclesListScreen() {
     acceptRejectMemberRequest(data, true)
   }
   async function acceptRejectClickedNewCircles(data: any, isAccept: any) {
-    // console.log('acceptRejectClickedNewCircles')
+    console.log('acceptRejectClickedNewCircles',isAccept)
     if (isAccept) {
       setIsShowNewCircles(false)
       setRequestData(data)
@@ -425,10 +427,9 @@ export function CirclesListScreen() {
         >
           <Feather name={'plus'} size={25} className="color-primary" />
         </TouchableOpacity>
-
       </View>
       {isDataReceived && !isHideCirclesView ? (
-        <ScrollView className="z-10">
+        <ScrollView key={key} className="z-10">
           {memberList.map((data: any, index: number) => {
             return (
               <View key={index}>
@@ -447,7 +448,7 @@ export function CirclesListScreen() {
       )}
 
       {isShowSharedContacts ? (
-        <View className="w-full ">
+        <View className="h-[95%] w-full">
           <SharedContactList
             cancelClicked={cancelClicked}
             sharedContactsList={sharedContactsList}
@@ -458,7 +459,7 @@ export function CirclesListScreen() {
         <View />
       )}
       {isShowNewCircles ? (
-        <View className="w-full ">
+        <View className="h-[95%] w-full">
           <NewCirclesList
             cancelClicked={cancelClicked}
             newCirclesList={newCirclesList}
@@ -470,7 +471,7 @@ export function CirclesListScreen() {
         <View />
       )}
       {isShowPrivacyPolicy ? (
-        <View className="w-full h-[85%]">
+        <View className="h-[85%] w-full">
           <PrivacyPolicy
             address={{}}
             cancelClicked={cancelClicked}
