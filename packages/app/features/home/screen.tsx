@@ -6,7 +6,7 @@ import {
   Alert,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from 'react-native'
 import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -22,7 +22,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import messaging from '@react-native-firebase/messaging'
 import {
   BASE_URL,
-  GET_WEEK_DETAILS,
+  GET_WEEKLY_DETAILS,
   GET_TRANSPORTATION_REQUESTS,
   REJECT_TRANSPORT,
   APPROVE_TRANSPORT,
@@ -72,7 +72,6 @@ export function HomeScreen() {
   }
   store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
-  const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
@@ -91,7 +90,7 @@ export function HomeScreen() {
   })
   const getWeekDetails = useCallback(async () => {
     setLoading(true)
-    let url = `${BASE_URL}${GET_WEEK_DETAILS}`
+    let url = `${BASE_URL}${GET_WEEKLY_DETAILS}`
     let dataObject = {
       header: header
     }
@@ -113,6 +112,7 @@ export function HomeScreen() {
             if (memberNamesList.includes(fullName) === false) {
               memberNamesList.push(fullName)
             }
+            console.log('memberNamesList', JSON.stringify(memberNamesList))
           })
           store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           let sentence = ''
@@ -617,7 +617,7 @@ export function HomeScreen() {
             className={`border-primary bg-card mx-[10px] mt-[30] h-[85%] w-full self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
-              {isWeekDataAvailable ? (
+              {memberList.length > 0 ? (
                 <View>
                   <Typography className="mt-[10] text-[20px] font-bold text-black">
                     {'Your Week'}
@@ -630,7 +630,7 @@ export function HomeScreen() {
                 <View className="mt-[10]" />
               )}
             </View>
-            {memberList.length > 0 && isWeekDataAvailable ? (
+            {memberList.length > 0 ? (
               <ScrollView persistentScrollbar={true} className="m-2 flex-1">
                 {memberList.map((data: any, index: number) => {
                   return (
