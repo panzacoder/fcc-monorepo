@@ -56,7 +56,7 @@ export const NewCirclesList = ({
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    acceptRejectClicked(data, true)
+                    acceptRejectClicked(data, false)
                   }}
                   className="ml-5 w-[25%] self-center rounded-full bg-[#e48f92] py-1 "
                 >

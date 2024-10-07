@@ -274,13 +274,14 @@ export const AddEditTransport = ({
         ? staticData.countryList[value.id - 1].id
         : 101
       await getStates(countryId)
-    } else {
-      reset({
-        country: -1
-      })
-      setStatesList([])
-      setStatesListFull([])
     }
+    //  else {
+    //   reset({
+    //     country: -1
+    //   })
+    //   setStatesList([])
+    //   setStatesListFull([])
+    // }
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'

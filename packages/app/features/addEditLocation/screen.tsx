@@ -219,10 +219,11 @@ export function AddEditLocationScreen() {
           : 101
         await getStates(countryId)
       }
-    } else {
-      setStatesList([])
-      setStatesListFull([])
-    }
+    } 
+    // else {
+    //   setStatesList([])
+    //   setStatesListFull([])
+    // }
   }
 
   async function addUpdateLocation(formData: Schema) {

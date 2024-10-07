@@ -6,7 +6,7 @@ import {
   Alert,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from 'react-native'
 import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -22,7 +22,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import messaging from '@react-native-firebase/messaging'
 import {
   BASE_URL,
-  GET_WEEK_DETAILS,
+  GET_WEEKLY_DETAILS,
   GET_TRANSPORTATION_REQUESTS,
   REJECT_TRANSPORT,
   APPROVE_TRANSPORT,
@@ -90,7 +90,7 @@ export function HomeScreen() {
   })
   const getWeekDetails = useCallback(async () => {
     setLoading(true)
-    let url = `${BASE_URL}${GET_WEEK_DETAILS}`
+    let url = `${BASE_URL}${GET_WEEKLY_DETAILS}`
     let dataObject = {
       header: header
     }
@@ -101,10 +101,18 @@ export function HomeScreen() {
           setMemberList(memberList)
           console.log('memberList', JSON.stringify(memberList))
           memberList.map((data: any) => {
+            if (
+              data.upcomingAppointment ||
+              data.recentIncident ||
+              data.upcomingEvent
+            ) {
+              setIsWeekDataAvailable(true)
+            }
             let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
             if (memberNamesList.includes(fullName) === false) {
               memberNamesList.push(fullName)
             }
+            console.log('memberNamesList', JSON.stringify(memberNamesList))
           })
           store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
           let sentence = ''
@@ -209,7 +217,7 @@ export function HomeScreen() {
         finalStatus = status
       }
       if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!')
+        alert('Please give permissions for sending notifications.')
         return
       }
       try {
@@ -588,7 +596,9 @@ export function HomeScreen() {
       <PtsLoader loading={isLoading} />
       <View className="">
         {isDataReceived ? (
-          <TabsHeader />
+          <View>
+            <TabsHeader />
+          </View>
         ) : (
           <View />
         )}
@@ -607,14 +617,18 @@ export function HomeScreen() {
             className={`border-primary bg-card mx-[10px] mt-[30] h-[85%] w-full self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
-              <View>
-                <Typography className="mt-[10] text-[20px] font-bold text-black">
-                  {'Your Week'}
-                </Typography>
-                <Typography className="font-400 text-[16px]">
-                  {upcomingSentence}
-                </Typography>
-              </View>
+              {memberList.length > 0 ? (
+                <View>
+                  <Typography className="mt-[10] text-[20px] font-bold text-black">
+                    {'Your Week'}
+                  </Typography>
+                  <Typography className="font-400 text-[16px]">
+                    {upcomingSentence}
+                  </Typography>
+                </View>
+              ) : (
+                <View className="mt-[10]" />
+              )}
             </View>
             {memberList.length > 0 ? (
               <ScrollView persistentScrollbar={true} className="m-2 flex-1">

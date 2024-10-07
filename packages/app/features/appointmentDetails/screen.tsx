@@ -62,8 +62,8 @@ export function AppointmentDetailsScreen() {
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
+  // let memberDat = item.memberData ? JSON.parse(item.memberData) : {}
+  // console.log('memberDat', '' + JSON.stringify(memberDat))
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [memberData, setMemberData] = useState(
@@ -73,6 +73,7 @@ export function AppointmentDetailsScreen() {
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isAddTransportation, setIsAddTransportation] = useState(false)
   const [isRender, setIsRender] = useState(false)
+  const [key, setKey] = useState(0)
   const [noteData, setNoteData] = useState({})
   const [isShowNotes, setIsShowNotes] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
@@ -577,6 +578,7 @@ export function AppointmentDetailsScreen() {
           // setTransportationData(data.data ? data.data : {})
           setIsAddReminder(false)
           setRemindersList(data.data.reminderList ? data.data.reminderList : [])
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -764,7 +766,10 @@ export function AppointmentDetailsScreen() {
   return (
     <View className="flex-1 ">
       <PtsLoader loading={isLoading} />
-      <PtsBackHeader title="Appointment Details" memberData={memberData} />
+      <PtsBackHeader
+        title="Appointment Details"
+        memberData={item.memberData ? JSON.parse(item.memberData) : {}}
+      />
       {isDataReceived ? (
         <View className=" h-full w-full flex-1 py-2">
           <ScrollView persistentScrollbar={true} className="flex-1">
@@ -1020,7 +1025,7 @@ export function AppointmentDetailsScreen() {
               </View>
 
               {remindersList.length > 0 && isShowReminder ? (
-                <ScrollView className="">
+                <ScrollView key={key} className="">
                   {remindersList.map((data: any, index: number) => {
                     data.apointmentId = appointmentDetails.id
                     return (

@@ -40,6 +40,7 @@ export const Transportation = ({
     list = transportationData.reminderList
   }
   const [remindersList, setRemindersList] = useState(list)
+  const [key, setKey] = useState(0)
   let creationDate = transportationData.createdOn
     ? convertTimeToUserLocalTime(transportationData.createdOn)
     : ''
@@ -125,6 +126,7 @@ export const Transportation = ({
           setTransportationData(data.data ? data.data : {})
           setRemindersList(data.data.reminderList ? data.data.reminderList : [])
           setIsRender(!isRender)
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -179,6 +181,7 @@ export const Transportation = ({
           setTransportationData(data.data ? data.data : {})
           setIsAddReminder(false)
           setRemindersList(data.data.reminderList ? data.data.reminderList : [])
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -270,7 +273,7 @@ export const Transportation = ({
         <View />
       )}
       {remindersList.length > 0 ? (
-        <ScrollView className="w-[95%]">
+        <ScrollView key={key} className="w-[95%]">
           {remindersList.map((data: any, index: number) => {
             return (
               <View key={index} className="ml-4">

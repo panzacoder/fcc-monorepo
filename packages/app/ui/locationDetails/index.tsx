@@ -71,7 +71,16 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           timeZoneListFull = data.data.timeZoneList
             ? data.data.timeZoneList
             : []
-          if (!_.isEmpty(locationData)) {
+          if (component === 'SignUp') {
+            let newTimeZone = moment.tz.guess()
+            // console.log('newTimeZone', newTimeZone)
+            data.data.timeZoneList.map((data: any, index: any) => {
+              if (data.name === newTimeZone) {
+                timeZoneIndex = index + 1
+              }
+            })
+            setAddressObject(timeZoneListFull[timeZoneIndex - 1], 8)
+          } else if (!_.isEmpty(locationData)) {
             let stateName = locationData.address.state.name
               ? locationData.address.state.name
               : ''
@@ -106,16 +115,6 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 timeZoneIndex = index + 1
               }
             })
-          } else {
-            if (component === 'SignUp') {
-              let newTimeZone = moment.tz.guess()
-              data.data.timeZoneList.map((data: any, index: any) => {
-                if (data.name === newTimeZone) {
-                  timeZoneIndex = index + 1
-                }
-              })
-              setAddressObject(timeZoneListFull[timeZoneIndex - 1], 8)
-            }
           }
           reset({
             state: stateIndex,
@@ -247,13 +246,14 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         countryId = staticData.countryList[value.id - 1].id
           ? staticData.countryList[value.id - 1].id
           : 101
-        stateIndex = -1
-        timeZoneIndex = -1
+        // stateIndex = -1
+        // timeZoneIndex = -1
         await getStates(countryId)
       }
-    } else {
-      statesList = []
     }
+    // else {
+    //   statesList = []
+    // }
   }
   async function setSelectedStateChange(value: any) {
     if (value) {

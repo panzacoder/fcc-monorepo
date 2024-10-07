@@ -6,9 +6,9 @@ import {
   Alert,
   TouchableOpacity,
   TextInput,
-  ToastAndroid
+  Keyboard,
+  ScrollView
 } from 'react-native'
-import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -17,6 +17,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
+import messageListAction from 'app/redux/messageList/messageListAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import store from 'app/redux/store'
@@ -44,10 +45,12 @@ Notifications.setNotificationHandler({
 export function NoteMessageScreen() {
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
+  const [isDataReceived, setIsDataReceived] = useState(false)
   const [message, setMessage] = useState('')
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [participantsList, setParticipantsList] = useState(null) as any
   const [messageList, setMessageList] = useState(null) as any
+  const [key, setKey] = useState(0)
   const [threadParticipantsList, setThreadParticipantsList] = useState(
     []
   ) as any
@@ -111,6 +114,7 @@ export function NoteMessageScreen() {
                 ? messageThread.messageList
                 : []
             setMessageList(messageList)
+            store.dispatch(messageListAction.setMessageList(messageList))
             let participantList =
               messageThread.participantList !== undefined &&
               messageThread.participantList !== null
@@ -140,7 +144,9 @@ export function NoteMessageScreen() {
             let messageList = messageThread.messageList
               ? messageThread.messageList
               : []
+
             setMessageList(messageList)
+            store.dispatch(messageListAction.setMessageList(messageList))
             let participantList = messageThread.participantList
               ? messageThread.participantList
               : []
@@ -155,7 +161,10 @@ export function NoteMessageScreen() {
             })
             setParticipantsList(list)
           }
+          // let messages: any = store.getState().messageList.messageList
+          // console.log('messages', JSON.stringify(messages))
           setLoading(false)
+          setIsDataReceived(true)
         } else {
           setLoading(false)
           Alert.alert('', data.message)
@@ -170,16 +179,44 @@ export function NoteMessageScreen() {
     try {
       Notifications.setNotificationHandler(null)
       await messaging().setBackgroundMessageHandler(async (message: any) => {
-        getNoteDetails()
+        // getNoteDetails()
+        updateMessageList(message)
       })
       await messaging().onMessage((message: any) => {
-        getNoteDetails()
+        // getNoteDetails()
+        updateMessageList(message)
       })
     } catch (e) {}
   }, [])
+  async function updateMessageList(message: any) {
+    let messageList: any = store.getState().messageList.messageList
+    let messeageContent = message.data ? message.data : {}
+    let messageObject = {
+      sender: messeageContent.MemberId ? messeageContent.MemberId : '',
+      senderName: messeageContent.MsgCreatedBy
+        ? messeageContent.MsgCreatedBy
+        : '',
+      body: messeageContent.MsgContent ? messeageContent.MsgContent : '',
+      createdOn: messeageContent.MsgDateUTC ? messeageContent.MsgDateUTC : ''
+    }
+    messageList.push(messageObject)
+    setMessageList(messageList)
+    setKey(Math.random())
+    setIsRender(!isRender)
+  }
   useEffect(() => {
+    // const keyboardDidShowListener = Keyboard.addListener(
+    //   'keyboardDidShow',
+    //   () => {
+    //     this.scrollView.scrollToEnd({ animated: true })
+    //   }
+    // )
     getNoteDetails()
     handleFcmMessage()
+    // return () => {
+    //   console.log('in return')
+    //   keyboardDidShowListener.remove()
+    // }
   }, [])
 
   async function getThreadParticipants() {
@@ -388,88 +425,108 @@ export function NoteMessageScreen() {
             )}
           </View>
         </View>
-        <View className=" h-[90%] w-full bg-[#e0d8d0]">
-          {isValidObject(messageList) && messageList.length > 0 ? (
-            <ScrollView className="max-h-[90%] ">
-              {messageList.map((message: any, index: number) => {
-                if (isValidObject(userDetails) && isValidObject(message)) {
-                  if (message.sender !== userDetails.id) {
-                    return (
-                      <View
-                        className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
-                        key={index}
-                      >
-                        <Typography style={{ color: '#30649c' }} className="">
-                          {message.senderName ? message.senderName : ''}
-                        </Typography>
-                        <Typography className="">
-                          {message.body ? message.body.trim() : ''}
-                        </Typography>
-                        <Typography
-                          style={{ fontSize: 8 }}
-                          className="text-right"
+        <View key={key} className=" h-[90%] w-full bg-[#e0d8d0]">
+          <ScrollView
+            ref={(ref) => {
+              this.scrollView = ref
+            }}
+            onContentSizeChange={() =>
+              this.scrollView.scrollToEnd({ animated: true })
+            }
+            className="max-h-[90%] "
+          >
+            {isValidObject(messageList) && messageList.length > 0 ? (
+              <View>
+                {messageList.map((message: any, index: number) => {
+                  if (isValidObject(userDetails) && isValidObject(message)) {
+                    if (message.sender !== userDetails.id) {
+                      return (
+                        <View
+                          className="my-1 ml-[-45%] w-[50%] self-center rounded-[5px] bg-white p-1"
+                          key={index}
                         >
-                          {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
-                            : ''}
-                        </Typography>
-                      </View>
-                    )
-                  } else {
-                    return (
-                      <View
-                        className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
-                        key={index}
-                      >
-                        <Typography className="">
-                          {message.body ? message.body : ''}
-                        </Typography>
-                        <Typography
-                          style={{ fontSize: 8 }}
-                          className="text-right"
+                          <Typography style={{ color: '#30649c' }} className="">
+                            {message.senderName ? message.senderName : ''}
+                          </Typography>
+                          <Typography className="">
+                            {message.body ? message.body.trim() : ''}
+                          </Typography>
+                          <Typography
+                            style={{ fontSize: 8 }}
+                            className="text-right"
+                          >
+                            {message.createdOn
+                              ? formatTimeToUserLocalTime(message.createdOn)
+                              : ''}
+                          </Typography>
+                        </View>
+                      )
+                    } else {
+                      return (
+                        <View
+                          className="my-1 mr-[-45%] w-[50%] self-center rounded-[5px] bg-[#dfedcc] p-2"
+                          key={index}
                         >
-                          {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
-                            : ''}
-                        </Typography>
-                      </View>
-                    )
+                          <Typography className="">
+                            {message.body ? message.body : ''}
+                          </Typography>
+                          <Typography
+                            style={{ fontSize: 8 }}
+                            className="text-right"
+                          >
+                            {message.createdOn
+                              ? formatTimeToUserLocalTime(message.createdOn)
+                              : ''}
+                          </Typography>
+                        </View>
+                      )
+                    }
                   }
-                }
-              })}
-            </ScrollView>
+                })}
+              </View>
+            ) : (
+              <View />
+            )}
+          </ScrollView>
+          {isDataReceived ? (
+            <View
+              style={{ position: 'absolute', bottom: 0 }}
+              className=" my-1 flex-row items-center"
+            >
+              <View className="w-[85%] self-center">
+                <TextInput
+                  defaultValue={message}
+                  multiline={true}
+                  placeholder={'Type a message'}
+                  className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
+                  onChangeText={(value) => {
+                    setMessage(value)
+                  }}
+                  onPressIn={() => {
+                    this.scrollView.scrollToEnd({ x: 0, y: 0, animated: true })
+                  }}
+                />
+              </View>
+              <View className="ml-2 self-center">
+                <TouchableOpacity
+                  className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
+                  onPress={() => {}}
+                >
+                  <Feather
+                    className=""
+                    name={'send'}
+                    size={20}
+                    color={'white'}
+                    onPress={() => {
+                      updateMessageThread()
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
           ) : (
             <View />
           )}
-          <View className=" my-1 flex-row items-center">
-            <View className="w-[85%] self-center">
-              <TextInput
-                defaultValue={message}
-                multiline={true}
-                placeholder={'Type a message'}
-                className="rounded-[5px] border-[1px] border-gray-400 bg-white p-2"
-                onChangeText={(value) => {
-                  setMessage(value)
-                }}
-              />
-            </View>
-            <View className="ml-2 self-center">
-              <TouchableOpacity
-                className="h-[40px] w-[40px] items-center justify-center rounded-[20px] bg-[#0d9195]"
-                onPress={() => {}}
-              >
-                <Feather
-                  className=""
-                  name={'send'}
-                  size={20}
-                  color={'white'}
-                  onPress={() => {
-                    updateMessageThread()
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
       </SafeAreaView>
       {true === isMessageThread ? (

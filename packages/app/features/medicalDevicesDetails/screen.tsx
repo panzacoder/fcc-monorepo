@@ -42,6 +42,7 @@ export function MedicalDevicesDetailsScreen() {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
+  const [key, setKey] = useState(0)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
@@ -228,6 +229,7 @@ export function MedicalDevicesDetailsScreen() {
               ? data.data.purchase.reminderList
               : []
           )
+          setKey(Math.random())
         } else {
           Alert.alert('', data.message)
         }
@@ -656,7 +658,7 @@ export function MedicalDevicesDetailsScreen() {
             </View>
 
             {remindersList.length > 0 && isShowReminder ? (
-              <ScrollView className="">
+              <ScrollView key={key} className="">
                 {remindersList.map((data: any, index: number) => {
                   return (
                     <View key={index}>
