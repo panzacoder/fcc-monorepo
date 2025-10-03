@@ -79,7 +79,7 @@ export function HomeScreen() {
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
     useState(false)
   const [upcomingSentence, setUpcomingSentence] = useState('')
-  const [isDataReceived, setDataReceived] = useState(false)
+  const [isDataReceived, setDataReceived] = useState(true)
   const [memberList, setMemberList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const { control, handleSubmit, reset } = useForm({
@@ -89,7 +89,6 @@ export function HomeScreen() {
     resolver: zodResolver(schema)
   })
   const getWeekDetails = useCallback(async () => {
-    setLoading(true)
     let url = `${BASE_URL}${GET_WEEK_DETAILS}`
     let dataObject = {
       header: header
@@ -121,12 +120,12 @@ export function HomeScreen() {
           setDataReceived(true)
         } else {
           Alert.alert('', data.message)
+          setDataReceived(true)
         }
-        setLoading(false)
       })
       .catch((error) => {
-        setLoading(false)
         console.log(error)
+        setDataReceived(true)
       })
   }, [])
   function handleBackButtonClick() {

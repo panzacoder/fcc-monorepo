@@ -56,7 +56,7 @@ export function CirclesListScreen() {
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
   const [newCirclesList, setNewCirclesList] = useState([])
-  const [isDataReceived, setDataReceived] = useState(false)
+  const [isDataReceived, setDataReceived] = useState(true)
   const [transportationList, setTransportationList] = useState([])
   const [transportMemberName, setTransportMemberName] = useState('')
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
@@ -68,7 +68,6 @@ export function CirclesListScreen() {
     resolver: zodResolver(schema)
   })
   const getMemberDetails = useCallback(async () => {
-    setLoading(true)
     let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
     let dataObject = {
       header: header
@@ -88,12 +87,12 @@ export function CirclesListScreen() {
           setDataReceived(true)
         } else {
           Alert.alert('', data.message)
+          setDataReceived(true)
         }
-        setLoading(false)
       })
       .catch((error) => {
-        setLoading(false)
         console.log(error)
+        setDataReceived(true)
       })
   }, [])
   useEffect(() => {
