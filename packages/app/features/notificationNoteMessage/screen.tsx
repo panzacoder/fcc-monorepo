@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View,
   Alert,
@@ -35,6 +35,7 @@ Notifications.setNotificationHandler({
   })
 })
 export function NotificationNoteMessageScreen() {
+  const scrollViewRef = useRef<ScrollView>(null)
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [key, setKey] = useState(0)
@@ -173,11 +174,9 @@ export function NotificationNoteMessageScreen() {
           {isValidObject(messageList) && messageList.length > 0 ? (
             <ScrollView
               key={key}
-              ref={(ref) => {
-                this.scrollView = ref
-              }}
+              ref={scrollViewRef}
               onContentSizeChange={() =>
-                this.scrollView.scrollToEnd({ animated: true })
+                scrollViewRef.current?.scrollToEnd({ animated: true })
               }
               className="max-h-[90%] "
             >
