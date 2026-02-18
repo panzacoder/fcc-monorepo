@@ -1,6 +1,7 @@
 # Project
 
 .env.local
+.future-exploration.md
 package-lock.json
 
 # OSX

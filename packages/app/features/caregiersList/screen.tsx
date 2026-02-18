@@ -20,6 +20,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { logger } from 'app/utils/logger'
 let caregiverPrivileges = {}
 export function CaregiversListScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -72,7 +73,7 @@ export function CaregiversListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   useEffect(() => {
@@ -112,7 +113,7 @@ export function CaregiversListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   return (

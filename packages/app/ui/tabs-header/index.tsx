@@ -7,9 +7,9 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGOUT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { clearCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
-// import * as SecureStore from 'expo-secure-store'
+import { logger } from 'app/utils/logger'
 
 export type TabsHeaderProps = {
   navigation: any
@@ -56,11 +56,7 @@ export const TabsHeader = ({}) => {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          try {
-            await AsyncStorage.setItem('loginDetails', JSON.stringify(null))
-          } catch (e) {
-            // saving error
-          }
+          await clearCredentials()
           router.dismissAll()
           router.push('/login')
         } else {
@@ -69,7 +65,7 @@ export const TabsHeader = ({}) => {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

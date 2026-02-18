@@ -25,6 +25,7 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
+import { logger } from 'app/utils/logger'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
@@ -159,7 +160,7 @@ export function AddEditCaregiverScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     }
   }
@@ -194,7 +195,7 @@ export function AddEditCaregiverScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function callCreateUpdateDevice(formData: Schema) {
@@ -234,7 +235,7 @@ export function AddEditCaregiverScreen() {
       }
     }
 
-    console.log('object', JSON.stringify(object))
+    logger.debug('object', JSON.stringify(object))
     createUpdateCaregiver(object)
   }
   let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'

@@ -17,6 +17,7 @@ import { BASE_URL, GET_EVENTS } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import {
   formatTimeToUserLocalTime,
   getMonthsList,
@@ -107,7 +108,7 @@ export function EventsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {

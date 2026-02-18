@@ -21,6 +21,7 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -36,7 +37,7 @@ export function FacilityDetailsScreen() {
   let facilityInfo = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
-  console.log('facilityInfo', JSON.stringify(facilityInfo))
+  logger.debug('facilityInfo', JSON.stringify(facilityInfo))
   const [isLoading, setLoading] = useState(false)
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
@@ -87,7 +88,7 @@ export function FacilityDetailsScreen() {
                 ? data.data.facilityWithAppointment.facilityAppointmentList
                 : []
             )
-            console.log('appointmentList', JSON.stringify(appointmentList))
+            logger.debug('appointmentList', JSON.stringify(appointmentList))
           } else {
             Alert.alert('', data.message)
           }
@@ -95,7 +96,7 @@ export function FacilityDetailsScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     }
     getfacilityDetails()
@@ -133,7 +134,7 @@ export function FacilityDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const cancelClicked = () => {
@@ -159,7 +160,7 @@ export function FacilityDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'

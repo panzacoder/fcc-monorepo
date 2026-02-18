@@ -12,6 +12,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_STATES_AND_TIMEZONES } from 'app/utils/urlConstants'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   locationName: z.string(),
   line: z.string(),
@@ -130,7 +131,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
         }
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
         setLoading(false)
       })
   }, [])
@@ -319,7 +320,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             placeholder={'Address'}
             className="w-full"
             onChangeText={(text) => {
-              console.log('text', text)
+              logger.debug('text', text)
               setAddressObject(text, 1)
             }}
           />

@@ -11,6 +11,7 @@ import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
+import { logger } from 'app/utils/logger'
 import { CircleSummaryCard } from './circle-summary-card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
@@ -42,7 +43,7 @@ export function CircleDetailsScreen() {
     memberData.component = ''
   }
   // console.log('component', item.component ? item.component : '')
-  console.log('memberData', JSON.stringify(memberData))
+  logger.debug('memberData', JSON.stringify(memberData))
   let unreadMessages = 0
   memberData.unreadMessages.map((data: any) => {
     unreadMessages += data.unreadMessageCount
@@ -65,7 +66,7 @@ export function CircleDetailsScreen() {
           data.data.memberList.map((data: any, index: any) => {
             if (memberData.member === data.member) {
               setMemberData(data)
-              console.log('memberData', JSON.stringify(memberData))
+              logger.debug('memberData', JSON.stringify(memberData))
             }
           })
         } else {
@@ -76,7 +77,7 @@ export function CircleDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   const getMemberMenus = useCallback(async () => {
@@ -108,11 +109,11 @@ export function CircleDetailsScreen() {
               } else if (data.menuid === 'MyEvents') {
                 setIsEvents(true)
               } else if (data.menuid === 'MyIncidents') {
-                console.log('MyIncidents')
+                logger.debug('MyIncidents')
                 setIsIncidents(true)
               }
             })
-            console.log('menuList', JSON.stringify(menuList))
+            logger.debug('menuList', JSON.stringify(menuList))
             setMenuList(menuList)
           }
         } else {
@@ -122,7 +123,7 @@ export function CircleDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {

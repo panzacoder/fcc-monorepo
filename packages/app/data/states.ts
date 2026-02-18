@@ -1,6 +1,7 @@
 import { GET_STATES_AND_TIMEZONES } from 'app/utils/urlConstants'
 import { Country, State, Timezone } from './types'
 import { fetchData } from './base'
+import { logger } from 'app/utils/logger'
 
 export type StateAndTimezoneData = {
   country: Country
@@ -14,7 +15,7 @@ export type StateAndTimezoneProps = {
 
 export async function getStateAndTimezoneData({ id }: StateAndTimezoneProps) {
   if (!id) {
-    console.log('Country id is missing')
+    logger.debug('Country id is missing')
     return
   }
 

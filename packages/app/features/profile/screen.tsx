@@ -39,6 +39,7 @@ import {
   getFullDateForCalendar
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
@@ -183,7 +184,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   useEffect(() => {
@@ -207,7 +208,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function upgradeButtonClicked() {
@@ -249,7 +250,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
 
@@ -278,7 +279,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function checkCredential(formData: Schema) {
@@ -301,7 +302,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function deleteAccount(password: any) {
@@ -325,7 +326,7 @@ export function ProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   const router = useRouter()

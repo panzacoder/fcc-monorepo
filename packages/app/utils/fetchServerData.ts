@@ -1,4 +1,6 @@
 import { Alert } from 'react-native'
+import { emitSessionExpired } from 'app/utils/auth-events'
+import { logger } from 'app/utils/logger'
 
 export type CallPostServiceResponse<T> =
   | {
@@ -14,9 +16,7 @@ export function CallPostService<T>(
   url: string | URL | Request,
   data: any
 ): Promise<CallPostServiceResponse<T>> {
-  console.log(
-    `Service Call: url( ${url} ) with data object: ${JSON.stringify(data)}`
-  )
+  logger.debug(`Service Call: url( ${url} )`)
   return new Promise(function (accept, reject) {
     fetch(url, {
       method: 'POST',
@@ -36,18 +36,14 @@ export function CallPostService<T>(
 
       .then((response) => {
         if (response.errorCode === 'SEP_101') {
-          Alert.alert('Session Expired. Please Login.', '', [
-            {
-              text: 'Ok',
-              onPress: () => { }
-            }
-          ])
+          emitSessionExpired()
           reject('Login Expired')
+          return
         }
         accept(response)
       })
       .catch((error) => {
-        console.log('Error Static Data Response: ' + JSON.stringify(error))
+        logger.error('API Error:', error)
         if (error.name !== null && error.name === 'TimeoutError') {
           reject("Can't reach to server, please try again later.")
         } else if (error.status) {
@@ -105,7 +101,7 @@ export function CallPostService<T>(
               errorMessage = 'You are not authenticate to call this service'
               break
           }
-          console.log('errorMessage:' + errorMessage)
+          logger.error('errorMessage:', errorMessage)
           reject(errorMessage)
         } else {
           if (
@@ -115,12 +111,6 @@ export function CallPostService<T>(
             Alert.alert('', error.message !== undefined ? error.message : error)
           }
 
-          // TODO: Need to handle unknown errors, this variable was unused
-          //
-          // let errorMessage =
-          //   undefined !== error.message && null !== error.message
-          //     ? error.message
-          //     : 'Unknown Error occurred'
           reject(error)
         }
       })

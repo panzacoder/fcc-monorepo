@@ -26,6 +26,7 @@ import {
   GET_THREAD,
   UPDATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
+import { logger } from 'app/utils/logger'
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -82,7 +83,7 @@ export function NotificationNoteMessageScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   const handleFcmMessage = useCallback(async () => {
@@ -148,7 +149,7 @@ export function NotificationNoteMessageScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log(error)
+          logger.debug(error)
         })
     }
   }

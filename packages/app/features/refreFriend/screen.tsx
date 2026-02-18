@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
@@ -47,7 +48,7 @@ export function ReferFriendScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

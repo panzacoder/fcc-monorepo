@@ -22,6 +22,7 @@ import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { useLocalSearchParams } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
 import {
   BASE_URL,
@@ -172,7 +173,7 @@ export function NoteMessageScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   const handleFcmMessage = useCallback(async () => {
@@ -241,14 +242,14 @@ export function NoteMessageScreen() {
             return object
           })
           setThreadParticipantsList(list)
-          console.log('setThreadParticipantsList', list)
+          logger.debug('setThreadParticipantsList', list)
         } else {
           Alert.alert('', data.message)
         }
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function isParticipantSelected(index: any) {
@@ -302,7 +303,7 @@ export function NoteMessageScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function updateMessageThread() {
@@ -336,7 +337,7 @@ export function NoteMessageScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log(error)
+          logger.debug(error)
         })
     }
   }

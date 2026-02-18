@@ -19,6 +19,7 @@ import {
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
 import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
@@ -91,7 +92,7 @@ export function ConsolidatedViewScreen() {
     listDaySeven = []
   }
   async function getWeekCurrentLastDays(currentDate: any) {
-    console.log('currentDate', currentDate)
+    logger.debug('currentDate', currentDate)
     weekFirstLastDays = []
     weekDayListDates = []
     weekDayUtcDates = []
@@ -184,7 +185,7 @@ export function ConsolidatedViewScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   const getConsolidatedDetails = useCallback(
@@ -219,7 +220,7 @@ export function ConsolidatedViewScreen() {
               setMemberActivityWithDays(data.data.memberActivityList)
             }
             setIsDataReceived(true)
-            console.log(
+            logger.debug(
               'memberActivityList',
               JSON.stringify(data.data.memberActivityList)
             )
@@ -230,7 +231,7 @@ export function ConsolidatedViewScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -269,7 +270,7 @@ export function ConsolidatedViewScreen() {
             }
             setIsShowFilter(false)
 
-            console.log(
+            logger.debug(
               'memberActivityList',
               JSON.stringify(data.data.memberActivityList)
             )
@@ -281,7 +282,7 @@ export function ConsolidatedViewScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []

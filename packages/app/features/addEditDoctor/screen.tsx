@@ -25,6 +25,7 @@ import {
 } from 'app/ui/utils'
 import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import { logger } from 'app/utils/logger'
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -228,7 +229,7 @@ export function AddEditDoctorScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createDoctor(formData: Schema) {
@@ -286,7 +287,7 @@ export function AddEditDoctorScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   type Response = {
@@ -324,7 +325,7 @@ export function AddEditDoctorScreen() {
                         setIsActive(false)
                         isDoctorActive = false
                       }
-                      console.log('isDoctorActive', '' + isDoctorActive)
+                      logger.debug('isDoctorActive', '' + isDoctorActive)
                     }}
                   />
                   <Typography className="font-400 ml-2 self-center">

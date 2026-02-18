@@ -7,7 +7,7 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState } from 'react'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getCredentials } from 'app/utils/secure-storage'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { getUserDeviceInformation } from 'app/utils/device'
 import headerAction from 'app/redux/header/headerAction'
@@ -20,6 +20,7 @@ import moment from 'moment-timezone'
 import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
+import { logger } from 'app/utils/logger'
 import messaging from '@react-native-firebase/messaging'
 let notificationData = {} as any
 export function SplashScreen() {
@@ -28,10 +29,9 @@ export function SplashScreen() {
   const getUsernamePassword = useCallback(async () => {
     setLoading(true)
     try {
-      let loginDetails: any = await AsyncStorage.getItem('loginDetails')
-      loginDetails = loginDetails != null ? JSON.parse(loginDetails) : null
-      if (loginDetails !== null) {
-        login(loginDetails.email, loginDetails.password)
+      const credentials = await getCredentials()
+      if (credentials !== null) {
+        login(credentials.email, credentials.password)
       } else {
         setIsShowButtons(true)
         setLoading(false)
@@ -219,7 +219,7 @@ export function SplashScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const router = useRouter()

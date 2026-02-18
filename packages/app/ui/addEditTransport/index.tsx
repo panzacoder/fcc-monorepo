@@ -25,6 +25,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   member: z.number().min(0, { message: 'Select Member' }),
   description: z.string(),
@@ -46,7 +47,7 @@ export const AddEditTransport = ({
   cancelClicked,
   createUpdateTransportation
 }) => {
-  console.log('address', JSON.stringify(address))
+  logger.debug('address', JSON.stringify(address))
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
   const staticData: any = store.getState().staticDataState.staticData
@@ -91,7 +92,7 @@ export const AddEditTransport = ({
         })
         .catch((error) => {
           setLoading(false)
-          console.log(error)
+          logger.debug(error)
         })
     }
     if (_.isEmpty(transportData)) {
@@ -188,7 +189,7 @@ export const AddEditTransport = ({
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
 

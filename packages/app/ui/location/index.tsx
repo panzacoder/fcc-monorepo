@@ -15,6 +15,7 @@ import {
   DELETE_DOCTOR_LOCATION,
   DELETE_FACILITY_LOCATION
 } from 'app/utils/urlConstants'
+import { logger } from 'app/utils/logger'
 export function Location(data: any) {
   // export const Location = ({ data }) => {
   const router = useRouter()
@@ -29,7 +30,7 @@ export function Location(data: any) {
     return newUrl
   }
   async function deleteLocation(memberData: any) {
-    console.log('deleteLocation', JSON.stringify(locationData))
+    logger.debug('deleteLocation', JSON.stringify(locationData))
     setLoading(true)
     let url = ''
     let dataObject = {}
@@ -87,7 +88,7 @@ export function Location(data: any) {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   let touchStyle =

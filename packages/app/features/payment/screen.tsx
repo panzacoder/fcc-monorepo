@@ -41,6 +41,7 @@ import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import sponsororAction from 'app/redux/sponsor/sponsorAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
+import { logger } from 'app/utils/logger'
 let StripeProvider: any
 let useStripe: any
 
@@ -98,7 +99,7 @@ export function PaymentsScreen() {
           let latestRecipt = response.latest_receipt_info
           // console.log(response, '../', userDetails.email, '../../', userDetails, refEmail);
           if (latestRecipt) {
-            console.log('latestRecipt', latestRecipt)
+            logger.debug('latestRecipt', latestRecipt)
             if (latestRecipt[0]) {
               completeIOSTransactionOnOurServer(latestRecipt[0])
             }
@@ -106,7 +107,7 @@ export function PaymentsScreen() {
         }
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
         setLoading(false)
       })
   }
@@ -151,13 +152,13 @@ export function PaymentsScreen() {
 
     CallPostService(url, object)
       .then((response) => {
-        console.log('our server response', response)
+        logger.debug('our server response', response)
         if (response.status === 'SUCCESS') {
           router.back()
         }
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
         setLoading(false)
       })
   }
@@ -167,17 +168,17 @@ export function PaymentsScreen() {
 
     CallPostService(url, object)
       .then(async (response) => {
-        console.log(response)
+        logger.debug(response)
         if (response.status === 'SUCCESS') {
           let data: any = response.data
           await setPublishableKey(data.publicKey)
-          console.log('publishableKey', publishableKey)
+          logger.debug('publishableKey', publishableKey)
         } else {
           Alert.alert('', response.message)
         }
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
         setLoading(false)
       })
   }
@@ -191,7 +192,7 @@ export function PaymentsScreen() {
       subscriptionId
     }: any = await createSessionCheckout()
 
-    console.log(
+    logger.debug(
       paymentIntent,
       ephemeralKey,
       customerId,
@@ -207,7 +208,7 @@ export function PaymentsScreen() {
     if (!error) {
       // setLoading(true);
     } else {
-      console.log(error)
+      logger.debug(error)
       Alert.alert('', error)
       return
     }
@@ -229,7 +230,7 @@ export function PaymentsScreen() {
     await CallPostService(url, object)
       .then(async (response: any) => {
         // setLoading(false)
-        console.log('payment response', response)
+        logger.debug('payment response', response)
         if (response.status === 'SUCCESS') {
           let userSubscription =
             response.data.userDetails &&
@@ -281,7 +282,7 @@ export function PaymentsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
 
@@ -297,11 +298,11 @@ export function PaymentsScreen() {
     CallPostService(url, object)
       .then((response) => {
         // setLoading(false)
-        console.log(JSON.stringify(response))
+        logger.debug(JSON.stringify(response))
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
 
@@ -312,20 +313,20 @@ export function PaymentsScreen() {
   ) => {
     let { error } = await presentPaymentSheet({ clientSecret: paymentIntent })
 
-    console.log(JSON.stringify(error), '../')
+    logger.debug(JSON.stringify(error), '../')
 
     if (error) {
       Alert.alert(`Error code: ${error.code}`, error.message)
       failPayment(error.message, sessionId, subscriptionId)
     } else {
       Alert.alert('Success', 'Your order is confirmed!')
-      console.log()
+      logger.debug()
       paymentSuccess(sessionId, subscriptionId)
     }
   }
 
   async function createSessionCheckout() {
-    console.log('in createSessionCheckout')
+    logger.debug('in createSessionCheckout')
     setLoading(true)
     let url = `${BASE_URL}${PAYMENT_CHECK_OUT_SESSION}`
     let object = {
@@ -355,7 +356,7 @@ export function PaymentsScreen() {
     await CallPostService(url, object)
       .then((response) => {
         if (response.status === 'SUCCESS') {
-          console.log(response.data)
+          logger.debug(response.data)
           let data: any = response.data
           let ephemeralKey = data.ephemeralKey
           let paymentIntent = data.paymentIntentClientSecret
@@ -381,7 +382,7 @@ export function PaymentsScreen() {
         setLoading(false)
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
         setLoading(false)
       })
 
@@ -395,7 +396,7 @@ export function PaymentsScreen() {
           RNIap.initConnection()
           RNIap.clearTransactionIOS()
         } catch (err) {
-          console.warn(err.code, err.message)
+          logger.warn(err.code, err.message)
         }
 
         let purchaseUpdateSubscription = purchaseUpdatedListener(
@@ -408,7 +409,7 @@ export function PaymentsScreen() {
               try {
                 verifyInAppPurchaseReceipt(receipt)
               } catch (ackErr) {
-                console.warn('ackErr', ackErr)
+                logger.warn('ackErr', ackErr)
               }
             }
           }
@@ -416,7 +417,7 @@ export function PaymentsScreen() {
 
         let purchaseErrorSubscription = purchaseErrorListener(
           (error: PurchaseError) => {
-            console.log('purchaseErrorListener', error)
+            logger.debug('purchaseErrorListener', error)
             Alert.alert('Purchase error', error.code)
           }
         )
@@ -449,7 +450,7 @@ export function PaymentsScreen() {
       // console.log('identifier', identifier)
       RNIap.requestSubscription(identifier)
     } catch (err) {
-      console.log('err', err.message)
+      logger.debug('err', err.message)
       Alert.alert(err.message)
     }
   }

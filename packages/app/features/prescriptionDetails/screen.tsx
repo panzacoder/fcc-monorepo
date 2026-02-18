@@ -20,6 +20,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { logger } from 'app/utils/logger'
 
 let prescriptionPrivileges = {}
 export function PrescriptionDetailsScreen() {
@@ -66,7 +67,7 @@ export function PrescriptionDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -198,7 +199,7 @@ export function PrescriptionDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
 

@@ -1,8 +1,13 @@
-// export const BASE_URL = 'https://www.familycarecircle.com/fccApi/2.0/';
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  process.env.EXPO_PUBLIC_BACKEND_URL ||
-  'https://45.79.147.166:8000/fccApi/2.0/'
+const resolvedUrl =
+  process.env.NEXT_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL
+
+if (!resolvedUrl) {
+  throw new Error(
+    'BACKEND_URL environment variable is required. Set NEXT_PUBLIC_BACKEND_URL or EXPO_PUBLIC_BACKEND_URL in your .env.local file.'
+  )
+}
+
+export const BASE_URL = resolvedUrl
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
 export const USER_LOGOUT = 'userms/logout'

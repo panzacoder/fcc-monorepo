@@ -28,6 +28,7 @@ import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { Typography } from 'app/ui/typography'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
@@ -167,7 +168,7 @@ export function AddEditAppointmentScreen() {
           list.map(async (data: any, index: any) => {
             if (data.locationId === facilityDoctorLocationId) {
               setFacilityDoctorIndex(index + 2)
-              console.log('doctoFacilityIndex', String(index + 2))
+              logger.debug('doctoFacilityIndex', String(index + 2))
               reset({
                 doctoFacilityIndex: index + 2
               })
@@ -181,7 +182,7 @@ export function AddEditAppointmentScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   let typeIndex: any = -1
@@ -195,8 +196,8 @@ export function AddEditAppointmentScreen() {
       typeIndex = 2
     }
 
-    console.log('typeIndex', '' + typeIndex)
-    console.log('facilityDoctorIndex', '' + facilityDoctorIndex)
+    logger.debug('typeIndex', '' + typeIndex)
+    logger.debug('facilityDoctorIndex', '' + facilityDoctorIndex)
   }
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
@@ -286,7 +287,7 @@ export function AddEditAppointmentScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
 
@@ -325,7 +326,7 @@ export function AddEditAppointmentScreen() {
   const onSelectionPurpose = (data: any) => {
     // purpose = data
     setPurpose(data)
-    console.log('purpose1', purpose)
+    logger.debug('purpose1', purpose)
   }
   async function setSelectedTypeChange(value: any) {
     if (value) {

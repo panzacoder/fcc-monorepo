@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   title: z.string().min(1, { message: 'Note title is required' }),
   note: z.string().min(1, { message: 'Note details is required' }),
@@ -86,7 +87,7 @@ export const AddEditNote = ({
     createUpdateNote(occurance, formData.note, formData.title, noteData)
   }
   async function setOccuranceChange(value: any) {
-    console.log('value', JSON.stringify(value))
+    logger.debug('value', JSON.stringify(value))
     if (value === null) {
       reset({
         occurrenceIndex: -1

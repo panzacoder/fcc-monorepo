@@ -27,6 +27,7 @@ import { useRouter } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { CheckBox } from 'react-native-elements'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   prescriberIndex: z.number().min(0, { message: 'Type is required' }),
   description: z.string().min(1, { message: 'Required' })
@@ -103,7 +104,7 @@ export function AddEditMedicalDeviceScreen() {
         }
       })
       .catch((error) => {
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
 
@@ -189,7 +190,7 @@ export function AddEditMedicalDeviceScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   const onSelectionType = (data: any) => {

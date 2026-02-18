@@ -17,6 +17,7 @@ import { Card } from 'app/ui/card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, JOIN_CIRCLE } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
+import { logger } from 'app/utils/logger'
 import { ModalScreen } from 'app/ui/modal-screen'
 
 export function CreateCircle() {
@@ -66,7 +67,7 @@ export function CreateCircle() {
     'circleExists'
   ])
   async function joinCircle() {
-    console.log('joinCircle', JSON.stringify(circleExists))
+    logger.debug('joinCircle', JSON.stringify(circleExists))
     let details: any = circleExists
     let url = `${BASE_URL}${JOIN_CIRCLE}`
     let dataObject = {
@@ -85,7 +86,7 @@ export function CreateCircle() {
         }
       })
       .catch((error) => {
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

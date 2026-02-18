@@ -29,6 +29,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
 import store from 'app/redux/store'
+import { logger } from 'app/utils/logger'
 let selectedType = ''
 let selectedAddress: any = {
   shortDescription: '',
@@ -173,7 +174,7 @@ export function AddEditFacilityScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createFacility(formData: Schema) {
@@ -233,7 +234,7 @@ export function AddEditFacilityScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const onSelectionType = (data: any) => {

@@ -19,6 +19,7 @@ import { Feather } from 'app/ui/icons'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -149,7 +150,7 @@ export function CreateCircleScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          console.log('data', JSON.stringify(data))
+          logger.debug('data', JSON.stringify(data))
           setIsCircleExists(data.data !== null ? true : false)
           setCircleDetails(data.data !== null ? data.data : {})
           if (data.data !== null) {
@@ -164,7 +165,7 @@ export function CreateCircleScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function sendRequest(formData: Schema) {
@@ -200,7 +201,7 @@ export function CreateCircleScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createCircle(formData: Schema) {
@@ -240,7 +241,7 @@ export function CreateCircleScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const showMemberModal = () => {
@@ -374,13 +375,13 @@ export function CreateCircleScreen() {
   }
   async function getContactsList() {
     // setLoading(true)
-    console.log('getContactsList')
+    logger.debug('getContactsList')
     const { status } = await Contacts.requestPermissionsAsync()
     if (status === 'granted') {
       const { data } = await Contacts.getContactsAsync({
         fields: [Contacts.Fields.Emails]
       })
-      console.log('data', data)
+      logger.debug('data', data)
       if (data.length > 0) {
         const contact = data[0]
         Alert.alert('contact', JSON.stringify(contact))

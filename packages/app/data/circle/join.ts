@@ -1,5 +1,6 @@
 import { JOIN_CIRCLE } from 'app/utils/urlConstants'
 import { fetchData } from '../base'
+import { logger } from 'app/utils/logger'
 
 export type JoinCircleReturnType = {
   version: number
@@ -28,7 +29,7 @@ export type JoinCircleProps =
     }
 
 export async function joinCircle(props: JoinCircleProps) {
-  console.log('props', JSON.stringify(props))
+  logger.debug('props', JSON.stringify(props))
   return await fetchData<JoinCircleReturnType>({
     route: JOIN_CIRCLE,
     data: { memberVo: { props } }

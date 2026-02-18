@@ -40,6 +40,7 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { AddEditTransport } from 'app/ui/addEditTransport'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -93,7 +94,7 @@ export function EventDetailsScreen() {
       CallPostService(url, dataObject)
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
-            console.log('data', JSON.stringify(data.data))
+            logger.debug('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
               eventPrivileges = data.data.domainObjectPrivileges.Event
                 ? data.data.domainObjectPrivileges.Event
@@ -110,7 +111,7 @@ export function EventDetailsScreen() {
                   ? data.data.domainObjectPrivileges.EventTransportation
                   : {}
             }
-            console.log('data.data.event', JSON.stringify(data.data.event))
+            logger.debug('data.data.event', JSON.stringify(data.data.event))
             setEventDetails(data.data.event ? data.data.event : {})
             if (data.data.event.status) {
               setEventStatus(data.data.event.status.status)
@@ -141,7 +142,7 @@ export function EventDetailsScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -240,7 +241,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const cancelClicked = () => {
@@ -274,7 +275,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const messageThreadClicked = (noteData: any) => {
@@ -323,7 +324,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function createMessageThread(subject: any, noteData: any) {
@@ -370,7 +371,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function isParticipantSelected(index: any) {
@@ -422,7 +423,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function deleteReminder(reminderData: any) {
@@ -449,7 +450,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
@@ -469,7 +470,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const editTransportation = (transportationData: any) => {
@@ -501,7 +502,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function deleteResendCancelTransportation(
@@ -552,7 +553,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function updateStatus(status: any) {
@@ -581,7 +582,7 @@ export function EventDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

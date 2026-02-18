@@ -27,6 +27,7 @@ import {
   CalendarView,
   CalendarViewInput
 } from '../addEditPrescription/calendar-view'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   typeIndex: z.number().min(0, { message: 'Type is required' }),
   drugName: z.string().min(1, { message: 'Name is required' }),
@@ -215,7 +216,7 @@ export function AddEditPrescriptionScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function callCreateUpdatePrescription(formData: Schema) {
@@ -246,7 +247,7 @@ export function AddEditPrescriptionScreen() {
   }
 
   const handleDateChange = (date: Date) => {
-    console.log('handleDateChange', date)
+    logger.debug('handleDateChange', date)
     if (calenderClickedCount === 0) {
       setPrescribedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
       setPrescribedDateUtc(date)
@@ -261,7 +262,7 @@ export function AddEditPrescriptionScreen() {
   }
 
   const handleDateCleared = () => {
-    console.log('handleDateCleared')
+    logger.debug('handleDateCleared')
     if (calenderClickedCount === 0) {
       setPrescribedDate('Date Prescribed')
       setPrescribedDateUtc('')

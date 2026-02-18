@@ -6,6 +6,7 @@ import {
   AutocompleteDropdownContextProvider,
   AutocompleteDropdownProps
 } from 'react-native-autocomplete-dropdown'
+import { logger } from 'app/utils/logger'
 
 export type DropdownItem = {
   id: string
@@ -95,7 +96,7 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onSelectItem={(item: DropdownItem) => {
-            console.log('item', item)
+            logger.debug('item', item)
             onChangeValue?.(item)
             item && onSubmitEditing?.()
           }}

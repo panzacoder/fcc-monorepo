@@ -19,6 +19,7 @@ import {
 } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -97,7 +98,7 @@ export function EditUserProfileScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          console.log('datatat ', JSON.stringify(data))
+          logger.debug('datatat ', JSON.stringify(data))
           let fullName = data.data.firstName ? data.data.firstName : ''
           fullName += data.data.lastName ? ' ' + data.data.lastName : ''
           user.memberName = fullName
@@ -120,7 +121,7 @@ export function EditUserProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   return (

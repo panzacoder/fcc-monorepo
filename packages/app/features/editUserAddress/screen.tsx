@@ -19,6 +19,7 @@ import { LocationDetails } from 'app/ui/locationDetails'
 import { useLocalSearchParams } from 'expo-router'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -63,7 +64,7 @@ export function EditUserAddressScreen() {
     }
     memberData = object
   }
-  console.log('memberData', JSON.stringify(memberData))
+  logger.debug('memberData', JSON.stringify(memberData))
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
@@ -143,7 +144,7 @@ export function EditUserAddressScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   return (

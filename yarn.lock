@@ -11509,6 +11509,7 @@ __metadata:
     expo-localization: "npm:~14.8.4"
     expo-notifications: "npm:~0.27.8"
     expo-router: "npm:~3.4.10"
+    expo-secure-store: "npm:~5.0.1"
     expo-splash-screen: "npm:~0.26.5"
     expo-status-bar: "npm:~1.11.1"
     nativewind: "npm:^4.0.36"
@@ -11865,6 +11866,13 @@ __metadata:
     react-native-reanimated:
       optional: true
   checksum: 10/c8fe551c1cd1d9c05707e6d1938ad0c32db6bdf668cac0bc62aaf0b741f275aa02c8337572ef1c75d6be7ba2f6fd209ca03cf9530006537aa5d33caafb6486ed
+  languageName: node
+  linkType: hard
+
+"expo-secure-store@npm:~5.0.1":
+  version: 5.0.1
+  resolution: "expo-secure-store@npm:5.0.1"
+  checksum: 10/0b5a5a997788f5351fa5c962e81931fb374488b16dc197acf9369eaff3e9555ca040d669d8b73841bdc498b5f7d8454eeeb0951df34e0fe8ce1e278cf2381bd9
   languageName: node
   linkType: hard
 

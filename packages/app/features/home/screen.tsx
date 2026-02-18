@@ -35,6 +35,7 @@ import { Feather } from 'app/ui/icons'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { logger } from 'app/utils/logger'
 import { TabsHeader } from 'app/ui/tabs-header'
 import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
@@ -100,7 +101,7 @@ export function HomeScreen() {
         if (data.status === 'SUCCESS') {
           let memberList = data.data.memberList ? data.data.memberList : []
           setMemberList(memberList)
-          console.log('memberList', JSON.stringify(memberList))
+          logger.debug('memberList', JSON.stringify(memberList))
           memberList.map((data: any) => {
             if (
               data.upcomingAppointment ||
@@ -134,7 +135,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -145,10 +146,10 @@ export function HomeScreen() {
     try {
       const fcmToken = await messaging().getToken()
       if (fcmToken) {
-        console.log('Your Firebase Token is:', fcmToken)
+        logger.debug('Your Firebase Token is:', fcmToken)
         updateFcmToken(fcmToken)
       } else {
-        console.log('Failed', 'No Token Recived')
+        logger.debug('Failed', 'No Token Recived')
       }
     } catch (e) {}
   }
@@ -171,7 +172,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const handleFcmMessage = useCallback(async () => {
@@ -192,7 +193,7 @@ export function HomeScreen() {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL
       if (enabled) {
         getFcmToken()
-        console.log('Authorization status:', authStatus)
+        logger.debug('Authorization status:', authStatus)
       }
     } catch (e) {}
   }, [])
@@ -232,7 +233,7 @@ export function HomeScreen() {
             projectId
           })
         ).data
-        console.log(token)
+        logger.debug(token)
       } catch (e) {
         token = `${e}`
       }
@@ -414,7 +415,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function approveRejectTrasportRequest(transportData: any) {
@@ -445,7 +446,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const showRequestModal = () => {
@@ -544,7 +545,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const shwoRejectModal = () => {

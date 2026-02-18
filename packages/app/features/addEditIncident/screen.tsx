@@ -25,6 +25,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
+import { logger } from 'app/utils/logger'
 let incidentType: any = ''
 const schema = z.object({
   description: z.string(),
@@ -171,7 +172,7 @@ export function AddEditIncidentScreen() {
       }
       // console.log('value', JSON.stringify(value))
       // console.log('index', JSON.stringify(index))
-      console.log('selectedAddress1', JSON.stringify(selectedAddress))
+      logger.debug('selectedAddress1', JSON.stringify(selectedAddress))
     }
   }
   async function addEditIncident(formData: Schema) {
@@ -226,7 +227,7 @@ export function AddEditIncidentScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const onSelectionIncidentType = (data: any) => {

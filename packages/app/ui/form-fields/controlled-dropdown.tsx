@@ -3,6 +3,7 @@ import { cn } from 'app/ui/utils'
 import { Controller, ControllerProps, FieldValues } from 'react-hook-form'
 import { View } from 'react-native'
 import PtsDropdown, { PtsDropdownProps } from '../PtsDropdown'
+import { logger } from 'app/utils/logger'
 
 export type ControlledDropdownProps<T extends FieldValues> = PtsDropdownProps &
   Omit<ControllerProps<T>, 'render'> & {
@@ -24,7 +25,7 @@ export function ControlledDropdown<T extends FieldValues>({
       rules={rules}
       render={({ field: { onChange, ...fieldProps }, fieldState }) => {
         const handleChangeValue: PtsDropdownProps['onChangeValue'] = (item) => {
-          console.log('handleDropdownChange', item)
+          logger.debug('handleDropdownChange', item)
           onChange(item?.id || item)
           onChangeValue && onChangeValue(item)
         }

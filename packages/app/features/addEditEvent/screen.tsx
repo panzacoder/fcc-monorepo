@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
+import { logger } from 'app/utils/logger'
 
 const schema = z.object({
   description: z.string(),
@@ -85,7 +86,7 @@ export function AddEditEventScreen() {
     resolver: zodResolver(schema)
   })
   function handleBackButtonClick() {
-    console.log('handleBackButtonClick')
+    logger.debug('handleBackButtonClick')
     router.dismiss(1)
     if (_.isEmpty(eventDetails)) {
       router.push(
@@ -200,7 +201,7 @@ export function AddEditEventScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (
