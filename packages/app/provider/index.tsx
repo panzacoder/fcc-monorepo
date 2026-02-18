@@ -3,6 +3,7 @@ import { SafeArea } from './safe-area'
 import { ReduxProvider } from './redux'
 import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown'
 import { StylesProvider } from './styles-provider'
+import { AuthGuard } from './auth-guard'
 
 export function Provider({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export function Provider({ children }: { children: React.ReactNode }) {
         <ReduxProvider>
           <SafeArea>
             <AutocompleteDropdownContextProvider>
-              {children}
+              <AuthGuard>
+                {children}
+              </AuthGuard>
             </AutocompleteDropdownContextProvider>
           </SafeArea>
         </ReduxProvider>

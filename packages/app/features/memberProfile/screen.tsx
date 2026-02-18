@@ -24,6 +24,7 @@ import {
 import { formatUrl } from 'app/utils/format-url'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
@@ -72,7 +73,7 @@ export function MemberProfileScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let member = data.data ? data.data : {}
-          console.log('member', JSON.stringify(member))
+          logger.debug('member', JSON.stringify(member))
           setMemberDetails(data.data ? data.data : {})
           setIsDataReceived(true)
         } else {
@@ -82,7 +83,7 @@ export function MemberProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   useEffect(() => {
@@ -129,7 +130,7 @@ export function MemberProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function deleteAuthorizedCaregiverCircle() {
@@ -153,7 +154,7 @@ export function MemberProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function deleteCircle() {
@@ -177,7 +178,7 @@ export function MemberProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function deleteCaregiver() {
@@ -202,7 +203,7 @@ export function MemberProfileScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   const showDeleteModal = () => {

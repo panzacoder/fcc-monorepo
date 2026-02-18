@@ -11,6 +11,7 @@ import { Feather } from 'app/ui/icons'
 import store from 'app/redux/store'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
+import { logger } from 'app/utils/logger'
 import { CircleSummaryCard } from './circle-summary-card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
@@ -19,14 +20,15 @@ import {
   GET_MEMBER_MENUS,
   GET_MEMBER_DETAILS
 } from 'app/utils/urlConstants'
-let isMessages = false,
-  isAppointments = false,
-  isIncidents = false,
-  isEvents = false
+
 export function CircleDetailsScreen() {
   const header = store.getState().headerState.header
   const router = useRouter()
   const userDetails = store.getState().userProfileState.header
+  const [isMessages, setIsMessages] = useState(false)
+  const [isAppointments, setIsAppointments] = useState(false)
+  const [isIncidents, setIsIncidents] = useState(false)
+  const [isEvents, setIsEvents] = useState(false)
   const item = useLocalSearchParams<any>()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -41,7 +43,7 @@ export function CircleDetailsScreen() {
     memberData.component = ''
   }
   // console.log('component', item.component ? item.component : '')
-  console.log('memberData', JSON.stringify(memberData))
+  logger.debug('memberData', JSON.stringify(memberData))
   let unreadMessages = 0
   memberData.unreadMessages.map((data: any) => {
     unreadMessages += data.unreadMessageCount
@@ -64,7 +66,7 @@ export function CircleDetailsScreen() {
           data.data.memberList.map((data: any, index: any) => {
             if (memberData.member === data.member) {
               setMemberData(data)
-              console.log('memberData', JSON.stringify(memberData))
+              logger.debug('memberData', JSON.stringify(memberData))
             }
           })
         } else {
@@ -75,7 +77,7 @@ export function CircleDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   const getMemberMenus = useCallback(async () => {
@@ -101,16 +103,17 @@ export function CircleDetailsScreen() {
               : []
             menuList.map((data: any, index: any) => {
               if (data.menuid === 'MyAppointments') {
-                isAppointments = true
+                setIsAppointments(true)
               } else if (data.menuid === 'MyCommunications') {
-                isMessages = true
+                setIsMessages(true)
               } else if (data.menuid === 'MyEvents') {
-                isEvents = true
+                setIsEvents(true)
               } else if (data.menuid === 'MyIncidents') {
-                isIncidents = true
+                logger.debug('MyIncidents')
+                setIsIncidents(true)
               }
             })
-            console.log('menuList', JSON.stringify(menuList))
+            logger.debug('menuList', JSON.stringify(menuList))
             setMenuList(menuList)
           }
         } else {
@@ -120,7 +123,7 @@ export function CircleDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -143,7 +146,6 @@ export function CircleDetailsScreen() {
     <View className=" flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader title="Circle Details" memberData={memberData} />
-    <ScrollView className=" flex-1">
       {menuList && isDataReceived ? (
         <View className="mt-5">
           <CircleSummaryCard
@@ -156,7 +158,7 @@ export function CircleDetailsScreen() {
         <View />
       )}
       {isDataReceived ? (
-        <View className=" flex-1">
+        <ScrollView className=" flex-1">
           {isMessages ? (
             <TouchableOpacity
               onPress={() => {
@@ -166,7 +168,7 @@ export function CircleDetailsScreen() {
                   })
                 )
               }}
-              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+              className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
             >
               <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
               <View className="py-5">
@@ -175,19 +177,15 @@ export function CircleDetailsScreen() {
                     {'Messages'}
                   </Typography>
                   {unreadMessages > 0 ? (
-                    <View className="bg-primary ml-2 p-1 w-8 h-8 rounded-full">
-                      <Typography className="self-center  text-center font-bold text-white">
+                    <View className="bg-primary ml-2 h-[24px] w-[24px] rounded-[12px]">
+                      <Typography className="self-center text-center font-bold text-white">
                         {unreadMessages}
                       </Typography>
-                    </View> )
-                    : null
-                  }
+                    </View>
+                  ) : (
+                    <View />
+                  )}
                 </View>
-                <Typography className="ml-2 flex w-[80%] rounded text-[14px] text-black">
-                  {memberData.unreadMessages.length > 0
-                    ? memberData.unreadMessages[0].message
-                    : 'No new messages'}
-                </Typography>
               </View>
               <View
                 style={{ position: 'absolute', right: 5 }}
@@ -208,7 +206,7 @@ export function CircleDetailsScreen() {
                   })
                 )
               }}
-              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+              className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
             >
               <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
               <View className="py-5">
@@ -252,7 +250,7 @@ export function CircleDetailsScreen() {
                   })
                 )
               }}
-              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+              className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
             >
               <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
               <View className="py-5">
@@ -296,7 +294,7 @@ export function CircleDetailsScreen() {
                   })
                 )
               }}
-              className="mt-3 flex-1 flex-row rounded-[16px] border border-[#287CFA]"
+              className="mt-3 w-[95%] flex-1 flex-row rounded-[16px] border border-[#287CFA]"
             >
               <View className="h-[100%] w-[10%] rounded-bl-[15px] rounded-tl-[15px] bg-[#287CFA] " />
               <View className="py-5">
@@ -340,11 +338,10 @@ export function CircleDetailsScreen() {
           ) : (
             <View />
           )}
-        </View>
+        </ScrollView>
       ) : (
         <View />
       )}
-    </ScrollView>
-        </View >
+    </View>
   )
 }

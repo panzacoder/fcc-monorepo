@@ -20,6 +20,7 @@ import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import { AddEditReminder } from 'app/ui/addEditReminder'
 import { Reminder } from 'app/ui/reminder'
+import { logger } from 'app/utils/logger'
 export const Transportation = ({
   component,
   data,
@@ -131,7 +132,7 @@ export const Transportation = ({
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateReminder(
@@ -185,7 +186,7 @@ export const Transportation = ({
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const editReminder = (remiderData: any) => {

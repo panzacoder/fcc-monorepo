@@ -35,6 +35,7 @@ import { Feather } from 'app/ui/icons'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { logger } from 'app/utils/logger'
 import { TabsHeader } from 'app/ui/tabs-header'
 import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
@@ -72,6 +73,7 @@ export function HomeScreen() {
   }
   store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
+  const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
@@ -99,8 +101,15 @@ export function HomeScreen() {
         if (data.status === 'SUCCESS') {
           let memberList = data.data.memberList ? data.data.memberList : []
           setMemberList(memberList)
-          console.log('memberList', JSON.stringify(memberList))
+          logger.debug('memberList', JSON.stringify(memberList))
           memberList.map((data: any) => {
+            if (
+              data.upcomingAppointment ||
+              data.recentIncident ||
+              data.upcomingEvent
+            ) {
+              setIsWeekDataAvailable(true)
+            }
             let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
             if (memberNamesList.includes(fullName) === false) {
               memberNamesList.push(fullName)
@@ -126,7 +135,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -137,10 +146,10 @@ export function HomeScreen() {
     try {
       const fcmToken = await messaging().getToken()
       if (fcmToken) {
-        console.log('Your Firebase Token is:', fcmToken)
+        logger.debug('Your Firebase Token is:', fcmToken)
         updateFcmToken(fcmToken)
       } else {
-        console.log('Failed', 'No Token Recived')
+        logger.debug('Failed', 'No Token Recived')
       }
     } catch (e) {}
   }
@@ -163,7 +172,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const handleFcmMessage = useCallback(async () => {
@@ -184,7 +193,7 @@ export function HomeScreen() {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL
       if (enabled) {
         getFcmToken()
-        console.log('Authorization status:', authStatus)
+        logger.debug('Authorization status:', authStatus)
       }
     } catch (e) {}
   }, [])
@@ -224,7 +233,7 @@ export function HomeScreen() {
             projectId
           })
         ).data
-        console.log(token)
+        logger.debug(token)
       } catch (e) {
         token = `${e}`
       }
@@ -406,7 +415,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function approveRejectTrasportRequest(transportData: any) {
@@ -437,7 +446,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const showRequestModal = () => {
@@ -536,7 +545,7 @@ export function HomeScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const shwoRejectModal = () => {
@@ -588,7 +597,9 @@ export function HomeScreen() {
       <PtsLoader loading={isLoading} />
       <View className="">
         {isDataReceived ? (
-          <TabsHeader />
+          <View>
+            <TabsHeader />
+          </View>
         ) : (
           <View />
         )}
@@ -607,16 +618,20 @@ export function HomeScreen() {
             className={`border-primary bg-card mx-[10px] mt-[30] h-[85%] w-full self-center rounded-[15px] border-[2px]`}
           >
             <View className="ml-[20] flex-row items-center">
-              <View>
-                <Typography className="mt-[10] text-[20px] font-bold text-black">
-                  {'Your Week'}
-                </Typography>
-                <Typography className="font-400 text-[16px]">
-                  {upcomingSentence}
-                </Typography>
-              </View>
+              {isWeekDataAvailable ? (
+                <View>
+                  <Typography className="mt-[10] text-[20px] font-bold text-black">
+                    {'Your Week'}
+                  </Typography>
+                  <Typography className="font-400 text-[16px]">
+                    {upcomingSentence}
+                  </Typography>
+                </View>
+              ) : (
+                <View className="mt-[10]" />
+              )}
             </View>
-            {memberList.length > 0 ? (
+            {memberList.length > 0 && isWeekDataAvailable ? (
               <ScrollView persistentScrollbar={true} className="m-2 flex-1">
                 {memberList.map((data: any, index: number) => {
                   return (

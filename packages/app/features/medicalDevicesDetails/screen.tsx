@@ -33,6 +33,7 @@ import { AddEditReminder } from 'app/ui/addEditReminder'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 
@@ -116,7 +117,7 @@ export function MedicalDevicesDetailsScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -234,7 +235,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateNote(
@@ -278,7 +279,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const cancelClicked = () => {
@@ -313,7 +314,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const messageThreadClicked = (noteData: any) => {
@@ -364,7 +365,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function createMessageThread(subject: any, noteData: any) {
@@ -411,7 +412,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function isParticipantSelected(index: any) {
@@ -447,7 +448,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const editReminder = (remiderData: any) => {
@@ -482,7 +483,7 @@ export function MedicalDevicesDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

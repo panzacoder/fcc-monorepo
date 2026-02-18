@@ -9,6 +9,7 @@ import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-fiel
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { logger } from 'app/utils/logger'
 
 export type ResetPasswordFormProps = {
   email: string
@@ -81,7 +82,7 @@ export function SetPasswordForm({
       .catch((error) => {
         onLoadingChange(true)
         Alert.alert('', 'Unknown error occurred, please try again.')
-        console.log(error)
+        logger.debug(error)
       })
   }
 

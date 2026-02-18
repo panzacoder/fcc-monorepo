@@ -19,6 +19,7 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -112,7 +113,7 @@ export function PrescriptionsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   const getPharmacyList = useCallback(async () => {
@@ -152,7 +153,7 @@ export function PrescriptionsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   const getActiveDoctorsList = useCallback(async () => {
@@ -191,7 +192,7 @@ export function PrescriptionsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   useEffect(() => {

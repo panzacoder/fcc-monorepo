@@ -27,6 +27,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
+import { logger } from 'app/utils/logger'
 let appointmentPrivileges = {}
 let selectedMonth = 'All'
 let selectedYear = 'All'
@@ -127,7 +128,7 @@ export function AppointmentsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   const getAppointmentDetails = useCallback(async () => {
@@ -164,7 +165,7 @@ export function AppointmentsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -200,7 +201,7 @@ export function AppointmentsListScreen() {
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
     // console.log('filter', filter)
-    if (filter === 'Open Items') {
+    if (filter === 'Open Items' || filter === 'Upcoming') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
       list = _.orderBy(list, (x) => x.date, 'desc')
@@ -301,7 +302,7 @@ export function AppointmentsListScreen() {
   async function setSelectedTypeChange(value: any) {
     if (value) {
       let id = value.id - 1
-      console.log('value', JSON.stringify(value))
+      logger.debug('value', JSON.stringify(value))
       if (id === 0) {
         selectedType = 'All'
       } else if (id === 1) {

@@ -15,6 +15,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 let facilityPrivileges = {}
 export function FacilitiesListScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -59,7 +60,7 @@ export function FacilitiesListScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     }
     getFacilityDetails()

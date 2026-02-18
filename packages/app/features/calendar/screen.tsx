@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
+import { logger } from 'app/utils/logger'
 let calendarPrivileges: any = {}
 export function CalendarScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -60,7 +61,7 @@ export function CalendarScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []

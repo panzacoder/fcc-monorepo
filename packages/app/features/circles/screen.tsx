@@ -25,6 +25,7 @@ import {
   REJECT_TRANSPORT
 } from 'app/utils/urlConstants'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { SharedContactList } from 'app/ui/sharedContactList'
 import { NewCirclesList } from 'app/ui/newCirclesList'
 import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
@@ -93,7 +94,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   useEffect(() => {
@@ -139,7 +140,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function acceptRejectClicked(data: any, isAccept: any) {
@@ -166,7 +167,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const cancelClicked = () => {
@@ -205,7 +206,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const hideCirclesView = (
@@ -262,7 +263,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function rejectRequest(formData: Schema) {
@@ -295,7 +296,7 @@ export function CirclesListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const showRequestModal = () => {
@@ -420,7 +421,7 @@ export function CirclesListScreen() {
         <TouchableOpacity
           className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
           onPress={() => {
-            router.push('/circles/create')
+            router.push('/circles/createCircle')
           }}
         >
           <Feather name={'plus'} size={25} className="color-primary" />
@@ -470,7 +471,7 @@ export function CirclesListScreen() {
         <View />
       )}
       {isShowPrivacyPolicy ? (
-        <View className="w-full ">
+        <View className="w-full h-[85%]">
           <PrivacyPolicy
             address={{}}
             cancelClicked={cancelClicked}

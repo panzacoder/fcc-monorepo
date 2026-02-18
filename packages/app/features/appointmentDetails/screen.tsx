@@ -52,6 +52,7 @@ import { AddEditTransport } from 'app/ui/addEditTransport'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { logger } from 'app/utils/logger'
 let appointmentPrivileges = {}
 let notePrivileges = {}
 let transportationPrivileges = {}
@@ -168,7 +169,7 @@ export function AppointmentDetailsScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -193,7 +194,7 @@ export function AppointmentDetailsScreen() {
           data.data.memberList.map((data: any, index: any) => {
             if (memberData.member === data.member) {
               setMemberData(data)
-              console.log('setMemberData', JSON.stringify(data))
+              logger.debug('setMemberData', JSON.stringify(data))
             }
           })
         } else {
@@ -203,7 +204,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   useEffect(() => {
@@ -342,7 +343,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function createMessageThread(subject: any, noteData: any) {
@@ -389,7 +390,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   function isParticipantSelected(index: any) {
@@ -428,7 +429,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function deleteAppointment() {
@@ -456,7 +457,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function deleteNote(noteId: any) {
@@ -479,7 +480,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateNote(
@@ -523,7 +524,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
@@ -541,7 +542,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function createUpdateReminder(
@@ -583,7 +584,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function updateStatus(status: any) {
@@ -613,7 +614,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function deleteReminder(reminderData: any) {
@@ -639,7 +640,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const editNote = (noteData: any) => {
@@ -711,7 +712,7 @@ export function AppointmentDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   const editTransportation = (transportationData: any) => {

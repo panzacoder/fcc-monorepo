@@ -19,6 +19,7 @@ import {
 } from 'app/utils/urlConstants'
 import store from 'app/redux/store'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
 import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
 import {
@@ -29,7 +30,6 @@ const schema = z.object({
   typeIndex: z.number()
 })
 let selectedType = 'All'
-let typesList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
 let weekFirstLastDays = [] as any
 let weekDayListDates = [] as any
 let weekDayUtcDates = [] as any
@@ -58,6 +58,7 @@ export function ConsolidatedViewScreen() {
   const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
+  const [typesList, setTypesList] = useState([]) as any
   const [selectedDate, setSelectedDate] = useState(
     getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
   )
@@ -91,7 +92,7 @@ export function ConsolidatedViewScreen() {
     listDaySeven = []
   }
   async function getWeekCurrentLastDays(currentDate: any) {
-    console.log('currentDate', currentDate)
+    logger.debug('currentDate', currentDate)
     weekFirstLastDays = []
     weekDayListDates = []
     weekDayUtcDates = []
@@ -167,13 +168,16 @@ export function ConsolidatedViewScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
+          let list: object[] = [{ id: 1, title: 'All' }]
+
           data.data.filterOptionTypes.map((data: any, index: any) => {
             let object = {
               title: data,
               id: index + 2
             }
-            typesList.push(object)
+            list.push(object)
           })
+          setTypesList(list)
         } else {
           Alert.alert('', data.message)
         }
@@ -181,7 +185,7 @@ export function ConsolidatedViewScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   const getConsolidatedDetails = useCallback(
@@ -216,7 +220,7 @@ export function ConsolidatedViewScreen() {
               setMemberActivityWithDays(data.data.memberActivityList)
             }
             setIsDataReceived(true)
-            console.log(
+            logger.debug(
               'memberActivityList',
               JSON.stringify(data.data.memberActivityList)
             )
@@ -227,7 +231,7 @@ export function ConsolidatedViewScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -266,7 +270,7 @@ export function ConsolidatedViewScreen() {
             }
             setIsShowFilter(false)
 
-            console.log(
+            logger.debug(
               'memberActivityList',
               JSON.stringify(data.data.memberActivityList)
             )
@@ -278,7 +282,7 @@ export function ConsolidatedViewScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []

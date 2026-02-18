@@ -15,6 +15,7 @@ import { BASE_URL, GET_INCIDENTS } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
@@ -94,7 +95,7 @@ export function IncidentsListScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {

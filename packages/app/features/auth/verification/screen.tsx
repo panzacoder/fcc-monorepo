@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatUrl } from 'app/utils/format-url'
+import { logger } from 'app/utils/logger'
 
 const schema = z.object({
   authCode: z.string().length(6, { message: 'Enter 6 digit code from email' })
@@ -56,7 +57,7 @@ export function VerificationScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function resendAuthCode() {
@@ -74,7 +75,7 @@ export function VerificationScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   return (

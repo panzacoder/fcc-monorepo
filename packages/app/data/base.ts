@@ -6,6 +6,7 @@ import {
 } from 'app/utils/fetchServerData'
 import { BASE_URL } from 'app/utils/urlConstants'
 import { Alert } from 'react-native'
+import { logger } from 'app/utils/logger'
 
 type fetchDataProps<DataType> = {
   route: string
@@ -19,7 +20,7 @@ export async function fetchData<DataType>({
   onFailure
 }: fetchDataProps<DataType>): Promise<DataType | void> {
   const url = new URL(route, BASE_URL)
-  console.log(`Fetching data from ${url}`)
+  logger.debug(`Fetching data from ${url}`)
   const deviceInfo = await getUserDeviceInformation()
   const header = store.getState().headerState.header
 
@@ -37,7 +38,7 @@ export async function fetchData<DataType>({
       }
     })
     .catch((error) => {
-      console.log(error)
+      logger.debug(error)
     })
   return res
 }

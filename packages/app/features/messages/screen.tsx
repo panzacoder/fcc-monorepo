@@ -23,6 +23,7 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 export function MessagesScreen() {
   const header = store.getState().headerState.header
@@ -66,10 +67,9 @@ export function MessagesScreen() {
                     : {}
               )
             }
-            setMessagesList(data.data.threadList ? data.data.threadList : [])
-            setMessagesListFull(
-              data.data.threadList ? data.data.threadList : []
-            )
+            let threadList = data.data.threadList ? data.data.threadList : []
+            setMessagesList(threadList)
+            setMessagesListFull(threadList)
             getFilteredList(
               data.data.threadList ? data.data.threadList : [],
               currentFilter
@@ -84,7 +84,6 @@ export function MessagesScreen() {
                 })
               )
             }
-            // console.log('threadList', threadList)
           } else {
             Alert.alert('', data.message)
           }
@@ -92,7 +91,7 @@ export function MessagesScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     },
     []
@@ -142,7 +141,7 @@ export function MessagesScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function getThreadParticipants() {
@@ -183,7 +182,7 @@ export function MessagesScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function getFilteredList(list: any, filter: any) {

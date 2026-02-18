@@ -5,7 +5,7 @@ import { View, Alert } from 'react-native'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getUserDeviceInformation } from 'app/utils/device'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { storeCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
@@ -27,6 +27,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { formatUrl } from 'app/utils/format-url'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
   password: z.string().min(1, { message: 'Password is required' })
@@ -40,10 +41,6 @@ export function LoginScreen() {
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      // email: 'sachaudhari0704@gmail.com',
-      // password: 'Shubh@m27'
-      // email: 'pritipatilfcc@gmail.com',
-      // password: 'Priti@123'
       email: '',
       password: ''
     },
@@ -98,16 +95,7 @@ export function LoginScreen() {
               })
             )
           }
-          try {
-            let loginDetails = {
-              email: formData.email,
-              password: formData.password
-            }
-            const jsonValue = JSON.stringify(loginDetails)
-            await AsyncStorage.setItem('loginDetails', jsonValue)
-          } catch (e) {
-            // saving error
-          }
+          await storeCredentials(formData.email, formData.password)
           router.push('/home')
         } else if (data.errorCode === 'RVF_101') {
           router.push(formatUrl('/verification', { email: formData.email }))
@@ -117,7 +105,7 @@ export function LoginScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }
 

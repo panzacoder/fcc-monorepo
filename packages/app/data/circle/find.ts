@@ -1,6 +1,7 @@
 import { FIND_CIRCLE } from 'app/utils/urlConstants'
 import { Member } from '../types'
 import { fetchData } from '../base'
+import { logger } from 'app/utils/logger'
 
 
 export type FindCircleProps = {
@@ -23,5 +24,5 @@ export async function findCircle({ email, phone }: FindCircleProps) {
       data: { member: { phone } }
     })
   }
-  console.log('Cannot lookup member without email or phone')
+  logger.debug('Cannot lookup member without email or phone')
 }

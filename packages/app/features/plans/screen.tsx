@@ -28,6 +28,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'app/ui/button'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   planIndex: z.number()
 })
@@ -103,7 +104,7 @@ export function PlansScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   useEffect(() => {
@@ -178,7 +179,7 @@ export function PlansScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log('error', error)
+          logger.debug('error', error)
         })
     }
     getPlandetails()
@@ -209,7 +210,7 @@ export function PlansScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function upgradePlanOnServer(data: any) {
@@ -240,7 +241,7 @@ export function PlansScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   async function navigateToPayments(data: any) {
@@ -291,7 +292,7 @@ export function PlansScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
   const getPlansView = () => {

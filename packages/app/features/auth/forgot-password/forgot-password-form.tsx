@@ -8,6 +8,7 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { logger } from 'app/utils/logger'
 
 export type ForgotPasswordFormProps = {
   onLoadingChange: (loading: boolean) => void
@@ -52,7 +53,7 @@ export function ForgotPasswordForm({
       .catch((error) => {
         onLoadingChange(false)
         Alert.alert('', 'Unknown error occurred, please try again.')
-        console.log(error)
+        logger.debug(error)
       })
   }
 

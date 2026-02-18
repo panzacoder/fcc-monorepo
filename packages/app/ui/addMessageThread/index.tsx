@@ -8,6 +8,7 @@ import * as z from 'zod'
 import { CheckBox } from 'react-native-elements'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
+import { logger } from 'app/utils/logger'
 const schema = z.object({
   subject: z.string().min(1, { message: 'Subject is required' })
 })
@@ -20,7 +21,7 @@ export const AddMessageThread = ({
   createMessageThread,
   isUpdateParticipants
 }) => {
-  console.log('noteData', JSON.stringify(noteData))
+  logger.debug('noteData', JSON.stringify(noteData))
   const { control, handleSubmit } = useForm({
     defaultValues: {
       subject:

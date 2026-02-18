@@ -17,6 +17,7 @@ import {
   GET_CAREGIVER_DETAILS
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
+import { logger } from 'app/utils/logger'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -98,7 +99,7 @@ export function CaregiverDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }, [])
   function handleBackButtonClick() {
@@ -170,7 +171,7 @@ export function CaregiverDetailsScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log('error', error)
+        logger.debug('error', error)
       })
   }
 

@@ -1,12 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, TextInput } from 'react-native'
-import { ScrollView } from 'app/ui/scroll-view'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  View,
+  Alert,
+  TouchableOpacity,
+  TextInput,
+  ScrollView
+} from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
+import messageListAction from 'app/redux/messageList/messageListAction'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import { Typography } from 'app/ui/typography'
@@ -20,6 +26,7 @@ import {
   GET_THREAD,
   UPDATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
+import { logger } from 'app/utils/logger'
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -28,7 +35,10 @@ Notifications.setNotificationHandler({
   })
 })
 export function NotificationNoteMessageScreen() {
+  const scrollViewRef = useRef<ScrollView>(null)
   const [isLoading, setLoading] = useState(false)
+  const [isRender, setIsRender] = useState(false)
+  const [key, setKey] = useState(0)
   const [message, setMessage] = useState('')
   const [messageList, setMessageList] = useState(null) as any
   const [threadDetails, setThreadDetails] = useState(null) as any
@@ -65,6 +75,7 @@ export function NotificationNoteMessageScreen() {
                 ? messageThread.messageList
                 : []
             setMessageList(messageList)
+            store.dispatch(messageListAction.setMessageList(messageList))
           }
         } else {
           Alert.alert('', data.message)
@@ -73,20 +84,36 @@ export function NotificationNoteMessageScreen() {
       })
       .catch((error) => {
         setLoading(false)
-        console.log(error)
+        logger.debug(error)
       })
   }, [])
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
       await messaging().setBackgroundMessageHandler(async (message: any) => {
-        getNoteDetails()
+        updateMessageList(message)
       })
       await messaging().onMessage((message: any) => {
-        getNoteDetails()
+        updateMessageList(message)
       })
     } catch (e) {}
   }, [])
+  async function updateMessageList(message: any) {
+    let messageList: any = store.getState().messageList.messageList
+    let messeageContent = message.data ? message.data : {}
+    let messageObject = {
+      sender: messeageContent.MemberId ? messeageContent.MemberId : '',
+      senderName: messeageContent.MsgCreatedBy
+        ? messeageContent.MsgCreatedBy
+        : '',
+      body: messeageContent.MsgContent ? messeageContent.MsgContent : '',
+      createdOn: messeageContent.MsgDateUTC ? messeageContent.MsgDateUTC : ''
+    }
+    messageList.push(messageObject)
+    setMessageList(messageList)
+    setKey(Math.random())
+    setIsRender(!isRender)
+  }
   useEffect(() => {
     getNoteDetails()
     handleFcmMessage()
@@ -123,7 +150,7 @@ export function NotificationNoteMessageScreen() {
         })
         .catch((error) => {
           setLoading(false)
-          console.log(error)
+          logger.debug(error)
         })
     }
   }
@@ -145,7 +172,14 @@ export function NotificationNoteMessageScreen() {
       <SafeAreaView className="flex-1">
         <View className=" h-[90%] w-full bg-[#e0d8d0]">
           {isValidObject(messageList) && messageList.length > 0 ? (
-            <ScrollView className="max-h-[90%] ">
+            <ScrollView
+              key={key}
+              ref={scrollViewRef}
+              onContentSizeChange={() =>
+                scrollViewRef.current?.scrollToEnd({ animated: true })
+              }
+              className="max-h-[90%] "
+            >
               {messageList.map((message: any, index: number) => {
                 if (isValidObject(userDetails) && isValidObject(message)) {
                   if (message.sender !== userDetails.id) {

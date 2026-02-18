@@ -24,6 +24,7 @@ import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
+import { logger } from 'app/utils/logger'
 let selectedAddress: any = {
   shortDescription: '',
   nickName: '',
@@ -149,7 +150,7 @@ export function SignUpScreen() {
       })
       .catch((error) => {
         Alert.alert('', error)
-        console.log(error)
+        logger.debug(error)
       })
   }
   async function setAddressObject(value: any, index: any) {
@@ -191,7 +192,7 @@ export function SignUpScreen() {
       if (index === 8) {
         let tz = value.name ? value.name : ''
         setTimeZone(tz)
-        console.log('timeZone', tz)
+        logger.debug('timeZone', tz)
       }
     }
     setAddress(selectedAddress)

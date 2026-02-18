@@ -4,6 +4,7 @@ import moment, { MomentInput } from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
 import store from '../redux/store'
 import _ from 'lodash'
+import { logger } from 'app/utils/logger'
 export const DATE_CONSTANT = {
   FULL_DATE: 'DD MMM YYYY hh:mm A'
   // FULL_DATE: 'MMM DD, YYYY'
@@ -13,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function consoleData(title: string, data: string) {
-  console.log(title, data)
+  logger.debug(title, data)
 }
 export const isNull = (input: any) => {
   if (undefined === input || null === input) {
@@ -28,12 +29,12 @@ export function googleMapOpenUrl(address: string) {
   Linking.canOpenURL(url)
     .then((supported) => {
       if (!supported) {
-        console.log("Can't handle url: " + url)
+        logger.debug("Can't handle url: " + url)
       } else {
         return Linking.openURL(url)
       }
     })
-    .catch((err) => console.error('An error occurred', err))
+    .catch((err) => logger.error('An error occurred', err))
 }
 export const removeAllSpecialCharFromString = (phoneNumber: any) => {
   let newNumber = String(phoneNumber).replace(

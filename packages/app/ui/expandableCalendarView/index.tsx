@@ -10,6 +10,7 @@ import moment from 'moment'
 import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 
 import testIDs from '../../utils/testIDs'
+import { logger } from 'app/utils/logger'
 
 const today = new Date().toISOString().split('T')[0]
 export const ExpandableCalendarView = ({
@@ -64,7 +65,7 @@ export const ExpandableCalendarView = ({
         marked[item.title] = { disabled: true }
       }
     })
-    console.log('marked', JSON.stringify(marked))
+    logger.debug('marked', JSON.stringify(marked))
     setMarkedObject(marked)
   }
   async function processData(data: any) {

@@ -3,6 +3,7 @@ import { TextLink as SolitoTextLink, Link } from 'solito/link'
 import { ComponentProps, forwardRef } from 'react'
 import { Typography, TypographyProps } from 'app/ui/typography'
 import { tv } from 'tailwind-variants'
+import { logger } from 'app/utils/logger'
 
 /**
  * This is a more advanced component with custom styles and per-platform functionality
@@ -12,7 +13,7 @@ export type ExternalLinkProps = TypographyProps
 export const ExternalLink = forwardRef<Text, ExternalLinkProps>(
   function ExternalLink({ href, ...props }, ref) {
     const target = '_blank'
-    console.log('href', href)
+    logger.debug('href', href)
     const nativeAProps = Platform.select<Partial<ExternalLinkProps>>({
       web: {
         href,
