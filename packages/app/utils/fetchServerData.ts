@@ -35,6 +35,7 @@ export function CallPostService<T>(
       })
 
       .then((response) => {
+        if (!response) return
         if (response.errorCode === 'SEP_101') {
           emitSessionExpired()
           reject('Login Expired')
