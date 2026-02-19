@@ -41,6 +41,10 @@
     "toggle-switch-react-native": "^3.3.0",
     "zod": "^3.22.4"
   },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
   "sideEffects": false,
   "devDependencies": {
     "@types/react-native-calendar-picker": "^8",
