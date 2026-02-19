@@ -11,8 +11,8 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 | 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)       | Triage Open PRs & Establish Baseline     | Done                                                                      |
 | 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
 | **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
-| **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** (PR pending)                                                     |
-| 4      | [#101](https://github.com/panzacoder/fcc-monorepo/issues/101)     | Data Layer Modernization                 | Ready (Phase 3 done)                                                      |
+| **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
+| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **In Progress**                                                           |
 | 5      | [#102](https://github.com/panzacoder/fcc-monorepo/issues/102)     | Testing Foundation                       | Blocked by Phase 4                                                        |
 | 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 4, 5                                                     |
 | 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 4, 6                                                     |
@@ -80,3 +80,4 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 - **Node 24** set across CI, Vercel, `.mise.toml`, and `.nvmrc` as of Phase 2.
 - **Redux persistence debouncing** tracked in [#117](https://github.com/panzacoder/fcc-monorepo/issues/117) — full store serialized on every dispatch with no debounce.
 - **`no-restricted-imports` for store** upgraded to `error` as of Phase 3. Only `provider/redux/index.tsx` has an eslint-disable (legitimate Provider usage).
+- **RBAC handling needs review**: API responses include `domainObjectPrivileges` (server-driven RBAC) parsed by `utils/getUserPemissions.tsx` (note: filename typo). Current usage is untyped (`useRef<any>`) and inconsistent across screens. Should be typed as a shared `DomainPrivileges` type in the data layer and potentially extracted into a `usePermissions` hook during Phase 4 or 7.
