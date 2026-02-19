@@ -54,6 +54,8 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - run: yarn turbo run build
+        env:
+          BASE_URL: https://placeholder.example.com
 
   # build-storybook:
   #   name: Build Storybook
