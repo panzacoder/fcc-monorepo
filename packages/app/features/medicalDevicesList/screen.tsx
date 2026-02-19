@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -32,16 +31,16 @@ const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
 })
-let selectedMonth = 'All'
-let selectedYear = 'All'
-let medicalDevicesPrivileges = {}
 export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
+  const selectedMonthRef = useRef('All')
+  const selectedYearRef = useRef('All')
+  const medicalDevicesPrivilegesRef = useRef<any>({})
   const [isLoading, setLoading] = useState(false)
   const [devicesList, setDevicesList] = useState([]) as any
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -52,7 +51,9 @@ export function MedicalDevicesListScreen() {
   const router = useRouter()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
 
   type Response = {
     id: number
@@ -77,14 +78,15 @@ export function MedicalDevicesListScreen() {
       }
     }
     if (isFromFilter) {
-      dataObject.month = selectedMonth
-      dataObject.year = selectedYear
+      dataObject.month = selectedMonthRef.current
+      dataObject.year = selectedYearRef.current
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            medicalDevicesPrivileges = data.data.domainObjectPrivileges.Purchase
+            medicalDevicesPrivilegesRef.current = data.data
+              .domainObjectPrivileges.Purchase
               ? data.data.domainObjectPrivileges.Purchase
               : {}
           }
@@ -116,11 +118,11 @@ export function MedicalDevicesListScreen() {
   })
 
   function filterDevice(formData: Schema) {
-    selectedMonth =
+    selectedMonthRef.current =
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYear =
+    selectedYearRef.current =
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     getDevicesList(true)
   }
@@ -153,7 +155,8 @@ export function MedicalDevicesListScreen() {
         <PtsBackHeader title="Medical Devices" memberData={memberData} />
         <View className="flex-row ">
           <View className="w-[70%]" />
-          {getUserPermission(medicalDevicesPrivileges).createPermission ? (
+          {getUserPermission(medicalDevicesPrivilegesRef.current)
+            .createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

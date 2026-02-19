@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -21,6 +20,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { Button } from 'app/ui/button'
@@ -34,11 +34,6 @@ const schema = z.object({
   pharmacyIndex: z.number(),
   drugName: z.string()
 })
-let prescriptionPrivileges = {}
-let selectedType = 'All'
-let selectedPrescriber = 'All'
-let selectedPharmacy = 'All'
-let drugName = ''
 export type Schema = z.infer<typeof schema>
 export function PrescriptionsListScreen() {
   const [isLoading, setLoading] = useState(false)
@@ -52,13 +47,20 @@ export function PrescriptionsListScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
-  const header = store.getState().headerState.header
+  const prescriptionPrivilegesRef = useRef<any>({})
+  const selectedTypeRef = useRef('All')
+  const selectedPrescriberRef = useRef('All')
+  const selectedPharmacyRef = useRef('All')
+  const drugNameRef = useRef('')
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
 
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
 
   //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
   type TypeResponse = {
@@ -85,18 +87,19 @@ export function PrescriptionsListScreen() {
       }
     }
     if (isFromFilter) {
-      dataObject.name = drugName
-      dataObject.pharmacy = selectedPharmacy
-      dataObject.prescribedBy = selectedPrescriber
+      dataObject.name = drugNameRef.current
+      dataObject.pharmacy = selectedPharmacyRef.current
+      dataObject.prescribedBy = selectedPrescriberRef.current
       dataObject.type = {
-        type: selectedType
+        type: selectedTypeRef.current
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            prescriptionPrivileges = data.data.domainObjectPrivileges.Medicine
+            prescriptionPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Medicine
               ? data.data.domainObjectPrivileges.Medicine
               : {}
           }
@@ -228,19 +231,21 @@ export function PrescriptionsListScreen() {
   })
 
   function filterPrescriptions(formData: Schema) {
-    drugName = formData.drugName
+    drugNameRef.current = formData.drugName
     if (formData.typeIndex !== 1) {
-      selectedType = staticData.medicineTypeList[formData.typeIndex - 2].type
+      selectedTypeRef.current =
+        staticData.medicineTypeList[formData.typeIndex - 2].type
     } else {
-      selectedType = 'All'
+      selectedTypeRef.current = 'All'
     }
 
-    selectedPharmacy = pharmacyList[formData.pharmacyIndex - 1].title
+    selectedPharmacyRef.current = pharmacyList[formData.pharmacyIndex - 1].title
 
     if (formData.prescribedIndex !== 1) {
-      selectedPrescriber = doctorListFull[formData.prescribedIndex - 2]
+      selectedPrescriberRef.current =
+        doctorListFull[formData.prescribedIndex - 2]
     } else {
-      selectedPrescriber = 'All'
+      selectedPrescriberRef.current = 'All'
     }
     getPrescriptionList(true)
   }
@@ -278,7 +283,8 @@ export function PrescriptionsListScreen() {
               />
             </TouchableOpacity>
           </View>
-          {getUserPermission(prescriptionPrivileges).createPermission ? (
+          {getUserPermission(prescriptionPrivilegesRef.current)
+            .createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,7 +10,6 @@ import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import moment from 'moment'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -38,9 +37,9 @@ import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
-let medicalDevicePrivileges = {}
-let notePrivileges = {}
 export function MedicalDevicesDetailsScreen() {
+  const medicalDevicePrivilegesRef = useRef<any>({})
+  const notePrivilegesRef = useRef<any>({})
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -55,7 +54,7 @@ export function MedicalDevicesDetailsScreen() {
   const [medicalDevicesDetails, setMedicalDevicesDetails] = useState({}) as any
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -87,11 +86,12 @@ export function MedicalDevicesDetailsScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
-              medicalDevicePrivileges = data.data.domainObjectPrivileges
-                .Purchase
+              medicalDevicePrivilegesRef.current = data.data
+                .domainObjectPrivileges.Purchase
                 ? data.data.domainObjectPrivileges.Purchase
                 : {}
-              notePrivileges = data.data.domainObjectPrivileges.PURCHASENOTE
+              notePrivilegesRef.current = data.data.domainObjectPrivileges
+                .PURCHASENOTE
                 ? data.data.domainObjectPrivileges.PURCHASENOTE
                 : data.data.domainObjectPrivileges.PurchaseNote
                   ? data.data.domainObjectPrivileges.PurchaseNote
@@ -505,7 +505,8 @@ export function MedicalDevicesDetailsScreen() {
         <ScrollView className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(medicalDevicePrivileges).createPermission ? (
+              {getUserPermission(medicalDevicePrivilegesRef.current)
+                .createPermission ? (
                 <Button
                   className="w-[50%]"
                   title="Create Similar"
@@ -527,7 +528,8 @@ export function MedicalDevicesDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(medicalDevicePrivileges).updatePermission ? (
+              {getUserPermission(medicalDevicePrivilegesRef.current)
+                .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
                   title="Edit"
@@ -585,7 +587,7 @@ export function MedicalDevicesDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivileges).createPermission ? (
+              {getUserPermission(notePrivilegesRef.current).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -612,7 +614,7 @@ export function MedicalDevicesDetailsScreen() {
                         editNote={editNote}
                         deleteNote={deleteNote}
                         messageThreadClicked={messageThreadClicked}
-                        notePrivileges={notePrivileges}
+                        notePrivileges={notePrivilegesRef.current}
                       />
                     </View>
                   )
@@ -685,7 +687,8 @@ export function MedicalDevicesDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(medicalDevicePrivileges).deletePermission ? (
+          {getUserPermission(medicalDevicePrivilegesRef.current)
+            .deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""

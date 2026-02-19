@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import {
@@ -18,12 +17,13 @@ import {
 } from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-let caregiverPrivileges = {}
 export function CaregiverDetailsScreen() {
-  const header = store.getState().headerState.header
+  const caregiverPrivilegesRef = useRef<any>({})
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
@@ -62,7 +62,8 @@ export function CaregiverDetailsScreen() {
         if (data.status === 'SUCCESS') {
           setCaregiverDetails(data.data.familyMember || {})
           if (data.data.domainObjectPrivileges) {
-            caregiverPrivileges = data.data.domainObjectPrivileges.Caregiver
+            caregiverPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Caregiver
               ? data.data.domainObjectPrivileges.Caregiver
               : {}
           }
@@ -215,7 +216,8 @@ export function CaregiverDetailsScreen() {
               />
             </View>
 
-            {getUserPermission(caregiverPrivileges).deletePermission ? (
+            {getUserPermission(caregiverPrivilegesRef.current)
+              .deletePermission ? (
               <View className="my-5">
                 <Button
                   className=""

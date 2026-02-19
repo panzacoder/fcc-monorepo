@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -26,12 +25,11 @@ import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
-let profile = ''
-let profileIndex = -1
 const schema = z.object({
   profileIndex: z.number().min(0, { message: 'Profile is required' }),
   email: z.string().min(1, { message: 'Required' }),
@@ -42,8 +40,10 @@ const phoneSchema = z.object({
   phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let email = ''
 export function AddEditCaregiverScreen() {
+  const profileRef = useRef('')
+  const profileIndexRef = useRef(-1)
+  const emailRef = useRef('')
   let caregiverPhone = ''
   const router = useRouter()
   const item = useLocalSearchParams<any>()
@@ -51,8 +51,10 @@ export function AddEditCaregiverScreen() {
     ? JSON.parse(item.caregiverDetails)
     : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  const staticData: any = store.getState().staticDataState.staticData
-  const header = store.getState().headerState.header
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
+  const header = useAppSelector((state) => state.headerState.header)
   const [isLoading, setLoading] = useState(false)
   const [memberId, setMemberId] = useState('')
   const [memberEmail, setMemberEmail] = useState('')
@@ -72,7 +74,7 @@ export function AddEditCaregiverScreen() {
       : ''
     fullName += caregiverDetails.lastName ? ' ' + caregiverDetails.lastName : ''
     if (caregiverDetails.relationRole) {
-      profile = caregiverDetails.relationRole.name
+      profileRef.current = caregiverDetails.relationRole.name
         ? caregiverDetails.relationRole.name
         : ''
     }
@@ -85,8 +87,8 @@ export function AddEditCaregiverScreen() {
   const profileList: Array<{ id: number; title: string }> =
     staticData.profileList.map(({ name, id }: ProfileResponse, index: any) => {
       if (!_.isEmpty(caregiverDetails)) {
-        if (profile === name) {
-          profileIndex = index + 1
+        if (profileRef.current === name) {
+          profileIndexRef.current = index + 1
         }
       }
       return {
@@ -96,7 +98,7 @@ export function AddEditCaregiverScreen() {
     })
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      profileIndex: profileIndex,
+      profileIndex: profileIndexRef.current,
       email:
         !_.isEmpty(caregiverDetails) && caregiverDetails.email
           ? caregiverDetails.email
@@ -123,13 +125,13 @@ export function AddEditCaregiverScreen() {
   })
 
   async function findCaregiver() {
-    if (email !== '') {
+    if (emailRef.current !== '') {
       setLoading(true)
       let url = `${BASE_URL}${FIND_CAREGIVER_BY_EMAIL_PHONE}`
       let dataObject = {
         header: header,
         member: {
-          email: email
+          email: emailRef.current
         }
       }
       CallPostService(url, dataObject)
@@ -298,7 +300,9 @@ export function AddEditCaregiverScreen() {
                     maxHeight={300}
                     list={profileList}
                     className="ml-2 mt-2 w-[85%]"
-                    defaultValue={!_.isEmpty(caregiverDetails) ? profile : ''}
+                    defaultValue={
+                      !_.isEmpty(caregiverDetails) ? profileRef.current : ''
+                    }
                   />
                   <Feather
                     onPress={() => {
@@ -322,7 +326,7 @@ export function AddEditCaregiverScreen() {
                       className="mt-2 w-[95%] self-center bg-white"
                       autoCapitalize="none"
                       onChangeText={(text) => {
-                        email = text
+                        emailRef.current = text
                       }}
                       onBlur={() => {
                         findCaregiver()
@@ -364,7 +368,7 @@ export function AddEditCaregiverScreen() {
                         list={profileList}
                         className="ml-2 mt-2 w-[85%]"
                         defaultValue={
-                          !_.isEmpty(caregiverDetails) ? profile : ''
+                          !_.isEmpty(caregiverDetails) ? profileRef.current : ''
                         }
                       />
                       <Feather
@@ -394,7 +398,7 @@ export function AddEditCaregiverScreen() {
                         list={profileList}
                         className="ml-2 mt-2 w-[85%]"
                         defaultValue={
-                          !_.isEmpty(caregiverDetails) ? profile : ''
+                          !_.isEmpty(caregiverDetails) ? profileRef.current : ''
                         }
                       />
                       <Feather

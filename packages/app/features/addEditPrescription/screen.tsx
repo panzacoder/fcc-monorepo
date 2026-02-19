@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -28,6 +27,7 @@ import {
   CalendarViewInput
 } from '../addEditPrescription/calendar-view'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   typeIndex: z.number().min(0, { message: 'Type is required' }),
   drugName: z.string().min(1, { message: 'Name is required' }),
@@ -39,7 +39,7 @@ export type Schema = z.infer<typeof schema>
 export function AddEditPrescriptionScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   let prescriptionDetails =
     item.prescriptionDetails !== undefined
       ? JSON.parse(item.prescriptionDetails)
@@ -93,7 +93,9 @@ export function AddEditPrescriptionScreen() {
       ? prescriptionDetails.endDate
       : ''
   )
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
   type TypeResponse = {
     id: number
