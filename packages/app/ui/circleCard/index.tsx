@@ -7,11 +7,13 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 
 export const CircleCard = ({ data, index, hideCirclesView }) => {
   const router = useRouter()
-  let memberNamesList: any = store.getState().memberNames.memberNamesList
+  const memberNamesList: any = useAppSelector(
+    (state) => state.memberNames.memberNamesList
+  )
   const [isLoading, setLoading] = useState(false)
   const memberData = data
   let fullName = ''

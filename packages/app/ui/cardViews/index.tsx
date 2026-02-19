@@ -6,12 +6,14 @@ import {
   getNameInitials,
   getColorSet
 } from 'app/ui/utils'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 export const CardView = ({ data, trasportationClicked }) => {
   const router = useRouter()
-  let memberNamesList: any = store.getState().memberNames.memberNamesList
+  const memberNamesList: any = useAppSelector(
+    (state) => state.memberNames.memberNamesList
+  )
   let memberData = data ? JSON.parse(data) : {}
   let textStyle =
     'ml-[10px] self-center text-[19px] font-bold text-black w-[80%]'

@@ -1,14 +1,16 @@
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { getNameInitials, getColorSet } from 'app/ui/utils'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { cn } from './utils'
 export type Props = {
   fullName?: string
   className?: string
 }
 const PtsNameInitials = ({ fullName, className }: Props) => {
-  let memberNamesList: any = store.getState().memberNames.memberNamesList
+  const memberNamesList: any = useAppSelector(
+    (state) => state.memberNames.memberNamesList
+  )
   let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
   return (
     <View
