@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -8,7 +8,6 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_CALENDER_ITEMS } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
@@ -18,13 +17,14 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
 import { logger } from 'app/utils/logger'
-let calendarPrivileges: any = {}
+import { useAppSelector } from 'app/redux/hooks'
 export function CalendarScreen() {
+  const calendarPrivilegesRef = useRef<any>({})
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowAddModal, setIsShowAddModal] = useState(false)
   const [calenderEvents, setCalenderEvents] = useState([])
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
@@ -46,7 +46,7 @@ export function CalendarScreen() {
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
             if (data.data.domainObjectPrivileges) {
-              calendarPrivileges = data.data.allowedDomainObjects
+              calendarPrivilegesRef.current = data.data.allowedDomainObjects
                 ? data.data.allowedDomainObjects
                 : {}
             }
@@ -148,9 +148,12 @@ export function CalendarScreen() {
         <PtsBackHeader title="Calendar" memberData={memberData} />
         <View className="flex-row ">
           <View className="w-[90%]" />
-          {getUserPermission(calendarPrivileges.Appointment).createPermission ||
-          getUserPermission(calendarPrivileges.Event).createPermission ||
-          getUserPermission(calendarPrivileges.Incident).createPermission ? (
+          {getUserPermission(calendarPrivilegesRef.current.Appointment)
+            .createPermission ||
+          getUserPermission(calendarPrivilegesRef.current.Event)
+            .createPermission ||
+          getUserPermission(calendarPrivilegesRef.current.Incident)
+            .createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

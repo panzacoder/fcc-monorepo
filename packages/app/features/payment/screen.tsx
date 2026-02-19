@@ -13,7 +13,6 @@ import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
-import store from 'app/redux/store'
 import { getAddressFromObject } from 'app/ui/utils'
 import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -42,6 +41,7 @@ import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscr
 import sponsororAction from 'app/redux/sponsor/sponsorAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import { logger } from 'app/utils/logger'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 let StripeProvider: any
 let useStripe: any
 
@@ -67,6 +67,7 @@ const itemSubs = Platform.select({
 }) as any
 
 export function PaymentsScreen() {
+  const dispatch = useAppDispatch()
   const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
     useStripe()
   const [isLoading, setLoading] = useState(false)
@@ -77,8 +78,8 @@ export function PaymentsScreen() {
   )
 
   const [email, setEmail] = useState('')
-  const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let planDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
@@ -250,25 +251,25 @@ export function PaymentsScreen() {
               ? response.data.userDetails.appuserVo
               : {}
           if (!_.isEmpty(appuserVo)) {
-            store.dispatch(userProfileAction.setUserProfile(appuserVo))
+            dispatch(userProfileAction.setUserProfile(appuserVo))
           }
           if (!_.isEmpty(userSubscription)) {
-            store.dispatch(subscriptionAction.setSubscription(userSubscription))
+            dispatch(subscriptionAction.setSubscription(userSubscription))
           }
           if (!_.isEmpty(userSubscription)) {
-            store.dispatch(
+            dispatch(
               userSubscriptionAction.setSubscriptionDetails(
                 subscriptionDetailsobject
               )
             )
           }
-          await store.dispatch(
+          await dispatch(
             sponsororAction.setSponsor({
               sponsorDetails: {},
               sponsorShipDetails: {}
             })
           )
-          await store.dispatch(
+          await dispatch(
             paidAdAction.setPaidAd({
               commercialsDetails: {},
               commercialPageMappings: {}

@@ -10,7 +10,6 @@ import {
 } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
-import store from 'app/redux/store'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -35,6 +34,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   getAddressFromObject
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
@@ -47,7 +47,7 @@ export function MemberProfileScreen() {
   const [memberDetails, setMemberDetails] = useState({}) as any
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
   const [isFromSelfCircle, setIsFromSelfCircle] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}

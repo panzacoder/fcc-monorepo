@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View,
   Alert,
@@ -28,7 +28,6 @@ import {
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import ToggleSwitch from 'toggle-switch-react-native'
-import store from 'app/redux/store'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
@@ -40,6 +39,7 @@ import {
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
@@ -50,10 +50,10 @@ const sponsorSchema = z.object({
 export type Schema = z.infer<typeof schema>
 export type SponsorSchema = z.infer<typeof sponsorSchema>
 
-let isShowRenewButton = false
 export function ProfileScreen() {
-  const header = store.getState().headerState.header
-  const userProfile = store.getState().userProfileState.header
+  const isShowRenewButtonRef = useRef(false)
+  const header = useAppSelector((state) => state.headerState.header)
+  const userProfile = useAppSelector((state) => state.userProfileState.header)
   // console.log('userProfile', JSON.stringify(userProfile))
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -119,7 +119,7 @@ export function ProfileScreen() {
               data.data.expiringSubscription &&
               userSubscription.status.toLowerCase() === 'active'
             ) {
-              isShowRenewButton = true
+              isShowRenewButtonRef.current = true
               // console.log('expiringSubscription../', JSON.stringify(data.data))
               Alert.alert(
                 '',
@@ -707,7 +707,7 @@ export function ProfileScreen() {
                     ) : (
                       <View />
                     )}
-                    {isShowRenewButton ? (
+                    {isShowRenewButtonRef.current ? (
                       <Button
                         className="my-2 ml-5 w-[40%] self-center bg-[#ef6603]"
                         title={'Renew Plan'}
