@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   View,
   Platform,
@@ -12,22 +12,22 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'react-native-elements'
-let selectedTime: any = new Date()
-let selectedDate: any = new Date()
 export const PtsDateTimePicker = ({ currentData, onSelection }) => {
+  const selectedTimeRef = useRef<any>(new Date())
+  const selectedDateRef = useRef<any>(new Date())
   // console.log('defaultValue', JSON.stringify(defaultValue))
   // console.log('currentData', JSON.stringify(currentData))
   // console.log('onSelection', JSON.stringify(onSelection))
   let date = new Date(currentData)
   // console.log('date', date)
-  selectedTime = moment(date).format('hh:mm A')
-  selectedDate = moment(date).format('DD MMM YYYY')
+  selectedTimeRef.current = moment(date).format('hh:mm A')
+  selectedDateRef.current = moment(date).format('DD MMM YYYY')
   const [isRender, setIsRender] = useState(false)
   const [isShowDateTimeModal, setDateTimeModal] = useState(false)
   const [isShowDateModal, setDateModal] = useState(false)
   const [isShowTimeModal, setTimeModal] = useState(false)
-  const [dateSelected, setDateSelected] = useState(selectedDate)
-  const [timeSelected, setTimeSelected] = useState(selectedTime)
+  const [dateSelected, setDateSelected] = useState(selectedDateRef.current)
+  const [timeSelected, setTimeSelected] = useState(selectedTimeRef.current)
 
   function getValueForPicker() {
     let date = new Date()
@@ -63,11 +63,11 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
               style={{}}
               onChange={(event, date) => {
                 if (event.type === 'set') {
-                  selectedTime = moment(date).format('hh:mm A')
-                  selectedDate = moment(date).format('DD MMM YYYY')
+                  selectedTimeRef.current = moment(date).format('hh:mm A')
+                  selectedDateRef.current = moment(date).format('DD MMM YYYY')
                   currentData = date
-                  setDateSelected(selectedDate)
-                  setTimeSelected(selectedTime)
+                  setDateSelected(selectedDateRef.current)
+                  setTimeSelected(selectedTimeRef.current)
                   cancelClicked()
                   // console.log('date', date)
                   // console.log('selectedTime', selectedTime)
@@ -105,7 +105,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
             }}
           >
             <DateTimePicker
-              value={selectedDate}
+              value={selectedDateRef.current}
               testID="dateAndTimePicker"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               mode={
