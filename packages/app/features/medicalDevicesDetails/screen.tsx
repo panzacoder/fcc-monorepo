@@ -36,6 +36,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 
 let medicalDevicePrivileges = {}
 let notePrivileges = {}
@@ -55,6 +56,12 @@ export function MedicalDevicesDetailsScreen() {
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
@@ -152,7 +159,11 @@ export function MedicalDevicesDetailsScreen() {
   let deviceAddress = {}
   if (!_.isEmpty(medicalDevicesDetails)) {
     if (medicalDevicesDetails.date) {
-      medicalDeviceDate = formatTimeToUserLocalTime(medicalDevicesDetails.date)
+      medicalDeviceDate = formatTimeToUserLocalTime(
+        medicalDevicesDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (medicalDevicesDetails.title) {
       medicalDevice = medicalDevicesDetails.title

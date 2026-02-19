@@ -14,6 +14,7 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import {
   BASE_URL,
   GET_MEMBER_THREADS,
@@ -28,6 +29,12 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 export function MessagesScreen() {
   const header = store.getState().headerState.header
   let memberNamesList: any = store.getState().memberNames.memberNamesList
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
@@ -345,7 +352,11 @@ export function MessagesScreen() {
                     <View className="flex-row">
                       <Typography className="font-400 ml-5 w-full text-black">
                         {data.updatedOn
-                          ? formatTimeToUserLocalTime(data.updatedOn)
+                          ? formatTimeToUserLocalTime(
+                              data.updatedOn,
+                              userAddress,
+                              memberAddress
+                            )
                           : ''}
                       </Typography>
                     </View>

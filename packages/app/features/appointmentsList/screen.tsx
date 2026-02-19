@@ -21,6 +21,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -63,6 +64,12 @@ export function AppointmentsListScreen() {
   ) as any
   const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   const staticData: any = store.getState().staticDataState.staticData
   const { control, handleSubmit, reset } = useForm({
@@ -550,7 +557,13 @@ export function AppointmentsListScreen() {
                   <View>
                     <View className=" flex-row">
                       <Typography className="font-400 ml-3 w-[75%] max-w-[75%] text-black">
-                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                        {data.date
+                          ? formatTimeToUserLocalTime(
+                              data.date,
+                              userAddress,
+                              memberAddress
+                            )
+                          : ''}
                       </Typography>
                       <View className="">
                         <Typography className="font-bold text-black">

@@ -17,6 +17,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -39,6 +40,12 @@ export function IncidentsListScreen() {
   const [isFilter, setIsFilter] = useState(false)
   const [incidentsList, setIncidentsList] = useState([]) as any
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const staticData: any = store.getState().staticDataState.staticData
   const item = useLocalSearchParams<any>()
   let memberData =
@@ -297,7 +304,13 @@ export function IncidentsListScreen() {
                     </View>
                     <View className="flex-row">
                       <Typography className="font-400 ml-5 w-full text-black">
-                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                        {data.date
+                          ? formatTimeToUserLocalTime(
+                              data.date,
+                              userAddress,
+                              memberAddress
+                            )
+                          : ''}
                       </Typography>
                     </View>
                     {data.hasNotes ? (

@@ -16,6 +16,7 @@ import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -66,6 +67,12 @@ export function HomeScreen() {
   const router = useRouter()
   const header = store.getState().headerState.header
   const user = store.getState().userProfileState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
 
   let fullName = user.memberName ? user.memberName : ''
   if (memberNamesList.includes(fullName) === false) {
@@ -486,7 +493,7 @@ export function HomeScreen() {
                   </Typography>
                   <Typography>{' on '}</Typography>
                   <Typography className="text-primary font-bold">
-                    {`${data.date ? convertTimeToUserLocalTime(data.date) : ''}`}
+                    {`${data.date ? convertTimeToUserLocalTime(data.date, userAddress, memberAddress) : ''}`}
                   </Typography>
                 </Typography>
                 <View className="my-2 flex-row justify-center">

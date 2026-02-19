@@ -23,6 +23,7 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -41,6 +42,12 @@ export function MedicalDevicesListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData =
@@ -267,7 +274,13 @@ export function MedicalDevicesListScreen() {
                   <View className="flex-row">
                     <View className="w-[95%] flex-row">
                       <Typography className="ml-5 text-black">
-                        {data.date ? convertTimeToUserLocalTime(data.date) : ''}
+                        {data.date
+                          ? convertTimeToUserLocalTime(
+                              data.date,
+                              userAddress,
+                              memberAddress
+                            )
+                          : ''}
                       </Typography>
                     </View>
                   </View>

@@ -43,6 +43,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 
 let eventPrivileges = {}
 let notePrivileges = {}
@@ -68,6 +69,12 @@ export function EventDetailsScreen() {
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
@@ -175,7 +182,11 @@ export function EventDetailsScreen() {
   let eventAddress = {}
   if (!_.isEmpty(eventDetails)) {
     if (eventDetails.date) {
-      eventDate = formatTimeToUserLocalTime(eventDetails.date)
+      eventDate = formatTimeToUserLocalTime(
+        eventDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (eventDetails.title) {
       event = eventDetails.title

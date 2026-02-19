@@ -21,6 +21,7 @@ import messageListAction from 'app/redux/messageList/messageListAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
@@ -59,6 +60,12 @@ export function NoteMessageScreen() {
   const [threadDetails, setThreadDetails] = useState(null) as any
   const header = store.getState().headerState.header
   const userDetails = store.getState().userProfileState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let noteData =
     item.noteData && item.noteData !== undefined
@@ -445,7 +452,11 @@ export function NoteMessageScreen() {
                           className="text-right"
                         >
                           {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
+                            ? formatTimeToUserLocalTime(
+                                message.createdOn,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                       </View>
@@ -464,7 +475,11 @@ export function NoteMessageScreen() {
                           className="text-right"
                         >
                           {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
+                            ? formatTimeToUserLocalTime(
+                                message.createdOn,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                       </View>

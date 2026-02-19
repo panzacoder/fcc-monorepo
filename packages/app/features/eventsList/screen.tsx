@@ -23,6 +23,7 @@ import {
   getMonthsList,
   convertUserTimeToUTC
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -48,6 +49,12 @@ export function EventsListScreen() {
   const [eventsList, setEventsList] = useState([]) as any
   const [eventsListFull, setEventsListFull] = useState([]) as any
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const staticData: any = store.getState().staticDataState.staticData
   const item = useLocalSearchParams<any>()
   let memberData =
@@ -164,7 +171,9 @@ export function EventsListScreen() {
         if (
           moment(data.date)
             .utc()
-            .isBefore(convertUserTimeToUTC(moment().utc())) &&
+            .isBefore(
+              convertUserTimeToUTC(moment().utc(), userAddress, memberAddress)
+            ) &&
           String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase()
         ) {
@@ -404,7 +413,13 @@ export function EventsListScreen() {
                   <View>
                     <View className="my-2 flex-row">
                       <Typography className="font-400 ml-5 w-[75%] text-black">
-                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                        {data.date
+                          ? formatTimeToUserLocalTime(
+                              data.date,
+                              userAddress,
+                              memberAddress
+                            )
+                          : ''}
                       </Typography>
                       <View className="">
                         <Typography className="font-bold text-black">

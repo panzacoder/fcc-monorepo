@@ -11,6 +11,7 @@ import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import * as Clipboard from 'expo-clipboard'
 import {
   BASE_URL,
@@ -31,6 +32,12 @@ export function FacilityDetailsScreen() {
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
@@ -415,7 +422,11 @@ export function FacilityDetailsScreen() {
                       <View className=" flex-row">
                         <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
                           {data.date
-                            ? formatTimeToUserLocalTime(data.date)
+                            ? formatTimeToUserLocalTime(
+                                data.date,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                         <View className="">

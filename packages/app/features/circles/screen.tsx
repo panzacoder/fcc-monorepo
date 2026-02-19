@@ -10,6 +10,7 @@ import store from 'app/redux/store'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -43,6 +44,12 @@ export function CirclesListScreen() {
   const router = useRouter()
   let memberNamesList: any = store.getState().memberNames.memberNamesList
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const [isLoading, setLoading] = useState(false)
   const [isShowSharedContacts, setIsShowSharedContacts] = useState(false)
   const [isShowNewCircles, setIsShowNewCircles] = useState(false)
@@ -337,7 +344,7 @@ export function CirclesListScreen() {
                   </Typography>
                   <Typography>{' on '}</Typography>
                   <Typography className="text-primary font-bold">
-                    {`${data.date ? convertTimeToUserLocalTime(data.date) : ''}`}
+                    {`${data.date ? convertTimeToUserLocalTime(data.date, userAddress, memberAddress) : ''}`}
                   </Typography>
                 </Typography>
                 <View className="my-2 flex-row justify-center">

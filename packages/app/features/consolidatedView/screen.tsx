@@ -22,6 +22,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
 import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import {
   CalendarView,
   CalendarViewInput
@@ -48,6 +49,12 @@ let currentDate = getFullDateForCalendar(new Date(), 'DD MMM YYYY') as any
 export function ConsolidatedViewScreen() {
   const router = useRouter()
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const userDetails = store.getState().userProfileState.header
   let memberData = {
     member: userDetails.memberId ? userDetails.memberId : ''
@@ -402,7 +409,9 @@ export function ConsolidatedViewScreen() {
         </View>
         <View className=" flex-row">
           <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm text-black">
-            {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+            {data.date
+              ? formatTimeToUserLocalTime(data.date, userAddress, memberAddress)
+              : ''}
           </Typography>
           <View className="">
             <Typography className="text-sm text-black">

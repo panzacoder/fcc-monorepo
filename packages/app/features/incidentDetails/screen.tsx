@@ -37,6 +37,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 
 let incidentPrivileges = {}
 let notePrivileges = {}
@@ -52,6 +53,12 @@ export function IncidentDetailsScreen() {
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
@@ -141,7 +148,11 @@ export function IncidentDetailsScreen() {
   let incidentAddress = {}
   if (!_.isEmpty(incidentDetails)) {
     if (incidentDetails.date) {
-      incidentDate = formatTimeToUserLocalTime(incidentDetails.date)
+      incidentDate = formatTimeToUserLocalTime(
+        incidentDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (incidentDetails.title) {
       incident = incidentDetails.title

@@ -11,6 +11,7 @@ import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 
 import testIDs from '../../utils/testIDs'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 
 const today = new Date().toISOString().split('T')[0]
 export const ExpandableCalendarView = ({
@@ -19,6 +20,12 @@ export const ExpandableCalendarView = ({
   handleChange
 }) => {
   const router = useRouter()
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const [isLoading, setLoading] = useState(false)
   const [markedObject, setMarkedObject] = useState({})
   // console.log('data.data.calenderItemList', JSON.stringify(calenderEvents))
@@ -169,7 +176,7 @@ export const ExpandableCalendarView = ({
             </Typography>
             <Typography className="">
               {data.date
-                ? `${getFullDateForCalendar(data.date, 'hh:mm A')} ${getOnlyUserTimeZone()}`
+                ? `${getFullDateForCalendar(data.date, 'hh:mm A')} ${getOnlyUserTimeZone(userAddress, memberAddress)}`
                 : ''}
             </Typography>
           </View>

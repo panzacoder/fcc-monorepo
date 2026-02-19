@@ -40,6 +40,7 @@ import {
   formatTimeToUserLocalTime,
   convertPhoneNumberToUsaPhoneNumberFormat
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
@@ -58,6 +59,12 @@ let notePrivileges = {}
 let transportationPrivileges = {}
 export function AppointmentDetailsScreen() {
   const header = store.getState().headerState.header
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
@@ -234,7 +241,11 @@ export function AppointmentDetailsScreen() {
   let doctorFacilityAddress = {} as any
   if (!_.isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
-      apptDate = formatTimeToUserLocalTime(appointmentDetails.date)
+      apptDate = formatTimeToUserLocalTime(
+        appointmentDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (appointmentDetails.status && appointmentDetails.status.status) {
       status = appointmentDetails.status.status
