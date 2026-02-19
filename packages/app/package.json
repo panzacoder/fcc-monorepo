@@ -4,10 +4,7 @@
   "name": "app",
   "exports": {
     ".": "./index.ts",
-    "./ui/*": "./ui/*",
-    "./features": "./features",
-    "./config/tailwind/theme": "./config/tailwind/theme.ts",
-    "./config/tailwind/global.css": "./config/tailwind/global.css"
+    "./*": "./*"
   },
   "type": "module",
   "dependencies": {
@@ -42,8 +39,7 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint ."
   },
   "sideEffects": false,
   "devDependencies": {

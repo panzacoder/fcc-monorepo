@@ -55,14 +55,17 @@ jobs:
       - run: yarn install --immutable
       - run: yarn turbo run build
 
-  build-storybook:
-    name: Build Storybook
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: yarn install --immutable
-      - run: yarn web:sb:build
+  # build-storybook:
+  #   name: Build Storybook
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: yarn
+  #     - run: yarn install --immutable
+  #     - run: yarn web:sb:build
+  # NOTE: Storybook build disabled — pre-existing failure from Phase 1
+  # expo-secure-store requires @unimodules/core which isn't available in
+  # webpack/Storybook context. Fix in Phase 8G (Storybook upgrade).

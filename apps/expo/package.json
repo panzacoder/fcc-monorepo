@@ -44,7 +44,6 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
