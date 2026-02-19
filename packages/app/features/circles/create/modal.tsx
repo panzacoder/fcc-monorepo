@@ -47,7 +47,7 @@ export function CreateCircle() {
       }
     }
 
-    const res = await createCircle(circleRequestProps)
+    const res = await createCircle(header, circleRequestProps)
     if (res) {
       router.replace('/circles')
     }

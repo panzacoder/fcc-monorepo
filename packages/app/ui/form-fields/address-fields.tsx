@@ -6,6 +6,7 @@ import { State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
 import { useFormContext } from 'react-hook-form'
+import { useAppSelector } from 'app/redux/hooks'
 import { DropdownItem } from '../PtsDropdown'
 import { ControlledTextField } from './controlled-field'
 import * as z from 'zod'
@@ -42,6 +43,7 @@ export function AddressFields({
   className,
   onSubmitEditing
 }: AddressFieldsProps) {
+  const header = useAppSelector((state) => state.headerState.header)
   const countries = useCountries()
   const [states, setStates] = useState<State[]>([])
   const [timezones, setTimezones] = useState<Timezone[]>([])
@@ -51,7 +53,7 @@ export function AddressFields({
       if (!item) return
       const itemId = parseInt(`${item.id}`)
 
-      getStateAndTimezoneData({ id: itemId }).then(
+      getStateAndTimezoneData(header, { id: itemId }).then(
         (statesAndTimezoneForCountry) => {
           if (statesAndTimezoneForCountry) {
             setStates(statesAndTimezoneForCountry.stateList)
@@ -60,7 +62,7 @@ export function AddressFields({
         }
       )
     },
-    [setStates, setTimezones]
+    [header, setStates, setTimezones]
   )
 
   const { setFocus } = useFormContext()

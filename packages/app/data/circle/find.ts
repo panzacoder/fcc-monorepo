@@ -10,14 +10,19 @@ export type FindCircleProps = {
 
 export type FindCircleReturnType = Member | null
 
-export async function findCircle({ email, phone }: FindCircleProps) {
+export async function findCircle(
+  header: any,
+  { email, phone }: FindCircleProps
+) {
   if (email) {
     return await fetchData<FindCircleReturnType>({
+      header,
       route: FIND_CIRCLE,
       data: { member: { email } }
     })
   } else if (phone) {
     return await fetchData<FindCircleReturnType>({
+      header,
       route: FIND_CIRCLE,
       data: { member: { phone } }
     })

@@ -13,13 +13,17 @@ export type StateAndTimezoneProps = {
   id: Country['id']
 }
 
-export async function getStateAndTimezoneData({ id }: StateAndTimezoneProps) {
+export async function getStateAndTimezoneData(
+  header: any,
+  { id }: StateAndTimezoneProps
+) {
   if (!id) {
     logger.debug('Country id is missing')
     return
   }
 
   return await fetchData<StateAndTimezoneData>({
+    header,
     route: GET_STATES_AND_TIMEZONES,
     data: { country: { id } }
   })
