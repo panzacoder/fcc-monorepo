@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -23,35 +23,9 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
-import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { logger } from 'app/utils/logger'
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   firstName: z.string(),
   website: z.string(),
@@ -64,14 +38,41 @@ const phoneSchema = z.object({
   phone: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let isDoctorActive = true
-
 export function AddEditDoctorScreen() {
+  const selectedAddressRef = useRef<any>({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
+  const isDoctorActiveRef = useRef(true)
   let doctorPhone = ''
   const router = useRouter()
-  const staticData = store.getState().staticDataState.staticData as any
+  const staticData = useAppSelector(
+    (state) => state.staticDataState.staticData
+  ) as any
   // console.log('header', JSON.stringify(header))
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
@@ -81,7 +82,7 @@ export function AddEditDoctorScreen() {
       doctorDetails.status &&
       doctorDetails.status.status.toLowerCase() === 'inactive'
     ) {
-      isDoctorActive = false
+      isDoctorActiveRef.current = false
     }
     if (doctorDetails.phone) {
       doctorPhone = doctorDetails.phone
@@ -111,42 +112,44 @@ export function AddEditDoctorScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddressRef.current.nickName = value
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddressRef.current.shortDescription = value
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddressRef.current.address.line = value
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddressRef.current.address.city = value
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = value
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
-        selectedAddress.address.state.country.description = value.description
+        selectedAddressRef.current.address.state.country.id = value.id
+        selectedAddressRef.current.address.state.country.name = value.name
+        selectedAddressRef.current.address.state.country.code = value.code
+        selectedAddressRef.current.address.state.country.namecode =
+          value.namecode
+        selectedAddressRef.current.address.state.country.snum = value.snum
+        selectedAddressRef.current.address.state.country.description =
+          value.description
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        selectedAddressRef.current.address.state.id = value.id
+        selectedAddressRef.current.address.state.name = value.name
+        selectedAddressRef.current.address.state.code = value.code
+        selectedAddressRef.current.address.state.namecode = value.namecode
+        selectedAddressRef.current.address.state.snum = value.snum
+        selectedAddressRef.current.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        selectedAddressRef.current = value
       }
     }
 
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
+    // console.log('selectedAddressRef.current', JSON.stringify(selectedAddressRef.current))
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -178,7 +181,9 @@ export function AddEditDoctorScreen() {
     resolver: zodResolver(phoneSchema)
   })
   const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(isDoctorActive ? true : false)
+  const [isActive, setIsActive] = useState(
+    isDoctorActiveRef.current ? true : false
+  )
 
   type SpecializationResponse = {
     id: number
@@ -203,8 +208,8 @@ export function AddEditDoctorScreen() {
         websiteuser: formData.username,
         specialist: findSpecializationFromId(formData.specialization),
         status: {
-          status: isDoctorActive === true ? 'Active' : 'InActive',
-          id: isDoctorActive === true ? 1 : 2
+          status: isDoctorActiveRef.current === true ? 'Active' : 'InActive',
+          id: isDoctorActiveRef.current === true ? 1 : 2
         }
       }
     }
@@ -235,8 +240,8 @@ export function AddEditDoctorScreen() {
   async function createDoctor(formData: Schema) {
     setLoading(true)
     let locationList: object[] = []
-    selectedAddress.address.id = ''
-    locationList.push(selectedAddress)
+    selectedAddressRef.current.address.id = ''
+    locationList.push(selectedAddressRef.current)
     let url = `${BASE_URL}${CREATE_DOCTOR}`
     let dataObject = {
       header: header,
@@ -320,12 +325,15 @@ export function AddEditDoctorScreen() {
                     onToggle={(isOn) => {
                       if (isOn) {
                         setIsActive(true)
-                        isDoctorActive = true
+                        isDoctorActiveRef.current = true
                       } else {
                         setIsActive(false)
-                        isDoctorActive = false
+                        isDoctorActiveRef.current = false
                       }
-                      logger.debug('isDoctorActive', '' + isDoctorActive)
+                      logger.debug(
+                        'isDoctorActiveRef.current',
+                        '' + isDoctorActiveRef.current
+                      )
                     }}
                   />
                   <Typography className="font-400 ml-2 self-center">
