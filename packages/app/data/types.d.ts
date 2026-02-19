@@ -239,3 +239,6 @@ export type Member = {
   memberId: number
   memberWithoutEmail: boolean
 }
+
+export type PrivilegeAction = '*' | 'Create' | 'Read' | 'Update' | 'Delete'
+export type DomainPrivileges = Record<string, PrivilegeAction[]>

@@ -7,11 +7,13 @@ import { BASE_URL } from 'app/utils/urlConstants'
 import { Alert } from 'react-native'
 import { logger } from 'app/utils/logger'
 
+export type AuthHeader = any
+
 type fetchDataProps<DataType> = {
-  header: any
+  header: AuthHeader
   route: string
   data?: any
-  onFailure?: (response: CallPostServiceResponse<DataType>) => void // if not provided, will show alert with response message
+  onFailure?: (response: CallPostServiceResponse<DataType>) => void
 }
 
 export async function fetchData<DataType>({
