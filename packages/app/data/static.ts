@@ -1,6 +1,6 @@
 import { fetchData } from './base'
 import { GET_STATIC_DATA } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
+import type { AppDispatch } from 'app/redux/store'
 import staticDataAction from 'app/redux/staticData/staticAction'
 import {
   AccompanyType,
@@ -53,10 +53,13 @@ export interface StaticData {
   purchaseOccuranceList: PurchaseOccurance[]
   countryList: Country[]
 }
-export async function fetchStaticData() {
-  const staticData = await fetchData<StaticData>({ route: GET_STATIC_DATA })
+export async function fetchStaticData(header: any, dispatch: AppDispatch) {
+  const staticData = await fetchData<StaticData>({
+    header,
+    route: GET_STATIC_DATA
+  })
   if (staticData) {
-    store.dispatch(staticDataAction.setStaticData(staticData))
+    dispatch(staticDataAction.setStaticData(staticData))
   }
 
   return staticData
