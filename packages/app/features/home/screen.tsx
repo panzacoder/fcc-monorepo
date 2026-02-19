@@ -12,11 +12,10 @@ import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -60,13 +59,15 @@ export function HomeScreen() {
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  let memberNamesList: any =
-    store.getState().memberNames.memberNamesList !== undefined
-      ? store.getState().memberNames.memberNamesList
+  const dispatch = useAppDispatch()
+  const memberNamesList: any = useAppSelector((state) =>
+    state.memberNames.memberNamesList !== undefined
+      ? state.memberNames.memberNamesList
       : []
+  )
   const router = useRouter()
-  const header = store.getState().headerState.header
-  const user = store.getState().userProfileState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const user = useAppSelector((state) => state.userProfileState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -78,7 +79,7 @@ export function HomeScreen() {
   if (memberNamesList.includes(fullName) === false) {
     memberNamesList.push(fullName)
   }
-  store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
+  dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isLoading, setLoading] = useState(false)
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
@@ -122,7 +123,7 @@ export function HomeScreen() {
               memberNamesList.push(fullName)
             }
           })
-          store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
+          dispatch(memberNamesAction.setMemberNames(memberNamesList))
           let sentence = ''
           sentence +=
             data.data.upcomingAppointmentCount &&
