@@ -7,7 +7,7 @@ import { getAddressFromObject, googleMapOpenUrl } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { Image } from 'app/ui/image'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -19,7 +19,7 @@ import { logger } from 'app/utils/logger'
 export function Location(data: any) {
   // export const Location = ({ data }) => {
   const router = useRouter()
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const [isLoading, setLoading] = useState(false)
   let locationData = data.data ? data.data : {}
   let memberData = locationData.memberData ? locationData.memberData : {}

@@ -15,7 +15,6 @@ import {
   DELETE_TRANSPORTATION_REMINDER_EVENT
 } from 'app/utils/urlConstants'
 import { convertTimeToUserLocalTime, getAddressFromObject } from 'app/ui/utils'
-import store from 'app/redux/store'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -34,7 +33,7 @@ export const Transportation = ({
   const [transportationData, setTransportationData] = useState(data ? data : {})
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
