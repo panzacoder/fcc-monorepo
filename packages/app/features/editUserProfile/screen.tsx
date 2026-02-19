@@ -6,7 +6,6 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
-import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { Button } from 'app/ui/button'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
@@ -28,6 +27,7 @@ import {
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 const phoneSchema = z.object({
   phone: z.string()
 })
@@ -38,11 +38,12 @@ const profileSchema = z.object({
 })
 export type ProfileSchema = z.infer<typeof profileSchema>
 export function EditUserProfileScreen() {
+  const dispatch = useAppDispatch()
   let userPhone = ''
-  const user = store.getState().userProfileState.header
+  const user = useAppSelector((state) => state.userProfileState.header)
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
@@ -102,7 +103,7 @@ export function EditUserProfileScreen() {
           let fullName = data.data.firstName ? data.data.firstName : ''
           fullName += data.data.lastName ? ' ' + data.data.lastName : ''
           user.memberName = fullName
-          store.dispatch(userProfileAction.setUserProfile(user))
+          dispatch(userProfileAction.setUserProfile(user))
           router.dismiss(2)
           if (item.component === 'Profile') {
             router.push('/profile')

@@ -3,14 +3,25 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import { Timer } from 'app/utils/timer'
+import { useAppSelector } from 'app/redux/hooks'
 
 export const Reminder = ({ data, editReminder, deleteReminder }) => {
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   let reminderData = data ? data : {}
   let creationDate = reminderData.createdOn
-    ? convertTimeToUserLocalTime(reminderData.createdOn)
+    ? convertTimeToUserLocalTime(
+        reminderData.createdOn,
+        userAddress,
+        memberAddress
+      )
     : ''
   let reminderDate = reminderData.date
-    ? convertTimeToUserLocalTime(reminderData.date)
+    ? convertTimeToUserLocalTime(reminderData.date, userAddress, memberAddress)
     : ''
   return (
     <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#e09093] bg-[#fbe2e3] py-2">
@@ -64,7 +75,13 @@ export const Reminder = ({ data, editReminder, deleteReminder }) => {
           {reminderDate}
         </Typography>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Timer startDate={convertUserTimeToUTC(reminderData.date)} />
+          <Timer
+            startDate={convertUserTimeToUTC(
+              reminderData.date,
+              userAddress,
+              memberAddress
+            )}
+          />
         </View>
       </View>
       <View className="mt-2 h-[1px] w-full bg-[#86939e]" />

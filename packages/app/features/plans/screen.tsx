@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getMonthsListOnly } from 'app/ui/utils'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -29,6 +28,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'app/ui/button'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   planIndex: z.number()
 })
@@ -41,8 +41,8 @@ const cardSchema = z.object({
 })
 export type CardSchema = z.infer<typeof cardSchema>
 const monthsList = getMonthsListOnly() as any
-let cardNumberWithoutDash = ''
 export function PlansScreen() {
+  const cardNumberWithoutDashRef = useRef('')
   const [isLoading, setLoading] = useState(false)
   const [selectedPlanId, setSelectedPlanId] = useState(-1)
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(1)
@@ -52,10 +52,10 @@ export function PlansScreen() {
   const [plansList, setPlansList] = useState([]) as any
   const [planNames, setPlanNames] = useState([]) as any
   const [cardDetails, setCardDetails] = useState([]) as any
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
-  const userDetails = store.getState().userProfileState.header
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
   let isRenewPlan =
     item.isRenewPlan && item.isRenewPlan === 'true' ? true : false
   let isFromUpgradePlan =
@@ -261,7 +261,7 @@ export function PlansScreen() {
       header: header,
       email: userDetails.email ? userDetails.email : '',
       card: {
-        number: cardNumberWithoutDash,
+        number: cardNumberWithoutDashRef.current,
         exp_month:
           formData.monthIndex < 10
             ? '0' + formData.monthIndex
@@ -546,7 +546,7 @@ export function PlansScreen() {
                   cardNum += value
                 }
               })
-              cardNumberWithoutDash = cardNum
+              cardNumberWithoutDashRef.current = cardNum
               cardNumber = cardNum
               // console.log('cardNumber hyphens', cardNumber)
               if (cardNumber.length > 0) {

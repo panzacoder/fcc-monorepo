@@ -3,6 +3,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 export const Note = ({
   component,
   data,
@@ -11,9 +12,15 @@ export const Note = ({
   messageThreadClicked,
   notePrivileges
 }) => {
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   let noteData = data ? data : {}
   let creationDate = noteData.createdOn
-    ? convertTimeToUserLocalTime(noteData.createdOn)
+    ? convertTimeToUserLocalTime(noteData.createdOn, userAddress, memberAddress)
     : ''
   // console.log('noteData', JSON.stringify(data))
   async function callDeletNote() {

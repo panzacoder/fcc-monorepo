@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledCheckbox } from 'app/ui/form-fields/controlled-checkbox'
 import { findCircle } from 'app/data/circle/find'
+import { useAppSelector } from 'app/redux/hooks'
 
 const emailCheckSchema = z.object({
   email: z.string().email()
@@ -23,6 +24,7 @@ const emailCheckSchema = z.object({
 export type CheckCircleSchema = z.infer<typeof emailCheckSchema>
 
 export function CircleEmailSection() {
+  const header = useAppSelector((state) => state.headerState.header)
   const [firstName, lastName] = useWatch({
     name: ['firstName', 'lastName']
   })
@@ -40,7 +42,7 @@ export function CircleEmailSection() {
   const checkEmailFormSubmit: SubmitHandler<CheckCircleSchema> = async (
     formFields
   ) => {
-    const circle = await findCircle(formFields)
+    const circle = await findCircle(header, formFields)
     if (circle) {
       setValue('circleExists', circle)
     }

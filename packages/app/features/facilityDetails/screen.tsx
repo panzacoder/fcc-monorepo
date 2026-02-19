@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import * as Clipboard from 'expo-clipboard'
 import {
   BASE_URL,
@@ -25,12 +25,18 @@ import { logger } from 'app/utils/logger'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-let facilityPrivileges = {}
 export function FacilityDetailsScreen() {
+  const facilityPrivilegesRef = useRef<any>({})
   const [facilityDetails, setFacilityDetails] = useState<any>({})
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
@@ -66,7 +72,8 @@ export function FacilityDetailsScreen() {
         .then(async (data: any) => {
           if (data.status === 'SUCCESS') {
             if (data.data.domainObjectPrivileges) {
-              facilityPrivileges = data.data.domainObjectPrivileges.Facility
+              facilityPrivilegesRef.current = data.data.domainObjectPrivileges
+                .Facility
                 ? data.data.domainObjectPrivileges.Facility
                 : {}
             }
@@ -415,7 +422,11 @@ export function FacilityDetailsScreen() {
                       <View className=" flex-row">
                         <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
                           {data.date
-                            ? formatTimeToUserLocalTime(data.date)
+                            ? formatTimeToUserLocalTime(
+                                data.date,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                         <View className="">
@@ -524,7 +535,7 @@ export function FacilityDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(facilityPrivileges).deletePermission ? (
+          {getUserPermission(facilityPrivilegesRef.current).deletePermission ? (
             <View className="mx-5 my-5 flex-row self-center">
               <Button
                 className="w-[50%]"

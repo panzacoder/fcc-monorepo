@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -28,35 +28,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
-import store from 'app/redux/store'
 import { logger } from 'app/utils/logger'
-let selectedType = ''
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
-      id: '',
-      country: {
-        name: '',
-        code: '',
-        namecode: '',
-        isoCode: '',
-        description: '',
-        id: ''
-      }
-    }
-  }
-}
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   website: z.string(),
   username: z.string(),
@@ -68,14 +41,43 @@ const phoneSchema = z.object({
   locationPhone: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let isThisPharmacy = false
-let isFacilityActive = true
-let locationPhone = ''
 export function AddEditFacilityScreen() {
+  const selectedTypeRef = useRef('')
+  const selectedAddressRef = useRef<any>({
+    shortDescription: '',
+    nickName: '',
+    address: {
+      id: '',
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
+        name: '',
+        code: '',
+        namecode: '',
+        description: '',
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
+      }
+    }
+  })
+  const isThisPharmacyRef = useRef(false)
+  const isFacilityActiveRef = useRef(true)
+  const locationPhoneRef = useRef('')
   const router = useRouter()
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   // console.log('header', JSON.stringify(header))
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let facilityDetails = item.facilityDetails
@@ -84,17 +86,19 @@ export function AddEditFacilityScreen() {
   // console.log('facilityDetails', JSON.stringify(facilityDetails))
   if (!_.isEmpty(facilityDetails)) {
     if (facilityDetails.type) {
-      selectedType = facilityDetails.type
+      selectedTypeRef.current = facilityDetails.type
     }
     if (
       facilityDetails.status &&
       facilityDetails.status.status.toLowerCase() === 'inactive'
     ) {
-      isFacilityActive = false
+      isFacilityActiveRef.current = false
     }
   }
   const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(isFacilityActive ? true : false)
+  const [isActive, setIsActive] = useState(
+    isFacilityActiveRef.current ? true : false
+  )
   const [isPharmacy, setIsPharmacy] = useState(false)
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
     return {
@@ -131,7 +135,7 @@ export function AddEditFacilityScreen() {
     resolver: zodResolver(phoneSchema)
   })
   async function updateFacility(formData: Schema) {
-    if (selectedType === '') {
+    if (selectedTypeRef.current === '') {
       Alert.alert('', 'Select Type')
       return
     }
@@ -145,14 +149,14 @@ export function AddEditFacilityScreen() {
           id: memberData.member
         },
         name: formData.facilityName,
-        ispharmacy: isThisPharmacy,
+        ispharmacy: isThisPharmacyRef.current,
         description: formData.description,
         website: formData.website,
         websiteuser: formData.username,
-        type: selectedType,
+        type: selectedTypeRef.current,
         status: {
-          status: isFacilityActive === true ? 'Active' : 'Inactive',
-          id: isFacilityActive === true ? 1 : 2
+          status: isFacilityActiveRef.current === true ? 'Active' : 'Inactive',
+          id: isFacilityActiveRef.current === true ? 1 : 2
         }
       }
     }
@@ -178,17 +182,19 @@ export function AddEditFacilityScreen() {
       })
   }
   async function createFacility(formData: Schema) {
-    if (selectedType === '') {
+    if (selectedTypeRef.current === '') {
       Alert.alert('', 'Select Type')
       return
     }
     setLoading(true)
     let locationList: object[] = []
-    selectedAddress.fax = formData.fax
-    selectedAddress.website = formData.website
-    selectedAddress.phone = removeAllSpecialCharFromString(locationPhone)
-    selectedAddress.address.id = ''
-    locationList.push(selectedAddress)
+    selectedAddressRef.current.fax = formData.fax
+    selectedAddressRef.current.website = formData.website
+    selectedAddressRef.current.phone = removeAllSpecialCharFromString(
+      locationPhoneRef.current
+    )
+    selectedAddressRef.current.address.id = ''
+    locationList.push(selectedAddressRef.current)
     let url = `${BASE_URL}${CREATE_FACILITY}`
     let dataObject = {
       header: header,
@@ -197,11 +203,11 @@ export function AddEditFacilityScreen() {
           id: memberData.member
         },
         name: formData.facilityName,
-        ispharmacy: isThisPharmacy,
+        ispharmacy: isThisPharmacyRef.current,
         description: formData.description,
         website: formData.website,
         websiteuser: formData.username,
-        type: selectedType,
+        type: selectedTypeRef.current,
         facilityLocationList: locationList
       }
     }
@@ -238,48 +244,50 @@ export function AddEditFacilityScreen() {
       })
   }
   const onSelectionType = (data: any) => {
-    selectedType = data
+    selectedTypeRef.current = data
     // console.log('purpose1', purpose)
   }
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddressRef.current.nickName = value
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddressRef.current.shortDescription = value
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddressRef.current.address.line = value
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddressRef.current.address.city = value
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = value
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
-        selectedAddress.address.state.country.description = value.description
+        selectedAddressRef.current.address.state.country.id = value.id
+        selectedAddressRef.current.address.state.country.name = value.name
+        selectedAddressRef.current.address.state.country.code = value.code
+        selectedAddressRef.current.address.state.country.namecode =
+          value.namecode
+        selectedAddressRef.current.address.state.country.snum = value.snum
+        selectedAddressRef.current.address.state.country.description =
+          value.description
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        selectedAddressRef.current.address.state.id = value.id
+        selectedAddressRef.current.address.state.name = value.name
+        selectedAddressRef.current.address.state.code = value.code
+        selectedAddressRef.current.address.state.namecode = value.namecode
+        selectedAddressRef.current.address.state.snum = value.snum
+        selectedAddressRef.current.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        selectedAddressRef.current = value
       }
     }
 
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
+    // console.log('selectedAddressRef.current', JSON.stringify(selectedAddressRef.current))
   }
   return (
     <View className="flex-1">
@@ -304,10 +312,10 @@ export function AddEditFacilityScreen() {
                     onToggle={(isOn) => {
                       if (isOn) {
                         setIsActive(true)
-                        isFacilityActive = true
+                        isFacilityActiveRef.current = true
                       } else {
                         setIsActive(false)
-                        isFacilityActive = false
+                        isFacilityActiveRef.current = false
                       }
                     }}
                   />
@@ -327,7 +335,7 @@ export function AddEditFacilityScreen() {
                 </View>
                 <View className="mt-2">
                   <PtsComboBox
-                    currentData={selectedType}
+                    currentData={selectedTypeRef.current}
                     listData={typesList}
                     onSelection={onSelectionType}
                     placeholderValue={'Type*'}
@@ -375,7 +383,7 @@ export function AddEditFacilityScreen() {
                     offColor="#ffcccb"
                     size="medium"
                     onToggle={(isOn) => {
-                      isThisPharmacy = !isThisPharmacy
+                      isThisPharmacyRef.current = !isThisPharmacyRef.current
                       setIsPharmacy(!isPharmacy)
                     }}
                   />
@@ -406,10 +414,10 @@ export function AddEditFacilityScreen() {
                       className="mt-[-5] w-full"
                       keyboard="number-pad"
                       onChangeText={(value) => {
-                        locationPhone =
+                        locationPhoneRef.current =
                           convertPhoneNumberToUsaPhoneNumberFormat(value)
                         reset1({
-                          locationPhone: locationPhone
+                          locationPhone: locationPhoneRef.current
                         })
                       }}
                     />

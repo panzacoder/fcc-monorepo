@@ -1,9 +1,8 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Alert, View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -28,13 +27,14 @@ import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { CheckBox } from 'react-native-elements'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   prescriberIndex: z.number().min(0, { message: 'Type is required' }),
   description: z.string().min(1, { message: 'Required' })
 })
 export type Schema = z.infer<typeof schema>
-let doctorList: Array<{ id: number; title: string }> = []
 export function AddEditMedicalDeviceScreen() {
+  const doctorListRef = useRef<Array<{ id: number; title: string }>>([])
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData =
@@ -62,8 +62,10 @@ export function AddEditMedicalDeviceScreen() {
       ? medicalDeviceDetails.isPrescribedBy
       : false
   )
-  const staticData: any = store.getState().staticDataState.staticData
-  const header = store.getState().headerState.header
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
+  const header = useAppSelector((state) => state.headerState.header)
   useEffect(() => {
     let url = `${BASE_URL}${GET_MEMBER_DOCTORS}`
     let dataObject = {
@@ -78,7 +80,7 @@ export function AddEditMedicalDeviceScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           let list = data.data.list ? data.data.list : []
-          doctorList = list.map((data: any, index: any) => {
+          doctorListRef.current = list.map((data: any, index: any) => {
             if (!_.isEmpty(medicalDeviceDetails)) {
               if (
                 medicalDeviceDetails.doctor &&
@@ -259,7 +261,7 @@ export function AddEditMedicalDeviceScreen() {
                   name="prescriberIndex"
                   label="Prescribed By*"
                   maxHeight={300}
-                  list={doctorList}
+                  list={doctorListRef.current}
                   className="w-[95%] self-center"
                   defaultValue={
                     !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''

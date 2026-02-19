@@ -16,7 +16,7 @@ import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscr
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
-import store from 'app/redux/store'
+import { useAppDispatch } from 'app/redux/hooks'
 import { useRouter } from 'expo-router'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
@@ -37,6 +37,7 @@ type Schema = z.infer<typeof schema>
 
 export function LoginScreen() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [isLoading, setLoading] = useState(false)
 
   const { control, handleSubmit } = useForm({
@@ -70,24 +71,24 @@ export function LoginScreen() {
             expiringSubscription: data.data.expiringSubscription
           }
           data.data.header.timezone = moment.tz.guess()
-          store.dispatch(headerAction.setHeader(data.data.header))
-          store.dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
-          store.dispatch(
+          dispatch(headerAction.setHeader(data.data.header))
+          dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
+          dispatch(
             subscriptionAction.setSubscription(data.data.userSubscription)
           )
-          store.dispatch(
+          dispatch(
             userSubscriptionAction.setSubscriptionDetails(
               subscriptionDetailsobject
             )
           )
-          store.dispatch(
+          dispatch(
             sponsorAction.setSponsor({
               sponsorDetails: data.data.sponsorUser,
               sponsorShipDetails: data.data.sponsorship
             })
           )
           if (data.data.commercialsDetails) {
-            store.dispatch(
+            dispatch(
               paidAdAction.setPaidAd({
                 commercialsDetails: data.data.commercialsDetails.commercials,
                 commercialPageMappings:

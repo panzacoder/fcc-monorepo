@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View,
   Alert,
@@ -15,8 +15,8 @@ import {
   formatTimeToUserLocalTime,
   convertPhoneNumberToUsaPhoneNumberFormat
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { Feather } from 'app/ui/icons'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -33,9 +33,15 @@ import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import * as Clipboard from 'expo-clipboard'
-let doctorPrivileges = {}
 export function DoctorDetailsScreen() {
-  const header = store.getState().headerState.header
+  const doctorPrivilegesRef = useRef<any>({})
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
@@ -62,7 +68,8 @@ export function DoctorDetailsScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            doctorPrivileges = data.data.domainObjectPrivileges.Doctor
+            doctorPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Doctor
               ? data.data.domainObjectPrivileges.Doctor
               : {}
           }
@@ -439,7 +446,11 @@ export function DoctorDetailsScreen() {
                       <View className=" flex-row">
                         <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
                           {data.date
-                            ? formatTimeToUserLocalTime(data.date)
+                            ? formatTimeToUserLocalTime(
+                                data.date,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                         <View className="">
@@ -548,7 +559,7 @@ export function DoctorDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(doctorPrivileges).deletePermission ? (
+          {getUserPermission(doctorPrivilegesRef.current).deletePermission ? (
             <View className="mx-5 my-5 flex-row self-center">
               <Button
                 className="w-[50%]"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -21,13 +20,14 @@ import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 
-let prescriptionPrivileges = {}
 export function PrescriptionDetailsScreen() {
+  const prescriptionPrivilegesRef = useRef<any>({})
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
@@ -55,7 +55,8 @@ export function PrescriptionDetailsScreen() {
         if (data.status === 'SUCCESS') {
           // console.log('data', JSON.stringify(data.data))
           if (data.data.domainObjectPrivileges) {
-            prescriptionPrivileges = data.data.domainObjectPrivileges.Medicine
+            prescriptionPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Medicine
               ? data.data.domainObjectPrivileges.Medicine
               : {}
           }
@@ -213,7 +214,8 @@ export function PrescriptionDetailsScreen() {
             <View className="w-full">
               <View className="flex-row">
                 <View className="w-[75%]" />
-                {getUserPermission(prescriptionPrivileges).updatePermission ? (
+                {getUserPermission(prescriptionPrivilegesRef.current)
+                  .updatePermission ? (
                   <Button
                     className=""
                     title="Edit"
@@ -248,7 +250,8 @@ export function PrescriptionDetailsScreen() {
             </View>
           </View>
 
-          {getUserPermission(prescriptionPrivileges).deletePermission ? (
+          {getUserPermission(prescriptionPrivilegesRef.current)
+            .deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""

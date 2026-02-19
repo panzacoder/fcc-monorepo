@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,7 +10,6 @@ import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import moment from 'moment'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -43,11 +42,12 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useAppSelector } from 'app/redux/hooks'
 
-let eventPrivileges = {}
-let notePrivileges = {}
-let transportationPrivileges = {}
 export function EventDetailsScreen() {
+  const eventPrivilegesRef = useRef<any>({})
+  const notePrivilegesRef = useRef<any>({})
+  const transportationPrivilegesRef = useRef<any>({})
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -67,7 +67,13 @@ export function EventDetailsScreen() {
   const [reminderData, setReminderData] = useState({})
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
@@ -96,16 +102,18 @@ export function EventDetailsScreen() {
           if (data.status === 'SUCCESS') {
             logger.debug('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
-              eventPrivileges = data.data.domainObjectPrivileges.Event
+              eventPrivilegesRef.current = data.data.domainObjectPrivileges
+                .Event
                 ? data.data.domainObjectPrivileges.Event
                 : {}
-              notePrivileges = data.data.domainObjectPrivileges.EVENTNOTE
+              notePrivilegesRef.current = data.data.domainObjectPrivileges
+                .EVENTNOTE
                 ? data.data.domainObjectPrivileges.EVENTNOTE
                 : data.data.domainObjectPrivileges.EventNote
                   ? data.data.domainObjectPrivileges.EventNote
                   : {}
-              transportationPrivileges = data.data.domainObjectPrivileges
-                .EVENTTRANSPORTATION
+              transportationPrivilegesRef.current = data.data
+                .domainObjectPrivileges.EVENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
                 : data.data.domainObjectPrivileges.EventTransportation
                   ? data.data.domainObjectPrivileges.EventTransportation
@@ -175,7 +183,11 @@ export function EventDetailsScreen() {
   let eventAddress = {}
   if (!_.isEmpty(eventDetails)) {
     if (eventDetails.date) {
-      eventDate = formatTimeToUserLocalTime(eventDetails.date)
+      eventDate = formatTimeToUserLocalTime(
+        eventDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (eventDetails.title) {
       event = eventDetails.title
@@ -594,7 +606,8 @@ export function EventDetailsScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(eventPrivileges).createPermission ? (
+              {getUserPermission(eventPrivilegesRef.current)
+                .createPermission ? (
                 <Button
                   className="w-[50%]"
                   title="Create Similar"
@@ -612,7 +625,8 @@ export function EventDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(eventPrivileges).updatePermission ? (
+              {getUserPermission(eventPrivilegesRef.current)
+                .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
                   title="Edit"
@@ -640,9 +654,11 @@ export function EventDetailsScreen() {
               {getDetailsView('Status', status)}
               {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
-              (getUserPermission(eventPrivileges).createPermission ||
-                getUserPermission(eventPrivileges).updatePermission ||
-                getUserPermission(eventPrivileges).deletePermission) ? (
+              (getUserPermission(eventPrivilegesRef.current).createPermission ||
+                getUserPermission(eventPrivilegesRef.current)
+                  .updatePermission ||
+                getUserPermission(eventPrivilegesRef.current)
+                  .deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
                   {moment(eventDetails.date ? eventDetails.date : '')
                     .utc()
@@ -717,7 +733,7 @@ export function EventDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivileges).createPermission ? (
+              {getUserPermission(notePrivilegesRef.current).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -744,7 +760,7 @@ export function EventDetailsScreen() {
                         editNote={editNote}
                         deleteNote={deleteNote}
                         messageThreadClicked={messageThreadClicked}
-                        notePrivileges={notePrivileges}
+                        notePrivileges={notePrivilegesRef.current}
                       />
                     </View>
                   )
@@ -845,7 +861,8 @@ export function EventDetailsScreen() {
               {moment(eventDetails.date ? eventDetails.date : '')
                 .utc()
                 .isAfter(moment().utc()) &&
-              getUserPermission(transportationPrivileges).createPermission ? (
+              getUserPermission(transportationPrivilegesRef.current)
+                .createPermission ? (
                 <Button
                   className=""
                   title="Transportation"
@@ -881,7 +898,7 @@ export function EventDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(eventPrivileges).deletePermission ? (
+          {getUserPermission(eventPrivilegesRef.current).deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""

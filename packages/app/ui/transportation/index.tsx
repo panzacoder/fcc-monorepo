@@ -15,7 +15,7 @@ import {
   DELETE_TRANSPORTATION_REMINDER_EVENT
 } from 'app/utils/urlConstants'
 import { convertTimeToUserLocalTime, getAddressFromObject } from 'app/ui/utils'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import { AddEditReminder } from 'app/ui/addEditReminder'
@@ -33,7 +33,13 @@ export const Transportation = ({
   const [transportationData, setTransportationData] = useState(data ? data : {})
   const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   // console.log('transportationData', JSON.stringify(data))
   let list: object[] = []
   if (transportationData.reminderList) {
@@ -42,13 +48,21 @@ export const Transportation = ({
   }
   const [remindersList, setRemindersList] = useState(list)
   let creationDate = transportationData.createdOn
-    ? convertTimeToUserLocalTime(transportationData.createdOn)
+    ? convertTimeToUserLocalTime(
+        transportationData.createdOn,
+        userAddress,
+        memberAddress
+      )
     : ''
   let acompanyName = transportationData.accompanyName
     ? transportationData.accompanyName
     : ''
   let transportationDate = transportationData.date
-    ? convertTimeToUserLocalTime(transportationData.date)
+    ? convertTimeToUserLocalTime(
+        transportationData.date,
+        userAddress,
+        memberAddress
+      )
     : ''
   let description = transportationData.description
     ? transportationData.description

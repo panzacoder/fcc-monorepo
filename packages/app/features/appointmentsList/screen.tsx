@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,7 +10,6 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import _ from 'lodash'
 import moment from 'moment'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -21,6 +20,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -28,12 +28,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
 import { logger } from 'app/utils/logger'
-let appointmentPrivileges = {}
-let selectedMonth = 'All'
-let selectedYear = 'All'
-let selectedType = 'All'
-let doctorId = 'All'
-let facilityId = 'All'
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number(),
@@ -50,6 +44,12 @@ const typesList: Array<{ id: number; title: string }> = [
 const monthsList = getMonthsList() as any
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
+  const appointmentPrivilegesRef = useRef({})
+  const selectedMonthRef = useRef('All')
+  const selectedYearRef = useRef('All')
+  const selectedTypeRef = useRef('All')
+  const doctorIdRef = useRef('All')
+  const facilityIdRef = useRef('All')
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
@@ -62,9 +62,17 @@ export function AppointmentsListScreen() {
     []
   ) as any
   const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       monthIndex: 1,
@@ -100,7 +108,7 @@ export function AppointmentsListScreen() {
           id: memberData.member ? memberData.member : ''
         }
       },
-      appointmentType: selectedType
+      appointmentType: selectedTypeRef.current
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
@@ -138,18 +146,19 @@ export function AppointmentsListScreen() {
       header: header,
       memberDetails: {
         id: memberData.member ? memberData.member : '',
-        month: selectedMonth,
-        year: selectedYear,
-        type: selectedType,
-        doctorId: doctorId,
-        facilityId: facilityId
+        month: selectedMonthRef.current,
+        year: selectedYearRef.current,
+        type: selectedTypeRef.current,
+        doctorId: doctorIdRef.current,
+        facilityId: facilityIdRef.current
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            appointmentPrivileges = data.data.domainObjectPrivileges.Appointment
+            appointmentPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Appointment
               ? data.data.domainObjectPrivileges.Appointment
               : {}
           }
@@ -248,28 +257,28 @@ export function AppointmentsListScreen() {
     getFilteredList(appointmentsListFull, filter)
   }
   function filterAppointment(formData: Schema) {
-    selectedMonth =
+    selectedMonthRef.current =
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYear =
+    selectedYearRef.current =
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
-    doctorId =
+    doctorIdRef.current =
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
         ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorId
         : 'All'
-    facilityId =
+    facilityIdRef.current =
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
         ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityId
         : 'All'
     getAppointmentDetails()
   }
   function resetFilter() {
-    selectedMonth = 'All'
-    selectedYear = 'All'
-    selectedType = 'All'
-    doctorId = 'All'
-    facilityId = 'All'
+    selectedMonthRef.current = 'All'
+    selectedYearRef.current = 'All'
+    selectedTypeRef.current = 'All'
+    doctorIdRef.current = 'All'
+    facilityIdRef.current = 'All'
     getAppointmentDetails()
     reset({
       monthIndex: 1,
@@ -304,15 +313,15 @@ export function AppointmentsListScreen() {
       let id = value.id - 1
       logger.debug('value', JSON.stringify(value))
       if (id === 0) {
-        selectedType = 'All'
+        selectedTypeRef.current = 'All'
       } else if (id === 1) {
-        selectedType = 'Doctor Appointment'
+        selectedTypeRef.current = 'Doctor Appointment'
       } else {
-        selectedType = 'Facility Appointment'
+        selectedTypeRef.current = 'Facility Appointment'
       }
       getDoctorFacilities(false)
     } else {
-      selectedType = 'All'
+      selectedTypeRef.current = 'All'
       reset({
         typeIndex: -1
       })
@@ -341,7 +350,8 @@ export function AppointmentsListScreen() {
           />
         </TouchableOpacity>
         <View className="w-[35%]" />
-        {getUserPermission(appointmentPrivileges).createPermission ? (
+        {getUserPermission(appointmentPrivilegesRef.current)
+          .createPermission ? (
           <View className=" mt-[20] self-center">
             <TouchableOpacity
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
@@ -550,7 +560,13 @@ export function AppointmentsListScreen() {
                   <View>
                     <View className=" flex-row">
                       <Typography className="font-400 ml-3 w-[75%] max-w-[75%] text-black">
-                        {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+                        {data.date
+                          ? formatTimeToUserLocalTime(
+                              data.date,
+                              userAddress,
+                              memberAddress
+                            )
+                          : ''}
                       </Typography>
                       <View className="">
                         <Typography className="font-bold text-black">

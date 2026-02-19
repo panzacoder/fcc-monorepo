@@ -1,4 +1,3 @@
-import store from 'app/redux/store'
 import { getUserDeviceInformation } from 'app/utils/device'
 import {
   CallPostService,
@@ -9,12 +8,14 @@ import { Alert } from 'react-native'
 import { logger } from 'app/utils/logger'
 
 type fetchDataProps<DataType> = {
+  header: any
   route: string
   data?: any
   onFailure?: (response: CallPostServiceResponse<DataType>) => void // if not provided, will show alert with response message
 }
 
 export async function fetchData<DataType>({
+  header,
   route,
   data = {},
   onFailure
@@ -22,7 +23,6 @@ export async function fetchData<DataType>({
   const url = new URL(route, BASE_URL)
   logger.debug(`Fetching data from ${url}`)
   const deviceInfo = await getUserDeviceInformation()
-  const header = store.getState().headerState.header
 
   const payload = {
     header: { deviceInfo, ...header },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,7 +8,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -21,15 +20,16 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { logger } from 'app/utils/logger'
-let caregiverPrivileges = {}
+import { useAppSelector } from 'app/redux/hooks'
 export function CaregiversListScreen() {
+  const caregiverPrivilegesRef = useRef<any>({})
   const [isLoading, setLoading] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
   const [caregiversList, setCaregiversList] = useState([]) as any
   const [caregiversListFull, setCaregiversListFull] = useState([])
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
@@ -46,7 +46,8 @@ export function CaregiversListScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            caregiverPrivileges = data.data.domainObjectPrivileges.Caregiver
+            caregiverPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Caregiver
               ? data.data.domainObjectPrivileges.Caregiver
               : {}
           }
@@ -138,7 +139,8 @@ export function CaregiversListScreen() {
               color={'black'}
             />
           </TouchableOpacity>
-          {getUserPermission(caregiverPrivileges).createPermission ? (
+          {getUserPermission(caregiverPrivilegesRef.current)
+            .createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

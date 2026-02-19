@@ -16,14 +16,14 @@ import { CreateCircleSchema, useCreateCircleForm } from './form-helpers'
 import { Card } from 'app/ui/card'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, JOIN_CIRCLE } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { logger } from 'app/utils/logger'
 import { ModalScreen } from 'app/ui/modal-screen'
 
 export function CreateCircle() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const submitCircleForm: SubmitHandler<CreateCircleSchema> = async (
     formData: CreateCircleSchema
   ) => {
@@ -47,7 +47,7 @@ export function CreateCircle() {
       }
     }
 
-    const res = await createCircle(circleRequestProps)
+    const res = await createCircle(header, circleRequestProps)
     if (res) {
       router.replace('/circles')
     }

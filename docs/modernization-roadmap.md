@@ -6,25 +6,25 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 ## Status Overview
 
-| Phase  | Issue                                                           | Title                                    | Status                                                                    |
-| ------ | --------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- |
-| 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)     | Triage Open PRs & Establish Baseline     | Done                                                                      |
-| 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)     | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
-| **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99) | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
-| 3      | [#100](https://github.com/panzacoder/fcc-monorepo/issues/100)   | State Management Remediation             | Blocked by Phase 2                                                        |
-| 4      | [#101](https://github.com/panzacoder/fcc-monorepo/issues/101)   | Data Layer Modernization                 | Blocked by Phase 3                                                        |
-| 5      | [#102](https://github.com/panzacoder/fcc-monorepo/issues/102)   | Testing Foundation                       | Blocked by Phase 2, 4                                                     |
-| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)   | TypeScript Strictness                    | Blocked by Phase 4, 5                                                     |
-| 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)   | Screen Decomposition & Cleanup           | Blocked by Phase 3, 4, 6                                                  |
-| 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)   | Expo SDK 50 → 55                         | Blocked by Phase 2                                                        |
-| 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)   | Next.js 14 → 16                          | Blocked by Phase 2                                                        |
-| 8C     | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)   | Redux → Zustand                          | Blocked by Phase 3                                                        |
-| 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)   | Navigation Strategy (Solito)             | Blocked by Phase 4                                                        |
-| 8E-F   | [#109](https://github.com/panzacoder/fcc-monorepo/issues/109)   | Replace moment-timezone & lodash         | Blocked by Phase 2                                                        |
-| 8G     | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)   | Storybook 7 → 10                         | Blocked by Phase 2                                                        |
-| 8H     | [#111](https://github.com/panzacoder/fcc-monorepo/issues/111)   | NativeWind → Uniwind + TW4               | Blocked by Phase 8A                                                       |
-| 9      | [#112](https://github.com/panzacoder/fcc-monorepo/issues/112)   | Web App Buildout                         | Blocked by Phases 1-8                                                     |
-| Future | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)   | Realtime Data Capabilities               | Blocked by Phase 4                                                        |
+| Phase  | Issue                                                             | Title                                    | Status                                                                    |
+| ------ | ----------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- |
+| 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)       | Triage Open PRs & Establish Baseline     | Done                                                                      |
+| 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
+| **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
+| **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** (PR pending)                                                     |
+| 4      | [#101](https://github.com/panzacoder/fcc-monorepo/issues/101)     | Data Layer Modernization                 | Ready (Phase 3 done)                                                      |
+| 5      | [#102](https://github.com/panzacoder/fcc-monorepo/issues/102)     | Testing Foundation                       | Blocked by Phase 4                                                        |
+| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 4, 5                                                     |
+| 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 4, 6                                                     |
+| 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Blocked by Phase 2                                                        |
+| 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Blocked by Phase 2                                                        |
+| 8C     | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)     | Redux → Zustand                          | Ready (Phase 3 done)                                                      |
+| 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Blocked by Phase 4                                                        |
+| 8E-F   | [#109](https://github.com/panzacoder/fcc-monorepo/issues/109)     | Replace moment-timezone & lodash         | Blocked by Phase 2                                                        |
+| 8G     | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)     | Storybook 7 → 10                         | Blocked by Phase 2                                                        |
+| 8H     | [#111](https://github.com/panzacoder/fcc-monorepo/issues/111)     | NativeWind → Uniwind + TW4               | Blocked by Phase 8A                                                       |
+| 9      | [#112](https://github.com/panzacoder/fcc-monorepo/issues/112)     | Web App Buildout                         | Blocked by Phases 1-8                                                     |
+| Future | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)     | Realtime Data Capabilities               | Blocked by Phase 4                                                        |
 
 ---
 
@@ -78,3 +78,5 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 - **EAS/Expo builds not yet in CI** — current pipeline covers web only (lint, typecheck, format, Next.js build). Add EAS Build CI after Expo SDK upgrade (Phase 8A, GH #105).
 - **PR convention**: always include `Closes #<issue>` in PR body for auto-closing. Consider adding a PR template.
 - **Node 24** set across CI, Vercel, `.mise.toml`, and `.nvmrc` as of Phase 2.
+- **Redux persistence debouncing** tracked in [#117](https://github.com/panzacoder/fcc-monorepo/issues/117) — full store serialized on every dispatch with no debounce.
+- **`no-restricted-imports` for store** upgraded to `error` as of Phase 3. Only `provider/redux/index.tsx` has an eslint-disable (legitimate Provider usage).

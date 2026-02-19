@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, Platform } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
@@ -33,37 +33,37 @@ const schema = z.object({
 const emailSchema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
-let email = ''
-let fullName = ''
-let timeZoneId = ''
-let selectedAddress: any = {
-  shortDescription: '',
-  nickName: '',
-  address: {
-    id: '',
-    line: '',
-    city: '',
-    zipCode: '',
-    state: {
-      name: '',
-      code: '',
-      namecode: '',
-      description: '',
-      snum: '',
+export type Schema = z.infer<typeof schema>
+export function CreateCircleScreen() {
+  const emailRef = useRef('')
+  const fullNameRef = useRef('')
+  const timeZoneIdRef = useRef('')
+  const selectedAddressRef = useRef<any>({
+    shortDescription: '',
+    nickName: '',
+    address: {
       id: '',
-      country: {
+      line: '',
+      city: '',
+      zipCode: '',
+      state: {
         name: '',
         code: '',
         namecode: '',
-        isoCode: '',
         description: '',
-        id: ''
+        snum: '',
+        id: '',
+        country: {
+          name: '',
+          code: '',
+          namecode: '',
+          isoCode: '',
+          description: '',
+          id: ''
+        }
       }
     }
-  }
-}
-export type Schema = z.infer<typeof schema>
-export function CreateCircleScreen() {
+  })
   const [isLoading, setLoading] = useState(false)
   const [isShowBackView, setIsShowBackView] = useState(true)
   const [isCircleExists, setIsCircleExists] = useState(false)
@@ -76,7 +76,7 @@ export function CreateCircleScreen() {
   const [circleDetails, setCircleDetails] = useState({}) as any
   const [isYesNoClicked, setIsYesNoClicked] = useState(true)
   const [isFirstTime, setIsFirstTime] = useState(true)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
 
   useEffect(() => {}, [])
@@ -97,41 +97,43 @@ export function CreateCircleScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddressRef.current.nickName = value
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddressRef.current.shortDescription = value
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddressRef.current.address.line = value
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddressRef.current.address.city = value
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = value
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
-        selectedAddress.address.state.country.description = value.description
+        selectedAddressRef.current.address.state.country.id = value.id
+        selectedAddressRef.current.address.state.country.name = value.name
+        selectedAddressRef.current.address.state.country.code = value.code
+        selectedAddressRef.current.address.state.country.namecode =
+          value.namecode
+        selectedAddressRef.current.address.state.country.snum = value.snum
+        selectedAddressRef.current.address.state.country.description =
+          value.description
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        selectedAddressRef.current.address.state.id = value.id
+        selectedAddressRef.current.address.state.name = value.name
+        selectedAddressRef.current.address.state.code = value.code
+        selectedAddressRef.current.address.state.namecode = value.namecode
+        selectedAddressRef.current.address.state.snum = value.snum
+        selectedAddressRef.current.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        selectedAddressRef.current = value
       }
       if (index === 8) {
-        timeZoneId = value.id
+        timeZoneIdRef.current = value.id
       }
     }
 
@@ -184,15 +186,15 @@ export function CreateCircleScreen() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
-        email: email,
-        address: selectedAddress.address
+        email: emailRef.current,
+        address: selectedAddressRef.current.address
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          fullName = formData.firstName + ' ' + formData.lastName
+          fullNameRef.current = formData.firstName + ' ' + formData.lastName
           setIsShowBackView(false)
           setIsShowMemberModal(true)
         } else {
@@ -210,8 +212,8 @@ export function CreateCircleScreen() {
     url = isYesNoClicked
       ? `${BASE_URL}${CREATE_CIRCLE}`
       : `${BASE_URL}${CREATE_CIRCLE_NO_EMAIL}`
-    selectedAddress.address.timezone = {
-      id: timeZoneId
+    selectedAddressRef.current.address.timezone = {
+      id: timeZoneIdRef.current
     }
     let dataObject = {
       header: header,
@@ -220,15 +222,15 @@ export function CreateCircleScreen() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
-        email: isYesNoClicked ? email : null,
-        address: selectedAddress.address
+        email: isYesNoClicked ? emailRef.current : null,
+        address: selectedAddressRef.current.address
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          fullName = formData.firstName + ' ' + formData.lastName
+          fullNameRef.current = formData.firstName + ' ' + formData.lastName
           setIsShowBackView(false)
           if (isYesNoClicked) {
             setIsShowCaregiverModal(true)
@@ -255,13 +257,13 @@ export function CreateCircleScreen() {
             {'A Family Care Circle request has been sent to '}
 
             <Typography className="text-primary font-bold">
-              {email + '.'}
+              {emailRef.current + '.'}
             </Typography>
             <Typography>
               {'Due to the security reasons, we will need to wait for '}
             </Typography>
             <Typography className="text-primary font-bold">
-              {fullName}
+              {fullNameRef.current}
             </Typography>
             <Typography className="">
               {' to register and accept the invite to become a member.\n\n'}
@@ -269,7 +271,7 @@ export function CreateCircleScreen() {
             <Typography className="">{'Please reach out to '}</Typography>
 
             <Typography className="text-primary font-bold">
-              {fullName}
+              {fullNameRef.current}
             </Typography>
             <Typography className="">
               {
@@ -278,7 +280,7 @@ export function CreateCircleScreen() {
             </Typography>
             <Typography className="">{'While you wait for '}</Typography>
             <Typography className="text-primary font-bold">
-              {fullName}
+              {fullNameRef.current}
             </Typography>
             <Typography className="">
               {
@@ -314,10 +316,12 @@ export function CreateCircleScreen() {
             }
 
             <Typography className="text-primary font-bold">
-              {fullName + '.'}
+              {fullNameRef.current + '.'}
             </Typography>
             <Typography>{'\n\nWe have also sent a message to '}</Typography>
-            <Typography className="text-primary font-bold">{email}</Typography>
+            <Typography className="text-primary font-bold">
+              {emailRef.current}
+            </Typography>
             <Typography className="">
               {
                 ' suggesting they register to help establish the information to build the best Family Care Circle.\n'
@@ -355,7 +359,7 @@ export function CreateCircleScreen() {
             }
 
             <Typography className="text-primary font-bold">
-              {fullName + '.'}
+              {fullNameRef.current + '.'}
             </Typography>
           </Typography>
         </ScrollView>
@@ -459,11 +463,11 @@ export function CreateCircleScreen() {
                               autoCapitalize="none"
                               className="flex-1"
                               onChangeText={(text) => {
-                                email = text
+                                emailRef.current = text
                               }}
                               onBlur={() => {
-                                if (email !== '') {
-                                  findCircle(email)
+                                if (emailRef.current !== '') {
+                                  findCircle(emailRef.current)
                                 }
                               }}
                             />

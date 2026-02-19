@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -14,7 +14,7 @@ import {
   UPDATE_TRANSPORTATION,
   UPDATE_TRANSPORTATION_EVENT
 } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -36,8 +36,6 @@ const schema = z.object({
   postalCode: z.string()
 })
 export type Schema = z.infer<typeof schema>
-let countryIndex = -1
-let stateIndex = -1
 export const AddEditTransport = ({
   component,
   address,
@@ -48,9 +46,11 @@ export const AddEditTransport = ({
   createUpdateTransportation
 }) => {
   logger.debug('address', JSON.stringify(address))
-  const header = store.getState().headerState.header
-  const user = store.getState().userProfileState.header
-  const staticData: any = store.getState().staticDataState.staticData
+  const header = useAppSelector((state) => state.headerState.header)
+  const user = useAppSelector((state) => state.userProfileState.header)
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   const [isLoading, setLoading] = useState(false)
   const [selectedDate, setSelectedDate] = useState(
     !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
@@ -58,8 +58,11 @@ export const AddEditTransport = ({
   const [key, setKey] = useState(0)
   const [memberList, setMemberList] = useState([]) as any
   const [memberListFull, setMemberListFull] = useState([]) as any
-  const memberAddress: any =
-    store.getState().currentMemberAddress.currentMemberAddress
+  const memberAddress: any = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
+  const countryIndexRef = useRef(-1)
+  const stateIndexRef = useRef(-1)
   useEffect(() => {
     async function getMemberList() {
       setLoading(true)
@@ -107,8 +110,8 @@ export const AddEditTransport = ({
       description: '',
       member: _.isEmpty(transportData) ? -1 : 1,
       addressLine: !_.isEmpty(address) && address.line ? address.line : '',
-      state: _.isEmpty(transportData) ? stateIndex : 1,
-      country: _.isEmpty(transportData) ? countryIndex : 1,
+      state: _.isEmpty(transportData) ? stateIndexRef.current : 1,
+      country: _.isEmpty(transportData) ? countryIndexRef.current : 1,
       city: !_.isEmpty(address) && address.city ? address.city : '',
       postalCode: !_.isEmpty(address) && address.zipCode ? address.zipCode : ''
     },
@@ -133,7 +136,7 @@ export const AddEditTransport = ({
   const countryList: Array<{ id: number; title: string }> = []
   staticData.countryList.map(({ name, id }: Response, index: any) => {
     if (name === countryName) {
-      countryIndex = index + 1
+      countryIndexRef.current = index + 1
     }
     let object = {
       title: name,
@@ -167,10 +170,10 @@ export const AddEditTransport = ({
           let statesList: Array<{ id: number; title: string }> = []
           data.data.stateList.map(({ name, id }: Response, index: any) => {
             if (name === stateName) {
-              stateIndex = index + 1
+              stateIndexRef.current = index + 1
               reset({
-                country: countryIndex,
-                state: stateIndex
+                country: countryIndexRef.current,
+                state: stateIndexRef.current
               })
             }
             let object = {

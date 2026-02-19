@@ -28,8 +28,9 @@ export type CreateCircleProps = {
   address: Address
 }
 
-export async function createCircle(props: CreateCircleProps) {
+export async function createCircle(header: any, props: CreateCircleProps) {
   return await fetchData<CreateCircleReturnType>({
+    header,
     route: props?.email ? CREATE_CIRCLE : CREATE_CIRCLE_NO_EMAIL,
     data: { memberVo: props }
     // onFailure: ({ errorCode }) => {

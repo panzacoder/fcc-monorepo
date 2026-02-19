@@ -2,7 +2,6 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import moment, { MomentInput } from 'moment-timezone'
 import { Alert, Platform, Linking } from 'react-native'
-import store from '../redux/store'
 import _ from 'lodash'
 import { logger } from 'app/utils/logger'
 export const DATE_CONSTANT = {
@@ -169,12 +168,11 @@ export const getMonthsListOnly = () => {
   ]
   return monthsList
 }
-function getTimezoneName() {
-  let userData = store.getState().userProfileState.header.address
-  // console.log('getTimezoneName', userData);
+function getTimezoneName(userAddress: any, memberAddress: any) {
+  let userData = userAddress
   let timeZoneName = null
-  let memberData = store.getState().currentMemberAddress.currentMemberAddress
-  if (memberData.timezone ? memberData.timezone.name : false) {
+  let memberData = memberAddress
+  if (memberData?.timezone ? memberData.timezone.name : false) {
     timeZoneName = memberData.timezone.name
   } else if (
     userData !== null
@@ -203,30 +201,42 @@ export const getDay = (date: any) => {
   var formatDate = moment(date).format('MMM DD, YYYY')
   return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
 }
-export const convertUserTimeToUTC = (time: any) => {
-  let timeZoneName = getTimezoneName()
+export const convertUserTimeToUTC = (
+  time: any,
+  userAddress: any,
+  memberAddress: any
+) => {
+  let timeZoneName = getTimezoneName(userAddress, memberAddress)
   let time1 = moment(time).format(DATE_CONSTANT.FULL_DATE)
   let utcDateTime = moment
     .tz(time1, DATE_CONSTANT.FULL_DATE, timeZoneName)
     .utc()
   return utcDateTime
 }
-export const getOnlyUserTimeZone = () => {
-  let timeZoneName = getTimezoneName()
+export const getOnlyUserTimeZone = (userAddress: any, memberAddress: any) => {
+  let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
     return `(${moment().tz(timeZoneName).format('z')})`
   }
 }
-export const convertTimeToUserLocalTime = (time: any) => {
-  let timeZoneName = getTimezoneName()
+export const convertTimeToUserLocalTime = (
+  time: any,
+  userAddress: any,
+  memberAddress: any
+) => {
+  let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
     return `${getFullDate(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
   } else {
     return getFullDate(moment(time).utc(true))
   }
 }
-export const formatTimeToUserLocalTime = (time: any) => {
-  let timeZoneName = getTimezoneName()
+export const formatTimeToUserLocalTime = (
+  time: any,
+  userAddress: any,
+  memberAddress: any
+) => {
+  let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
     return `${getDay(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
   } else {

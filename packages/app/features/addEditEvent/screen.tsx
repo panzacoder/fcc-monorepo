@@ -14,13 +14,13 @@ import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 
 const schema = z.object({
   description: z.string(),
@@ -28,7 +28,7 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export function AddEditEventScreen() {
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}

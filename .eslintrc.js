@@ -12,7 +12,7 @@ module.exports = {
     'no-console': 'warn',
     '@typescript-eslint/no-explicit-any': 'warn',
     'no-restricted-imports': [
-      'warn',
+      'error',
       {
         paths: [
           {

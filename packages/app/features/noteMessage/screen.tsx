@@ -20,7 +20,7 @@ import { Typography } from 'app/ui/typography'
 import messageListAction from 'app/redux/messageList/messageListAction'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
-import store from 'app/redux/store'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
@@ -57,8 +57,15 @@ export function NoteMessageScreen() {
     []
   ) as any
   const [threadDetails, setThreadDetails] = useState(null) as any
-  const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
+  const dispatch = useAppDispatch()
+  const header = useAppSelector((state) => state.headerState.header)
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   let noteData =
     item.noteData && item.noteData !== undefined
@@ -116,7 +123,7 @@ export function NoteMessageScreen() {
                 ? messageThread.messageList
                 : []
             setMessageList(messageList)
-            store.dispatch(messageListAction.setMessageList(messageList))
+            dispatch(messageListAction.setMessageList(messageList))
             let participantList =
               messageThread.participantList !== undefined &&
               messageThread.participantList !== null
@@ -148,7 +155,7 @@ export function NoteMessageScreen() {
               : []
 
             setMessageList(messageList)
-            store.dispatch(messageListAction.setMessageList(messageList))
+            dispatch(messageListAction.setMessageList(messageList))
             let participantList = messageThread.participantList
               ? messageThread.participantList
               : []
@@ -190,8 +197,11 @@ export function NoteMessageScreen() {
       })
     } catch (e) {}
   }, [])
+  const messageListFromStore = useAppSelector(
+    (state) => state.messageList.messageList
+  )
   async function updateMessageList(message: any) {
-    let messageList: any = store.getState().messageList.messageList
+    let messageList: any = messageListFromStore
     let messeageContent = message.data ? message.data : {}
     let messageObject = {
       sender: messeageContent.MemberId ? messeageContent.MemberId : '',
@@ -445,7 +455,11 @@ export function NoteMessageScreen() {
                           className="text-right"
                         >
                           {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
+                            ? formatTimeToUserLocalTime(
+                                message.createdOn,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                       </View>
@@ -464,7 +478,11 @@ export function NoteMessageScreen() {
                           className="text-right"
                         >
                           {message.createdOn
-                            ? formatTimeToUserLocalTime(message.createdOn)
+                            ? formatTimeToUserLocalTime(
+                                message.createdOn,
+                                userAddress,
+                                memberAddress
+                              )
                             : ''}
                         </Typography>
                       </View>

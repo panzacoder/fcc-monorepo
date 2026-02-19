@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View,
   Alert,
@@ -13,7 +13,6 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import store from 'app/redux/store'
 import moment from 'moment'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
@@ -40,6 +39,7 @@ import {
   formatTimeToUserLocalTime,
   convertPhoneNumberToUsaPhoneNumberFormat
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
@@ -53,11 +53,17 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { logger } from 'app/utils/logger'
-let appointmentPrivileges = {}
-let notePrivileges = {}
-let transportationPrivileges = {}
 export function AppointmentDetailsScreen() {
-  const header = store.getState().headerState.header
+  const appointmentPrivilegesRef = useRef({})
+  const notePrivilegesRef = useRef({})
+  const transportationPrivilegesRef = useRef({})
+  const header = useAppSelector((state) => state.headerState.header)
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
@@ -101,17 +107,18 @@ export function AppointmentDetailsScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('appointmentInfo', '' + JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
-              appointmentPrivileges = data.data.domainObjectPrivileges
-                .Appointment
+              appointmentPrivilegesRef.current = data.data
+                .domainObjectPrivileges.Appointment
                 ? data.data.domainObjectPrivileges.Appointment
                 : {}
-              notePrivileges = data.data.domainObjectPrivileges.APPOINTMENTNOTE
+              notePrivilegesRef.current = data.data.domainObjectPrivileges
+                .APPOINTMENTNOTE
                 ? data.data.domainObjectPrivileges.APPOINTMENTNOTE
                 : data.data.domainObjectPrivileges.AppointmentNote
                   ? data.data.domainObjectPrivileges.AppointmentNote
                   : {}
-              transportationPrivileges = data.data.domainObjectPrivileges
-                .APPOINTMENTTRANSPORTATION
+              transportationPrivilegesRef.current = data.data
+                .domainObjectPrivileges.APPOINTMENTTRANSPORTATION
                 ? data.data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
                 : data.data.domainObjectPrivileges.AppointmentTransportation
                   ? data.data.domainObjectPrivileges.AppointmentTransportation
@@ -234,7 +241,11 @@ export function AppointmentDetailsScreen() {
   let doctorFacilityAddress = {} as any
   if (!_.isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
-      apptDate = formatTimeToUserLocalTime(appointmentDetails.date)
+      apptDate = formatTimeToUserLocalTime(
+        appointmentDetails.date,
+        userAddress,
+        memberAddress
+      )
     }
     if (appointmentDetails.status && appointmentDetails.status.status) {
       status = appointmentDetails.status.status
@@ -771,7 +782,8 @@ export function AppointmentDetailsScreen() {
           <ScrollView persistentScrollbar={true} className="flex-1">
             <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-                {getUserPermission(appointmentPrivileges).createPermission ? (
+                {getUserPermission(appointmentPrivilegesRef.current)
+                  .createPermission ? (
                   <Button
                     className="w-[50%]"
                     title="Create Similar"
@@ -795,7 +807,8 @@ export function AppointmentDetailsScreen() {
                 ) : (
                   <View />
                 )}
-                {getUserPermission(appointmentPrivileges).updatePermission ? (
+                {getUserPermission(appointmentPrivilegesRef.current)
+                  .updatePermission ? (
                   <Button
                     className="ml-[5px] w-[30%]"
                     title="Edit"
@@ -860,9 +873,12 @@ export function AppointmentDetailsScreen() {
               {getDetailsView('Status', status, false, '')}
               {getDetailsView('Description', description, false, '')}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
-              (getUserPermission(appointmentPrivileges).createPermission ||
-                getUserPermission(appointmentPrivileges).updatePermission ||
-                getUserPermission(appointmentPrivileges).deletePermission) ? (
+              (getUserPermission(appointmentPrivilegesRef.current)
+                .createPermission ||
+                getUserPermission(appointmentPrivilegesRef.current)
+                  .updatePermission ||
+                getUserPermission(appointmentPrivilegesRef.current)
+                  .deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
                   {moment(
                     appointmentDetails.date ? appointmentDetails.date : ''
@@ -939,7 +955,8 @@ export function AppointmentDetailsScreen() {
                     <View />
                   )}
                 </TouchableOpacity>
-                {getUserPermission(notePrivileges).createPermission ? (
+                {getUserPermission(notePrivilegesRef.current)
+                  .createPermission ? (
                   <Button
                     className=""
                     title="Add Note"
@@ -966,7 +983,7 @@ export function AppointmentDetailsScreen() {
                           editNote={editNote}
                           deleteNote={deleteNote}
                           messageThreadClicked={messageThreadClicked}
-                          notePrivileges={notePrivileges}
+                          notePrivileges={notePrivilegesRef.current}
                         />
                       </View>
                     )
@@ -1070,7 +1087,8 @@ export function AppointmentDetailsScreen() {
                 {moment(appointmentDetails.date ? appointmentDetails.date : '')
                   .utc()
                   .isAfter(moment().utc()) &&
-                getUserPermission(transportationPrivileges).createPermission ? (
+                getUserPermission(transportationPrivilegesRef.current)
+                  .createPermission ? (
                   <Button
                     className=""
                     title="Transportation"
@@ -1108,7 +1126,8 @@ export function AppointmentDetailsScreen() {
               )}
             </View>
 
-            {getUserPermission(appointmentPrivileges).deletePermission ? (
+            {getUserPermission(appointmentPrivilegesRef.current)
+              .deletePermission ? (
               <View className="mx-5 my-5 flex-row self-center">
                 <Button
                   className="w-[50%]"

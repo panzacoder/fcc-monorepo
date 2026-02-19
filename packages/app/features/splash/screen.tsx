@@ -5,7 +5,7 @@ import { View, Text, Alert, ToastAndroid } from 'react-native'
 import _ from 'lodash'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
 import { getCredentials } from 'app/utils/secure-storage'
 import { CallPostService } from 'app/utils/fetchServerData'
@@ -17,13 +17,14 @@ import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscr
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
 import moment from 'moment-timezone'
-import store from 'app/redux/store'
+import { useAppDispatch } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
 import { logger } from 'app/utils/logger'
 import messaging from '@react-native-firebase/messaging'
-let notificationData = {} as any
 export function SplashScreen() {
+  const notificationDataRef = useRef<any>({})
+  const dispatch = useAppDispatch()
   const [isLoading, setLoading] = useState(false)
   const [isShowButtons, setIsShowButtons] = useState(false)
   const getUsernamePassword = useCallback(async () => {
@@ -47,13 +48,13 @@ export function SplashScreen() {
         .getInitialNotification()
         .then((notification: any) => {
           if (notification) {
-            notificationData = notification
+            notificationDataRef.current = notification
           }
         })
 
       await messaging().onNotificationOpenedApp((remoteMessage: any) => {
         if (remoteMessage) {
-          notificationData = remoteMessage
+          notificationDataRef.current = remoteMessage
         }
       })
       getUsernamePassword()
@@ -68,24 +69,26 @@ export function SplashScreen() {
   }, [])
   async function navigateToNotification() {
     if (
-      !_.isEmpty(notificationData.data) &&
-      notificationData.data !== undefined
+      !_.isEmpty(notificationDataRef.current.data) &&
+      notificationDataRef.current.data !== undefined
     ) {
-      let notificationType = notificationData.data.MessageType
-        ? notificationData.data.MessageType
+      let notificationType = notificationDataRef.current.data.MessageType
+        ? notificationDataRef.current.data.MessageType
         : ''
       let memberData = {
         member:
-          notificationData.data && notificationData.data.MemberId
-            ? notificationData.data.MemberId
+          notificationDataRef.current.data &&
+          notificationDataRef.current.data.MemberId
+            ? notificationDataRef.current.data.MemberId
             : '',
         firstname: '',
         lastname: ''
       } as object
       let details = {
         id:
-          notificationData.data && notificationData.data.DomainObjectId
-            ? notificationData.data.DomainObjectId
+          notificationDataRef.current.data &&
+          notificationDataRef.current.data.DomainObjectId
+            ? notificationDataRef.current.data.DomainObjectId
             : ''
       }
       if (
@@ -132,8 +135,9 @@ export function SplashScreen() {
       ) {
         let noteData = {
           id:
-            notificationData.data && notificationData.data.MsgThreadId
-              ? Number(notificationData.data.MsgThreadId)
+            notificationDataRef.current.data &&
+            notificationDataRef.current.data.MsgThreadId
+              ? Number(notificationDataRef.current.data.MsgThreadId)
               : ''
         } as object
         router.push(
@@ -174,7 +178,7 @@ export function SplashScreen() {
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
-          await store.dispatch(headerAction.setHeader(data.data.header))
+          await dispatch(headerAction.setHeader(data.data.header))
           let subscriptionDetailsobject = {
             subscriptionEndDate: data.data.subscriptionEndDate || '',
             days: data.data.days || '',
@@ -183,25 +187,23 @@ export function SplashScreen() {
           }
           data.data.header.timezone = moment.tz.guess()
 
-          await store.dispatch(
-            userProfileAction.setUserProfile(data.data.appuserVo)
-          )
-          await store.dispatch(
+          await dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
+          await dispatch(
             subscriptionAction.setSubscription(data.data.userSubscription)
           )
-          await store.dispatch(
+          await dispatch(
             userSubscriptionAction.setSubscriptionDetails(
               subscriptionDetailsobject
             )
           )
-          await store.dispatch(
+          await dispatch(
             sponsorAction.setSponsor({
               sponsorDetails: data.data.sponsorUser,
               sponsorShipDetails: data.data.sponsorship
             })
           )
           if (data.data.commercialsDetails) {
-            await store.dispatch(
+            await dispatch(
               paidAdAction.setPaidAd({
                 commercialsDetails: data.data.commercialsDetails.commercials,
                 commercialPageMappings:

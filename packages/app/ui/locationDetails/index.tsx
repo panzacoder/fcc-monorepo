@@ -1,8 +1,8 @@
 import { View, Alert } from 'react-native'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,19 +27,22 @@ const schema1 = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export type Schema1 = z.infer<typeof schema1>
-let statesListFull = []
-let statesList: Array<{ id: number; title: string }> = []
-let timezonesList: Array<{ id: number; title: string }> = []
-let timeZoneListFull = []
-let countryIndex = -1
-let stateIndex = -1
-let timeZoneIndex = -1
 export const LocationDetails = ({ component, data, setAddressObject }) => {
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const staticData: any = store.getState().staticDataState.staticData
-  const memberAddress: any =
-    store.getState().currentMemberAddress.currentMemberAddress
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
+  const memberAddress: any = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
+  const statesListFullRef = useRef<any>([])
+  const statesListRef = useRef<Array<{ id: number; title: string }>>([])
+  const timezonesListRef = useRef<Array<{ id: number; title: string }>>([])
+  const timeZoneListFullRef = useRef<any>([])
+  const countryIndexRef = useRef(-1)
+  const stateIndexRef = useRef(-1)
+  const timeZoneIndexRef = useRef(-1)
   // console.log('memberAddress', JSON.stringify(memberAddress))
   const getStates = useCallback(async (countryId: any) => {
     setLoading(true)
@@ -66,10 +69,12 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
                 id: index + 1
               }
             })
-          statesList = stateList
-          timezonesList = timeZoneList
-          statesListFull = data.data.stateList ? data.data.stateList : []
-          timeZoneListFull = data.data.timeZoneList
+          statesListRef.current = stateList
+          timezonesListRef.current = timeZoneList
+          statesListFullRef.current = data.data.stateList
+            ? data.data.stateList
+            : []
+          timeZoneListFullRef.current = data.data.timeZoneList
             ? data.data.timeZoneList
             : []
           if (component === 'SignUp') {
@@ -77,17 +82,20 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             // console.log('newTimeZone', newTimeZone)
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === newTimeZone) {
-                timeZoneIndex = index + 1
+                timeZoneIndexRef.current = index + 1
               }
             })
-            setAddressObject(timeZoneListFull[timeZoneIndex - 1], 8)
+            setAddressObject(
+              timeZoneListFullRef.current[timeZoneIndexRef.current - 1],
+              8
+            )
           } else if (!_.isEmpty(locationData)) {
             let stateName = locationData.address.state.name
               ? locationData.address.state.name
               : ''
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
-                stateIndex = index + 1
+                stateIndexRef.current = index + 1
               }
             })
             let timeZoneName = locationData.address.timezone.name
@@ -95,7 +103,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               : ''
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === timeZoneName) {
-                timeZoneIndex = index + 1
+                timeZoneIndexRef.current = index + 1
               }
             })
           } else if (!_.isEmpty(memberAddress)) {
@@ -104,7 +112,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               : ''
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
-                stateIndex = index + 1
+                stateIndexRef.current = index + 1
               }
             })
 
@@ -113,13 +121,13 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               : ''
             data.data.timeZoneList.map((data: any, index: any) => {
               if (data.name === timeZoneName) {
-                timeZoneIndex = index + 1
+                timeZoneIndexRef.current = index + 1
               }
             })
           }
           reset({
-            state: stateIndex,
-            timeZone: timeZoneIndex
+            state: stateIndexRef.current,
+            timeZone: timeZoneIndexRef.current
           })
           setLoading(false)
           setIsDataReceived(true)
@@ -175,14 +183,14 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     }
     staticData.countryList.map(async (data: any, index: any) => {
       if (data.name === countryName) {
-        countryIndex = index + 1
+        countryIndexRef.current = index + 1
         reset({
-          country: countryIndex
+          country: countryIndexRef.current
         })
       }
     })
-    let countryId = staticData.countryList[countryIndex - 1].id
-      ? staticData.countryList[countryIndex - 1].id
+    let countryId = staticData.countryList[countryIndexRef.current - 1].id
+      ? staticData.countryList[countryIndexRef.current - 1].id
       : 101
     await getStates(countryId)
   }, [])
@@ -212,10 +220,10 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
           : '',
       country:
         !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
-          ? countryIndex
+          ? countryIndexRef.current
           : -1,
-      state: stateIndex,
-      timeZone: timeZoneIndex
+      state: stateIndexRef.current,
+      timeZone: timeZoneIndexRef.current
     },
     resolver: zodResolver(schema)
   })
@@ -258,13 +266,13 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   }
   async function setSelectedStateChange(value: any) {
     if (value) {
-      setAddressObject(statesListFull[value.id - 1], 5)
+      setAddressObject(statesListFullRef.current[value.id - 1], 5)
     }
   }
   async function setSelectedTimeZoneChange(value: any) {
     // console.log('value', JSON.stringify(value))
     if (value) {
-      setAddressObject(timeZoneListFull[value.id - 1], 8)
+      setAddressObject(timeZoneListFullRef.current[value.id - 1], 8)
     }
   }
 
@@ -341,7 +349,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
             name="state"
             label="State*"
             maxHeight={300}
-            list={statesList}
+            list={statesListRef.current}
             onChangeValue={setSelectedStateChange}
           />
         </View>
@@ -380,7 +388,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
               name="timeZone"
               label="Timezone*"
               maxHeight={300}
-              list={timezonesList}
+              list={timezonesListRef.current}
               onChangeValue={setSelectedTimeZoneChange}
             />
           </View>

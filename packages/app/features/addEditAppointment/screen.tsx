@@ -23,12 +23,12 @@ import { Feather } from 'app/ui/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import store from 'app/redux/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { Typography } from 'app/ui/typography'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
@@ -46,7 +46,9 @@ type DoctorFacilityResponse = {
 }
 export function AddEditAppointmentScreen() {
   const router = useRouter()
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorFacilityDetails = item.doctorFacilityDetails
@@ -62,7 +64,7 @@ export function AddEditAppointmentScreen() {
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const [isLoading, setLoading] = useState(false)
   const [selectedDate, setSelectedDate] = useState(
     appointmentDetails.date ? appointmentDetails.date : new Date()

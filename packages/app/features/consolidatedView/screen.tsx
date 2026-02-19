@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
@@ -17,11 +17,11 @@ import {
   GET_CONSOLIDATED_DETAILS,
   GET_FILTER_CONSOLIDATED_DETAILS
 } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
 import { getFullDateForCalendar, formatTimeToUserLocalTime } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 import {
   CalendarView,
   CalendarViewInput
@@ -29,26 +29,37 @@ import {
 const schema = z.object({
   typeIndex: z.number()
 })
-let selectedType = 'All'
-let weekFirstLastDays = [] as any
-let weekDayListDates = [] as any
-let weekDayUtcDates = [] as any
-let weekDayList = [] as any
-let listDayOne = [] as any
-let listDayTwo = [] as any
-let listDayThree = [] as any
-let listDayFour = [] as any
-let listDayFive = [] as any
-let listDaySix = [] as any
-let listDaySeven = [] as any
-let fromDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
-let toDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
-let currentDate = getFullDateForCalendar(new Date(), 'DD MMM YYYY') as any
-
 export function ConsolidatedViewScreen() {
   const router = useRouter()
-  const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
+  const header = useAppSelector((state) => state.headerState.header)
+  const [selectedType, setSelectedType] = useState('All')
+  const [fromDate, setFromDate] = useState(
+    getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+  )
+  const [toDate, setToDate] = useState(
+    getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+  )
+  const [currentDate, setCurrentDate] = useState(
+    getFullDateForCalendar(new Date(), 'DD MMM YYYY') as any
+  )
+  const weekFirstLastDaysRef = useRef<any>([])
+  const weekDayListDatesRef = useRef<any>([])
+  const weekDayUtcDatesRef = useRef<any>([])
+  const weekDayListRef = useRef<any>([])
+  const listDayOneRef = useRef<any>([])
+  const listDayTwoRef = useRef<any>([])
+  const listDayThreeRef = useRef<any>([])
+  const listDayFourRef = useRef<any>([])
+  const listDayFiveRef = useRef<any>([])
+  const listDaySixRef = useRef<any>([])
+  const listDaySevenRef = useRef<any>([])
+  const userAddress = useAppSelector(
+    (state) => state.userProfileState.header.address
+  )
+  const memberAddress = useAppSelector(
+    (state) => state.currentMemberAddress.currentMemberAddress
+  )
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
   let memberData = {
     member: userDetails.memberId ? userDetails.memberId : ''
   }
@@ -83,49 +94,49 @@ export function ConsolidatedViewScreen() {
     data: string
   }
   function clearLists() {
-    listDayOne = []
-    listDayTwo = []
-    listDayThree = []
-    listDayFour = []
-    listDayFive = []
-    listDaySix = []
-    listDaySeven = []
+    listDayOneRef.current = []
+    listDayTwoRef.current = []
+    listDayThreeRef.current = []
+    listDayFourRef.current = []
+    listDayFiveRef.current = []
+    listDaySixRef.current = []
+    listDaySevenRef.current = []
   }
-  async function getWeekCurrentLastDays(currentDate: any) {
-    logger.debug('currentDate', currentDate)
-    weekFirstLastDays = []
-    weekDayListDates = []
-    weekDayUtcDates = []
-    weekDayList = []
-    var curr = new Date(currentDate)
+  async function getWeekCurrentLastDays(currentDateParam: any) {
+    logger.debug('currentDate', currentDateParam)
+    weekFirstLastDaysRef.current = []
+    weekDayListDatesRef.current = []
+    weekDayUtcDatesRef.current = []
+    weekDayListRef.current = []
+    var curr = new Date(currentDateParam)
     let day = curr.getDay()
     let firstday = new Date(curr.getTime() - 60 * 60 * 24 * day * 1000)
 
     let previouDayUtc = new Date(firstday.getTime() - 60 * 60 * 24 * 1 * 1000)
-    weekDayUtcDates.push(previouDayUtc)
-    weekDayUtcDates.push(firstday)
+    weekDayUtcDatesRef.current.push(previouDayUtc)
+    weekDayUtcDatesRef.current.push(firstday)
     let fullDate = getFullDateForCalendar(firstday, 'DD MMM')
     let firstDate = '   ' + weekDaysShort[0] + ' ' + fullDate
-    weekDayList.push(firstDate)
-    weekDayListDates.push(fullDate)
+    weekDayListRef.current.push(firstDate)
+    weekDayListDatesRef.current.push(fullDate)
     let weekFirstDate = getFullDateForCalendar(firstday, 'YYYY-MM-DD')
-    weekFirstLastDays.push(weekFirstDate)
+    weekFirstLastDaysRef.current.push(weekFirstDate)
     for (let i = 1; i <= 6; i++) {
       let nextDay = new Date(firstday.getTime() + 60 * 60 * 24 * i * 1000)
 
       let fullDate = getFullDateForCalendar(nextDay, 'DD MMM')
       let firstDate = '   ' + weekDaysShort[i] + ' ' + fullDate
-      weekDayList.push(firstDate)
-      weekDayListDates.push(fullDate)
+      weekDayListRef.current.push(firstDate)
+      weekDayListDatesRef.current.push(fullDate)
 
       let weekDate = getFullDateForCalendar(nextDay, 'YYYY-MM-DD')
-      weekFirstLastDays.push(weekDate)
+      weekFirstLastDaysRef.current.push(weekDate)
 
       let nextDayUtc = new Date(firstday.getTime() + 60 * 60 * 24 * 7 * 1000)
-      weekDayUtcDates.push(nextDayUtc)
+      weekDayUtcDatesRef.current.push(nextDayUtc)
       if (i === 6) {
         let nextDayUtc = new Date(firstday.getTime() + 60 * 60 * 24 * 7 * 1000)
-        weekDayUtcDates.push(nextDayUtc)
+        weekDayUtcDatesRef.current.push(nextDayUtc)
       }
     }
   }
@@ -135,26 +146,26 @@ export function ConsolidatedViewScreen() {
       const fullDate = getFullDateForCalendar(data.date, 'YYYY-MM-DD')
 
       switch (fullDate) {
-        case weekFirstLastDays[0]:
-          listDayOne.push(data)
+        case weekFirstLastDaysRef.current[0]:
+          listDayOneRef.current.push(data)
           break
-        case weekFirstLastDays[1]:
-          listDayTwo.push(data)
+        case weekFirstLastDaysRef.current[1]:
+          listDayTwoRef.current.push(data)
           break
-        case weekFirstLastDays[2]:
-          listDayThree.push(data)
+        case weekFirstLastDaysRef.current[2]:
+          listDayThreeRef.current.push(data)
           break
-        case weekFirstLastDays[3]:
-          listDayFour.push(data)
+        case weekFirstLastDaysRef.current[3]:
+          listDayFourRef.current.push(data)
           break
-        case weekFirstLastDays[4]:
-          listDayFive.push(data)
+        case weekFirstLastDaysRef.current[4]:
+          listDayFiveRef.current.push(data)
           break
-        case weekFirstLastDays[5]:
-          listDaySix.push(data)
+        case weekFirstLastDaysRef.current[5]:
+          listDaySixRef.current.push(data)
           break
-        case weekFirstLastDays[6]:
-          listDaySeven.push(data)
+        case weekFirstLastDaysRef.current[6]:
+          listDaySevenRef.current.push(data)
           break
       }
     })
@@ -290,44 +301,55 @@ export function ConsolidatedViewScreen() {
   useEffect(() => {
     getWeekCurrentLastDays(new Date())
     getConsolidatedFilterOptions()
-    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
+    getConsolidatedDetails(
+      weekFirstLastDaysRef.current[0],
+      weekFirstLastDaysRef.current[6]
+    )
   }, [])
   const handleDateCleared = () => {}
   const handleDateChange = (date: Date) => {
-    fromDate = getFullDateForCalendar(date, 'YYYY-MM-DD')
-    toDate = getFullDateForCalendar(date, 'YYYY-MM-DD')
-    currentDate = getFullDateForCalendar(date, 'DD MMM YYYY')
+    setFromDate(getFullDateForCalendar(date, 'YYYY-MM-DD'))
+    setToDate(getFullDateForCalendar(date, 'YYYY-MM-DD'))
+    setCurrentDate(getFullDateForCalendar(date, 'DD MMM YYYY'))
     setSelectedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
     setSelectedDateUtc(date)
     setIsShowCalender(false)
   }
   async function getPreviousWeek() {
-    getWeekCurrentLastDays(weekDayUtcDates[0])
-    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
+    getWeekCurrentLastDays(weekDayUtcDatesRef.current[0])
+    getConsolidatedDetails(
+      weekFirstLastDaysRef.current[0],
+      weekFirstLastDaysRef.current[6]
+    )
   }
   async function getPreviousDate() {
     setDayCount((prev) => prev - 1)
     let yesterday = new Date(currentDateUtc)
     yesterday.setUTCDate(yesterday.getDate() + dayCount)
     setCurrentDateForDayView(getFullDateForCalendar(yesterday, 'DD MMM YYYY'))
-    currentDate = getFullDateForCalendar(yesterday, 'DD MMM YYYY')
-    toDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
-    fromDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
-    getConsolidatedDetails(fromDate, toDate)
+    setCurrentDate(getFullDateForCalendar(yesterday, 'DD MMM YYYY'))
+    const newDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
+    setToDate(newDate)
+    setFromDate(newDate)
+    getConsolidatedDetails(newDate, newDate)
   }
   async function getNextWeek() {
-    getWeekCurrentLastDays(weekDayUtcDates[6])
-    getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
+    getWeekCurrentLastDays(weekDayUtcDatesRef.current[6])
+    getConsolidatedDetails(
+      weekFirstLastDaysRef.current[0],
+      weekFirstLastDaysRef.current[6]
+    )
   }
   async function getNextDate() {
     setDayCount((prev) => prev + 1)
     let tomorrow = new Date(currentDateUtc)
     tomorrow.setUTCDate(tomorrow.getDate() + dayCount)
     setCurrentDateForDayView(getFullDateForCalendar(tomorrow, 'DD MMM YYYY'))
-    currentDate = getFullDateForCalendar(tomorrow, 'DD MMM YYYY')
-    toDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
-    fromDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
-    getConsolidatedDetails(fromDate, toDate)
+    setCurrentDate(getFullDateForCalendar(tomorrow, 'DD MMM YYYY'))
+    const newDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
+    setToDate(newDate)
+    setFromDate(newDate)
+    getConsolidatedDetails(newDate, newDate)
   }
   function getActivityName(type: any) {
     let activityName = ''
@@ -402,7 +424,9 @@ export function ConsolidatedViewScreen() {
         </View>
         <View className=" flex-row">
           <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm text-black">
-            {data.date ? formatTimeToUserLocalTime(data.date) : ''}
+            {data.date
+              ? formatTimeToUserLocalTime(data.date, userAddress, memberAddress)
+              : ''}
           </Typography>
           <View className="">
             <Typography className="text-sm text-black">
@@ -492,20 +516,20 @@ export function ConsolidatedViewScreen() {
     )
   }
   async function setSelectedTypeChange(value: any) {
-    selectedType = value && value.title !== null ? value.title : 'All'
+    setSelectedType(value && value.title !== null ? value.title : 'All')
   }
 
   const dayTimesView = memberActivityList.map((data: any, index: any) => {
     return getCard(data, index)
   })
-  const weekView = weekDayList.map((data: any, index: any) => {
+  const weekView = weekDayListRef.current.map((data: any, index: any) => {
     return (
       <View key={index} className="">
         <View className="my-4 flex-row ">
           {index === 0 ? (
             <ScrollView className="w-full ">
               <Typography className=" font-bold">{data}</Typography>
-              {listDayOne.map((data: any, index: number) => {
+              {listDayOneRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -521,7 +545,7 @@ export function ConsolidatedViewScreen() {
             <ScrollView className="w-full flex-1">
               <Typography className="font-bold">{data}</Typography>
 
-              {listDayTwo.map((data: any, index: number) => {
+              {listDayTwoRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -536,7 +560,7 @@ export function ConsolidatedViewScreen() {
           {index === 2 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDayThree.map((data: any, index: number) => {
+              {listDayThreeRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -551,7 +575,7 @@ export function ConsolidatedViewScreen() {
           {index === 3 ? (
             <ScrollView className="w-full">
               <Typography className=" font-bold">{data}</Typography>
-              {listDayFour.map((data: any, index: number) => {
+              {listDayFourRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -566,7 +590,7 @@ export function ConsolidatedViewScreen() {
           {index === 4 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDayFive.map((data: any, index: number) => {
+              {listDayFiveRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -581,7 +605,7 @@ export function ConsolidatedViewScreen() {
           {index === 5 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDaySix.map((data: any, index: number) => {
+              {listDaySixRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -596,7 +620,7 @@ export function ConsolidatedViewScreen() {
           {index === 6 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDaySeven.map((data: any, index: number) => {
+              {listDaySevenRef.current.map((data: any, index: number) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -637,7 +661,10 @@ export function ConsolidatedViewScreen() {
             clearLists()
             setIsWeekView(true)
             setIsDayView(false)
-            getConsolidatedDetails(weekFirstLastDays[0], weekFirstLastDays[6])
+            getConsolidatedDetails(
+              weekFirstLastDaysRef.current[0],
+              weekFirstLastDaysRef.current[6]
+            )
           }}
           className={`w-[40%] items-center justify-center ${isWeekView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -691,8 +718,8 @@ export function ConsolidatedViewScreen() {
                     } else {
                       getWeekCurrentLastDays(selectedDateUtc)
                       getFilterConsolidatedDetails(
-                        weekFirstLastDays[0],
-                        weekFirstLastDays[6]
+                        weekFirstLastDaysRef.current[0],
+                        weekFirstLastDaysRef.current[6]
                       )
                     }
                   }}
@@ -708,20 +735,21 @@ export function ConsolidatedViewScreen() {
                     )
                     setIsShowFilter(false)
                     if (isDayView) {
-                      fromDate = getFullDateForCalendar(
+                      const resetDate = getFullDateForCalendar(
                         new Date(),
                         'YYYY-MM-DD'
                       )
+                      setFromDate(resetDate)
                       setCurrentDateForDayView(
                         getFullDateForCalendar(new Date(), 'DD MMM YYYY')
                       )
-                      toDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
-                      getConsolidatedDetails(fromDate, toDate)
+                      setToDate(resetDate)
+                      getConsolidatedDetails(resetDate, resetDate)
                     } else {
                       getWeekCurrentLastDays(new Date())
                       getConsolidatedDetails(
-                        weekFirstLastDays[0],
-                        weekFirstLastDays[6]
+                        weekFirstLastDaysRef.current[0],
+                        weekFirstLastDaysRef.current[6]
                       )
                     }
                   }}
@@ -761,11 +789,11 @@ export function ConsolidatedViewScreen() {
                 ? currentDateForDayView
                 : weekDaysShort[0] +
                   ', ' +
-                  weekDayListDates[0] +
+                  weekDayListDatesRef.current[0] +
                   ' - ' +
                   weekDaysShort[6] +
                   ', ' +
-                  weekDayListDates[6] +
+                  weekDayListDatesRef.current[6] +
                   ', ' +
                   currentYear}
             </Typography>

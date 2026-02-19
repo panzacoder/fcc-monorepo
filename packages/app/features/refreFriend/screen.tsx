@@ -5,7 +5,6 @@ import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Image } from 'app/ui/image'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, REFER_FRIEND } from 'app/utils/urlConstants'
@@ -16,13 +15,14 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { logger } from 'app/utils/logger'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
 export type Schema = z.infer<typeof schema>
 export function ReferFriendScreen() {
   const [isLoading, setLoading] = useState(false)
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
   const { control, handleSubmit } = useForm({
     defaultValues: {

@@ -8,7 +8,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
-import store from 'app/redux/store'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { logger } from 'app/utils/logger'
@@ -22,9 +22,10 @@ import {
 } from 'app/utils/urlConstants'
 
 export function CircleDetailsScreen() {
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
-  const userDetails = store.getState().userProfileState.header
+  const dispatch = useAppDispatch()
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
   const [isMessages, setIsMessages] = useState(false)
   const [isAppointments, setIsAppointments] = useState(false)
   const [isIncidents, setIsIncidents] = useState(false)
@@ -93,7 +94,7 @@ export function CircleDetailsScreen() {
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.member && data.data.member.address) {
-            store.dispatch(
+            dispatch(
               currentMemberAddressAction.setMemberAddress(
                 data.data.member.address
               )

@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -21,7 +21,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
-import store from 'app/redux/store'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useRouter } from 'expo-router'
@@ -33,6 +32,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   locationName: z.string().min(1, { message: 'Location name is required' }),
   address: z.string(),
@@ -48,13 +48,15 @@ const phoneSchema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 // let statesList = []
-let countryIndex = -1
-let stateIndex = -1
 export function AddEditLocationScreen() {
+  const stateIndexRef = useRef(-1)
+  const countryIndexRef = useRef(-1)
   let locationPhone = ''
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   // console.log('header', JSON.stringify(header))
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
@@ -108,9 +110,9 @@ export function AddEditLocationScreen() {
               : ''
             data.data.stateList.map((data: any, index: any) => {
               if (data.name === stateName) {
-                stateIndex = index + 1
+                stateIndexRef.current = index + 1
                 reset({
-                  state: stateIndex
+                  state: stateIndexRef.current
                 })
               }
             })
@@ -159,14 +161,14 @@ export function AddEditLocationScreen() {
       consoleData('countryName', countryName)
       staticData.countryList.map(async (data: any, index: any) => {
         if (data.name === countryName) {
-          countryIndex = index + 1
-          consoleData('countryName index', '' + countryIndex)
+          countryIndexRef.current = index + 1
+          consoleData('countryName index', '' + countryIndexRef.current)
           reset({
-            country: countryIndex
+            country: countryIndexRef.current
           })
         }
       })
-      let countryId = staticData.countryList[countryIndex - 1].id
+      let countryId = staticData.countryList[countryIndexRef.current - 1].id
         ? staticData.countryList[countryIndex - 1].id
         : 101
       await getStates(countryId)
@@ -197,8 +199,8 @@ export function AddEditLocationScreen() {
         !_.isEmpty(locationDetails) && locationDetails.website
           ? locationDetails.website
           : '',
-      country: !_.isEmpty(locationDetails) ? countryIndex : 97,
-      state: !_.isEmpty(locationDetails) ? stateIndex : -1
+      country: !_.isEmpty(locationDetails) ? countryIndexRef.current : 97,
+      state: !_.isEmpty(locationDetails) ? stateIndexRef.current : -1
     },
     resolver: zodResolver(schema)
   })
@@ -382,8 +384,9 @@ export function AddEditLocationScreen() {
                     label="Country"
                     maxHeight={300}
                     defaultValue={
-                      countryIndex !== -1 && countryList[countryIndex - 1]
-                        ? countryList[countryIndex - 1]?.title
+                      countryIndexRef.current !== -1 &&
+                      countryList[countryIndexRef.current - 1]
+                        ? countryList[countryIndexRef.current - 1]?.title
                         : ''
                     }
                     list={countryList}
@@ -394,8 +397,9 @@ export function AddEditLocationScreen() {
                     name="state"
                     label="State*"
                     defaultValue={
-                      stateIndex !== -1 && statesList[stateIndex - 1]
-                        ? statesList[stateIndex - 1].title
+                      stateIndexRef.current !== -1 &&
+                      statesList[stateIndexRef.current - 1]
+                        ? statesList[stateIndexRef.current - 1].title
                         : ''
                     }
                     maxHeight={300}
