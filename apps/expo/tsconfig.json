@@ -1,3 +1,7 @@
 {
-  "extends": "../../tsconfig"
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
 }

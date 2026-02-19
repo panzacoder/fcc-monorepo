@@ -1,18 +1,18 @@
-import {GET_HEADER, SET_HEADER} from './headerTypes';
+import { GET_HEADER, SET_HEADER } from './headerTypes'
 
 const getHeader = () => {
   return {
-    type: GET_HEADER,
-  };
-};
+    type: GET_HEADER
+  }
+}
 
-const setHeader = (data:any) => {
+const setHeader = (data: any) => {
   return {
     type: SET_HEADER,
-    payload: data,
-  };
-};
+    payload: data
+  }
+}
 
-const headerAction = {getHeader, setHeader};
+const headerAction = { getHeader, setHeader }
 
-export default headerAction;
+export default headerAction

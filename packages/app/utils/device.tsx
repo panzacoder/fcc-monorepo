@@ -15,6 +15,6 @@ export const getUserDeviceInformation = async () => {
     osversion,
     modelnumber,
     browser,
-    appclient: 'M',
+    appclient: 'M'
   }
 }

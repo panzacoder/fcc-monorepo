@@ -43,6 +43,7 @@
     "typescript": "^5.4.3"
   },
   "scripts": {
+    "lint": "eslint .",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",

@@ -7,9 +7,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
   return (
     <StylesProvider>
       <ReduxProvider>
-        <AuthGuard>
-          {children}
-        </AuthGuard>
+        <AuthGuard>{children}</AuthGuard>
       </ReduxProvider>
     </StylesProvider>
   )

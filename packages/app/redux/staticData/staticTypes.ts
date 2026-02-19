@@ -10,9 +10,9 @@ export interface StaticDataState {
 }
 export type StaticDataActionProps =
   | {
-    type: StaticDataActionTypes.GET_STATIC_DATA
-  }
+      type: StaticDataActionTypes.GET_STATIC_DATA
+    }
   | {
-    type: StaticDataActionTypes.SET_STATIC_DATA
-    payload: StaticData
-  }
+      type: StaticDataActionTypes.SET_STATIC_DATA
+      payload: StaticData
+    }

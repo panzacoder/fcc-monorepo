@@ -12,9 +12,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
         <ReduxProvider>
           <SafeArea>
             <AutocompleteDropdownContextProvider>
-              <AuthGuard>
-                {children}
-              </AuthGuard>
+              <AuthGuard>{children}</AuthGuard>
             </AutocompleteDropdownContextProvider>
           </SafeArea>
         </ReduxProvider>

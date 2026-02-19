@@ -1,23 +1,23 @@
-import {GET_PAID_AD, SET_PAID_AD} from './paidAdTypes';
+import { GET_PAID_AD, SET_PAID_AD } from './paidAdTypes'
 
 const initialState = {
-  header: {},
-};
+  header: {}
+}
 
 const paidAdReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_PAID_AD:
       return {
-        ...state,
-      };
+        ...state
+      }
     case SET_PAID_AD:
       return {
         ...state,
-        header: action.payload,
-      };
+        header: action.payload
+      }
     default:
-      return state;
+      return state
   }
-};
+}
 
-export default paidAdReducer;
+export default paidAdReducer

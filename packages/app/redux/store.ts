@@ -6,14 +6,19 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 
 const stateLoader = new StateLoader()
 
-const store = createStore(
-  rootReducer,
-  stateLoader.loadState(),
-  composeWithDevTools()
-)
+const store = createStore(rootReducer, {}, composeWithDevTools())
+
 store.subscribe(() => {
   stateLoader.saveState(store.getState())
 })
+
+export async function hydrateStore() {
+  const savedState = await stateLoader.loadState()
+  if (savedState && Object.keys(savedState).length > 0) {
+    store.dispatch({ type: 'HYDRATE', payload: savedState })
+  }
+}
+
 export default store
 
 export type RootState = ReturnType<typeof store.getState>

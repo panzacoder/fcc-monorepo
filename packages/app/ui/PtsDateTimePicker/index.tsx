@@ -60,7 +60,7 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
               mode={
                 isShowDateModal ? 'date' : isShowTimeModal ? 'time' : 'datetime'
               }
-              style={{  }}
+              style={{}}
               onChange={(event, date) => {
                 if (event.type === 'set') {
                   selectedTime = moment(date).format('hh:mm A')

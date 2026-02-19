@@ -21,4 +21,4 @@ module.exports = {
   },
   expandableCalendar: { CONTAINER: 'expandableCalendar' },
   weekCalendar: { CONTAINER: 'weekCalendar' }
-};
+}

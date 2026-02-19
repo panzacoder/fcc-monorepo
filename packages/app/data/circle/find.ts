@@ -3,14 +3,12 @@ import { Member } from '../types'
 import { fetchData } from '../base'
 import { logger } from 'app/utils/logger'
 
-
 export type FindCircleProps = {
   email?: Member['email']
   phone?: Member['phone']
 }
 
 export type FindCircleReturnType = Member | null
-
 
 export async function findCircle({ email, phone }: FindCircleProps) {
   if (email) {

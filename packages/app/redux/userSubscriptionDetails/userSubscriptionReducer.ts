@@ -1,23 +1,26 @@
-import { GET_SUBSCRIPTION_DETAILS, SET_SUBSCRIPTION_DETAILS } from './userSubscriptionTypes';
+import {
+  GET_SUBSCRIPTION_DETAILS,
+  SET_SUBSCRIPTION_DETAILS
+} from './userSubscriptionTypes'
 
 const initialState = {
-    subscriptionDetails: {},
-};
+  subscriptionDetails: {}
+}
 
 const subscriptionDetailsReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case GET_SUBSCRIPTION_DETAILS:
-            return {
-                ...state,
-            };
-        case SET_SUBSCRIPTION_DETAILS:
-            return {
-                ...state,
-                subscriptionDetails: action.payload,
-            };
-        default:
-            return state;
-    }
-};
+  switch (action.type) {
+    case GET_SUBSCRIPTION_DETAILS:
+      return {
+        ...state
+      }
+    case SET_SUBSCRIPTION_DETAILS:
+      return {
+        ...state,
+        subscriptionDetails: action.payload
+      }
+    default:
+      return state
+  }
+}
 
-export default subscriptionDetailsReducer;
+export default subscriptionDetailsReducer

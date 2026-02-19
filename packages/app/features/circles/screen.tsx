@@ -426,7 +426,6 @@ export function CirclesListScreen() {
         >
           <Feather name={'plus'} size={25} className="color-primary" />
         </TouchableOpacity>
-
       </View>
       {isDataReceived && !isHideCirclesView ? (
         <ScrollView className="z-10">
@@ -471,7 +470,7 @@ export function CirclesListScreen() {
         <View />
       )}
       {isShowPrivacyPolicy ? (
-        <View className="w-full h-[85%]">
+        <View className="h-[85%] w-full">
           <PrivacyPolicy
             address={{}}
             cancelClicked={cancelClicked}

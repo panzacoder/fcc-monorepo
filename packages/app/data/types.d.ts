@@ -210,32 +210,32 @@ export type Address = {
 }
 
 export type Member = {
-  firstName: string,
-  middleName: string | null,
-  lastName: string,
-  email: string,
-  phone: string,
-  salutation: string | null,
-  gender: string | null,
-  dob: string | null,
-  createdOn: string,
-  updatedOn: string | null,
-  createdBy: string | null,
-  modifiedBy: string | null,
-  approvedBy: string | null,
-  version: number,
-  description: string | null,
-  isMember: boolean,
-  name: string | null,
-  isActive: boolean,
-  iscreatedbyPOA: boolean,
-  id: number,
-  address: Address,
-  memberType: string | null,
-  appuser: any | null,
-  timezone: Timezone,
-  isAuthorizedCaregiver: boolean,
-  isSelfMember: boolean,
-  memberId: number,
+  firstName: string
+  middleName: string | null
+  lastName: string
+  email: string
+  phone: string
+  salutation: string | null
+  gender: string | null
+  dob: string | null
+  createdOn: string
+  updatedOn: string | null
+  createdBy: string | null
+  modifiedBy: string | null
+  approvedBy: string | null
+  version: number
+  description: string | null
+  isMember: boolean
+  name: string | null
+  isActive: boolean
+  iscreatedbyPOA: boolean
+  id: number
+  address: Address
+  memberType: string | null
+  appuser: any | null
+  timezone: Timezone
+  isAuthorizedCaregiver: boolean
+  isSelfMember: boolean
+  memberId: number
   memberWithoutEmail: boolean
 }

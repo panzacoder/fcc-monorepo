@@ -193,7 +193,6 @@ export function CardView(data: any) {
       ) : (
         <View />
       )}
-
     </View>
   )
 }

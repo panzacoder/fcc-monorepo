@@ -1,32 +1,30 @@
+const STORE_NAME = '_appdata_store'
+
 export class StateLoader {
-    loadState() {
-      let storeName = '_appdata_store';
-      try {
-        let serializedState = localStorage.getItem(storeName);
-  
-        if (serializedState === null) {
-          return this.initializeState();
-        }
-        return JSON.parse(serializedState);
-      } catch (err) {
-        return this.initializeState();
+  async loadState(): Promise<Record<string, unknown>> {
+    try {
+      const serializedState = localStorage.getItem(STORE_NAME)
+      if (serializedState === null) {
+        return this.initializeState()
       }
-    }
-  
-    saveState(state:any) {
-      let storeName = '_appdata_store';
-      try {
-        let serializedState = JSON.stringify(state);
-        localStorage.setItem(storeName, serializedState);
-      } catch (err) {}
-    }
-  
-    initializeState() {
-      return {
-        //state object
-      };
+      return JSON.parse(serializedState)
+    } catch (err) {
+      return this.initializeState()
     }
   }
-  
-  export default StateLoader;
-  
+
+  async saveState(state: Record<string, unknown>): Promise<void> {
+    try {
+      const serializedState = JSON.stringify(state)
+      localStorage.setItem(STORE_NAME, serializedState)
+    } catch (err) {
+      // Silently fail — localStorage may be full or unavailable
+    }
+  }
+
+  initializeState(): Record<string, unknown> {
+    return {}
+  }
+}
+
+export default StateLoader

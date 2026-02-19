@@ -28,6 +28,10 @@ const rootReducer = (state: any, action: any) => {
     state = undefined
   }
 
+  if (action.type === 'HYDRATE' && action.payload) {
+    return { ...state, ...action.payload }
+  }
+
   return appReducer(state, action)
 }
 export default rootReducer
