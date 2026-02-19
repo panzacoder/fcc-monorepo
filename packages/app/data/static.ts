@@ -1,6 +1,6 @@
 import { fetchData } from './base'
 import { GET_STATIC_DATA } from 'app/utils/urlConstants'
-import type { AppDispatch } from 'app/redux/store'
+import type { AppDispatch } from 'app/redux/hooks'
 import staticDataAction from 'app/redux/staticData/staticAction'
 import {
   AccompanyType,
