@@ -1,9 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const STORE_NAME = '_appdata_store'
 
 export class StateLoader {
-  async loadState(): Promise<Record<string, unknown>> {
+  async loadState() {
     try {
-      const serializedState = localStorage.getItem(STORE_NAME)
+      const serializedState = await AsyncStorage.getItem(STORE_NAME)
       if (serializedState === null) {
         return this.initializeState()
       }
@@ -13,16 +15,16 @@ export class StateLoader {
     }
   }
 
-  async saveState(state: Record<string, unknown>): Promise<void> {
+  async saveState(state: Record<string, unknown>) {
     try {
       const serializedState = JSON.stringify(state)
-      localStorage.setItem(STORE_NAME, serializedState)
+      await AsyncStorage.setItem(STORE_NAME, serializedState)
     } catch (err) {
-      // Silently fail — localStorage may be full or unavailable
+      // Silently fail — AsyncStorage may be unavailable
     }
   }
 
-  initializeState(): Record<string, unknown> {
+  initializeState() {
     return {}
   }
 }
