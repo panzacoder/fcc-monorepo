@@ -64,6 +64,11 @@ yarn web:sb:build   # Storybook build
 - `packages/app/utils/fetchServerData.ts` - Server communication
 - `packages/app/provider/Provider.tsx` - Main app wrapper
 
+## MODERNIZATION ROADMAP
+- **Tracking doc**: `docs/modernization-roadmap.md` — read this first for phase status, GH issue links, and current priorities
+- **Sensitive exploration**: `.claude/future-exploration.md` (gitignored) + `git stash list` for backup
+- Backend team has repo visibility — keep GH issues focused on frontend modernization only
+
 ## ASSUMPTIONS
 - Dev servers assumed running unless stated otherwise
 - User handles builds/deploys unless explicitly requested
