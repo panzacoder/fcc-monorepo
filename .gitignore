@@ -2,6 +2,8 @@
 
 .env.local
 .future-exploration.md
+.claude/
+storybook-static/
 package-lock.json
 
 # OSX

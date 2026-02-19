@@ -13,6 +13,7 @@
 ### Task 1: Update turbo.json with lint and typecheck pipelines
 
 **Files:**
+
 - Modify: `turbo.json`
 
 **Step 1: Replace turbo.json content**
@@ -45,6 +46,7 @@ git commit -m "chore: add lint and typecheck turbo pipelines"
 ### Task 2: Add lint and typecheck scripts to each workspace
 
 **Files:**
+
 - Modify: `apps/next/package.json`
 - Modify: `apps/expo/package.json`
 - Modify: `packages/app/package.json`
@@ -102,6 +104,7 @@ git commit -m "chore: add lint and typecheck scripts to all workspaces"
 ### Task 3: Expand ESLint with new rules and per-workspace configs
 
 **Files:**
+
 - Modify: `.eslintrc.js` (root)
 - Create: `apps/expo/.eslintrc.js`
 - Create: `packages/app/.eslintrc.js`
@@ -135,7 +138,8 @@ module.exports = {
         paths: [
           {
             name: 'app/redux/store',
-            message: 'Use useAppSelector/useAppDispatch hooks from app/redux/hooks instead of importing store directly.'
+            message:
+              'Use useAppSelector/useAppDispatch hooks from app/redux/hooks instead of importing store directly.'
           }
         ]
       }
@@ -192,6 +196,7 @@ git commit -m "chore: expand ESLint with no-console, no-explicit-any, no-restric
 ### Task 4: Split StateLoader into platform variants
 
 **Files:**
+
 - Modify: `packages/app/redux/stateLoader.ts` → becomes shared interface
 - Create: `packages/app/redux/stateLoader.web.ts`
 - Create: `packages/app/redux/stateLoader.native.ts`
@@ -359,6 +364,7 @@ git commit -m "fix: split StateLoader into platform variants with async interfac
 ### Task 5: Create GitHub Actions CI workflow
 
 **Files:**
+
 - Create: `.github/workflows/ci.yml`
 
 **Step 1: Create the workflow file**

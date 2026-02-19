@@ -5,12 +5,14 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 ## ENFORCED PATTERNS
 
 ### File Organization
+
 - **FEATURE-BASED**: Organize by feature, not screen
 - **ATOMIC DESIGN**: UI components follow atomic principles
 - **PLATFORM FILES**: Use `.web.tsx` / `.native.tsx` / `.tsx` extensions
 - **IMPORTS**: Always `import Component from "app/ui/component"`
 
 ### Code Standards
+
 - **NativeWind** for all styling (universal TailwindCSS)
 - **TypeScript strict mode** required
 - **Redux feature-based reducers** in `packages/app/redux/`
@@ -18,20 +20,24 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 - **No comments** unless explicitly requested
 
 ### Branch Naming
+
 `${category}/${issue}-${description}`
+
 - feature/ - New features
-- bugfix/ - Bug fixes  
+- bugfix/ - Bug fixes
 - chore/ - Documentation, formatting, tests
 - hotfix/ - Emergency fixes
 
 ## STRUCTURE
 
 ### Monorepo
+
 - `apps/expo` - React Native (Expo SDK 50)
 - `apps/next` - Next.js 14 web app
 - `packages/app` - Shared code
 
 ### packages/app/
+
 - `features/` - Feature modules (auth, appointments, circles)
 - `ui/` - Cross-platform components
 - `provider/` - React context providers
@@ -40,6 +46,7 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 - `utils/` - Utilities, API constants
 
 ## TECH STACK
+
 - React Native 0.73.6 + Expo SDK 50
 - Next.js 14 + TypeScript
 - NativeWind v4 + TailwindCSS
@@ -48,6 +55,7 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 - Storybook 7
 
 ## QUALITY COMMANDS
+
 ```bash
 yarn format         # Prettier
 yarn workspace next-app lint  # ESLint
@@ -55,21 +63,25 @@ yarn web:sb:build   # Storybook build
 ```
 
 ## DEPENDENCIES
+
 - **Pure JS**: Install in `packages/app`
 - **Native code**: Install in `apps/expo`
 
 ## KEY FILES
+
 - `packages/app/config/tailwind.config.js` - Design system
 - `packages/app/utils/serverUrls.ts` - 150+ API endpoints
 - `packages/app/utils/fetchServerData.ts` - Server communication
 - `packages/app/provider/Provider.tsx` - Main app wrapper
 
 ## MODERNIZATION ROADMAP
+
 - **Tracking doc**: `docs/modernization-roadmap.md` — read this first for phase status, GH issue links, and current priorities
 - **Sensitive exploration**: `.claude/future-exploration.md` (gitignored) + `git stash list` for backup
 - Backend team has repo visibility — keep GH issues focused on frontend modernization only
 
 ## ASSUMPTIONS
+
 - Dev servers assumed running unless stated otherwise
 - User handles builds/deploys unless explicitly requested
 - Healthcare compliance and security critical
