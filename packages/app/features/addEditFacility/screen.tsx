@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState , useRef} from 'react'
+import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -38,7 +38,7 @@ const schema = z.object({
   fax: z.string()
 })
 const phoneSchema = z.object({
-  locationPhoneRef.current: z.string()
+  locationPhone: z.string()
 })
 export type Schema = z.infer<typeof schema>
 export function AddEditFacilityScreen() {
@@ -96,7 +96,9 @@ export function AddEditFacilityScreen() {
     }
   }
   const [isLoading, setLoading] = useState(false)
-  const [isActive, setIsActive] = useState(isFacilityActiveRef.current ? true : false)
+  const [isActive, setIsActive] = useState(
+    isFacilityActiveRef.current ? true : false
+  )
   const [isPharmacy, setIsPharmacy] = useState(false)
   const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
     return {
@@ -128,7 +130,7 @@ export function AddEditFacilityScreen() {
   })
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
-      locationPhoneRef.current: ''
+      locationPhone: ''
     },
     resolver: zodResolver(phoneSchema)
   })
@@ -188,7 +190,9 @@ export function AddEditFacilityScreen() {
     let locationList: object[] = []
     selectedAddressRef.current.fax = formData.fax
     selectedAddressRef.current.website = formData.website
-    selectedAddressRef.current.phone = removeAllSpecialCharFromString(locationPhoneRef.current)
+    selectedAddressRef.current.phone = removeAllSpecialCharFromString(
+      locationPhoneRef.current
+    )
     selectedAddressRef.current.address.id = ''
     locationList.push(selectedAddressRef.current)
     let url = `${BASE_URL}${CREATE_FACILITY}`
@@ -264,9 +268,11 @@ export function AddEditFacilityScreen() {
         selectedAddressRef.current.address.state.country.id = value.id
         selectedAddressRef.current.address.state.country.name = value.name
         selectedAddressRef.current.address.state.country.code = value.code
-        selectedAddressRef.current.address.state.country.namecode = value.namecode
+        selectedAddressRef.current.address.state.country.namecode =
+          value.namecode
         selectedAddressRef.current.address.state.country.snum = value.snum
-        selectedAddressRef.current.address.state.country.description = value.description
+        selectedAddressRef.current.address.state.country.description =
+          value.description
       }
       if (index === 5) {
         selectedAddressRef.current.address.state.id = value.id
@@ -403,7 +409,7 @@ export function AddEditFacilityScreen() {
 
                     <ControlledTextField
                       control={control1}
-                      name="locationPhoneRef.current"
+                      name="locationPhone"
                       placeholder={'Phone'}
                       className="mt-[-5] w-full"
                       keyboard="number-pad"
@@ -411,7 +417,7 @@ export function AddEditFacilityScreen() {
                         locationPhoneRef.current =
                           convertPhoneNumberToUsaPhoneNumberFormat(value)
                         reset1({
-                          locationPhoneRef.current: locationPhoneRef.current
+                          locationPhone: locationPhoneRef.current
                         })
                       }}
                     />

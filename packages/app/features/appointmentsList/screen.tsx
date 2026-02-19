@@ -149,15 +149,16 @@ export function AppointmentsListScreen() {
         month: selectedMonthRef.current,
         year: selectedYearRef.current,
         type: selectedTypeRef.current,
-        doctorIdRef.current: doctorIdRef.current,
-        facilityIdRef.current: facilityIdRef.current
+        doctorId: doctorIdRef.current,
+        facilityId: facilityIdRef.current
       }
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           if (data.data.domainObjectPrivileges) {
-            appointmentPrivilegesRef.current = data.data.domainObjectPrivileges.Appointment
+            appointmentPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Appointment
               ? data.data.domainObjectPrivileges.Appointment
               : {}
           }
@@ -264,11 +265,11 @@ export function AppointmentsListScreen() {
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     doctorIdRef.current =
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
-        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorIdRef.current
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorId
         : 'All'
     facilityIdRef.current =
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
-        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityIdRef.current
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityId
         : 'All'
     getAppointmentDetails()
   }
@@ -349,7 +350,8 @@ export function AppointmentsListScreen() {
           />
         </TouchableOpacity>
         <View className="w-[35%]" />
-        {getUserPermission(appointmentPrivilegesRef.current).createPermission ? (
+        {getUserPermission(appointmentPrivilegesRef.current)
+          .createPermission ? (
           <View className=" mt-[20] self-center">
             <TouchableOpacity
               className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
