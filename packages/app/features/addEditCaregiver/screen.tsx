@@ -270,7 +270,6 @@ export function AddEditCaregiverScreen() {
     setIsShowProfileInfo(false)
   }
   const infoClicked = () => {
-
     setIsShowProfileInfo(true)
   }
   return (
@@ -280,7 +279,7 @@ export function AddEditCaregiverScreen() {
         title={_.isEmpty(caregiverDetails) ? 'Add Caregiver' : 'Edit Caregiver'}
         memberData={memberData}
       />
-      <SafeAreaView className='flex-1'>
+      <SafeAreaView className="flex-1">
         <ScrollView
           className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[90%]' : ' mt-10 max-h-[60%]'} w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2`}
         >

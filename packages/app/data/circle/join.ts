@@ -24,7 +24,7 @@ export type JoinCircleProps =
       id: number
     }
   | {
-      email: string,
+      email: string
       caregiverFname: string
     }
 

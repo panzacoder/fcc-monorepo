@@ -361,7 +361,7 @@ export function SignUpScreen() {
       )}
       {isShowTerms ? (
         <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
-          <TermsAndConditions  address={address} cancelClicked={cancelClicked} />
+          <TermsAndConditions address={address} cancelClicked={cancelClicked} />
         </View>
       ) : (
         <View />

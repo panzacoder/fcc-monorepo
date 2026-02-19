@@ -632,7 +632,7 @@ export function EventDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-bold w-[95%] text-[15px] text-black">
+                <Typography className=" w-[95%] text-[15px] font-bold text-black">
                   {event}
                 </Typography>
               </View>

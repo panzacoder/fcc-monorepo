@@ -1,5 +1,5 @@
 export {
   storeCredentials,
   getCredentials,
-  clearCredentials,
+  clearCredentials
 } from './secure-storage.native'

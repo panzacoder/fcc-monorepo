@@ -1,10 +1,17 @@
 import Checkbox from 'expo-checkbox'
-import { useController, useFormState } from "react-hook-form"
-import { cn } from "app/ui/utils"
+import { useController, useFormState } from 'react-hook-form'
+import { cn } from 'app/ui/utils'
 
-export function ControlledCheckbox({ name, disabled, className, ...rest }: { name: string } & React.ComponentProps<typeof Checkbox>) {
-
-  const { field: { onChange, value }, fieldState: { invalid } } = useController({ name })
+export function ControlledCheckbox({
+  name,
+  disabled,
+  className,
+  ...rest
+}: { name: string } & React.ComponentProps<typeof Checkbox>) {
+  const {
+    field: { onChange, value },
+    fieldState: { invalid }
+  } = useController({ name })
   const { isSubmitting } = useFormState()
 
   return (
@@ -15,7 +22,5 @@ export function ControlledCheckbox({ name, disabled, className, ...rest }: { nam
       disabled={disabled || isSubmitting}
       {...rest}
     />
-
   )
 }
-

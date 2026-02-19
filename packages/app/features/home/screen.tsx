@@ -6,7 +6,7 @@ import {
   Alert,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from 'react-native'
 import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'

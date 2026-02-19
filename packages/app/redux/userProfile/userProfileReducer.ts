@@ -1,23 +1,23 @@
-import { GET_USER_PROFILE, SET_USER_PROFILE } from './userProfileTypes';
+import { GET_USER_PROFILE, SET_USER_PROFILE } from './userProfileTypes'
 
 const initialState = {
-  header: {},
-};
+  header: {}
+}
 
 const userProfileReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_USER_PROFILE:
       return {
-        ...state,
-      };
+        ...state
+      }
     case SET_USER_PROFILE:
       return {
         ...state,
-        header: action.payload,
-      };
+        header: action.payload
+      }
     default:
-      return state;
+      return state
   }
-};
+}
 
-export default userProfileReducer;
+export default userProfileReducer

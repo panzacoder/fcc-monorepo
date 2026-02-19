@@ -220,7 +220,7 @@ export function AddEditLocationScreen() {
           : 101
         await getStates(countryId)
       }
-    } 
+    }
     // else {
     //   setStatesList([])
     //   setStatesListFull([])

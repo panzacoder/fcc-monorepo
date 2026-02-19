@@ -16,7 +16,7 @@ export const CaregiverProfileInfo = ({ cancelClicked }) => {
     )
   }
   return (
-    <View className="my-2 h-[90%] w-[95%] self-center rounded-[15px] bg-white shadow border-[0.5px] border-gray-400">
+    <View className="my-2 h-[90%] w-[95%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-white shadow">
       <View className=" w-full">
         <View className="h-[50px] w-full flex-row rounded-tl-[10px] rounded-tr-[10px] bg-[#066f72]">
           <Typography className="mt-[15px] w-[85%] text-center font-bold text-white">

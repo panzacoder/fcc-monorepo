@@ -12,10 +12,7 @@ export async function storeCredentials(
   password: string
 ): Promise<void> {
   const credentials: StoredCredentials = { email, password }
-  await SecureStore.setItemAsync(
-    CREDENTIALS_KEY,
-    JSON.stringify(credentials)
-  )
+  await SecureStore.setItemAsync(CREDENTIALS_KEY, JSON.stringify(credentials))
 }
 
 export async function getCredentials(): Promise<StoredCredentials | null> {

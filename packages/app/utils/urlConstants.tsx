@@ -11,7 +11,7 @@ export const BASE_URL = resolvedUrl
 export const GET_STATIC_DATA = 'staticms/getAll'
 export const USER_LOGIN = 'userms/login'
 export const USER_LOGOUT = 'userms/logout'
-export const UPDATE_FCM_TOKEN = 'userms/updateFcmToken';
+export const UPDATE_FCM_TOKEN = 'userms/updateFcmToken'
 export const CREATE_ACCOUNT = 'regms/create'
 export const FORGOT_PASSWORD = 'userms/forgetPassword'
 export const RESET_PASSWORD = 'userms/resetPassword'
@@ -193,6 +193,8 @@ export const REJECT_TRANSPORT = 'apptransportms/rejectTransportationRequest'
 
 export const APPROVE_TRANSPORT = 'apptransportms/acceptTransporationRequest'
 
-export const EVENT_ACCEPT_TRANSPORTATION_REQUEST = 'eventtransportms/acceptTransportationRequest';
+export const EVENT_ACCEPT_TRANSPORTATION_REQUEST =
+  'eventtransportms/acceptTransportationRequest'
 
-export const EVENT_REJECT_TRANSPORTATION_REQUEST = 'eventtransportms/rejectTransportationRequest';
+export const EVENT_REJECT_TRANSPORTATION_REQUEST =
+  'eventtransportms/rejectTransportationRequest'

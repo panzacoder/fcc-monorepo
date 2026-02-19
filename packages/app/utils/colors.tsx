@@ -11,5 +11,5 @@ export const COLORS = {
   noteColor: '#FCF3CF',
   buttonOrange: '#ef6603',
   drawer_bg: '#184E4E',
-  transparent: "transparent",
+  transparent: 'transparent'
 }

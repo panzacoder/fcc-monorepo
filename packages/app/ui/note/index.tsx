@@ -92,7 +92,7 @@ export const Note = ({
       <View className="my-2 h-[1px] w-full bg-[#86939e]" />
       <View className="">
         <Typography
-          className={`font-400 ml-2 text-[9px] text-[#1A1A1A] w-full`}
+          className={`font-400 ml-2 w-full text-[9px] text-[#1A1A1A]`}
         >
           {noteData.createdByName
             ? 'Created by ' + noteData.createdByName + ' on ' + creationDate

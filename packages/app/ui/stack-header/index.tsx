@@ -3,7 +3,11 @@ import { NativeStackHeaderProps } from '@react-navigation/native-stack'
 import { Typography } from '../typography'
 import { Feather } from '../icons'
 
-export function StackHeader({ navigation, options, back }: NativeStackHeaderProps) {
+export function StackHeader({
+  navigation,
+  options,
+  back
+}: NativeStackHeaderProps) {
   return (
     <View className="w-3/4 flex-row items-center gap-2 pl-2 pt-2">
       {back && (

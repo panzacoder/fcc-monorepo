@@ -1,20 +1,18 @@
-
-import {GET_PAID_AD, SET_PAID_AD} from './paidAdTypes';
+import { GET_PAID_AD, SET_PAID_AD } from './paidAdTypes'
 
 const getPaidAd = () => {
   return {
-    type: GET_PAID_AD,
-  };
-};
+    type: GET_PAID_AD
+  }
+}
 
 const setPaidAd = (data) => {
   return {
     type: SET_PAID_AD,
-    payload: data,
-  };
-};
+    payload: data
+  }
+}
 
-const paidAdAction = {getPaidAd, setPaidAd};
+const paidAdAction = { getPaidAd, setPaidAd }
 
-export default paidAdAction;
-
+export default paidAdAction
