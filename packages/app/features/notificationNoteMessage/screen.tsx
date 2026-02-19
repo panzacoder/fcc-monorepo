@@ -18,8 +18,7 @@ import * as Notifications from 'expo-notifications'
 import { Typography } from 'app/ui/typography'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
-import store from 'app/redux/store'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {
@@ -43,8 +42,9 @@ export function NotificationNoteMessageScreen() {
   const [message, setMessage] = useState('')
   const [messageList, setMessageList] = useState(null) as any
   const [threadDetails, setThreadDetails] = useState(null) as any
-  const header = store.getState().headerState.header
-  const userDetails = store.getState().userProfileState.header
+  const dispatch = useAppDispatch()
+  const header = useAppSelector((state) => state.headerState.header)
+  const userDetails = useAppSelector((state) => state.userProfileState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -82,7 +82,7 @@ export function NotificationNoteMessageScreen() {
                 ? messageThread.messageList
                 : []
             setMessageList(messageList)
-            store.dispatch(messageListAction.setMessageList(messageList))
+            dispatch(messageListAction.setMessageList(messageList))
           }
         } else {
           Alert.alert('', data.message)
@@ -105,8 +105,11 @@ export function NotificationNoteMessageScreen() {
       })
     } catch (e) {}
   }, [])
+  const messageListFromStore = useAppSelector(
+    (state) => state.messageList.messageList
+  )
   async function updateMessageList(message: any) {
-    let messageList: any = store.getState().messageList.messageList
+    let messageList: any = messageListFromStore
     let messeageContent = message.data ? message.data : {}
     let messageObject = {
       sender: messeageContent.MemberId ? messeageContent.MemberId : '',
