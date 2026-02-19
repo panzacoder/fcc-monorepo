@@ -8,9 +8,9 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 | Phase  | Issue                                                           | Title                                    | Status                                                                                        |
 | ------ | --------------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)     | Triage Open PRs & Establish Baseline     | Needs closing                                                                                 |
-| 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)     | Security Hardening                       | Merged ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115)) — issue needs closing |
-| **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99) | **Developer Experience & CI Foundation** | **Up next**                                                                                   |
+| 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)     | Triage Open PRs & Establish Baseline     | Done                                                                                          |
+| 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)     | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))                         |
+| **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99) | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116))                     |
 | 3      | [#100](https://github.com/panzacoder/fcc-monorepo/issues/100)   | State Management Remediation             | Blocked by Phase 2                                                                            |
 | 4      | [#101](https://github.com/panzacoder/fcc-monorepo/issues/101)   | Data Layer Modernization                 | Blocked by Phase 3                                                                            |
 | 5      | [#102](https://github.com/panzacoder/fcc-monorepo/issues/102)   | Testing Foundation                       | Blocked by Phase 2, 4                                                                         |
@@ -73,6 +73,8 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 ## Notes
 
-- Phase 1 PR #115 was merged 2026-02-18. Issues #97 and #98 should be closed.
 - Sensitive long-term exploration tracked separately (see `git stash list` for `.future-exploration.md`).
 - Backend team has visibility on this repo — keep GH issues focused on frontend modernization only.
+- **EAS/Expo builds not yet in CI** — current pipeline covers web only (lint, typecheck, format, Next.js build). Add EAS Build CI after Expo SDK upgrade (Phase 8A, GH #105).
+- **PR convention**: always include `Closes #<issue>` in PR body for auto-closing. Consider adding a PR template.
+- **Node 24** set across CI, Vercel, `.mise.toml`, and `.nvmrc` as of Phase 2.
