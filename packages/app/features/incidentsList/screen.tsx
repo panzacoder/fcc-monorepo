@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -9,7 +9,6 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import { BASE_URL, GET_INCIDENTS } from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
@@ -23,7 +22,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-let incidentsPrivileges = {}
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
@@ -31,22 +29,25 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 
 const monthsList = getMonthsList() as any
-let selectedMonth = 'All'
-let selectedYear = 'All'
 export function IncidentsListScreen() {
+  const incidentsPrivilegesRef = useRef<any>({})
+  const selectedMonthRef = useRef<any>('All')
+  const selectedYearRef = useRef<any>('All')
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [incidentsList, setIncidentsList] = useState([]) as any
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
@@ -79,15 +80,16 @@ export function IncidentsListScreen() {
           id: memberData.member ? memberData.member : ''
         }
       },
-      month: selectedMonth,
-      year: selectedYear
+      month: selectedMonthRef.current,
+      year: selectedYearRef.current
     }
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         if (data.status === 'SUCCESS') {
           // console.log('data', JSON.stringify(data.data.eventList))
           if (data.data.domainObjectPrivileges) {
-            incidentsPrivileges = data.data.domainObjectPrivileges.Incident
+            incidentsPrivilegesRef.current = data.data.domainObjectPrivileges
+              .Incident
               ? data.data.domainObjectPrivileges.Incident
               : {}
           }
@@ -135,17 +137,17 @@ export function IncidentsListScreen() {
   }, [])
 
   function filterEvents(formData: Schema) {
-    selectedMonth =
+    selectedMonthRef.current =
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYear =
+    selectedYearRef.current =
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
     getIncidentDetails()
   }
   function resetFilter() {
-    selectedMonth = 'All'
-    selectedYear = 'All'
+    selectedMonthRef.current = 'All'
+    selectedYearRef.current = 'All'
     getIncidentDetails()
     reset({
       monthIndex: 1,
@@ -173,7 +175,7 @@ export function IncidentsListScreen() {
       <View className="flex-row">
         <View className="w-[75%]" />
 
-        {getUserPermission(incidentsPrivileges).createPermission ? (
+        {getUserPermission(incidentsPrivilegesRef.current).createPermission ? (
           <View className="self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

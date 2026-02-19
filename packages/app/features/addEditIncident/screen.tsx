@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Alert, View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -18,7 +18,6 @@ import {
   CREATE_INCIDENT,
   UPDATE_INCIDENT
 } from 'app/utils/urlConstants'
-import store from 'app/redux/store'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -26,16 +25,19 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { logger } from 'app/utils/logger'
-let incidentType: any = ''
+import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter incident title' })
 })
 export type Schema = z.infer<typeof schema>
 export function AddEditIncidentScreen() {
-  const header = store.getState().headerState.header
+  const incidentTypeRef = useRef<any>('')
+  const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
@@ -81,7 +83,7 @@ export function AddEditIncidentScreen() {
     setKey(Math.random())
   }
   if (!_.isEmpty(incidentDetails) && !isLoading) {
-    incidentType = incidentDetails.type ? incidentDetails.type : ''
+    incidentTypeRef.current = incidentDetails.type ? incidentDetails.type : ''
   }
   const incidentTypeList = staticData.incidentTypeList.map(
     (data: any, index: any) => {
@@ -185,7 +187,7 @@ export function AddEditIncidentScreen() {
         date: selectedDate,
         title: formData.title,
         description: formData.description,
-        type: incidentType,
+        type: incidentTypeRef.current,
         member: {
           id: memberData.member ? memberData.member : ''
         },
@@ -231,7 +233,7 @@ export function AddEditIncidentScreen() {
       })
   }
   const onSelectionIncidentType = (data: any) => {
-    incidentType = data
+    incidentTypeRef.current = data
     // console.log('purpose1', purpose)
   }
   return (
@@ -255,7 +257,7 @@ export function AddEditIncidentScreen() {
           </View>
           <View className="mt-2 w-full self-center">
             <PtsComboBox
-              currentData={incidentType}
+              currentData={incidentTypeRef.current}
               listData={incidentTypeList}
               onSelection={onSelectionIncidentType}
               placeholderValue={'Incident Type'}

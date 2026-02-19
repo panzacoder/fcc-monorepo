@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   View,
   Alert,
@@ -14,7 +14,6 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import store from 'app/redux/store'
 import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
@@ -39,9 +38,9 @@ import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
-let incidentPrivileges = {}
-let notePrivileges = {}
 export function IncidentDetailsScreen() {
+  const incidentPrivilegesRef = useRef<any>({})
+  const notePrivilegesRef = useRef<any>({})
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -52,7 +51,7 @@ export function IncidentDetailsScreen() {
   const [incidentDetails, setIncidentDetails] = useState({}) as any
   const [noteData, setNoteData] = useState({})
   const [notesList, setNotesList] = useState([])
-  const header = store.getState().headerState.header
+  const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -84,10 +83,12 @@ export function IncidentDetailsScreen() {
           if (data.status === 'SUCCESS') {
             // console.log('data', JSON.stringify(data.data))
             if (data.data.domainObjectPrivileges) {
-              incidentPrivileges = data.data.domainObjectPrivileges.Incident
+              incidentPrivilegesRef.current = data.data.domainObjectPrivileges
+                .Incident
                 ? data.data.domainObjectPrivileges.Incident
                 : {}
-              notePrivileges = data.data.domainObjectPrivileges.INCIDENTNOTE
+              notePrivilegesRef.current = data.data.domainObjectPrivileges
+                .INCIDENTNOTE
                 ? data.data.domainObjectPrivileges.INCIDENTNOTE
                 : data.data.domainObjectPrivileges.IncidentNote
                   ? data.data.domainObjectPrivileges.IncidentNote
@@ -397,7 +398,8 @@ export function IncidentDetailsScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(incidentPrivileges).createPermission ? (
+              {getUserPermission(incidentPrivilegesRef.current)
+                .createPermission ? (
                 <Button
                   className="w-[50%]"
                   title="Create Similar"
@@ -415,7 +417,8 @@ export function IncidentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(incidentPrivileges).updatePermission ? (
+              {getUserPermission(incidentPrivilegesRef.current)
+                .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
                   title="Edit"
@@ -476,7 +479,7 @@ export function IncidentDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivileges).createPermission ? (
+              {getUserPermission(notePrivilegesRef.current).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -503,7 +506,7 @@ export function IncidentDetailsScreen() {
                         editNote={editNote}
                         deleteNote={deleteNote}
                         messageThreadClicked={messageThreadClicked}
-                        notePrivileges={notePrivileges}
+                        notePrivileges={notePrivilegesRef.current}
                       />
                     </View>
                   )
@@ -514,7 +517,7 @@ export function IncidentDetailsScreen() {
             )}
           </View>
 
-          {getUserPermission(incidentPrivileges).deletePermission ? (
+          {getUserPermission(incidentPrivilegesRef.current).deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""
