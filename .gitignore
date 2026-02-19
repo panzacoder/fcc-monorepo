@@ -2,7 +2,9 @@
 
 .env.local
 .future-exploration.md
-.claude/
+.claude/settings.local.json
+.claude/future-exploration.md
+.claude/worktrees/
 storybook-static/
 package-lock.json
 
