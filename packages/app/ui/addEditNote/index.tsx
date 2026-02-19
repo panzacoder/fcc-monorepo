@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import store from 'app/redux/store'
+import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -15,14 +15,16 @@ const schema = z.object({
   occurrenceIndex: z.number().min(0, { message: 'Occurrence is required' })
 })
 export type Schema = z.infer<typeof schema>
-let occurance: any = ''
 export const AddEditNote = ({
   component,
   noteData,
   cancelClicked,
   createUpdateNote
 }) => {
-  const staticData: any = store.getState().staticDataState.staticData
+  const staticData: any = useAppSelector(
+    (state) => state.staticDataState.staticData
+  )
+  let occurance: any = ''
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
