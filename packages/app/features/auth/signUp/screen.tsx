@@ -1,10 +1,9 @@
 'use client'
 
-import { Component, useState } from 'react'
+import { useState } from 'react'
 import { View, Alert } from 'react-native'
-import { CallPostService } from 'app/utils/fetchServerData'
+import { useCreateAccount } from 'app/data/auth'
 import { Button } from 'app/ui/button'
-import { BASE_URL, CREATE_ACCOUNT } from 'app/utils/urlConstants'
 import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
@@ -83,7 +82,7 @@ type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
   let userPhone = ''
-  const [isLoading, setLoading] = useState(false)
+  const createAccountMutation = useCreateAccount({})
   const [timeZone, setTimeZone] = useState('')
   const [address, setAddress] = useState({})
   const [isShowPrivacyPolicy, setIsShowPrivacyPolicy] = useState(false)
@@ -119,39 +118,34 @@ export function SignUpScreen() {
       Alert.alert('', 'Please select State')
       return
     }
-    const url = `${BASE_URL}${CREATE_ACCOUNT}`
-    const dataObject = {
-      registration: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: removeAllSpecialCharFromString(userPhone),
-        email: formData.email,
-        credential: formData.password,
-        userTimezone: timeZone,
-        referralCode: '',
-        address: {
-          state: {
-            id: selectedAddress.address.state.id
+    createAccountMutation.mutate(
+      {
+        registration: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: removeAllSpecialCharFromString(userPhone),
+          email: formData.email,
+          credential: formData.password,
+          userTimezone: timeZone,
+          referralCode: '',
+          address: {
+            state: {
+              id: selectedAddress.address.state.id
+            }
           }
         }
-      }
-    }
-    setLoading(true)
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          router.push(formatUrl('/verification', { email: formData.email }))
-        } else if (data.errorCode === 'RVF_101') {
-          Alert.alert('', 'Please check your email for verification code')
-        } else {
-          Alert.alert('', data.message)
+      },
+      {
+        onSuccess: (data: any) => {
+          if (data) {
+            router.push(formatUrl('/verification', { email: formData.email }))
+          }
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to create account')
         }
-      })
-      .catch((error) => {
-        Alert.alert('', error)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function setAddressObject(value: any, index: any) {
     if (value) {
@@ -227,7 +221,7 @@ export function SignUpScreen() {
             }
           />
 
-          <PtsLoader loading={isLoading} />
+          <PtsLoader loading={createAccountMutation.isPending} />
           <View className="my-5 flex flex-shrink justify-end gap-y-4">
             <View className="flex w-full gap-2">
               <View className="flex w-full flex-row justify-between gap-2">
