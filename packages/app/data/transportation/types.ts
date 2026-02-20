@@ -71,7 +71,7 @@ export interface UpdateTransportationReminderParams {
 }
 
 export interface DeleteTransportationReminderParams {
-  reminder: { id: number | string }
+  reminder: Record<string, unknown>
 }
 
 export interface CreateTransportationReminderEventParams {
@@ -83,5 +83,5 @@ export interface UpdateTransportationReminderEventParams {
 }
 
 export interface DeleteTransportationReminderEventParams {
-  reminder: { id: number | string }
+  reminder: Record<string, unknown>
 }
