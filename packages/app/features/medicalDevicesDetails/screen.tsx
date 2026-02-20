@@ -13,17 +13,19 @@ import moment from 'moment'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
-  GET_MEDICAL_DEVICE_DETAILS,
   GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD,
-  DELETE_MEDICAL_DEVICE_NOTE,
-  CREATE_MEDICAL_DEVICE_NOTE,
-  UPDATE_MEDICAL_DEVICE_NOTE,
-  DELETE_MEDICAL_DEVICE,
-  DELETE_MEDICAL_DEVICE_REMINDER,
-  CREATE_MEDICAL_DEVICE_REMINDER,
-  UPDATE_MEDICAL_DEVICE_REMINDER
+  CREATE_MESSAGE_THREAD
 } from 'app/utils/urlConstants'
+import {
+  useMedicalDeviceDetails,
+  useDeleteMedicalDevice,
+  useCreateMedicalDeviceNote,
+  useUpdateMedicalDeviceNote,
+  useDeleteMedicalDeviceNote,
+  useCreateMedicalDeviceReminder,
+  useUpdateMedicalDeviceReminder,
+  useDeleteMedicalDeviceReminder
+} from 'app/data/medical-devices'
 import { useLocalSearchParams } from 'expo-router'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -70,65 +72,63 @@ export function MedicalDevicesDetailsScreen() {
     item.medicalDevicesDetails && item.medicalDevicesDetails !== undefined
       ? JSON.parse(item.medicalDevicesDetails)
       : {}
-  // console.log('medicalDevicesDetails', JSON.stringify(medicalDevicesDetails))
-  const getMedicalDevicesDetails = useCallback(
-    async (isFromCreateThread: any, noteData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEDICAL_DEVICE_DETAILS}`
-      let dataObject = {
-        header: header,
-        purchase: {
-          id: medicalDeviceData.id ? medicalDeviceData.id : ''
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('data', JSON.stringify(data.data))
-            if (data.data.domainObjectPrivileges) {
-              medicalDevicePrivilegesRef.current = data.data
-                .domainObjectPrivileges.Purchase
-                ? data.data.domainObjectPrivileges.Purchase
-                : {}
-              notePrivilegesRef.current = data.data.domainObjectPrivileges
-                .PURCHASENOTE
-                ? data.data.domainObjectPrivileges.PURCHASENOTE
-                : data.data.domainObjectPrivileges.PurchaseNote
-                  ? data.data.domainObjectPrivileges.PurchaseNote
-                  : {}
-            }
 
-            setMedicalDevicesDetails(
-              data.data.purchase ? data.data.purchase : {}
-            )
-            if (data.data.purchase.noteList) {
-              setNotesList(data.data.purchase.noteList)
-            }
-            if (data.data.purchase.reminderList) {
-              setRemindersList(data.data.purchase.reminderList)
-            }
-            setIsRender(!isRender)
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'Medical Device',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(noteData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
+  const medicalDeviceId = medicalDeviceData.id
+    ? Number(medicalDeviceData.id)
+    : 0
+  const {
+    data: medicalDeviceDetailsData,
+    isLoading: isDetailsLoading,
+    refetch: refetchDetails
+  } = useMedicalDeviceDetails(header, medicalDeviceId)
+
+  const deleteMedicalDeviceMutation = useDeleteMedicalDevice(header)
+  const createNoteMutation = useCreateMedicalDeviceNote(header)
+  const updateNoteMutation = useUpdateMedicalDeviceNote(header)
+  const deleteNoteMutation = useDeleteMedicalDeviceNote(header)
+  const createReminderMutation = useCreateMedicalDeviceReminder(header)
+  const updateReminderMutation = useUpdateMedicalDeviceReminder(header)
+  const deleteReminderMutation = useDeleteMedicalDeviceReminder(header)
+
+  const navigateAfterThreadRef = useRef<{ noteData: any } | null>(null)
+
+  useEffect(() => {
+    if (medicalDeviceDetailsData) {
+      const data = medicalDeviceDetailsData as any
+      if (data.domainObjectPrivileges) {
+        medicalDevicePrivilegesRef.current = data.domainObjectPrivileges
+          .Purchase
+          ? data.domainObjectPrivileges.Purchase
+          : {}
+        notePrivilegesRef.current = data.domainObjectPrivileges.PURCHASENOTE
+          ? data.domainObjectPrivileges.PURCHASENOTE
+          : data.domainObjectPrivileges.PurchaseNote
+            ? data.domainObjectPrivileges.PurchaseNote
+            : {}
+      }
+
+      setMedicalDevicesDetails(data.purchase ? data.purchase : {})
+      if (data.purchase && data.purchase.noteList) {
+        setNotesList(data.purchase.noteList)
+      }
+      if (data.purchase && data.purchase.reminderList) {
+        setRemindersList(data.purchase.reminderList)
+      }
+      setIsRender((prev) => !prev)
+
+      if (navigateAfterThreadRef.current) {
+        const navNoteData = navigateAfterThreadRef.current.noteData
+        navigateAfterThreadRef.current = null
+        router.push(
+          formatUrl('/circles/noteMessage', {
+            component: 'Medical Device',
+            memberData: JSON.stringify(memberData),
+            noteData: JSON.stringify(navNoteData)
+          })
+        )
+      }
+    }
+  }, [medicalDeviceDetailsData])
 
   function handleBackButtonClick() {
     router.dismiss(2)
@@ -140,9 +140,6 @@ export function MedicalDevicesDetailsScreen() {
     return true
   }
   useEffect(() => {
-    if (!isAddNote) {
-      getMedicalDevicesDetails(false, noteData)
-    }
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -209,45 +206,50 @@ export function MedicalDevicesDetailsScreen() {
     date: any,
     reminderData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: '',
-        content: title,
-        date: date,
-        purchase: {
-          id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
-        }
+    const reminderPayload: Record<string, unknown> = {
+      content: title,
+      date: date,
+      purchase: {
+        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
       }
     }
-    if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_MEDICAL_DEVICE_REMINDER}`
-    } else {
-      url = `${BASE_URL}${UPDATE_MEDICAL_DEVICE_REMINDER}`
-      dataObject.reminder.id = reminderData.id
-    }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddReminder(false)
-          setRemindersList(
-            data.data.purchase.reminderList
-              ? data.data.purchase.reminderList
-              : []
-          )
-        } else {
-          Alert.alert('', data.message)
+    if (_.isEmpty(reminderData)) {
+      createReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            if (data.purchase && data.purchase.reminderList) {
+              setRemindersList(data.purchase.reminderList)
+            } else {
+              refetchDetails()
+            }
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create reminder')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      reminderPayload.id = reminderData.id
+      updateReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            if (data.purchase && data.purchase.reminderList) {
+              setRemindersList(data.purchase.reminderList)
+            } else {
+              refetchDetails()
+            }
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update reminder')
+          }
+        }
+      )
+    }
   }
   async function createUpdateNote(
     occurance: any,
@@ -255,43 +257,45 @@ export function MedicalDevicesDetailsScreen() {
     title: any,
     noteData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      note: {
-        id: '',
-        purchase: {
-          id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
-        },
-        occurance: {
-          occurance: occurance
-        },
-        note: noteDetails,
-        shortDescription: title
-      }
+    const notePayload: Record<string, unknown> = {
+      purchase: {
+        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
+      },
+      occurance: {
+        occurance: occurance
+      },
+      note: noteDetails,
+      shortDescription: title
     }
+
     if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_MEDICAL_DEVICE_NOTE}`
-    } else {
-      dataObject.note.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_MEDICAL_DEVICE_NOTE}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddNote(false)
-          getMedicalDevicesDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+      createNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create note')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      notePayload.id = noteData.id ? noteData.id : ''
+      updateNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update note')
+          }
+        }
+      )
+    }
   }
   const cancelClicked = () => {
     setIsAddNote(false)
@@ -300,39 +304,25 @@ export function MedicalDevicesDetailsScreen() {
   }
 
   const editNote = (noteData: any) => {
-    // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
   }
   async function deleteNote(noteId: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_MEDICAL_DEVICE_NOTE}`
-    let dataObject = {
-      header: header,
-      note: {
-        id: noteId
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getMedicalDevicesDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+    deleteNoteMutation.mutate(
+      { note: { id: noteId } },
+      {
+        onSuccess: () => {
+          refetchDetails()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete note')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const messageThreadClicked = (noteData: any) => {
-    // console.log('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
-      // console.log('noteData', noteData)
       router.push(
         formatUrl('/circles/noteMessage', {
           component: 'Medical Device',
@@ -356,12 +346,10 @@ export function MedicalDevicesDetailsScreen() {
         type: 'Purchase'
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants')
           const list = data.data.map((data: any, index: any) => {
             let object = data
             object.isSelected = false
@@ -410,13 +398,13 @@ export function MedicalDevicesDetailsScreen() {
         messageList: []
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getMedicalDevicesDetails(true, noteData)
+          navigateAfterThreadRef.current = { noteData }
+          refetchDetails()
         } else {
           Alert.alert('', data.message)
         }
@@ -432,74 +420,68 @@ export function MedicalDevicesDetailsScreen() {
     setParticipantsList(participantsList)
   }
   async function deleteMedicalDevice() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_MEDICAL_DEVICE}`
-    let dataObject = {
-      header: header,
-      purchase: {
-        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
+    deleteMedicalDeviceMutation.mutate(
+      {
+        purchase: {
+          id: medicalDevicesDetails.id ? medicalDevicesDetails.id : 0
+        }
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/medicalDevicesList', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete medical device')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const editReminder = (remiderData: any) => {
-    // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
   }
   async function deleteReminder(reminderData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_MEDICAL_DEVICE_REMINDER}`
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        purchase: {
-          id: reminderData.id ? reminderData.id : ''
+    deleteReminderMutation.mutate(
+      {
+        reminder: {
+          id: reminderData.id ? reminderData.id : '',
+          purchase: {
+            id: reminderData.id ? reminderData.id : ''
+          }
+        }
+      },
+      {
+        onSuccess: (data: any) => {
+          if (data.purchase && data.purchase.reminderList) {
+            setRemindersList(data.purchase.reminderList)
+          } else {
+            refetchDetails()
+          }
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete reminder')
         }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setRemindersList(
-            data.data.purchase.reminderList
-              ? data.data.purchase.reminderList
-              : []
-          )
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
+
+  const isMutating =
+    deleteMedicalDeviceMutation.isPending ||
+    createNoteMutation.isPending ||
+    updateNoteMutation.isPending ||
+    deleteNoteMutation.isPending ||
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending
+
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isLoading || isDetailsLoading || isMutating} />
       <PtsBackHeader title="Medical Device Details" memberData={memberData} />
       <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView className="flex-1">
@@ -512,8 +494,6 @@ export function MedicalDevicesDetailsScreen() {
                   title="Create Similar"
                   variant="border"
                   onPress={() => {
-                    // setIsCreateSimilar(true)
-                    // setIsAddDevice(true)
                     router.push(
                       formatUrl('/circles/addEditMedicalDevice', {
                         memberData: JSON.stringify(memberData),
@@ -535,8 +515,6 @@ export function MedicalDevicesDetailsScreen() {
                   title="Edit"
                   variant="border"
                   onPress={() => {
-                    // setIsCreateSimilar(false)
-                    // setIsAddDevice(true)
                     router.push(
                       formatUrl('/circles/addEditMedicalDevice', {
                         memberData: JSON.stringify(memberData),
