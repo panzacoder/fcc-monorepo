@@ -1,23 +1,17 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_MEDICAL_DEVICES,
-  CREATE_MEDICAL_DEVICE
-} from 'app/utils/urlConstants'
+import { useMedicalDevices } from 'app/data/medical-devices'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { Button } from 'app/ui/button'
@@ -33,13 +27,12 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
-  const selectedMonthRef = useRef('All')
-  const selectedYearRef = useRef('All')
   const medicalDevicesPrivilegesRef = useRef<any>({})
-  const [isLoading, setLoading] = useState(false)
   const [devicesList, setDevicesList] = useState([]) as any
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
+  const [filterMonth, setFilterMonth] = useState<string | undefined>(undefined)
+  const [filterYear, setFilterYear] = useState<string | undefined>(undefined)
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -66,48 +59,27 @@ export function MedicalDevicesListScreen() {
       title: name
     })
   })
-  const getDevicesList = useCallback(async (isFromFilter: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_MEDICAL_DEVICES}`
-    let dataObject: any = {
-      header: header,
-      purchase: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-    }
-    if (isFromFilter) {
-      dataObject.month = selectedMonthRef.current
-      dataObject.year = selectedYearRef.current
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.domainObjectPrivileges) {
-            medicalDevicesPrivilegesRef.current = data.data
-              .domainObjectPrivileges.Purchase
-              ? data.data.domainObjectPrivileges.Purchase
-              : {}
-          }
-          let list = data.data.list ? data.data.list : []
-          setDevicesList(list)
-          setIsFilter(false)
-          setIsDataReceived(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+
+  const { data: devicesData, isLoading } = useMedicalDevices(header, {
+    memberId: memberData.member ? memberData.member : '',
+    month: filterMonth,
+    year: filterYear
+  })
 
   useEffect(() => {
-    getDevicesList(false)
-  }, [])
+    if (devicesData) {
+      if (devicesData.domainObjectPrivileges) {
+        medicalDevicesPrivilegesRef.current = devicesData.domainObjectPrivileges
+          .Purchase
+          ? devicesData.domainObjectPrivileges.Purchase
+          : {}
+      }
+      let list = devicesData.list ? devicesData.list : []
+      setDevicesList(list)
+      setIsFilter(false)
+      setIsDataReceived(true)
+    }
+  }, [devicesData])
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -118,16 +90,18 @@ export function MedicalDevicesListScreen() {
   })
 
   function filterDevice(formData: Schema) {
-    selectedMonthRef.current =
+    const month =
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYearRef.current =
+    const year =
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
-    getDevicesList(true)
+    setFilterMonth(month)
+    setFilterYear(year)
   }
   function resetFilter() {
-    getDevicesList(false)
+    setFilterMonth(undefined)
+    setFilterYear(undefined)
     reset({
       monthIndex: 1,
       yearIndex: 1
