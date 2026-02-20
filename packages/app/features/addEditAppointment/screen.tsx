@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Alert, View, BackHandler, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -8,14 +8,12 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_APPOINTMENT_DOCTORS,
-  GET_APPOINTMENT_FACILITIES,
-  CREATE_APPOINTMENT,
-  UPDATE_APPOINTMENT
-} from 'app/utils/urlConstants'
+  useAppointmentDoctors,
+  useAppointmentFacilities,
+  useCreateAppointment,
+  useUpdateAppointment
+} from 'app/data/appointments'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -40,10 +38,6 @@ type TypeResponse = {
   id: number
   type: string
 }
-type DoctorFacilityResponse = {
-  id: number
-  name: string
-}
 export function AddEditAppointmentScreen() {
   const router = useRouter()
   const staticData: any = useAppSelector(
@@ -65,7 +59,7 @@ export function AddEditAppointmentScreen() {
     ? JSON.parse(item.appointmentDetails)
     : {}
   const header = useAppSelector((state) => state.headerState.header)
-  const [isLoading, setLoading] = useState(false)
+  const memberId = memberData.member ? memberData.member : ''
   const [selectedDate, setSelectedDate] = useState(
     appointmentDetails.date ? appointmentDetails.date : new Date()
   )
@@ -87,106 +81,88 @@ export function AddEditAppointmentScreen() {
   ) as any
   const [isShowDoctorFacilityDropdown, setIsShowDoctorFacilityDropdown] =
     useState(false)
-  const getDoctorFacilities = useCallback(async (value: any) => {
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
-    if (value === 0) {
-      url = `${BASE_URL}${GET_APPOINTMENT_DOCTORS}`
-      dataObject = {
-        header: header,
-        doctor: {
-          member: {
-            id: memberData.member ? memberData.member : ''
-          }
-        }
+  const [fetchDoctors, setFetchDoctors] = useState(false)
+  const [fetchFacilities, setFetchFacilities] = useState(false)
+  const doctorsQuery = useAppointmentDoctors(header, memberId)
+  const facilitiesQuery = useAppointmentFacilities(header, memberId)
+  const createAppointmentMutation = useCreateAppointment(header)
+  const updateAppointmentMutation = useUpdateAppointment(header)
+
+  const isLoading =
+    (fetchDoctors && doctorsQuery.isLoading) ||
+    (fetchFacilities && facilitiesQuery.isLoading) ||
+    createAppointmentMutation.isPending ||
+    updateAppointmentMutation.isPending
+
+  useEffect(() => {
+    const rawData = fetchDoctors
+      ? doctorsQuery.data
+      : fetchFacilities
+        ? facilitiesQuery.data
+        : null
+    if (!rawData) return
+
+    const isDoctorType = fetchDoctors
+    let doctorFacilities: Array<{ id: number; title: string }> = [
+      {
+        id: 1,
+        title: isDoctorType ? 'Add New Doctor' : 'Add New Facility'
       }
-    } else {
-      url = `${BASE_URL}${GET_APPOINTMENT_FACILITIES}`
-      dataObject = {
-        header: header,
-        facility: {
-          member: {
-            id: memberData.member ? memberData.member : ''
-          }
+    ]
+    rawData.map(({ name }: any, index: any) => {
+      let object = {
+        id: index + 2,
+        title: name
+      }
+      doctorFacilities.push(object)
+    })
+    let list = rawData ? rawData : []
+    setDoctorFacilityList(doctorFacilities)
+    setDoctorFacilityListFull(list)
+    setIsDataReceived(true)
+    setIsAddDoctorFacility(list.length === 0)
+    let facilityDoctorLocationId = -1
+    if (!_.isEmpty(doctorFacilityDetails)) {
+      if (component === 'Doctor') {
+        if (
+          doctorFacilityDetails.doctorLocationList[0] &&
+          doctorFacilityDetails.doctorLocationList[0].id
+        ) {
+          facilityDoctorLocationId =
+            doctorFacilityDetails.doctorLocationList[0].id
+        }
+      } else {
+        if (
+          doctorFacilityDetails.facilityLocationList[0] &&
+          doctorFacilityDetails.facilityLocationList[0].id
+        ) {
+          facilityDoctorLocationId =
+            doctorFacilityDetails.facilityLocationList[0].id
         }
       }
     }
+    if (
+      appointmentDetails.doctorLocation &&
+      appointmentDetails.doctorLocation.id
+    ) {
+      facilityDoctorLocationId = appointmentDetails.doctorLocation.id
+    } else if (
+      appointmentDetails.facilityLocation &&
+      appointmentDetails.facilityLocation.id
+    ) {
+      facilityDoctorLocationId = appointmentDetails.facilityLocation.id
+    }
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let doctorFacilities: Array<{ id: number; title: string }> = [
-            {
-              id: 1,
-              title: value === 0 ? 'Add New Doctor' : 'Add New Facility'
-            }
-          ]
-          data.data.map(({ name, id }: DoctorFacilityResponse, index: any) => {
-            let object = {
-              id: index + 2,
-              title: name
-            }
-            doctorFacilities.push(object)
-          })
-          let list = data.data ? data.data : []
-          setDoctorFacilityList(doctorFacilities)
-          setDoctorFacilityListFull(list)
-          setIsDataReceived(true)
-          setIsAddDoctorFacility(list.length === 0)
-          let facilityDoctorLocationId = -1
-          if (!_.isEmpty(doctorFacilityDetails)) {
-            if (component === 'Doctor') {
-              if (
-                doctorFacilityDetails.doctorLocationList[0] &&
-                doctorFacilityDetails.doctorLocationList[0].id
-              ) {
-                facilityDoctorLocationId =
-                  doctorFacilityDetails.doctorLocationList[0].id
-              }
-            } else {
-              if (
-                doctorFacilityDetails.facilityLocationList[0] &&
-                doctorFacilityDetails.facilityLocationList[0].id
-              ) {
-                facilityDoctorLocationId =
-                  doctorFacilityDetails.facilityLocationList[0].id
-              }
-            }
-          }
-          if (
-            appointmentDetails.doctorLocation &&
-            appointmentDetails.doctorLocation.id
-          ) {
-            facilityDoctorLocationId = appointmentDetails.doctorLocation.id
-          } else if (
-            appointmentDetails.facilityLocation &&
-            appointmentDetails.facilityLocation.id
-          ) {
-            facilityDoctorLocationId = appointmentDetails.facilityLocation.id
-          }
-
-          list.map(async (data: any, index: any) => {
-            if (data.locationId === facilityDoctorLocationId) {
-              setFacilityDoctorIndex(index + 2)
-              logger.debug('doctoFacilityIndex', String(index + 2))
-              reset({
-                doctoFacilityIndex: index + 2
-              })
-            }
-          })
-          // console.log('setStateslistFull', JSON.stringify(statesListFull))
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+    list.map(async (data: any, index: any) => {
+      if (data.locationId === facilityDoctorLocationId) {
+        setFacilityDoctorIndex(index + 2)
+        logger.debug('doctoFacilityIndex', String(index + 2))
+        reset({
+          doctoFacilityIndex: index + 2
+        })
+      }
+    })
+  }, [doctorsQuery.data, facilitiesQuery.data, fetchDoctors, fetchFacilities])
   let typeIndex: any = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
     if (
@@ -208,89 +184,84 @@ export function AddEditAppointmentScreen() {
   }
 
   async function addEditAppointment(formData: Schema) {
-    // console.log('selectedDate', selectedDate)
-    // console.log('purpose', purpose)
-    let dataObject: any = {
-      header: header,
-      appointment: {
-        date: selectedDate,
-        description: formData.description,
-        appointmentPreNote: '',
-        purpose: purpose,
-        type: {
-          type:
-            selectedDoctorFacility === 1
-              ? 'Doctor Appointment'
-              : 'Facility Appointment'
-        },
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        doctorLocation: {},
-        facilityLocation: {}
-      }
+    let appointmentData: any = {
+      date: selectedDate,
+      description: formData.description,
+      appointmentPreNote: '',
+      purpose: purpose,
+      type: {
+        type:
+          selectedDoctorFacility === 1
+            ? 'Doctor Appointment'
+            : 'Facility Appointment'
+      },
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      doctorLocation: {},
+      facilityLocation: {}
     }
-    let url = ''
-    if (_.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true') {
-      url = `${BASE_URL}${CREATE_APPOINTMENT}`
-    } else {
-      url = `${BASE_URL}${UPDATE_APPOINTMENT}`
-      dataObject.appointment.id = appointmentDetails.id
+    const isCreate =
+      _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+    if (!isCreate) {
+      appointmentData.id = appointmentDetails.id
     }
     if (formData.doctoFacilityIndex !== 1) {
       if (selectedDoctorFacility === 1) {
-        dataObject.appointment.doctorLocation.id =
+        appointmentData.doctorLocation.id =
           doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
       } else {
-        dataObject.appointment.facilityLocation.id =
+        appointmentData.facilityLocation.id =
           doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
       }
     } else {
       Alert.alert('', 'Please Select Doctor/Facility')
       return
     }
-    setLoading(true)
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let apptDetails = {}
-          if (_.isEmpty(appointmentDetails)) {
-            apptDetails = data.data.appointmentWithPreviousAppointment
-              .appointment
-              ? data.data.appointmentWithPreviousAppointment.appointment
+    const mutationCallbacks = {
+      onSuccess: (data: any) => {
+        let apptDetails = {}
+        if (_.isEmpty(appointmentDetails)) {
+          apptDetails = data?.appointmentWithPreviousAppointment?.appointment
+            ? data.appointmentWithPreviousAppointment.appointment
+            : {}
+        } else {
+          if (isFromCreateSimilar === 'true') {
+            apptDetails = data?.appointmentWithPreviousAppointment?.appointment
+              ? data.appointmentWithPreviousAppointment.appointment
               : {}
           } else {
-            if (isFromCreateSimilar === 'true') {
-              apptDetails = data.data.appointmentWithPreviousAppointment
-                .appointment
-                ? data.data.appointmentWithPreviousAppointment.appointment
-                : {}
-            } else {
-              apptDetails = data.data.appointment ? data.data.appointment : {}
-            }
+            apptDetails = data?.appointment ? data.appointment : {}
           }
-          if (_.isEmpty(appointmentDetails)) {
-            router.dismiss(1)
-          } else {
-            router.dismiss(2)
-          }
-
-          router.push(
-            formatUrl('/circles/appointmentDetails', {
-              appointmentDetails: JSON.stringify(apptDetails),
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        } else {
-          Alert.alert('', data.message)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+        if (_.isEmpty(appointmentDetails)) {
+          router.dismiss(1)
+        } else {
+          router.dismiss(2)
+        }
+
+        router.push(
+          formatUrl('/circles/appointmentDetails', {
+            appointmentDetails: JSON.stringify(apptDetails),
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      },
+      onError: (error: any) => {
+        Alert.alert('', error.message || 'Failed to save appointment')
+      }
+    }
+    if (isCreate) {
+      createAppointmentMutation.mutate(
+        { appointment: appointmentData },
+        mutationCallbacks
+      )
+    } else {
+      updateAppointmentMutation.mutate(
+        { appointment: appointmentData },
+        mutationCallbacks
+      )
+    }
   }
 
   const { control, handleSubmit, reset } = useForm({
@@ -334,7 +305,16 @@ export function AddEditAppointmentScreen() {
     if (value) {
       setIsShowDoctorFacilityDropdown(true)
       setSelectedDoctorFacility(value.id)
-      getDoctorFacilities(value.id - 1)
+      setIsDataReceived(false)
+      if (value.id - 1 === 0) {
+        setFetchDoctors(true)
+        setFetchFacilities(false)
+        doctorsQuery.refetch()
+      } else {
+        setFetchFacilities(true)
+        setFetchDoctors(false)
+        facilitiesQuery.refetch()
+      }
     }
   }
   async function selectedDoctorFacilityChange(value: any) {
@@ -370,8 +350,14 @@ export function AddEditAppointmentScreen() {
       component === 'Facility'
     ) {
       setIsShowDoctorFacilityDropdown(true)
-      getDoctorFacilities(typeIndex - 1)
       setSelectedDoctorFacility(facilityDoctorIndex)
+      if (typeIndex - 1 === 0) {
+        setFetchDoctors(true)
+        setFetchFacilities(false)
+      } else {
+        setFetchFacilities(true)
+        setFetchDoctors(false)
+      }
     }
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
