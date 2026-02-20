@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -9,12 +9,10 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_INCIDENTS } from 'app/utils/urlConstants'
+import { useIncidents } from 'app/data/incidents'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { getUserPermission } from 'app/utils/getUserPemissions'
@@ -31,13 +29,12 @@ export type Schema = z.infer<typeof schema>
 const monthsList = getMonthsList() as any
 export function IncidentsListScreen() {
   const incidentsPrivilegesRef = useRef<any>({})
-  const selectedMonthRef = useRef<any>('All')
-  const selectedYearRef = useRef<any>('All')
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [incidentsList, setIncidentsList] = useState([]) as any
+  const [selectedMonth, setSelectedMonth] = useState('All')
+  const [selectedYear, setSelectedYear] = useState('All')
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -70,43 +67,26 @@ export function IncidentsListScreen() {
     })
   })
 
-  const getIncidentDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_INCIDENTS}`
-    let dataObject = {
-      header: header,
-      incident: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      },
-      month: selectedMonthRef.current,
-      year: selectedYearRef.current
+  const { data: incidentsData, isLoading } = useIncidents(header, {
+    memberId: memberData.member ? memberData.member : '',
+    month: selectedMonth,
+    year: selectedYear
+  })
+
+  useEffect(() => {
+    if (incidentsData) {
+      if (incidentsData.domainObjectPrivileges) {
+        incidentsPrivilegesRef.current = incidentsData.domainObjectPrivileges
+          .Incident
+          ? incidentsData.domainObjectPrivileges.Incident
+          : {}
+      }
+      setIncidentsList(incidentsData.list ? incidentsData.list : [])
+      setIsDataReceived(true)
+      setIsFilter(false)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('data', JSON.stringify(data.data.eventList))
-          if (data.data.domainObjectPrivileges) {
-            incidentsPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Incident
-              ? data.data.domainObjectPrivileges.Incident
-              : {}
-          }
-          setIncidentsList(data.data.list ? data.data.list : [])
-          setIsDataReceived(true)
-          setIsFilter(false)
-          // console.log('eventList', incidentsList)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  }, [incidentsData])
+
   function handleBackButtonClick() {
     let fullName = ''
     if (memberData.firstname) {
@@ -126,7 +106,6 @@ export function IncidentsListScreen() {
   }
 
   useEffect(() => {
-    getIncidentDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -137,18 +116,18 @@ export function IncidentsListScreen() {
   }, [])
 
   function filterEvents(formData: Schema) {
-    selectedMonthRef.current =
+    setSelectedMonth(
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYearRef.current =
+    )
+    setSelectedYear(
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
-    getIncidentDetails()
+    )
   }
   function resetFilter() {
-    selectedMonthRef.current = 'All'
-    selectedYearRef.current = 'All'
-    getIncidentDetails()
+    setSelectedMonth('All')
+    setSelectedYear('All')
     reset({
       monthIndex: 1,
       yearIndex: 1
