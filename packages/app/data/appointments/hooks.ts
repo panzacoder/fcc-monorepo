@@ -147,7 +147,7 @@ export function useUpdateAppointmentNote(header: AuthHeader) {
 export function useDeleteAppointmentNote(header: AuthHeader) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (params: { note: { id: number } }) =>
+    mutationFn: (params: { appointmentNote: { id: number } }) =>
       deleteAppointmentNote(header, params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.all })

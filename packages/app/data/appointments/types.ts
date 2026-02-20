@@ -56,7 +56,7 @@ export interface DeleteAppointmentParams {
 }
 
 export interface AppointmentNoteParams {
-  note: Record<string, unknown>
+  appointmentNote: Record<string, unknown>
 }
 
 export interface AppointmentReminderParams {
@@ -64,5 +64,5 @@ export interface AppointmentReminderParams {
 }
 
 export interface UpdateAppointmentStatusParams {
-  appointment: { id: number; status: string }
+  appointment: Record<string, unknown>
 }

@@ -17,15 +17,6 @@ import moment from 'moment'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
-  GET_APPOINTMENT_DETAILS,
-  DELETE_APPOINTMENT_REMINDER,
-  CREATE_APPOINTMENT_REMINDER,
-  UPDATE_APPOINTMENT_REMINDER,
-  CREATE_APPOINTMENT_NOTE,
-  DELETE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_STATUS,
-  DELETE_APPOINTMENT,
   GET_THREAD_PARTICIPANTS,
   CREATE_MESSAGE_THREAD,
   RESEND_TRANSPORTATION_REQUEST,
@@ -34,6 +25,17 @@ import {
   SEND_CALENDAR_INVITE,
   GET_MEMBER_DETAILS
 } from 'app/utils/urlConstants'
+import {
+  useAppointmentDetails as useAppointmentDetailsQuery,
+  useDeleteAppointment,
+  useCreateAppointmentNote,
+  useUpdateAppointmentNote,
+  useDeleteAppointmentNote,
+  useCreateAppointmentReminder,
+  useUpdateAppointmentReminder,
+  useDeleteAppointmentReminder,
+  useUpdateAppointmentStatus
+} from 'app/data/appointments'
 import { useLocalSearchParams } from 'expo-router'
 import {
   formatTimeToUserLocalTime,
@@ -92,95 +94,61 @@ export function AppointmentDetailsScreen() {
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
-  const getAppointmentDetails = useCallback(
-    async (isFromCreateThread: any, noteData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_APPOINTMENT_DETAILS}`
-      let dataObject = {
-        header: header,
-        appointment: {
-          id: appointmentInfo.id ? appointmentInfo.id : ''
+  const appointmentId = appointmentInfo.id ? Number(appointmentInfo.id) : 0
+  const {
+    data: appointmentDetailsData,
+    isLoading: isDetailsLoading,
+    refetch: refetchDetails
+  } = useAppointmentDetailsQuery(header, appointmentId)
+
+  const deleteAppointmentMutation = useDeleteAppointment(header)
+  const createNoteMutation = useCreateAppointmentNote(header)
+  const updateNoteMutation = useUpdateAppointmentNote(header)
+  const deleteNoteMutation = useDeleteAppointmentNote(header)
+  const createReminderMutation = useCreateAppointmentReminder(header)
+  const updateReminderMutation = useUpdateAppointmentReminder(header)
+  const deleteReminderMutation = useDeleteAppointmentReminder(header)
+  const updateStatusMutation = useUpdateAppointmentStatus(header)
+
+  useEffect(() => {
+    if (appointmentDetailsData) {
+      const data = appointmentDetailsData as any
+      if (data.domainObjectPrivileges) {
+        appointmentPrivilegesRef.current = data.domainObjectPrivileges
+          .Appointment
+          ? data.domainObjectPrivileges.Appointment
+          : {}
+        notePrivilegesRef.current = data.domainObjectPrivileges.APPOINTMENTNOTE
+          ? data.domainObjectPrivileges.APPOINTMENTNOTE
+          : data.domainObjectPrivileges.AppointmentNote
+            ? data.domainObjectPrivileges.AppointmentNote
+            : {}
+        transportationPrivilegesRef.current = data.domainObjectPrivileges
+          .APPOINTMENTTRANSPORTATION
+          ? data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
+          : data.domainObjectPrivileges.AppointmentTransportation
+            ? data.domainObjectPrivileges.AppointmentTransportation
+            : {}
+      }
+      if (
+        data.appointmentWithPreviousAppointment &&
+        data.appointmentWithPreviousAppointment.appointment
+      ) {
+        const details = data.appointmentWithPreviousAppointment.appointment
+        setAppointmentDetails(details)
+        if (details.noteList) {
+          setNotesList(details.noteList)
+        }
+        if (details.reminderList) {
+          setRemindersList(details.reminderList)
+        }
+        if (details.transportationList) {
+          setTransportationList(details.transportationList)
         }
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('appointmentInfo', '' + JSON.stringify(data.data))
-            if (data.data.domainObjectPrivileges) {
-              appointmentPrivilegesRef.current = data.data
-                .domainObjectPrivileges.Appointment
-                ? data.data.domainObjectPrivileges.Appointment
-                : {}
-              notePrivilegesRef.current = data.data.domainObjectPrivileges
-                .APPOINTMENTNOTE
-                ? data.data.domainObjectPrivileges.APPOINTMENTNOTE
-                : data.data.domainObjectPrivileges.AppointmentNote
-                  ? data.data.domainObjectPrivileges.AppointmentNote
-                  : {}
-              transportationPrivilegesRef.current = data.data
-                .domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                ? data.data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                : data.data.domainObjectPrivileges.AppointmentTransportation
-                  ? data.data.domainObjectPrivileges.AppointmentTransportation
-                  : {}
-            }
-            if (
-              data.data.appointmentWithPreviousAppointment &&
-              data.data.appointmentWithPreviousAppointment.appointment
-            ) {
-              let details =
-                data.data.appointmentWithPreviousAppointment.appointment
-              setAppointmentDetails(details)
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .noteList
-              ) {
-                let notesList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .noteList
-                setNotesList(notesList)
-              }
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .reminderList
-              ) {
-                let reminderList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .reminderList
-                setRemindersList(reminderList)
-              }
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .transportationList
-              ) {
-                let transportationList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .transportationList
-                setTransportationList(transportationList)
-              }
-            }
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'Appointment',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(noteData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setIsDataReceived(true)
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
+      setIsDataReceived(true)
+    }
+  }, [appointmentDetailsData])
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -216,10 +184,6 @@ export function AppointmentDetailsScreen() {
   }, [])
   useEffect(() => {
     getMemberDetails()
-    if (!isAddNote) {
-      getAppointmentDetails(false, noteData)
-    }
-
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -394,7 +358,14 @@ export function AppointmentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getAppointmentDetails(true, noteData)
+          refetchDetails()
+          router.push(
+            formatUrl('/circles/noteMessage', {
+              component: 'Appointment',
+              memberData: JSON.stringify(memberData),
+              noteData: JSON.stringify(noteData)
+            })
+          )
         } else {
           Alert.alert('', data.message)
         }
@@ -444,55 +415,37 @@ export function AppointmentDetailsScreen() {
       })
   }
   async function deleteAppointment() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT}`
-    let dataObject = {
-      header: header,
-      appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    deleteAppointmentMutation.mutate(
+      {
+        appointment: { id: appointmentDetails.id ? appointmentDetails.id : 0 }
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/appointmentsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete appointment')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function deleteNote(noteId: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: noteId
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getAppointmentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+    deleteNoteMutation.mutate(
+      { appointmentNote: { id: noteId } },
+      {
+        onSuccess: () => {
+          refetchDetails()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete note')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function createUpdateNote(
     occurance: any,
@@ -500,43 +453,45 @@ export function AppointmentDetailsScreen() {
     title: any,
     noteData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: '',
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : ''
-        },
-        occurance: {
-          occurance: occurance
-        },
-        note: noteDetails,
-        shortDescription: title
-      }
+    const appointmentNotePayload: Record<string, unknown> = {
+      appointment: {
+        id: appointmentDetails.id ? appointmentDetails.id : ''
+      },
+      occurance: {
+        occurance: occurance
+      },
+      note: noteDetails,
+      shortDescription: title
     }
+
     if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_NOTE}`
-    } else {
-      dataObject.appointmentNote.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_NOTE}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddNote(false)
-          getAppointmentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+      createNoteMutation.mutate(
+        { appointmentNote: appointmentNotePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create note')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      appointmentNotePayload.id = noteData.id ? noteData.id : ''
+      updateNoteMutation.mutate(
+        { appointmentNote: appointmentNotePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update note')
+          }
+        }
+      )
+    }
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
     setLoading(true)
@@ -546,7 +501,7 @@ export function AppointmentDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           cancelClicked()
-          getAppointmentDetails(false, noteData)
+          refetchDetails()
         } else {
           Alert.alert('', data.message)
         }
@@ -561,98 +516,85 @@ export function AppointmentDetailsScreen() {
     date: any,
     reminderData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: '',
-        content: title,
-        date: date,
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : ''
-        }
+    const reminderPayload: Record<string, unknown> = {
+      content: title,
+      date: date,
+      appointment: {
+        id: appointmentDetails.id ? appointmentDetails.id : ''
       }
-    }
-    if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_REMINDER}`
-    } else {
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_REMINDER}`
-      dataObject.reminder.id = reminderData.id
     }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // setTransportationData(data.data ? data.data : {})
-          setIsAddReminder(false)
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-        } else {
-          Alert.alert('', data.message)
+    if (_.isEmpty(reminderData)) {
+      createReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create reminder')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      reminderPayload.id = reminderData.id
+      updateReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update reminder')
+          }
+        }
+      )
+    }
   }
   async function updateStatus(status: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_APPOINTMENT_STATUS}`
-    let dataObject = {
-      header: header,
-      appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : '',
-        status: {
-          status: status
+    updateStatusMutation.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : '',
+          status: {
+            status: status
+          },
+          member: {
+            id: memberData.member ? memberData.member : ''
+          }
+        }
+      },
+      {
+        onSuccess: () => {
+          refetchDetails()
         },
-        member: {
-          id: memberData.member ? memberData.member : ''
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update status')
         }
       }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   async function deleteReminder(reminderData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT_REMINDER}`
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        appointment: {
-          id: reminderData.apointmentId ? reminderData.apointmentId : ''
+    deleteReminderMutation.mutate(
+      {
+        reminder: {
+          id: reminderData.id ? reminderData.id : '',
+          appointment: {
+            id: reminderData.apointmentId ? reminderData.apointmentId : ''
+          }
+        }
+      },
+      {
+        onSuccess: (data: any) => {
+          setRemindersList(data?.reminderList ? data.reminderList : [])
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete reminder')
         }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   const editNote = (noteData: any) => {
     setNoteData(noteData)
@@ -712,7 +654,7 @@ export function AppointmentDetailsScreen() {
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          refreshData()
+          refetchDetails()
           if (count !== 0) {
             Alert.alert('', data.message)
           }
@@ -730,9 +672,6 @@ export function AppointmentDetailsScreen() {
     // console.log('remiderData', JSON.stringify(transportationData))
     setTransportationData(transportationData)
     setIsAddTransportation(true)
-  }
-  async function refreshData() {
-    getAppointmentDetails(false, noteData)
   }
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
@@ -773,9 +712,19 @@ export function AppointmentDetailsScreen() {
     )
   }
 
+  const isMutating =
+    deleteAppointmentMutation.isPending ||
+    createNoteMutation.isPending ||
+    updateNoteMutation.isPending ||
+    deleteNoteMutation.isPending ||
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending ||
+    updateStatusMutation.isPending
+
   return (
     <View className="flex-1 ">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isLoading || isDetailsLoading || isMutating} />
       <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
         <View className=" h-full w-full flex-1 py-2">

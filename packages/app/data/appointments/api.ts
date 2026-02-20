@@ -122,7 +122,7 @@ export async function updateAppointmentNote(
 
 export async function deleteAppointmentNote(
   header: AuthHeader,
-  params: { note: { id: number } }
+  params: { appointmentNote: { id: number } }
 ) {
   return fetchData<Record<string, unknown>>({
     header,
