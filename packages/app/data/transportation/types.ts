@@ -7,59 +7,59 @@ export interface TransportationMemberListParams {
 }
 
 export interface CreateTransportationParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface UpdateTransportationParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface DeleteTransportationParams {
-  transport: { id: number }
+  transportation: { id: number | string }
 }
 
 export interface CreateTransportationEventParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface UpdateTransportationEventParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface DeleteTransportationEventParams {
-  transport: { id: number }
+  transportation: { id: number | string }
 }
 
 export interface ApproveTransportParams {
-  transport: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface RejectTransportParams {
-  transport: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface EventAcceptTransportationRequestParams {
-  transport: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface EventRejectTransportationRequestParams {
-  transport: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface ResendTransportationRequestParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface ResendTransportationRequestEventParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface CancelTransportationRequestParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface CancelTransportationRequestEventParams {
-  transport: Record<string, unknown>
+  transportation: Record<string, unknown>
 }
 
 export interface CreateTransportationReminderParams {
@@ -71,7 +71,7 @@ export interface UpdateTransportationReminderParams {
 }
 
 export interface DeleteTransportationReminderParams {
-  reminder: { id: number }
+  reminder: { id: number | string }
 }
 
 export interface CreateTransportationReminderEventParams {
@@ -83,5 +83,5 @@ export interface UpdateTransportationReminderEventParams {
 }
 
 export interface DeleteTransportationReminderEventParams {
-  reminder: { id: number }
+  reminder: { id: number | string }
 }
