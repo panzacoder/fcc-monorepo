@@ -105,3 +105,10 @@ export interface PharmacyListItem {
 export interface PharmacyListResponse {
   list: PharmacyListItem[]
 }
+
+export interface ShareFacilityParams {
+  doctorSharingInfo: {
+    facilityid: number | string
+    targetemail: string
+  }
+}

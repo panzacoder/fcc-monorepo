@@ -9,7 +9,8 @@ import {
   createDoctorLocation,
   updateDoctorLocation,
   deleteDoctorLocation,
-  getActiveDoctors
+  getActiveDoctors,
+  shareDoctor
 } from './api'
 import type {
   GetMemberDoctorsParams,
@@ -20,7 +21,8 @@ import type {
   CreateDoctorLocationParams,
   UpdateDoctorLocationParams,
   DeleteDoctorLocationParams,
-  GetActiveDoctorsParams
+  GetActiveDoctorsParams,
+  ShareDoctorParams
 } from './types'
 
 export const doctorKeys = {
@@ -127,5 +129,11 @@ export function useDeleteDoctorLocation(header: AuthHeader) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: doctorKeys.all })
     }
+  })
+}
+
+export function useShareDoctor(header: AuthHeader) {
+  return useMutation({
+    mutationFn: (params: ShareDoctorParams) => shareDoctor(header, params)
   })
 }

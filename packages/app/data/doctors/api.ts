@@ -8,7 +8,8 @@ import {
   CREATE_DOCTOR_LOCATION,
   UPDATE_DOCTOR_LOCATION,
   DELETE_DOCTOR_LOCATION,
-  GET_ACTIVE_DOCTORS
+  GET_ACTIVE_DOCTORS,
+  SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
 import type {
   DoctorListResponse,
@@ -22,7 +23,8 @@ import type {
   UpdateDoctorLocationParams,
   DeleteDoctorLocationParams,
   GetActiveDoctorsParams,
-  ActiveDoctorsResponse
+  ActiveDoctorsResponse,
+  ShareDoctorParams
 } from './types'
 
 export async function getMemberDoctors(
@@ -121,5 +123,16 @@ export async function getActiveDoctors(
     header,
     route: GET_ACTIVE_DOCTORS,
     data: { doctor: { member: { id: params.memberId } } }
+  })
+}
+
+export async function shareDoctor(
+  header: AuthHeader,
+  params: ShareDoctorParams
+) {
+  return fetchData<Record<string, unknown>>({
+    header,
+    route: SHARE_CONTACT_INFO,
+    data: params
   })
 }

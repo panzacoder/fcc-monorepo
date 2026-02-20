@@ -9,7 +9,8 @@ import {
   createFacilityLocation,
   updateFacilityLocation,
   deleteFacilityLocation,
-  getPharmacyList
+  getPharmacyList,
+  shareFacility
 } from './api'
 import type {
   GetMemberFacilitiesParams,
@@ -19,7 +20,8 @@ import type {
   DeleteFacilityParams,
   CreateFacilityLocationParams,
   UpdateFacilityLocationParams,
-  DeleteFacilityLocationParams
+  DeleteFacilityLocationParams,
+  ShareFacilityParams
 } from './types'
 
 export const facilityKeys = {
@@ -130,5 +132,11 @@ export function useDeleteFacilityLocation(header: AuthHeader) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: facilityKeys.all })
     }
+  })
+}
+
+export function useShareFacility(header: AuthHeader) {
+  return useMutation({
+    mutationFn: (params: ShareFacilityParams) => shareFacility(header, params)
   })
 }

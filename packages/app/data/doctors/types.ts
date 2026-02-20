@@ -92,3 +92,10 @@ export interface GetActiveDoctorsParams {
 export interface ActiveDoctorsResponse {
   doctorList: Record<string, unknown>[]
 }
+
+export interface ShareDoctorParams {
+  doctorSharingInfo: {
+    doctorid: number | string
+    targetemail: string
+  }
+}

@@ -8,7 +8,8 @@ import {
   CREATE_FACILITY_LOCATION,
   UPDATE_FACILITY_LOCATION,
   DELETE_FACILITY_LOCATION,
-  GET_PHARMACY_LIST
+  GET_PHARMACY_LIST,
+  SHARE_CONTACT_INFO
 } from 'app/utils/urlConstants'
 import type {
   FacilityListResponse,
@@ -21,7 +22,8 @@ import type {
   CreateFacilityLocationParams,
   UpdateFacilityLocationParams,
   DeleteFacilityLocationParams,
-  PharmacyListResponse
+  PharmacyListResponse,
+  ShareFacilityParams
 } from './types'
 
 export async function getMemberFacilities(
@@ -120,5 +122,16 @@ export async function getPharmacyList(
     header,
     route: GET_PHARMACY_LIST,
     data: { facility: { member: { id: params.memberId } } }
+  })
+}
+
+export async function shareFacility(
+  header: AuthHeader,
+  params: ShareFacilityParams
+) {
+  return fetchData<Record<string, unknown>>({
+    header,
+    route: SHARE_CONTACT_INFO,
+    data: params
   })
 }
