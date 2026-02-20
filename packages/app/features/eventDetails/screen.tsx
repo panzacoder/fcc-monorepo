@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -13,21 +13,23 @@ import moment from 'moment'
 import { CallPostService } from 'app/utils/fetchServerData'
 import {
   BASE_URL,
-  GET_EVENT_DETAILS,
   GET_THREAD_PARTICIPANTS,
   CREATE_MESSAGE_THREAD,
-  DELETE_EVENT_NOTE,
-  CREATE_EVENT_NOTE,
-  UPDATE_EVENT_NOTE,
-  CREATE_EVENT_REMINDER,
-  UPDATE_EVENT_REMINDER,
-  DELETE_EVENT_REMINDER,
   RESEND_TRANSPORTATION_REQUEST_EVENT,
   CANCEL_TRANSPORTATION_REQUEST_EVENT,
-  DELETE_TRANSPORTATION_EVENT,
-  DELETE_EVENT,
-  UPDATE_EVENT_STATUS
+  DELETE_TRANSPORTATION_EVENT
 } from 'app/utils/urlConstants'
+import {
+  useEventDetails as useEventDetailsQuery,
+  useDeleteEvent,
+  useCreateEventNote,
+  useUpdateEventNote,
+  useDeleteEventNote,
+  useCreateEventReminder,
+  useUpdateEventReminder,
+  useDeleteEventReminder,
+  useUpdateEventStatus
+} from 'app/data/events'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -83,78 +85,60 @@ export function EventDetailsScreen() {
     item.eventDetails && item.eventDetails !== undefined
       ? JSON.parse(item.eventDetails)
       : {}
-  // console.log('eventDetails', JSON.stringify(eventDetails))
-  const getEventDetails = useCallback(
-    async (isFromCreateThread: any, noteData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_EVENT_DETAILS}`
-      let dataObject = {
-        header: header,
-        event: {
-          id: eventData.id ? eventData.id : '',
-          member: {
-            id: memberData.member ? memberData.member : ''
-          }
-        }
+
+  const eventId = eventData.id ? eventData.id : ''
+  const memberId = memberData.member ? memberData.member : ''
+
+  const {
+    data: eventDetailsData,
+    isLoading: isDetailsLoading,
+    refetch: refetchDetails
+  } = useEventDetailsQuery(header, { eventId, memberId })
+
+  const deleteEventMutation = useDeleteEvent(header)
+  const createNoteMutation = useCreateEventNote(header)
+  const updateNoteMutation = useUpdateEventNote(header)
+  const deleteNoteMutation = useDeleteEventNote(header)
+  const createReminderMutation = useCreateEventReminder(header)
+  const updateReminderMutation = useUpdateEventReminder(header)
+  const deleteReminderMutation = useDeleteEventReminder(header)
+  const updateStatusMutation = useUpdateEventStatus(header)
+
+  useEffect(() => {
+    if (eventDetailsData) {
+      const data = eventDetailsData as any
+      if (data.domainObjectPrivileges) {
+        eventPrivilegesRef.current = data.domainObjectPrivileges.Event
+          ? data.domainObjectPrivileges.Event
+          : {}
+        notePrivilegesRef.current = data.domainObjectPrivileges.EVENTNOTE
+          ? data.domainObjectPrivileges.EVENTNOTE
+          : data.domainObjectPrivileges.EventNote
+            ? data.domainObjectPrivileges.EventNote
+            : {}
+        transportationPrivilegesRef.current = data.domainObjectPrivileges
+          .EVENTTRANSPORTATION
+          ? data.domainObjectPrivileges.EVENTTRANSPORTATION
+          : data.domainObjectPrivileges.EventTransportation
+            ? data.domainObjectPrivileges.EventTransportation
+            : {}
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            logger.debug('data', JSON.stringify(data.data))
-            if (data.data.domainObjectPrivileges) {
-              eventPrivilegesRef.current = data.data.domainObjectPrivileges
-                .Event
-                ? data.data.domainObjectPrivileges.Event
-                : {}
-              notePrivilegesRef.current = data.data.domainObjectPrivileges
-                .EVENTNOTE
-                ? data.data.domainObjectPrivileges.EVENTNOTE
-                : data.data.domainObjectPrivileges.EventNote
-                  ? data.data.domainObjectPrivileges.EventNote
-                  : {}
-              transportationPrivilegesRef.current = data.data
-                .domainObjectPrivileges.EVENTTRANSPORTATION
-                ? data.data.domainObjectPrivileges.EVENTTRANSPORTATION
-                : data.data.domainObjectPrivileges.EventTransportation
-                  ? data.data.domainObjectPrivileges.EventTransportation
-                  : {}
-            }
-            logger.debug('data.data.event', JSON.stringify(data.data.event))
-            setEventDetails(data.data.event ? data.data.event : {})
-            if (data.data.event.status) {
-              setEventStatus(data.data.event.status.status)
-            }
-            if (data.data.event.noteList) {
-              setNotesList(data.data.event.noteList)
-            }
-            if (data.data.event.reminderList) {
-              setRemindersList(data.data.event.reminderList)
-            }
-            if (data.data.event.transportationList) {
-              setTransportationList(data.data.event.transportationList)
-            }
-            setIsRender(!isRender)
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'Event',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(noteData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
+      setEventDetails(data.event ? data.event : {})
+      if (data.event && data.event.status) {
+        setEventStatus(data.event.status.status)
+      }
+      if (data.event && data.event.noteList) {
+        setNotesList(data.event.noteList)
+      }
+      if (data.event && data.event.reminderList) {
+        setRemindersList(data.event.reminderList)
+      }
+      if (data.event && data.event.transportationList) {
+        setTransportationList(data.event.transportationList)
+      }
+    }
+  }, [eventDetailsData])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -165,9 +149,6 @@ export function EventDetailsScreen() {
     return true
   }
   useEffect(() => {
-    if (!isAddNote) {
-      getEventDetails(false, noteData)
-    }
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -221,40 +202,42 @@ export function EventDetailsScreen() {
     title: any,
     noteData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      note: {
-        id: '',
-        event: {
-          id: eventDetails.id ? eventDetails.id : ''
-        },
-        note: noteDetails,
-        shortDescription: title
-      }
+    const notePayload: Record<string, unknown> = {
+      event: {
+        id: eventDetails.id ? eventDetails.id : ''
+      },
+      note: noteDetails,
+      shortDescription: title
     }
+
     if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_EVENT_NOTE}`
-    } else {
-      dataObject.note.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_EVENT_NOTE}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddNote(false)
-          getEventDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+      createNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create note')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      notePayload.id = noteData.id ? noteData.id : ''
+      updateNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update note')
+          }
+        }
+      )
+    }
   }
   const cancelClicked = () => {
     setIsAddNote(false)
@@ -263,32 +246,21 @@ export function EventDetailsScreen() {
     setIsMessageThread(false)
   }
   const editNote = (noteData: any) => {
-    // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
   }
   async function deleteNote(noteId: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_EVENT_NOTE}`
-    let dataObject = {
-      header: header,
-      note: {
-        id: noteId
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getEventDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+    deleteNoteMutation.mutate(
+      { note: { id: noteId } },
+      {
+        onSuccess: () => {
+          refetchDetails()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete note')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const messageThreadClicked = (noteData: any) => {
     setNoteData(noteData)
@@ -316,12 +288,10 @@ export function EventDetailsScreen() {
         type: 'Event'
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants')
           const list = data.data.map((data: any, index: any) => {
             let object = data
             object.isSelected = false
@@ -370,13 +340,19 @@ export function EventDetailsScreen() {
         messageList: []
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           setIsMessageThread(false)
-          getEventDetails(true, noteData)
+          refetchDetails()
+          router.push(
+            formatUrl('/circles/noteMessage', {
+              component: 'Event',
+              memberData: JSON.stringify(memberData),
+              noteData: JSON.stringify(noteData)
+            })
+          )
         } else {
           Alert.alert('', data.message)
         }
@@ -392,7 +368,6 @@ export function EventDetailsScreen() {
     setParticipantsList(participantsList)
   }
   const editReminder = (remiderData: any) => {
-    // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
   }
@@ -401,69 +376,62 @@ export function EventDetailsScreen() {
     date: any,
     reminderData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: '',
-        content: title,
-        date: date,
-        event: {
-          id: eventDetails.id ? eventDetails.id : ''
-        }
+    const reminderPayload: Record<string, unknown> = {
+      content: title,
+      date: date,
+      event: {
+        id: eventDetails.id ? eventDetails.id : ''
       }
-    }
-    if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_EVENT_REMINDER}`
-    } else {
-      url = `${BASE_URL}${UPDATE_EVENT_REMINDER}`
-      dataObject.reminder.id = reminderData.id
     }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // setTransportationData(data.data ? data.data : {})
-          setIsAddReminder(false)
-          setRemindersList(data.data ? data.data : [])
-        } else {
-          Alert.alert('', data.message)
+    if (_.isEmpty(reminderData)) {
+      createReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data ? data : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create reminder')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      reminderPayload.id = reminderData.id
+      updateReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data ? data : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update reminder')
+          }
+        }
+      )
+    }
   }
   async function deleteReminder(reminderData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_EVENT_REMINDER}`
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        event: {
-          id: reminderData.apointmentId ? reminderData.apointmentId : ''
+    deleteReminderMutation.mutate(
+      {
+        reminder: {
+          id: reminderData.id ? reminderData.id : '',
+          event: {
+            id: reminderData.apointmentId ? reminderData.apointmentId : ''
+          }
+        }
+      },
+      {
+        onSuccess: (data: any) => {
+          setRemindersList(data ? data : [])
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete reminder')
         }
       }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setRemindersList(data.data ? data.data : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   async function createUpdateTransportation(url: any, dataObject: any) {
     setTransportationList([])
@@ -473,7 +441,7 @@ export function EventDetailsScreen() {
         setLoading(false)
         if (data.status === 'SUCCESS') {
           cancelClicked()
-          getEventDetails(false, noteData)
+          refetchDetails()
           setIsRender(!isRender)
           setIsShowTransportation(true)
         } else {
@@ -490,32 +458,22 @@ export function EventDetailsScreen() {
     setIsAddTransportation(true)
   }
   async function deleteEvent() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_EVENT}`
-    let dataObject = {
-      header: header,
-      event: {
-        id: eventDetails.id ? eventDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    deleteEventMutation.mutate(
+      { event: { id: eventDetails.id ? eventDetails.id : 0 } },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/eventsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete event')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function deleteResendCancelTransportation(
     count: any,
@@ -548,12 +506,11 @@ export function EventDetailsScreen() {
       }
     }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
     CallPostService(url, dataObject)
       .then(async (data: any) => {
         setLoading(false)
         if (data.status === 'SUCCESS') {
-          getEventDetails(false, noteData)
+          refetchDetails()
           setIsShowTransportation(true)
           if (count !== 0) {
             Alert.alert('', data.message)
@@ -569,37 +526,41 @@ export function EventDetailsScreen() {
       })
   }
   async function updateStatus(status: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_EVENT_STATUS}`
-    let dataObject = {
-      header: header,
-      event: {
-        id: eventDetails.id ? eventDetails.id : '',
-        status: {
-          status: status
+    updateStatusMutation.mutate(
+      {
+        event: {
+          id: eventDetails.id ? eventDetails.id : '',
+          status: {
+            status: status
+          },
+          member: {
+            id: memberData.member ? memberData.member : ''
+          }
+        }
+      },
+      {
+        onSuccess: () => {
+          refetchDetails()
         },
-        member: {
-          id: memberData.member ? memberData.member : ''
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update status')
         }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getEventDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
+
+  const isMutating =
+    deleteEventMutation.isPending ||
+    createNoteMutation.isPending ||
+    updateNoteMutation.isPending ||
+    deleteNoteMutation.isPending ||
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending ||
+    updateStatusMutation.isPending
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isLoading || isDetailsLoading || isMutating} />
       <PtsBackHeader title="Event Details" memberData={memberData} />
 
       <View className="h-full w-full flex-1 py-2 ">
