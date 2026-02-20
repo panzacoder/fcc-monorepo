@@ -27,6 +27,7 @@ export const circleKeys = {
   all: ['circle'] as const,
   find: (params: FindCircleParams) =>
     [...circleKeys.all, 'find', params] as const,
+  allMemberDetails: () => [...circleKeys.all, 'memberDetails'] as const,
   memberDetails: (memberId: number | string) =>
     [...circleKeys.all, 'memberDetails', memberId] as const,
   memberMenus: (memberId: number | string) =>
@@ -38,6 +39,14 @@ export function useFindCircle(header: AuthHeader, params: FindCircleParams) {
     queryKey: circleKeys.find(params),
     queryFn: () => findCircle(header, params),
     enabled: !!header && !!(params.email || params.phone)
+  })
+}
+
+export function useAllMemberDetails(header: AuthHeader) {
+  return useQuery({
+    queryKey: circleKeys.allMemberDetails(),
+    queryFn: () => getMemberDetails(header),
+    enabled: !!header
   })
 }
 

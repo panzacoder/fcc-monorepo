@@ -67,12 +67,12 @@ export async function createCircle(
 
 export async function getMemberDetails(
   header: AuthHeader,
-  params: GetMemberDetailsParams
+  params?: GetMemberDetailsParams
 ) {
   return fetchData<GetMemberDetailsResponse>({
     header,
     route: GET_MEMBER_DETAILS,
-    data: params
+    data: params ?? {}
   })
 }
 

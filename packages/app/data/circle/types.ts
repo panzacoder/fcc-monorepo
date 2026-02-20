@@ -69,13 +69,13 @@ export interface GetMemberMenusParams {
 export type GetMemberMenusResponse = Record<string, any>
 
 export interface AcceptSharedInfoParams {
-  infoSharing: Record<string, unknown>
+  doctorSharingInfo: Record<string, unknown>
 }
 
 export type AcceptSharedInfoResponse = Record<string, any>
 
 export interface RejectSharedInfoParams {
-  infoSharing: Record<string, unknown>
+  doctorSharingInfo: Record<string, unknown>
 }
 
 export type RejectSharedInfoResponse = Record<string, any>
