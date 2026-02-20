@@ -1,15 +1,13 @@
 'use client'
 
 import { AccentButton } from 'app/ui/accent-button'
-import { View, Text, Alert, ToastAndroid } from 'react-native'
+import { View, Text, Alert } from 'react-native'
 import _ from 'lodash'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState, useRef } from 'react'
-import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
+import { useLogin } from 'app/data/auth'
 import { getCredentials } from 'app/utils/secure-storage'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { getUserDeviceInformation } from 'app/utils/device'
 import headerAction from 'app/redux/header/headerAction'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
 import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
@@ -20,26 +18,26 @@ import moment from 'moment-timezone'
 import { useAppDispatch } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
-import { logger } from 'app/utils/logger'
 import messaging from '@react-native-firebase/messaging'
 export function SplashScreen() {
   const notificationDataRef = useRef<any>({})
   const dispatch = useAppDispatch()
-  const [isLoading, setLoading] = useState(false)
+  const router = useRouter()
+  const loginMutation = useLogin({})
   const [isShowButtons, setIsShowButtons] = useState(false)
+
+  const isLoading = loginMutation.isPending
+
   const getUsernamePassword = useCallback(async () => {
-    setLoading(true)
     try {
       const credentials = await getCredentials()
       if (credentials !== null) {
         login(credentials.email, credentials.password)
       } else {
         setIsShowButtons(true)
-        setLoading(false)
       }
     } catch (e) {
       setIsShowButtons(true)
-      setLoading(false)
     }
   }, [])
   const getNotificationData = useCallback(async () => {
@@ -65,7 +63,6 @@ export function SplashScreen() {
 
   useEffect(() => {
     getNotificationData()
-    // getUsernamePassword()
   }, [])
   async function navigateToNotification() {
     if (
@@ -163,68 +160,62 @@ export function SplashScreen() {
       router.push('/home')
     }
   }
-  async function login(email: any, password: any) {
-    setLoading(true)
-    let deviceInfo = await getUserDeviceInformation()
-    let url = `${BASE_URL}${USER_LOGIN}`
-    let dataObject = {
-      header: deviceInfo,
-      appuserVo: {
-        emailOrPhone: email,
-        credential: password,
-        rememberMe: true
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          await dispatch(headerAction.setHeader(data.data.header))
-          let subscriptionDetailsobject = {
-            subscriptionEndDate: data.data.subscriptionEndDate || '',
-            days: data.data.days || '',
-            expiredSubscription: data.data.expiredSubscription,
-            expiringSubscription: data.data.expiringSubscription
+  function login(email: any, password: any) {
+    loginMutation.mutate(
+      {
+        appuserVo: {
+          emailOrPhone: email,
+          credential: password,
+          rememberMe: true
+        },
+        options: {
+          onFailure: (res) => {
+            if (res.status === 'FAILURE' && res.errorCode === 'RVF_101') {
+              router.push(formatUrl('/verification', { email: email }))
+            } else if (res.status === 'FAILURE') {
+              Alert.alert('', res.message)
+            }
           }
-          data.data.header.timezone = moment.tz.guess()
-
-          await dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
-          await dispatch(
-            subscriptionAction.setSubscription(data.data.userSubscription)
-          )
-          await dispatch(
+        }
+      },
+      {
+        onSuccess: async (data: any) => {
+          if (!data) return
+          let subscriptionDetailsobject = {
+            subscriptionEndDate: data.subscriptionEndDate || '',
+            days: data.days || '',
+            expiredSubscription: data.expiredSubscription,
+            expiringSubscription: data.expiringSubscription
+          }
+          data.header.timezone = moment.tz.guess()
+          dispatch(headerAction.setHeader(data.header))
+          dispatch(userProfileAction.setUserProfile(data.appuserVo))
+          dispatch(subscriptionAction.setSubscription(data.userSubscription))
+          dispatch(
             userSubscriptionAction.setSubscriptionDetails(
               subscriptionDetailsobject
             )
           )
-          await dispatch(
+          dispatch(
             sponsorAction.setSponsor({
-              sponsorDetails: data.data.sponsorUser,
-              sponsorShipDetails: data.data.sponsorship
+              sponsorDetails: data.sponsorUser,
+              sponsorShipDetails: data.sponsorship
             })
           )
-          if (data.data.commercialsDetails) {
-            await dispatch(
+          if (data.commercialsDetails) {
+            dispatch(
               paidAdAction.setPaidAd({
-                commercialsDetails: data.data.commercialsDetails.commercials,
+                commercialsDetails: data.commercialsDetails.commercials,
                 commercialPageMappings:
-                  data.data.commercialsDetails.commercialPageMappings
+                  data.commercialsDetails.commercialPageMappings
               })
             )
           }
           navigateToNotification()
-        } else if (data.errorCode === 'RVF_101') {
-          router.push(formatUrl('/verification', { email: email }))
-        } else {
-          Alert.alert('', data.message)
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
-  const router = useRouter()
   return (
     <View className="native:pt-60 web:pt-40 flex h-full w-full flex-1 px-4 md:justify-center md:pt-0">
       <PtsLoader loading={isLoading} />
