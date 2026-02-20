@@ -65,3 +65,7 @@ export interface DeleteCaregiverParams {
 export interface DeleteMemberParams {
   memberVo: { memberDetailsId: number | string }
 }
+
+export interface ReferFriendParams {
+  [key: string]: any
+}

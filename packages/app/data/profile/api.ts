@@ -14,7 +14,8 @@ import {
   UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS,
   DELETE_AUTHORIZED_CAREGIVER,
   DELETE_CAREGIVER,
-  DELETE_MEMBER
+  DELETE_MEMBER,
+  REFER_FRIEND
 } from 'app/utils/urlConstants'
 import type {
   UserProfileResponse,
@@ -33,7 +34,8 @@ import type {
   UpdateMemberAuthorizedCaregiverAddressParams,
   DeleteAuthorizedCaregiverParams,
   DeleteCaregiverParams,
-  DeleteMemberParams
+  DeleteMemberParams,
+  ReferFriendParams
 } from './types'
 
 export async function getUserProfile(
@@ -197,6 +199,17 @@ export async function deleteMember(
   return fetchData<Record<string, unknown>>({
     header,
     route: DELETE_MEMBER,
+    data: params
+  })
+}
+
+export async function referFriend(
+  header: AuthHeader,
+  params: ReferFriendParams
+) {
+  return fetchData<Record<string, unknown>>({
+    header,
+    route: REFER_FRIEND,
     data: params
   })
 }

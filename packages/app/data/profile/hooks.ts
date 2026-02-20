@@ -15,7 +15,8 @@ import {
   updateMemberAuthorizedCaregiverAddress,
   deleteAuthorizedCaregiver,
   deleteCaregiver,
-  deleteMember
+  deleteMember,
+  referFriend
 } from './api'
 import type {
   GetUserProfileParams,
@@ -32,7 +33,8 @@ import type {
   UpdateMemberAuthorizedCaregiverAddressParams,
   DeleteAuthorizedCaregiverParams,
   DeleteCaregiverParams,
-  DeleteMemberParams
+  DeleteMemberParams,
+  ReferFriendParams
 } from './types'
 
 export const profileKeys = {
@@ -193,6 +195,16 @@ export function useDeleteMember(header: AuthHeader) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (params: DeleteMemberParams) => deleteMember(header, params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.all })
+    }
+  })
+}
+
+export function useReferFriend(header: AuthHeader) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (params: ReferFriendParams) => referFriend(header, params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: profileKeys.all })
     }
