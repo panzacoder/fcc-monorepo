@@ -1,25 +1,53 @@
 export interface PaymentConfigResponse {
-  config: any
+  publicKey: string
 }
 
 export interface CheckOutSessionParams {
-  payment: Record<string, unknown>
+  user: Record<string, unknown>
+  order: Record<string, unknown>
+}
+
+export interface CheckOutSessionResponse {
+  ephemeralKey: string
+  paymentIntentClientSecret: string
+  customerId: string
+  sessionId: string
+  paymentIntentId: string
+  subscriptionId: string
 }
 
 export interface PaymentSuccessParams {
   sessionId: string
+  subscriptionId: string
+}
+
+export interface PaymentSuccessResponse {
+  userDetails: {
+    userSubscription?: Record<string, unknown>
+    appuserVo?: Record<string, unknown>
+  }
 }
 
 export interface PaymentFailParams {
   sessionId: string
+  reason: string
+  subscriptionId: string
 }
 
 export interface AppleSuccessPaymentParams {
-  payment: Record<string, unknown>
+  notificationType: string
+  notificationUUID: string
+  subtype: string
+  email: string
+  version: string
+  renewableInfo: Record<string, unknown>
+  transactionInfo: Record<string, unknown>
 }
 
 export interface IosReceiptVerificationParams {
-  receiptData: string
+  'receipt-data': string
+  password: string
+  'exclude-old-transactions': boolean
 }
 
 export interface GetAllPlansResponse {

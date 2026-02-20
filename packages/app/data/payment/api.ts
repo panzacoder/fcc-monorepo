@@ -16,7 +16,9 @@ import {
 import type {
   PaymentConfigResponse,
   CheckOutSessionParams,
+  CheckOutSessionResponse,
   PaymentSuccessParams,
+  PaymentSuccessResponse,
   PaymentFailParams,
   AppleSuccessPaymentParams,
   IosReceiptVerificationParams,
@@ -39,7 +41,7 @@ export async function checkOutSession(
   header: AuthHeader,
   params: CheckOutSessionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CheckOutSessionResponse>({
     header,
     route: PAYMENT_CHECK_OUT_SESSION,
     data: params
@@ -50,7 +52,7 @@ export async function paymentSuccess(
   header: AuthHeader,
   params: PaymentSuccessParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<PaymentSuccessResponse>({
     header,
     route: PAYMENT_SUCCESS,
     data: params
@@ -80,14 +82,15 @@ export async function appleSuccessPayment(
 }
 
 export async function iosReceiptVerification(
-  header: AuthHeader,
+  _header: AuthHeader,
   params: IosReceiptVerificationParams
-) {
-  return fetchData<Record<string, unknown>>({
-    header,
-    route: IOS_RECEIPT_VERIFICATION_URL,
-    data: params
+): Promise<any> {
+  const response = await fetch(IOS_RECEIPT_VERIFICATION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params)
   })
+  return response.json()
 }
 
 export async function getAllPlans(header: AuthHeader) {
