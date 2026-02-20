@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity, Pressable } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity, Pressable } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -11,19 +11,16 @@ import { COLORS } from 'app/utils/colors'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
-import { CallPostService } from 'app/utils/fetchServerData'
+import {
+  useMemberThreads,
+  useThreadParticipants,
+  useCreateMessageThread
+} from 'app/data/messages'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
-import {
-  BASE_URL,
-  GET_MEMBER_THREADS,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD
-} from 'app/utils/urlConstants'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 export function MessagesScreen() {
   const dispatch = useAppDispatch()
@@ -38,9 +35,8 @@ export function MessagesScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
+  const messagePrivilegesRef = useRef<any>({})
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [messagePrivileges, setMessagePrivileges] = useState({})
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
@@ -48,69 +44,76 @@ export function MessagesScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [messagesList, setMessagesList] = useState([]) as any
   const [messagesListFull, setMessagesListFull] = useState([]) as any
+  const [fetchParticipants, setFetchParticipants] = useState(false)
   const item = useLocalSearchParams<any>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
-  const getMessageDetails = useCallback(
-    async (isFromCreateThread: any, messageData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_THREADS}`
-      let dataObject = {
-        header: header,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('data', JSON.stringify(data.data.eventList))
-            if (data.data.domainObjectPrivileges) {
-              setMessagePrivileges(
-                data.data.domainObjectPrivileges.MESSAGETHREAD
-                  ? data.data.domainObjectPrivileges.MESSAGETHREAD
-                  : data.data.domainObjectPrivileges.MessageThread
-                    ? data.data.domainObjectPrivileges.MessageThread
-                    : {}
-              )
-            }
-            let threadList = data.data.threadList ? data.data.threadList : []
-            setMessagesList(threadList)
-            setMessagesListFull(threadList)
-            getFilteredList(
-              data.data.threadList ? data.data.threadList : [],
-              currentFilter
-            )
-            setIsDataReceived(true)
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'General',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(messageData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
+
+  const threadParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
+    }
+  }
+
+  const participantParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
     },
-    []
+    messageThreadType: {
+      type: 'General'
+    }
+  }
+
+  const { data: threadsData, isLoading: isThreadsLoading } = useMemberThreads(
+    header,
+    threadParams
   )
+
+  const { data: participantsData, isLoading: isParticipantsLoading } =
+    useThreadParticipants(header, participantParams)
+
+  const createThreadMutation = useCreateMessageThread(header)
+
+  const isLoading =
+    isThreadsLoading || isParticipantsLoading || createThreadMutation.isPending
+
   useEffect(() => {
-    getMessageDetails(false, {})
-  }, [])
+    if (threadsData) {
+      if (threadsData.domainObjectPrivileges) {
+        messagePrivilegesRef.current = threadsData.domainObjectPrivileges
+          .MESSAGETHREAD
+          ? threadsData.domainObjectPrivileges.MESSAGETHREAD
+          : threadsData.domainObjectPrivileges.MessageThread
+            ? threadsData.domainObjectPrivileges.MessageThread
+            : {}
+      }
+      let threadList = threadsData.threadList ? threadsData.threadList : []
+      setMessagesList(threadList)
+      setMessagesListFull(threadList)
+      getFilteredList(
+        threadsData.threadList ? threadsData.threadList : [],
+        currentFilter
+      )
+      setIsDataReceived(true)
+    }
+  }, [threadsData])
+
+  useEffect(() => {
+    if (fetchParticipants && participantsData) {
+      const list = participantsData.map((data: any, index: any) => {
+        let object = data
+        object.isSelected = false
+        return object
+      })
+      setParticipantsList(list)
+      setIsMessageThread(true)
+      setFetchParticipants(false)
+    }
+  }, [fetchParticipants, participantsData])
+
   function createMessageThread(subject: any, noteData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -122,77 +125,35 @@ export function MessagesScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        subject: subject,
-        member: memberData.member ? memberData.member : '',
-        type: {
-          type: 'General'
-        },
-        participantList: list,
-        messageList: []
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsMessageThread(false)
-          let messageData = data.data.messageThread
-            ? data.data.messageThread
-            : {}
-          getMessageDetails(true, messageData)
-        } else {
-          Alert.alert('', data.message)
+    createThreadMutation.mutate(
+      {
+        messageThread: {
+          subject: subject,
+          member: memberData.member ? memberData.member : '',
+          type: {
+            type: 'General'
+          },
+          participantList: list,
+          messageList: []
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }
-  async function getThreadParticipants() {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
       },
-      messageThreadType: {
-        type: 'General'
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            object.isSelected = false
-            return object
-          })
-
-          // data.data.map((data: any) => {
-          //   let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
-          //   if (memberNamesList.includes(fullName) === false) {
-          //     memberNamesList.push(fullName)
-          //   }
-          // })
-          // store.dispatch(memberNamesAction.setMemberNames(memberNamesList))
-          setParticipantsList(list)
-          setIsMessageThread(true)
-        } else {
-          Alert.alert('', data.message)
+      {
+        onSuccess: (data: any) => {
+          setIsMessageThread(false)
+          let messageData = data?.messageThread ? data.messageThread : {}
+          router.push(
+            formatUrl('/circles/noteMessage', {
+              component: 'General',
+              memberData: JSON.stringify(memberData),
+              noteData: JSON.stringify(messageData)
+            })
+          )
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
+  }
+  function getThreadParticipants() {
+    setFetchParticipants(true)
   }
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
@@ -240,7 +201,7 @@ export function MessagesScreen() {
             color={'black'}
           />
         </TouchableOpacity>
-        {getUserPermission(messagePrivileges).createPermission ? (
+        {getUserPermission(messagePrivilegesRef.current).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
