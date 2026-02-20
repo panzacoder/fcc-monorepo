@@ -7,7 +7,7 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
-import { CreateCircleProps, createCircle } from 'app/data/circle/create'
+import { CreateCircleParams, createCircle } from 'app/data/circle'
 import { CircleNameSection } from './name-section'
 import _ from 'lodash'
 import { CircleEmailSection } from './email-section'
@@ -27,23 +27,25 @@ export function CreateCircle() {
   const submitCircleForm: SubmitHandler<CreateCircleSchema> = async (
     formData: CreateCircleSchema
   ) => {
-    const circleRequestProps: CreateCircleProps = {
-      email: formData.email,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      address: {
-        line: formData.address,
-        city: formData.city,
-        state: {
-          id: formData.state,
-          country: {
-            id: formData.country
-          }
-        },
-        timezone: {
-          id: formData.timezone
-        },
-        zipCode: formData.postalCode
+    const circleRequestProps: CreateCircleParams = {
+      memberVo: {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: {
+          line: formData.address,
+          city: formData.city,
+          state: {
+            id: formData.state,
+            country: {
+              id: formData.country
+            }
+          },
+          timezone: {
+            id: formData.timezone
+          },
+          zipCode: formData.postalCode
+        }
       }
     }
 
