@@ -1,14 +1,13 @@
+import { useEffect } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Alert, View } from 'react-native'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'expo-router'
-import { BASE_URL, FORGOT_PASSWORD } from 'app/utils/urlConstants'
+import { useForgotPassword } from 'app/data/auth'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { CallPostService } from 'app/utils/fetchServerData'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { logger } from 'app/utils/logger'
 
 export type ForgotPasswordFormProps = {
   onLoadingChange: (loading: boolean) => void
@@ -32,29 +31,30 @@ export function ForgotPasswordForm({
   })
 
   const router = useRouter()
+  const forgotPasswordMutation = useForgotPassword({})
+
+  useEffect(() => {
+    onLoadingChange(forgotPasswordMutation.isPending)
+  }, [forgotPasswordMutation.isPending])
 
   const onSubmit = (formData: any) => {
-    onLoadingChange(true)
-    const url = `${BASE_URL}${FORGOT_PASSWORD}`
-    const dataObject = {
-      appuserVo: {
-        emailOrPhone: formData.email
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        onLoadingChange(false)
-        if (data.status === 'SUCCESS') {
-          onEmailVerified(formData.email)
-        } else {
-          Alert.alert('', data.message)
+    forgotPasswordMutation.mutate(
+      {
+        appuserVo: {
+          emailOrPhone: formData.email
         }
-      })
-      .catch((error) => {
-        onLoadingChange(false)
-        Alert.alert('', 'Unknown error occurred, please try again.')
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: (data) => {
+          if (data) {
+            onEmailVerified(formData.email)
+          }
+        },
+        onError: () => {
+          Alert.alert('', 'Unknown error occurred, please try again.')
+        }
+      }
+    )
   }
 
   return (
