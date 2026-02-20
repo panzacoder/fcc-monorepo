@@ -1,15 +1,14 @@
+import { useEffect } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Alert, View } from 'react-native'
 import { useRouter } from 'expo-router'
-import { BASE_URL, RESET_PASSWORD } from 'app/utils/urlConstants'
-import { CallPostService } from 'app/utils/fetchServerData'
+import { useResetPassword } from 'app/data/auth'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { logger } from 'app/utils/logger'
 
 export type ResetPasswordFormProps = {
   email: string
@@ -59,31 +58,32 @@ export function SetPasswordForm({
   })
 
   const router = useRouter()
+  const resetPasswordMutation = useResetPassword({})
+
+  useEffect(() => {
+    onLoadingChange(resetPasswordMutation.isPending)
+  }, [resetPasswordMutation.isPending])
 
   const onSubmit = (formData: any) => {
-    onLoadingChange(true)
-    const url = `${BASE_URL}${RESET_PASSWORD}`
-    const dataObject = {
-      appuserVo: {
-        emailOrPhone: formData.email,
-        tempPassword: formData.authCode,
-        credential: formData.password
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        onLoadingChange(false)
-        if (data.status === 'SUCCESS') {
-          router.push('/login')
-        } else {
-          Alert.alert('', data.message)
+    resetPasswordMutation.mutate(
+      {
+        appuserVo: {
+          emailOrPhone: formData.email,
+          tempPassword: formData.authCode,
+          credential: formData.password
         }
-      })
-      .catch((error) => {
-        onLoadingChange(true)
-        Alert.alert('', 'Unknown error occurred, please try again.')
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: (data) => {
+          if (data) {
+            router.push('/login')
+          }
+        },
+        onError: () => {
+          Alert.alert('', 'Unknown error occurred, please try again.')
+        }
+      }
+    )
   }
 
   return (
