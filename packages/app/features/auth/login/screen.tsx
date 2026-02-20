@@ -1,10 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { View, Alert } from 'react-native'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, USER_LOGIN } from 'app/utils/urlConstants'
-import { getUserDeviceInformation } from 'app/utils/device'
+import { useLogin } from 'app/data/auth'
 import { storeCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
@@ -27,7 +24,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
 import { formatUrl } from 'app/utils/format-url'
-import { logger } from 'app/utils/logger'
+
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' }).email(),
   password: z.string().min(1, { message: 'Password is required' })
@@ -38,7 +35,7 @@ type Schema = z.infer<typeof schema>
 export function LoginScreen() {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const [isLoading, setLoading] = useState(false)
+  const loginMutation = useLogin({})
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -48,34 +45,39 @@ export function LoginScreen() {
     resolver: zodResolver(schema)
   })
 
+  const isLoading = loginMutation.isPending
+
   async function login(formData: Schema) {
-    setLoading(true)
-    let deviceInfo = await getUserDeviceInformation()
-    let url = `${BASE_URL}${USER_LOGIN}`
-    let dataObject = {
-      header: deviceInfo,
-      appuserVo: {
-        emailOrPhone: formData.email,
-        credential: formData.password,
-        rememberMe: true
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let subscriptionDetailsobject = {
-            subscriptionEndDate: data.data.subscriptionEndDate || '',
-            days: data.data.days || '',
-            expiredSubscription: data.data.expiredSubscription,
-            expiringSubscription: data.data.expiringSubscription
+    loginMutation.mutate(
+      {
+        appuserVo: {
+          emailOrPhone: formData.email,
+          credential: formData.password,
+          rememberMe: true
+        },
+        options: {
+          onFailure: (res) => {
+            if (res.status === 'FAILURE' && res.errorCode === 'RVF_101') {
+              router.push(formatUrl('/verification', { email: formData.email }))
+            } else if (res.status === 'FAILURE') {
+              Alert.alert('', res.message)
+            }
           }
-          data.data.header.timezone = moment.tz.guess()
-          dispatch(headerAction.setHeader(data.data.header))
-          dispatch(userProfileAction.setUserProfile(data.data.appuserVo))
-          dispatch(
-            subscriptionAction.setSubscription(data.data.userSubscription)
-          )
+        }
+      },
+      {
+        onSuccess: async (data: any) => {
+          if (!data) return
+          let subscriptionDetailsobject = {
+            subscriptionEndDate: data.subscriptionEndDate || '',
+            days: data.days || '',
+            expiredSubscription: data.expiredSubscription,
+            expiringSubscription: data.expiringSubscription
+          }
+          data.header.timezone = moment.tz.guess()
+          dispatch(headerAction.setHeader(data.header))
+          dispatch(userProfileAction.setUserProfile(data.appuserVo))
+          dispatch(subscriptionAction.setSubscription(data.userSubscription))
           dispatch(
             userSubscriptionAction.setSubscriptionDetails(
               subscriptionDetailsobject
@@ -83,31 +85,24 @@ export function LoginScreen() {
           )
           dispatch(
             sponsorAction.setSponsor({
-              sponsorDetails: data.data.sponsorUser,
-              sponsorShipDetails: data.data.sponsorship
+              sponsorDetails: data.sponsorUser,
+              sponsorShipDetails: data.sponsorship
             })
           )
-          if (data.data.commercialsDetails) {
+          if (data.commercialsDetails) {
             dispatch(
               paidAdAction.setPaidAd({
-                commercialsDetails: data.data.commercialsDetails.commercials,
+                commercialsDetails: data.commercialsDetails.commercials,
                 commercialPageMappings:
-                  data.data.commercialsDetails.commercialPageMappings
+                  data.commercialsDetails.commercialPageMappings
               })
             )
           }
           await storeCredentials(formData.email, formData.password)
           router.push('/home')
-        } else if (data.errorCode === 'RVF_101') {
-          router.push(formatUrl('/verification', { email: formData.email }))
-        } else {
-          Alert.alert('', data.message)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
 
   return (

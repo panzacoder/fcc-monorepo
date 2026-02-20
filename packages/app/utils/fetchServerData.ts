@@ -10,6 +10,7 @@ export type CallPostServiceResponse<T> =
   | {
       status: 'FAILURE'
       message: string
+      errorCode?: string
     }
 
 export function CallPostService<T>(

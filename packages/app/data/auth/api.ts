@@ -1,4 +1,4 @@
-import { fetchData, type AuthHeader } from '../base'
+import { fetchData, type AuthHeader, type FetchDataOptions } from '../base'
 import {
   USER_LOGIN,
   USER_LOGOUT,
@@ -28,11 +28,16 @@ import type {
   CheckValidCredentialResponse
 } from './types'
 
-export async function login(header: AuthHeader, params: LoginParams) {
+export async function login(
+  header: AuthHeader,
+  params: LoginParams,
+  options?: FetchDataOptions<LoginResponse>
+) {
   return fetchData<LoginResponse>({
     header,
     route: USER_LOGIN,
-    data: params
+    data: params,
+    ...options
   })
 }
 

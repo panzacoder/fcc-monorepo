@@ -9,12 +9,15 @@ import { logger } from 'app/utils/logger'
 
 export type AuthHeader = any
 
+export type FetchDataOptions<DataType> = {
+  onFailure?: (response: CallPostServiceResponse<DataType>) => void
+}
+
 type fetchDataProps<DataType> = {
   header: AuthHeader
   route: string
   data?: any
-  onFailure?: (response: CallPostServiceResponse<DataType>) => void
-}
+} & FetchDataOptions<DataType>
 
 export async function fetchData<DataType>({
   header,
