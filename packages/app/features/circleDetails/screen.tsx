@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { Alert, View, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -13,13 +13,8 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { logger } from 'app/utils/logger'
 import { CircleSummaryCard } from './circle-summary-card'
-import { CallPostService } from 'app/utils/fetchServerData'
+import { useMemberDetails, useMemberMenus } from 'app/data/circle'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
-import {
-  BASE_URL,
-  GET_MEMBER_MENUS,
-  GET_MEMBER_DETAILS
-} from 'app/utils/urlConstants'
 
 export function CircleDetailsScreen() {
   const header = useAppSelector((state) => state.headerState.header)
@@ -31,8 +26,6 @@ export function CircleDetailsScreen() {
   const [isIncidents, setIsIncidents] = useState(false)
   const [isEvents, setIsEvents] = useState(false)
   const item = useLocalSearchParams<any>()
-  const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const [menuList, setMenuList] = useState(null)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
@@ -43,7 +36,6 @@ export function CircleDetailsScreen() {
   } else {
     memberData.component = ''
   }
-  // console.log('component', item.component ? item.component : '')
   logger.debug('memberData', JSON.stringify(memberData))
   let unreadMessages = 0
   memberData.unreadMessages.map((data: any) => {
@@ -56,85 +48,66 @@ export function CircleDetailsScreen() {
       ' with ' +
       memberData.upcomingAppointment.location
   }
-  const getMemberDetails = useCallback(async () => {
-    let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          data.data.memberList.map((data: any, index: any) => {
-            if (memberData.member === data.member) {
-              setMemberData(data)
-              logger.debug('memberData', JSON.stringify(memberData))
-            }
-          })
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-        setIsDataReceived(true)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
-  const getMemberMenus = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_MEMBER_MENUS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
+
+  const memberId = memberData.member ? memberData.member : ''
+
+  const { data: memberDetailsData, isLoading: isDetailsLoading } =
+    useMemberDetails(header, memberId)
+
+  const { data: memberMenusData, isLoading: isMenusLoading } = useMemberMenus(
+    header,
+    memberId
+  )
+
+  useEffect(() => {
+    if (memberDetailsData) {
+      const data = memberDetailsData as any
+      if (data.memberList) {
+        data.memberList.map((entry: any) => {
+          if (memberData.member === entry.member) {
+            setMemberData(entry)
+            logger.debug('memberData', JSON.stringify(memberData))
+          }
+        })
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.member && data.data.member.address) {
-            dispatch(
-              currentMemberAddressAction.setMemberAddress(
-                data.data.member.address
-              )
-            )
-            let menuList = data.data.member.menuList
-              ? data.data.member.menuList
-              : []
-            menuList.map((data: any, index: any) => {
-              if (data.menuid === 'MyAppointments') {
-                setIsAppointments(true)
-              } else if (data.menuid === 'MyCommunications') {
-                setIsMessages(true)
-              } else if (data.menuid === 'MyEvents') {
-                setIsEvents(true)
-              } else if (data.menuid === 'MyIncidents') {
-                logger.debug('MyIncidents')
-                setIsIncidents(true)
-              }
-            })
-            logger.debug('menuList', JSON.stringify(menuList))
-            setMenuList(menuList)
+  }, [memberDetailsData])
+
+  useEffect(() => {
+    if (memberMenusData) {
+      const data = memberMenusData as any
+      if (data.member && data.member.address) {
+        dispatch(
+          currentMemberAddressAction.setMemberAddress(data.member.address)
+        )
+        let list = data.member.menuList ? data.member.menuList : []
+        list.map((entry: any) => {
+          if (entry.menuid === 'MyAppointments') {
+            setIsAppointments(true)
+          } else if (entry.menuid === 'MyCommunications') {
+            setIsMessages(true)
+          } else if (entry.menuid === 'MyEvents') {
+            setIsEvents(true)
+          } else if (entry.menuid === 'MyIncidents') {
+            logger.debug('MyIncidents')
+            setIsIncidents(true)
           }
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+        })
+        logger.debug('menuList', JSON.stringify(list))
+        setMenuList(list)
+      }
+    }
+  }, [memberMenusData])
+
+  const isLoading = isDetailsLoading || isMenusLoading
+  const isDataReceived = !isLoading && !!memberDetailsData
+
   function handleBackButtonClick() {
     router.dismissAll()
     router.push('/home')
     return true
   }
   useEffect(() => {
-    getMemberMenus()
-    getMemberDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
