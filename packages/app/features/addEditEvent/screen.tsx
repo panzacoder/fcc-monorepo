@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Alert, View, BackHandler } from 'react-native'
+import { View, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -12,8 +12,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, CREATE_EVENT, UPDATE_EVENT } from 'app/utils/urlConstants'
+import { useCreateEvent, useUpdateEvent } from 'app/data/events'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -29,6 +28,8 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 export function AddEditEventScreen() {
   const header = useAppSelector((state) => state.headerState.header)
+  const createEventMutation = useCreateEvent(header)
+  const updateEventMutation = useUpdateEvent(header)
   const router = useRouter()
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
@@ -36,7 +37,8 @@ export function AddEditEventScreen() {
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
-  const [isLoading, setLoading] = useState(false)
+  const isLoading =
+    createEventMutation.isPending || updateEventMutation.isPending
   const [selectedAddress, setSelectedAddress] = useState({
     shortDescription: '',
     nickName: '',
@@ -155,54 +157,38 @@ export function AddEditEventScreen() {
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function addEditEvent(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    let dataObject: any = {
-      header: header,
-      event: {
-        date: selectedDate,
-        title: formData.title,
-        description: formData.description,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        location: selectedAddress,
-        contactList: [],
-        reminderList: []
+    let eventData: any = {
+      date: selectedDate,
+      title: formData.title,
+      description: formData.description,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      location: selectedAddress,
+      contactList: [],
+      reminderList: []
+    }
+    const onSuccess = (data: any) => {
+      if (_.isEmpty(eventDetails)) {
+        router.dismiss(1)
+      } else {
+        router.dismiss(2)
       }
+      let details = data?.event ? data.event : {}
+      router.push(
+        formatUrl('/circles/eventDetails', {
+          eventDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
     }
     if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
-      url = `${BASE_URL}${CREATE_EVENT}`
-      dataObject.event.location.address.id = ''
+      eventData.location.address.id = ''
+      createEventMutation.mutate({ event: eventData }, { onSuccess })
     } else {
-      url = `${BASE_URL}${UPDATE_EVENT}`
-      dataObject.event.id = eventDetails.id
+      eventData.id = eventDetails.id
+      updateEventMutation.mutate({ event: eventData }, { onSuccess })
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          if (_.isEmpty(eventDetails)) {
-            router.dismiss(1)
-          } else {
-            router.dismiss(2)
-          }
-          let details = data.data.event ? data.data.event : {}
-          router.push(
-            formatUrl('/circles/eventDetails', {
-              eventDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   return (
     <View className="flex-1">
