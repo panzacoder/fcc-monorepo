@@ -1,5 +1,5 @@
 export interface GetUserProfileParams {
-  member: { id: number | string }
+  [key: string]: any
 }
 
 export interface UserProfileResponse {
@@ -7,7 +7,7 @@ export interface UserProfileResponse {
 }
 
 export interface UpdateProfileParams {
-  member: Record<string, unknown>
+  memberVo: Record<string, unknown>
 }
 
 export interface GetMemberProfileParams {
@@ -35,33 +35,33 @@ export interface DeleteAccountParams {
 }
 
 export interface CheckValidCredentialParams {
-  credential: Record<string, unknown>
+  appuserVo: { credential: string }
 }
 
 export interface UpdateSponsorCodeParams {
-  member: Record<string, unknown>
+  appuserVo: { sponsorCode: string; email: string }
 }
 
 export interface UpdateMemberAuthorizedCaregiverParams {
-  member: Record<string, unknown>
+  memberVo: Record<string, unknown>
 }
 
 export interface UpdateMemberAddressParams {
-  member: Record<string, unknown>
+  memberVo: Record<string, unknown>
 }
 
 export interface UpdateMemberAuthorizedCaregiverAddressParams {
-  member: Record<string, unknown>
+  memberVo: Record<string, unknown>
 }
 
 export interface DeleteAuthorizedCaregiverParams {
-  member: { id: number | string }
+  appuserVo: { id: number | string }
 }
 
 export interface DeleteCaregiverParams {
-  caregiver: { id: number | string }
+  familyMember: { id: number | string; memberId: number | string }
 }
 
 export interface DeleteMemberParams {
-  member: { id: number | string }
+  memberVo: { memberDetailsId: number | string }
 }

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { View, Alert } from 'react-native'
+import { View } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -9,13 +8,11 @@ import _ from 'lodash'
 import { formatUrl } from 'app/utils/format-url'
 import { Button } from 'app/ui/button'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import { CallPostService } from 'app/utils/fetchServerData'
-import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
-  BASE_URL,
-  UPDATE_PROFILE,
-  UPDATE_MEMBER_AUTHORIZED_CAREGIVER
-} from 'app/utils/urlConstants'
+  useUpdateProfile,
+  useUpdateMemberAuthorizedCaregiver
+} from 'app/data/profile'
+import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
@@ -41,9 +38,11 @@ export function EditUserProfileScreen() {
   const dispatch = useAppDispatch()
   let userPhone = ''
   const user = useAppSelector((state) => state.userProfileState.header)
-  const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
+  const updateProfileMutation = useUpdateProfile(header)
+  const updateCaregiverMutation = useUpdateMemberAuthorizedCaregiver(header)
+  const isLoading =
+    updateProfileMutation.isPending || updateCaregiverMutation.isPending
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
@@ -79,29 +78,25 @@ export function EditUserProfileScreen() {
     resolver: zodResolver(phoneSchema)
   })
   async function updateProfile(formData: ProfileSchema) {
-    setLoading(true)
-    let url = ''
-    url =
-      item.component === 'Profile'
-        ? `${BASE_URL}${UPDATE_PROFILE}`
-        : `${BASE_URL}${UPDATE_MEMBER_AUTHORIZED_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      memberVo: {
-        id: memberDetails.id ? memberDetails.id : '',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: removeAllSpecialCharFromString(userPhone),
-        isMemberUpdate: true
-      }
+    const memberVo = {
+      id: memberDetails.id ? memberDetails.id : '',
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: removeAllSpecialCharFromString(userPhone),
+      isMemberUpdate: true
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+    const mutation =
+      item.component === 'Profile'
+        ? updateProfileMutation
+        : updateCaregiverMutation
+    mutation.mutate(
+      { memberVo },
+      {
+        onSuccess: (data: any) => {
           logger.debug('datatat ', JSON.stringify(data))
-          let fullName = data.data.firstName ? data.data.firstName : ''
-          fullName += data.data.lastName ? ' ' + data.data.lastName : ''
+          let fullName = data.firstName ? data.firstName : ''
+          fullName += data.lastName ? ' ' + data.lastName : ''
           user.memberName = fullName
           dispatch(userProfileAction.setUserProfile(user))
           router.dismiss(2)
@@ -115,15 +110,12 @@ export function EditUserProfileScreen() {
               })
             )
           }
-        } else {
-          setLoading(false)
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          logger.debug('error', error)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   return (
     <View className="flex-1">
