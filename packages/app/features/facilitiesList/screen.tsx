@@ -1,24 +1,21 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_MEMBER_FACILITIES } from 'app/utils/urlConstants'
+import { useMemberFacilities } from 'app/data/facilities'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 export function FacilitiesListScreen() {
   const facilityPrivilegesRef = useRef<any>({})
-  const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [facilityList, setFacilityList] = useState([]) as any
   const [facilityListFull, setFacilityListFull] = useState([]) as any
@@ -28,44 +25,28 @@ export function FacilitiesListScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
+
+  const { data: facilitiesData, isLoading: isFacilitiesLoading } =
+    useMemberFacilities(header, {
+      memberId: memberData.member ? memberData.member : ''
+    })
+
+  const isLoading = isFacilitiesLoading
+
   useEffect(() => {
-    async function getFacilityDetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_FACILITIES}`
-      let dataObject = {
-        header: header,
-        facility: {
-          member: {
-            id: memberData.member ? memberData.member : ''
-          }
-        }
+    if (facilitiesData) {
+      if (facilitiesData.domainObjectPrivileges) {
+        facilityPrivilegesRef.current = facilitiesData.domainObjectPrivileges
+          .Facility
+          ? facilitiesData.domainObjectPrivileges.Facility
+          : {}
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.domainObjectPrivileges) {
-              facilityPrivilegesRef.current = data.data.domainObjectPrivileges
-                .Facility
-                ? data.data.domainObjectPrivileges.Facility
-                : {}
-            }
-            let list = data.data.list ? data.data.list : []
-            setFacilityList(list)
-            setFacilityListFull(list)
-            getFilteredList(list, currentFilter)
-            setIsDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
+      let list = facilitiesData.list ? facilitiesData.list : []
+      setFacilityListFull(list)
+      getFilteredList(list, currentFilter)
+      setIsDataReceived(true)
     }
-    getFacilityDetails()
-  }, [])
+  }, [facilitiesData])
   function setFilteredList(filter: any) {
     setIsShowFilter(false)
     setCurrentFilter(filter)

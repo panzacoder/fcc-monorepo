@@ -7,17 +7,15 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import * as Clipboard from 'expo-clipboard'
 import {
-  BASE_URL,
-  GET_FACILITY_DETAILS,
-  DELETE_FACILITY,
-  SHARE_CONTACT_INFO
-} from 'app/utils/urlConstants'
+  useFacilityDetails,
+  useDeleteFacility,
+  useShareFacility
+} from 'app/data/facilities'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -44,10 +42,45 @@ export function FacilityDetailsScreen() {
     ? JSON.parse(item.facilityDetails)
     : {}
   logger.debug('facilityInfo', JSON.stringify(facilityInfo))
-  const [isLoading, setLoading] = useState(false)
   const [isShareFacility, setIsShareFacility] = useState(false)
   const [locationList, setLocationList] = useState([])
   const [appointmentList, setAppointmentList] = useState([])
+
+  const facilityId = facilityInfo.id ? facilityInfo.id : ''
+  const { data: facilityDetailsData, isLoading: isDetailsLoading } =
+    useFacilityDetails(header, { id: facilityId })
+
+  const deleteFacilityMutation = useDeleteFacility(header)
+  const shareFacilityMutation = useShareFacility(header)
+
+  useEffect(() => {
+    if (facilityDetailsData) {
+      const data = facilityDetailsData as any
+      if (data.domainObjectPrivileges) {
+        facilityPrivilegesRef.current = data.domainObjectPrivileges.Facility
+          ? data.domainObjectPrivileges.Facility
+          : {}
+      }
+      setFacilityDetails(
+        data.facilityWithAppointment
+          ? data.facilityWithAppointment.facility || {}
+          : {}
+      )
+      setLocationList(
+        data.facilityWithAppointment &&
+          data.facilityWithAppointment.facility.facilityLocationList
+          ? data.facilityWithAppointment.facility.facilityLocationList
+          : []
+      )
+      setAppointmentList(
+        data.facilityWithAppointment &&
+          data.facilityWithAppointment.facilityAppointmentList
+          ? data.facilityWithAppointment.facilityAppointmentList
+          : []
+      )
+      logger.debug('appointmentList', JSON.stringify(appointmentList))
+    }
+  }, [facilityDetailsData])
 
   function handleBackButtonClick() {
     router.dismiss(2)
@@ -59,54 +92,6 @@ export function FacilityDetailsScreen() {
     return true
   }
   useEffect(() => {
-    async function getfacilityDetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_FACILITY_DETAILS}`
-      let dataObject = {
-        header: header,
-        facility: {
-          id: facilityInfo.id ? facilityInfo.id : ''
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.domainObjectPrivileges) {
-              facilityPrivilegesRef.current = data.data.domainObjectPrivileges
-                .Facility
-                ? data.data.domainObjectPrivileges.Facility
-                : {}
-            }
-            setFacilityDetails(data.data.facilityWithAppointment.facility || {})
-            // console.log(
-            //   'facilityWithAppointment',
-            //   JSON.stringify(data.data.facilityWithAppointment.facility)
-            // )
-            setLocationList(
-              data.data.facilityWithAppointment &&
-                data.data.facilityWithAppointment.facility.facilityLocationList
-                ? data.data.facilityWithAppointment.facility
-                    .facilityLocationList
-                : []
-            )
-            setAppointmentList(
-              data.data.facilityWithAppointment &&
-                data.data.facilityWithAppointment.facilityAppointmentList
-                ? data.data.facilityWithAppointment.facilityAppointmentList
-                : []
-            )
-            logger.debug('appointmentList', JSON.stringify(appointmentList))
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    }
-    getfacilityDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -117,58 +102,46 @@ export function FacilityDetailsScreen() {
   }, [])
 
   async function deleteFacility() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_FACILITY}`
-    let dataObject = {
-      header: header,
-      facility: {
-        id: facilityDetails.id ? facilityDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    deleteFacilityMutation.mutate(
+      {
+        facility: { id: facilityDetails.id ? facilityDetails.id : '' }
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/facilitiesList', {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete facility')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const cancelClicked = () => {
     setIsShareFacility(false)
   }
   async function shareFacility(email: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${SHARE_CONTACT_INFO}`
-    let dataObject = {
-      header: header,
-      doctorSharingInfo: {
-        facilityid: facilityDetails.id ? facilityDetails.id : '',
-        targetemail: email
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsShareFacility(false)
+    shareFacilityMutation.mutate(
+      {
+        doctorSharingInfo: {
+          facilityid: facilityDetails.id ? facilityDetails.id : '',
+          targetemail: email
         }
-        Alert.alert('', data.message)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: () => {
+          setIsShareFacility(false)
+          Alert.alert('', 'Facility shared successfully')
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to share facility')
+        }
+      }
+    )
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
@@ -196,7 +169,13 @@ export function FacilityDetailsScreen() {
   }
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader
+        loading={
+          isDetailsLoading ||
+          deleteFacilityMutation.isPending ||
+          shareFacilityMutation.isPending
+        }
+      />
       <PtsBackHeader title="Facility Details" memberData={memberData} />
       <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">

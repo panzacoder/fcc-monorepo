@@ -10,16 +10,11 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { LocationDetails } from 'app/ui/locationDetails'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
-import {
-  BASE_URL,
-  CREATE_FACILITY,
-  UPDATE_FACILITY
-} from 'app/utils/urlConstants'
+import { useCreateFacility, useUpdateFacility } from 'app/data/facilities'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
@@ -28,7 +23,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   website: z.string(),
@@ -78,12 +72,15 @@ export function AddEditFacilityScreen() {
   )
   // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
+  const createFacilityMutation = useCreateFacility(header)
+  const updateFacilityMutation = useUpdateFacility(header)
+  const isLoading =
+    createFacilityMutation.isPending || updateFacilityMutation.isPending
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let facilityDetails = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
-  // console.log('facilityDetails', JSON.stringify(facilityDetails))
   if (!_.isEmpty(facilityDetails)) {
     if (facilityDetails.type) {
       selectedTypeRef.current = facilityDetails.type
@@ -95,7 +92,6 @@ export function AddEditFacilityScreen() {
       isFacilityActiveRef.current = false
     }
   }
-  const [isLoading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(
     isFacilityActiveRef.current ? true : false
   )
@@ -139,10 +135,7 @@ export function AddEditFacilityScreen() {
       Alert.alert('', 'Select Type')
       return
     }
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_FACILITY}`
-    let dataObject = {
-      header: header,
+    const data: any = await updateFacilityMutation.mutateAsync({
       facility: {
         id: facilityDetails.id ? facilityDetails.id : '',
         member: {
@@ -159,34 +152,23 @@ export function AddEditFacilityScreen() {
           id: isFacilityActiveRef.current === true ? 1 : 2
         }
       }
+    })
+    if (data) {
+      let details = data.facility ? data.facility : {}
+      router.dismiss(2)
+      router.push(
+        formatUrl('/circles/facilityDetails', {
+          facilityDetails: JSON.stringify(details),
+          memberData: JSON.stringify(memberData)
+        })
+      )
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details = data.data.facility ? data.data.facility : {}
-          router.dismiss(2)
-          router.push(
-            formatUrl('/circles/facilityDetails', {
-              facilityDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   async function createFacility(formData: Schema) {
     if (selectedTypeRef.current === '') {
       Alert.alert('', 'Select Type')
       return
     }
-    setLoading(true)
     let locationList: object[] = []
     selectedAddressRef.current.fax = formData.fax
     selectedAddressRef.current.website = formData.website
@@ -195,9 +177,7 @@ export function AddEditFacilityScreen() {
     )
     selectedAddressRef.current.address.id = ''
     locationList.push(selectedAddressRef.current)
-    let url = `${BASE_URL}${CREATE_FACILITY}`
-    let dataObject = {
-      header: header,
+    const data: any = await createFacilityMutation.mutateAsync({
       facility: {
         member: {
           id: memberData.member
@@ -210,38 +190,28 @@ export function AddEditFacilityScreen() {
         type: selectedTypeRef.current,
         facilityLocationList: locationList
       }
+    })
+    if (data) {
+      let details = data.facility ? data.facility : {}
+      if (item.component === 'addEditAppointment') {
+        router.dismiss(2)
+        router.push(
+          formatUrl('/circles/addEditAppointment', {
+            memberData: JSON.stringify(memberData),
+            doctorFacilityDetails: JSON.stringify(details),
+            component: 'Facility'
+          })
+        )
+      } else {
+        router.dismiss(1)
+        router.push(
+          formatUrl('/circles/facilityDetails', {
+            facilityDetails: JSON.stringify(details),
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details = data.data.facility ? data.data.facility : {}
-          if (item.component === 'addEditAppointment') {
-            router.dismiss(2)
-            router.push(
-              formatUrl('/circles/addEditAppointment', {
-                memberData: JSON.stringify(memberData),
-                doctorFacilityDetails: JSON.stringify(details),
-                component: 'Facility'
-              })
-            )
-          } else {
-            router.dismiss(1)
-            router.push(
-              formatUrl('/circles/facilityDetails', {
-                facilityDetails: JSON.stringify(details),
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   const onSelectionType = (data: any) => {
     selectedTypeRef.current = data

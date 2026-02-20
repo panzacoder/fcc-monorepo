@@ -1,24 +1,19 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_PRESCRIPTION_LIST,
-  GET_PHARMACY_LIST,
-  GET_ACTIVE_DOCTORS
-} from 'app/utils/urlConstants'
+import { usePrescriptionList } from 'app/data/prescriptions'
+import { usePharmacyList } from 'app/data/facilities'
+import { useActiveDoctors } from 'app/data/doctors'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
@@ -36,7 +31,6 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export function PrescriptionsListScreen() {
-  const [isLoading, setLoading] = useState(false)
   const [prescriptionList, setPrescriptionList] = useState([]) as any
   const [pharmacyList, setPharmacyList] = useState([]) as any
   const [pharmacyListFull, setPharmacyListFull] = useState([]) as any
@@ -48,10 +42,11 @@ export function PrescriptionsListScreen() {
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
   const prescriptionPrivilegesRef = useRef<any>({})
-  const selectedTypeRef = useRef('All')
-  const selectedPrescriberRef = useRef('All')
-  const selectedPharmacyRef = useRef('All')
-  const drugNameRef = useRef('')
+  const [selectedType, setSelectedType] = useState('All')
+  const [selectedPrescriber, setSelectedPrescriber] = useState('All')
+  const [selectedPharmacy, setSelectedPharmacy] = useState('All')
+  const [drugName, setDrugName] = useState('')
+  const [isFilterApplied, setIsFilterApplied] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
@@ -62,7 +57,6 @@ export function PrescriptionsListScreen() {
     (state) => state.staticDataState.staticData
   )
 
-  //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
   type TypeResponse = {
     id: number
     type: string
@@ -76,133 +70,90 @@ export function PrescriptionsListScreen() {
       title: type
     })
   })
-  // console.log('typesList', JSON.stringify(typesList))
-  const getPrescriptionList = useCallback(async (isFromFilter: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_PRESCRIPTION_LIST}`
-    let dataObject: any = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      }
-    }
-    if (isFromFilter) {
-      dataObject.name = drugNameRef.current
-      dataObject.pharmacy = selectedPharmacyRef.current
-      dataObject.prescribedBy = selectedPrescriberRef.current
-      dataObject.type = {
-        type: selectedTypeRef.current
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.domainObjectPrivileges) {
-            prescriptionPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Medicine
-              ? data.data.domainObjectPrivileges.Medicine
-              : {}
-          }
-          let list = data.data.medicineList ? data.data.medicineList : []
-          setPrescriptionList(list)
-          setPrescriptionListFull(list)
-          setIsDataReceived(true)
-          getFilteredList(list, currentFilter)
-          setIsFilter(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
-  const getPharmacyList = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_PHARMACY_LIST}`
-    let dataObject = {
-      header: header,
-      facility: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list = data.data.list ? data.data.list : []
-          // let pharmacyList: object[] = [{ title: 'All', id: 0 }]
 
-          //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
-          let pharmacyList: Array<{ id: number; title: string }> = [
-            { id: 1, title: 'All' }
-          ]
-          list.map((data: any, index: any) => {
-            let object = {
-              title: data.name,
-              id: index + 2
-            }
-            pharmacyList.push(object)
-          })
-          setPharmacyList(pharmacyList)
-          setPharmacyListFull(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
-  const getActiveDoctorsList = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_ACTIVE_DOCTORS}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
+  const memberId = memberData.member ? memberData.member : ''
+
+  const prescriptionParams = isFilterApplied
+    ? {
+        memberId,
+        name: drugName || undefined,
+        pharmacy: selectedPharmacy !== 'All' ? selectedPharmacy : undefined,
+        prescribedBy:
+          selectedPrescriber !== 'All' ? selectedPrescriber : undefined,
+        type: selectedType !== 'All' ? { type: selectedType } : undefined
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list = data.data.doctorList ? data.data.doctorList : []
-          // let doctorList: object[] = [{ title: 'All', id: 0 }]
-          //we have to add 'All' type in some list and dropdown is not working for 0 as id, so we started id from 1
-          let doctorList: Array<{ id: number; title: string }> = [
-            { id: 1, title: 'All' }
-          ]
-          list.map((data: any, index: any) => {
-            let object = {
-              title: data.name,
-              id: index + 2
-            }
-            doctorList.push(object)
-          })
-          setDoctorList(doctorList)
-          setDoctorListFull(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+    : { memberId }
+
+  const { data: prescriptionData, isLoading: isPrescriptionsLoading } =
+    usePrescriptionList(header, prescriptionParams)
+
+  const { data: pharmacyData, isLoading: isPharmacyLoading } = usePharmacyList(
+    header,
+    { memberId }
+  )
+
+  const { data: doctorsData, isLoading: isDoctorsLoading } = useActiveDoctors(
+    header,
+    { memberId }
+  )
+
+  const isLoading =
+    isPrescriptionsLoading || isPharmacyLoading || isDoctorsLoading
+
   useEffect(() => {
-    getPrescriptionList(false)
-    getPharmacyList()
-    getActiveDoctorsList()
-  }, [])
+    if (prescriptionData) {
+      if (prescriptionData.domainObjectPrivileges) {
+        prescriptionPrivilegesRef.current = prescriptionData
+          .domainObjectPrivileges.Medicine
+          ? prescriptionData.domainObjectPrivileges.Medicine
+          : {}
+      }
+      let list = prescriptionData.medicineList
+        ? prescriptionData.medicineList
+        : []
+      setPrescriptionListFull(list)
+      getFilteredList(list, currentFilter)
+      setIsDataReceived(true)
+      setIsFilter(false)
+    }
+  }, [prescriptionData])
+
+  useEffect(() => {
+    if (pharmacyData) {
+      let list = pharmacyData.list ? pharmacyData.list : []
+      let pharmacyDropdown: Array<{ id: number; title: string }> = [
+        { id: 1, title: 'All' }
+      ]
+      list.map((data: any, index: any) => {
+        let object = {
+          title: data.name,
+          id: index + 2
+        }
+        pharmacyDropdown.push(object)
+      })
+      setPharmacyList(pharmacyDropdown)
+      setPharmacyListFull(list)
+    }
+  }, [pharmacyData])
+
+  useEffect(() => {
+    if (doctorsData) {
+      let list = doctorsData.doctorList ? doctorsData.doctorList : []
+      let doctorDropdown: Array<{ id: number; title: string }> = [
+        { id: 1, title: 'All' }
+      ]
+      list.map((data: any, index: any) => {
+        let object = {
+          title: data.name,
+          id: index + 2
+        }
+        doctorDropdown.push(object)
+      })
+      setDoctorList(doctorDropdown)
+      setDoctorListFull(list)
+    }
+  }, [doctorsData])
+
   function setFilteredList(filter: any) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
@@ -231,26 +182,33 @@ export function PrescriptionsListScreen() {
   })
 
   function filterPrescriptions(formData: Schema) {
-    drugNameRef.current = formData.drugName
+    let newDrugName = formData.drugName
+    let newType = 'All'
+    let newPharmacy = 'All'
+    let newPrescriber: any = 'All'
+
     if (formData.typeIndex !== 1) {
-      selectedTypeRef.current =
-        staticData.medicineTypeList[formData.typeIndex - 2].type
-    } else {
-      selectedTypeRef.current = 'All'
+      newType = staticData.medicineTypeList[formData.typeIndex - 2].type
     }
 
-    selectedPharmacyRef.current = pharmacyList[formData.pharmacyIndex - 1].title
+    newPharmacy = pharmacyList[formData.pharmacyIndex - 1].title
 
     if (formData.prescribedIndex !== 1) {
-      selectedPrescriberRef.current =
-        doctorListFull[formData.prescribedIndex - 2]
-    } else {
-      selectedPrescriberRef.current = 'All'
+      newPrescriber = doctorListFull[formData.prescribedIndex - 2]
     }
-    getPrescriptionList(true)
+
+    setDrugName(newDrugName)
+    setSelectedType(newType)
+    setSelectedPharmacy(newPharmacy)
+    setSelectedPrescriber(newPrescriber)
+    setIsFilterApplied(true)
   }
   function resetFilter() {
-    getPrescriptionList(false)
+    setDrugName('')
+    setSelectedType('All')
+    setSelectedPharmacy('All')
+    setSelectedPrescriber('All')
+    setIsFilterApplied(false)
     reset({
       typeIndex: 1,
       prescribedIndex: 1,
@@ -296,7 +254,6 @@ export function PrescriptionsListScreen() {
                       pharmacyList: JSON.stringify(pharmacyListFull)
                     })
                   )
-                  // setIsAddPrescription(true)
                 }}
               >
                 <Feather name={'plus'} size={25} color={COLORS.primary} />
