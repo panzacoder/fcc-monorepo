@@ -1,5 +1,4 @@
 import { Alert, View, Linking, TouchableOpacity } from 'react-native'
-import { useState } from 'react'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
@@ -9,87 +8,75 @@ import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useAppSelector } from 'app/redux/hooks'
 import { Image } from 'app/ui/image'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  DELETE_DOCTOR_LOCATION,
-  DELETE_FACILITY_LOCATION
-} from 'app/utils/urlConstants'
-import { logger } from 'app/utils/logger'
+  useDeleteDoctorLocation,
+  useDeleteFacilityLocation
+} from 'app/data/locations'
 export function Location(data: any) {
-  // export const Location = ({ data }) => {
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
-  const [isLoading, setLoading] = useState(false)
   let locationData = data.data ? data.data : {}
   let memberData = locationData.memberData ? locationData.memberData : {}
-  // console.log('locationData', JSON.stringify(locationData))
-  // console.log('memberData', JSON.stringify(memberData))
+  const deleteDoctorLocationMutation = useDeleteDoctorLocation(header)
+  const deleteFacilityLocationMutation = useDeleteFacilityLocation(header)
+  const isLoading =
+    deleteDoctorLocationMutation.isPending ||
+    deleteFacilityLocationMutation.isPending
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
   }
   async function deleteLocation(memberData: any) {
-    logger.debug('deleteLocation', JSON.stringify(locationData))
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
-    if (locationData.component === 'Doctor') {
-      url = `${BASE_URL}${DELETE_DOCTOR_LOCATION}`
-      dataObject = {
-        header: header,
-        doctorLocation: {
-          id: locationData.id ? locationData.id : '',
-          doctor: {
-            id: locationData.doctorFacilityId
-              ? locationData.doctorFacilityId
-              : ''
-          }
-        }
-      }
-    } else {
-      url = `${BASE_URL}${DELETE_FACILITY_LOCATION}`
-      dataObject = {
-        header: header,
-        facilityLocation: {
-          id: locationData.id ? locationData.id : '',
-          facility: {
-            id: locationData.doctorFacilityId
-              ? locationData.doctorFacilityId
-              : ''
-          }
-        }
-      }
+    const onError = (error: any) => {
+      Alert.alert('', error.message || 'Failed to delete location')
     }
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details: any = data.data ? JSON.stringify(data.data) : {}
-          if (locationData.component === 'Doctor') {
+    if (locationData.component === 'Doctor') {
+      deleteDoctorLocationMutation.mutate(
+        {
+          doctorLocation: {
+            id: locationData.id ? locationData.id : '',
+            doctor: {
+              id: locationData.doctorFacilityId
+                ? locationData.doctorFacilityId
+                : ''
+            }
+          }
+        },
+        {
+          onSuccess: (data: any) => {
+            let details: any = data ? JSON.stringify(data) : {}
             router.replace(
               formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
                 memberData: JSON.stringify(memberData)
               })
             )
-          } else {
+          },
+          onError
+        }
+      )
+    } else {
+      deleteFacilityLocationMutation.mutate(
+        {
+          facilityLocation: {
+            id: locationData.id ? locationData.id : ''
+          }
+        },
+        {
+          onSuccess: (data: any) => {
+            let details: any = data ? JSON.stringify(data) : {}
             router.replace(
               formatUrl('/circles/facilityDetails', {
                 facilityDetails: details,
                 memberData: JSON.stringify(memberData)
               })
             )
-          }
-        } else {
-          Alert.alert('', data.message)
+          },
+          onError
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    }
   }
   let touchStyle =
     'mt-2 h-[32px] w-[32px] items-center justify-center  rounded-full bg-[#0d9195] ml-2'
