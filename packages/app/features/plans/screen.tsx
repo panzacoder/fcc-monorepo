@@ -8,16 +8,14 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { getMonthsListOnly } from 'app/ui/utils'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_ALL_PLANS,
-  GET_CARD_LIST,
-  UPGRADE_PLAN,
-  RENEW_SUBSCRIPTION,
-  ADD_CARD,
-  DELETE_CARD
-} from 'app/utils/urlConstants'
+  useAllPlans,
+  useCardList,
+  useUpgradePlan,
+  useRenewSubscription,
+  useAddCard,
+  useDeleteCard
+} from 'app/data/payment'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -27,7 +25,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'app/ui/button'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   planIndex: z.number()
@@ -43,15 +40,12 @@ export type CardSchema = z.infer<typeof cardSchema>
 const monthsList = getMonthsListOnly() as any
 export function PlansScreen() {
   const cardNumberWithoutDashRef = useRef('')
-  const [isLoading, setLoading] = useState(false)
   const [selectedPlanId, setSelectedPlanId] = useState(-1)
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(1)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowCardModal, setIsShowCardModal] = useState(false)
   const [isAddCard, setIsAddCardModal] = useState(false)
   const [plansList, setPlansList] = useState([]) as any
   const [planNames, setPlanNames] = useState([]) as any
-  const [cardDetails, setCardDetails] = useState([]) as any
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
@@ -61,9 +55,25 @@ export function PlansScreen() {
   let isFromUpgradePlan =
     item.isFromUpgradePlan && item.isFromUpgradePlan === 'true' ? true : false
   let previousPlanDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
-  // console.log('userDetails', JSON.stringify(userDetails))
-  // console.log('isRenewPlan', '' + isRenewPlan)
-  // console.log('isFromUpgradePlan', '' + isFromUpgradePlan)
+
+  const { data: allPlansData, isLoading: isPlansLoading } = useAllPlans(header)
+  const { data: cardListData, isLoading: isCardsLoading } = useCardList(header)
+
+  const upgradePlanMutation = useUpgradePlan(header)
+  const renewSubscriptionMutation = useRenewSubscription(header)
+  const addCardMutation = useAddCard(header)
+  const deleteCardMutation = useDeleteCard(header)
+
+  const cardList = (cardListData as any) || []
+
+  const isLoading =
+    isPlansLoading ||
+    isCardsLoading ||
+    upgradePlanMutation.isPending ||
+    renewSubscriptionMutation.isPending ||
+    addCardMutation.isPending ||
+    deleteCardMutation.isPending
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       planIndex: 1
@@ -84,143 +94,76 @@ export function PlansScreen() {
     },
     resolver: zodResolver(cardSchema)
   })
-  async function getCardsInfoFromServer() {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_CARD_LIST}`
-    let dataObject = {
-      header: header,
-      email: userDetails.email ? userDetails.email : ''
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('setCardDetails', JSON.stringify(data.data))
-          setCardDetails(data.data ? data.data : [])
-          setIsShowCardModal(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
-  useEffect(() => {
-    async function getPlandetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_ALL_PLANS}`
-      let dataObject = {
-        header: header
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            let planDetails = data.data
-            let plan: any = {}
-            planDetails.map((plans: any) => {
-              if (plans.planName === 'FCC Subscription') {
-                plan = plans
-              }
-            })
 
-            let plansData: any = plan.planList
-            if (isFromUpgradePlan || isRenewPlan) {
-              plansData = []
-              let previousPlanIndex = 0
-              plan.planList.map((data: any, index: any) => {
-                if (data.plantype === previousPlanDetails.plan.plantype) {
-                  previousPlanIndex = index
-                  // console.log('previousPlanIndex', '' + previousPlanIndex)
-                }
-              })
-              plan.planList.map((data: any, index: any) => {
-                if (isFromUpgradePlan) {
-                  if (index > previousPlanIndex) {
-                    plansData.push(data)
-                  }
-                } else {
-                  if (index === previousPlanIndex) {
-                    plansData.push(data)
-                  }
-                }
-              })
-              // console.log('plansData', JSON.stringify(plansData))
-            }
-            type Response = {
-              id: number
-              plantype: string
-            }
-            let planNamesList: Array<{ id: number; title: string }> =
-              plansData.map(({ plantype, id }: Response, index: any) => {
-                return {
-                  title: plantype,
-                  id: index + 1
-                }
-              })
-            let planNames: any = []
-            plansData.map((planData: any) => {
-              planNames.push(planData.plantype)
-            })
-            let first_plan = _.find(
-              plansData,
-              (e) => e.plantype === planNames[0]
-            )
-            let selectedPlanId = first_plan.id
-            setPlansList(plansData)
-            setPlanNames(planNamesList)
-            setSelectedPlanId(selectedPlanId)
-            // console.log('getPlanDetails', JSON.stringify(plansData))
-          } else {
-            Alert.alert('', data.message)
+  useEffect(() => {
+    if (allPlansData) {
+      let planDetails = allPlansData as any
+      let plan: any = {}
+      planDetails.map((plans: any) => {
+        if (plans.planName === 'FCC Subscription') {
+          plan = plans
+        }
+      })
+
+      let plansData: any = plan.planList
+      if (isFromUpgradePlan || isRenewPlan) {
+        plansData = []
+        let previousPlanIndex = 0
+        plan.planList.map((data: any, index: any) => {
+          if (data.plantype === previousPlanDetails.plan.plantype) {
+            previousPlanIndex = index
           }
-          setLoading(false)
         })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
+        plan.planList.map((data: any, index: any) => {
+          if (isFromUpgradePlan) {
+            if (index > previousPlanIndex) {
+              plansData.push(data)
+            }
+          } else {
+            if (index === previousPlanIndex) {
+              plansData.push(data)
+            }
+          }
         })
+      }
+      type Response = {
+        id: number
+        plantype: string
+      }
+      let planNamesList: Array<{ id: number; title: string }> = plansData.map(
+        ({ plantype, id }: Response, index: any) => {
+          return {
+            title: plantype,
+            id: index + 1
+          }
+        }
+      )
+      let planNamesArr: any = []
+      plansData.map((planData: any) => {
+        planNamesArr.push(planData.plantype)
+      })
+      let first_plan = _.find(plansData, (e) => e.plantype === planNamesArr[0])
+      let selectedId = first_plan.id
+      setPlansList(plansData)
+      setPlanNames(planNamesList)
+      setSelectedPlanId(selectedId)
     }
-    getPlandetails()
-  }, [])
+  }, [allPlansData])
   async function upgradePlan() {
-    getCardsInfoFromServer()
+    setIsShowCardModal(true)
   }
   async function deleteCard(data: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_CARD}`
-    let dataObject = {
-      header: header,
-      email: userDetails.email ? userDetails.email : '',
-      card: data
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('setCardDetails', JSON.stringify(data.data))
-          setCardDetails(data.data ? data.data : [])
-          // setIsAddCardModal(false)
-          // setIsShowCardModal(true)
-        } else {
-          Alert.alert('', data.message)
+    deleteCardMutation.mutate(
+      { card: data },
+      {
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete card')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   async function upgradePlanOnServer(data: any) {
-    setLoading(true)
-    let url = ''
-    url = isFromUpgradePlan
-      ? `${BASE_URL}${UPGRADE_PLAN}`
-      : `${BASE_URL}${RENEW_SUBSCRIPTION}`
-    let dataObject = {
-      header: header,
+    const mutationParams = {
       email: userDetails.email ? userDetails.email : '',
       subscriptionId: '',
       paymentMethodId: data.paymentMethodId ? data.paymentMethodId : '',
@@ -229,23 +172,21 @@ export function PlansScreen() {
         plantype: plansList[selectedPlanIndex - 1].plantype
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('setCardDetails', JSON.stringify(data.data))
-          router.back()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+    const mutationOptions = {
+      onSuccess: () => {
+        router.back()
+      },
+      onError: (error: any) => {
+        Alert.alert('', error.message || 'Failed to process plan')
+      }
+    }
+    if (isFromUpgradePlan) {
+      upgradePlanMutation.mutate(mutationParams as any, mutationOptions)
+    } else {
+      renewSubscriptionMutation.mutate(mutationParams as any, mutationOptions)
+    }
   }
   async function navigateToPayments(data: any) {
-    // console.log('data', JSON.stringify(data))
     router.push(
       formatUrl('/payments', {
         planDetails: JSON.stringify(data)
@@ -254,46 +195,35 @@ export function PlansScreen() {
   }
 
   async function addCard(formData: CardSchema) {
-    // console.log('formData', JSON.stringify(formData.cardHolderName))
-    setLoading(true)
-    let url = `${BASE_URL}${ADD_CARD}`
-    let dataObject = {
-      header: header,
-      email: userDetails.email ? userDetails.email : '',
-      card: {
-        number: cardNumberWithoutDashRef.current,
-        exp_month:
-          formData.monthIndex < 10
-            ? '0' + formData.monthIndex
-            : '' + formData.monthIndex,
-        exp_year: formData.expiryYear,
-        country:
-          userDetails.address &&
-          userDetails.address.timezone &&
-          userDetails.address.timezone.isoAlpha2
-            ? userDetails.address.timezone.isoAlpha2
-            : 'US',
-        cvc: formData.cvv,
-        name: formData.cardHolderName
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('setCardDetails', JSON.stringify(data.data))
-          setCardDetails(data.data ? data.data : [])
+    addCardMutation.mutate(
+      {
+        card: {
+          number: cardNumberWithoutDashRef.current,
+          exp_month:
+            formData.monthIndex < 10
+              ? '0' + formData.monthIndex
+              : '' + formData.monthIndex,
+          exp_year: formData.expiryYear,
+          country:
+            userDetails.address &&
+            userDetails.address.timezone &&
+            userDetails.address.timezone.isoAlpha2
+              ? userDetails.address.timezone.isoAlpha2
+              : 'US',
+          cvc: formData.cvv,
+          name: formData.cardHolderName
+        }
+      },
+      {
+        onSuccess: () => {
           setIsAddCardModal(false)
           setIsShowCardModal(true)
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to add card')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   const getPlansView = () => {
     let planId = selectedPlanId
@@ -373,7 +303,6 @@ export function PlansScreen() {
                     plansList,
                     (e) => e.plantype === data.title
                   )
-                  // console.log('selectedIndex', JSON.stringify(selectedIndex))
                   setSelectedPlanId(selectedIndex.id)
                   setSelectedPlanIndex(Number(data.id))
                 }
@@ -444,9 +373,9 @@ export function PlansScreen() {
           />
         </View>
         <View className=" items-center">
-          {cardDetails.length > 0 ? (
+          {cardList.length > 0 ? (
             <ScrollView className="my-2 h-full w-[95%]">
-              {cardDetails.map((data: any, index: number) => {
+              {cardList.map((data: any, index: number) => {
                 return (
                   <View key={index}>
                     <View className="my-1 max-h-[90%] w-full self-center rounded-[5px] border-[1px] border-[#e0deda] bg-[#3c7eb0] px-5 py-10">
@@ -548,13 +477,11 @@ export function PlansScreen() {
               })
               cardNumberWithoutDashRef.current = cardNum
               cardNumber = cardNum
-              // console.log('cardNumber hyphens', cardNumber)
               if (cardNumber.length > 0) {
                 cardNumber = cardNumber
                   .match(new RegExp('.{1,4}', 'g'))
                   .join('-')
               }
-              // console.log('cardNumber', cardNumber)
               reset1({
                 cardNumber: cardNumber
               })
