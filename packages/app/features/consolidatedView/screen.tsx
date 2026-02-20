@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -10,13 +10,11 @@ import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_CONSOLIDATED_FILTER_OPTIONS,
-  GET_CONSOLIDATED_DETAILS,
-  GET_FILTER_CONSOLIDATED_DETAILS
-} from 'app/utils/urlConstants'
+  useConsolidatedFilterOptions,
+  useConsolidatedDetails,
+  useFilterConsolidatedDetails
+} from 'app/data/dashboard'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
@@ -63,7 +61,6 @@ export function ConsolidatedViewScreen() {
   let memberData = {
     member: userDetails.memberId ? userDetails.memberId : ''
   }
-  const [isLoading, setLoading] = useState(false)
   const [memberActivityList, setMemberActivityList] = useState([]) as any
 
   const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -83,12 +80,36 @@ export function ConsolidatedViewScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDayView, setIsDayView] = useState(false)
   const [isWeekView, setIsWeekView] = useState(true)
+  const [isFilterActive, setIsFilterActive] = useState(false)
+  const [queryFromDate, setQueryFromDate] = useState('')
+  const [queryToDate, setQueryToDate] = useState('')
   const { control } = useForm({
     defaultValues: {
       typeIndex: 0
     },
     resolver: zodResolver(schema)
   })
+
+  const { data: filterOptionsData, isLoading: isFilterOptionsLoading } =
+    useConsolidatedFilterOptions(header)
+
+  const { data: detailsData, isLoading: isDetailsLoading } =
+    useConsolidatedDetails(header, {
+      fromdate: queryFromDate,
+      todate: queryToDate
+    })
+
+  const { data: filteredDetailsData, isLoading: isFilteredDetailsLoading } =
+    useFilterConsolidatedDetails(header, {
+      fromdate: queryFromDate,
+      todate: queryToDate,
+      type: selectedType
+    })
+
+  const isLoading =
+    isFilterOptionsLoading ||
+    (!isFilterActive && isDetailsLoading) ||
+    (isFilterActive && isFilteredDetailsLoading)
   type TypeResponse = {
     id: number
     data: string
@@ -170,142 +191,78 @@ export function ConsolidatedViewScreen() {
       }
     })
   }
-  const getConsolidatedFilterOptions = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_CONSOLIDATED_FILTER_OPTIONS}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list: object[] = [{ id: 1, title: 'All' }]
-
-          data.data.filterOptionTypes.map((data: any, index: any) => {
-            let object = {
-              title: data,
-              id: index + 2
-            }
-            list.push(object)
-          })
-          setTypesList(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
-  const getConsolidatedDetails = useCallback(
-    async (fromDate: any, toDate: any) => {
-      setLoading(true)
-      setIsDataReceived(false)
-      let url = `${BASE_URL}${GET_CONSOLIDATED_DETAILS}`
-      let dataObject = {
-        header: header,
-        fromdate: fromDate,
-        todate: toDate
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            let list: object[] = []
-            if (isDayView) {
-              data.data.memberActivityList.map(async (option: any) => {
-                if (
-                  currentDate ===
-                  getFullDateForCalendar(option.date, 'DD MMM YYYY')
-                ) {
-                  list.push(option)
-                }
-              })
-            }
-
-            await setMemberActivityList(
-              isDayView ? list : data.data.memberActivityList
-            )
-            if (isWeekView) {
-              setMemberActivityWithDays(data.data.memberActivityList)
-            }
-            setIsDataReceived(true)
-            logger.debug(
-              'memberActivityList',
-              JSON.stringify(data.data.memberActivityList)
-            )
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
-  const getFilterConsolidatedDetails = useCallback(
-    async (fromDate: any, toDate: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_FILTER_CONSOLIDATED_DETAILS}`
-      let dataObject = {
-        header: header,
-        fromdate: fromDate,
-        todate: toDate,
-        type: selectedType
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            let list: object[] = []
-            data.data.memberActivityList.map((option: any) => {
-              if (isDayView) {
-                if (
-                  currentDate ===
-                  getFullDateForCalendar(option.date, 'DD MMM YYYY')
-                ) {
-                  list.push(option)
-                }
-              }
-            })
-            setMemberActivityList(
-              isDayView ? list : data.data.memberActivityList
-            )
-            if (isWeekView) {
-              setMemberActivityWithDays(data.data.memberActivityList)
-            } else {
-              setCurrentDateForDayView(selectedDate)
-            }
-            setIsShowFilter(false)
-
-            logger.debug(
-              'memberActivityList',
-              JSON.stringify(data.data.memberActivityList)
-            )
-            setIsDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
   useEffect(() => {
     getWeekCurrentLastDays(new Date())
-    getConsolidatedFilterOptions()
-    getConsolidatedDetails(
-      weekFirstLastDaysRef.current[0],
-      weekFirstLastDaysRef.current[6]
-    )
+    setQueryFromDate(weekFirstLastDaysRef.current[0])
+    setQueryToDate(weekFirstLastDaysRef.current[6])
   }, [])
+
+  useEffect(() => {
+    if (filterOptionsData) {
+      let list: object[] = [{ id: 1, title: 'All' }]
+      filterOptionsData.filterOptionTypes.map((data: any, index: any) => {
+        let object = {
+          title: data,
+          id: index + 2
+        }
+        list.push(object)
+      })
+      setTypesList(list)
+    }
+  }, [filterOptionsData])
+
+  useEffect(() => {
+    if (!isFilterActive && detailsData) {
+      let list: object[] = []
+      if (isDayView) {
+        detailsData.memberActivityList.map(async (option: any) => {
+          if (
+            currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
+          ) {
+            list.push(option)
+          }
+        })
+      }
+      setMemberActivityList(isDayView ? list : detailsData.memberActivityList)
+      if (isWeekView) {
+        setMemberActivityWithDays(detailsData.memberActivityList)
+      }
+      setIsDataReceived(true)
+      logger.debug(
+        'memberActivityList',
+        JSON.stringify(detailsData.memberActivityList)
+      )
+    }
+  }, [detailsData, isFilterActive])
+
+  useEffect(() => {
+    if (isFilterActive && filteredDetailsData) {
+      let list: object[] = []
+      filteredDetailsData.memberActivityList.map((option: any) => {
+        if (isDayView) {
+          if (
+            currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
+          ) {
+            list.push(option)
+          }
+        }
+      })
+      setMemberActivityList(
+        isDayView ? list : filteredDetailsData.memberActivityList
+      )
+      if (isWeekView) {
+        setMemberActivityWithDays(filteredDetailsData.memberActivityList)
+      } else {
+        setCurrentDateForDayView(selectedDate)
+      }
+      setIsShowFilter(false)
+      logger.debug(
+        'memberActivityList',
+        JSON.stringify(filteredDetailsData.memberActivityList)
+      )
+      setIsDataReceived(true)
+    }
+  }, [filteredDetailsData, isFilterActive])
   const handleDateCleared = () => {}
   const handleDateChange = (date: Date) => {
     setFromDate(getFullDateForCalendar(date, 'YYYY-MM-DD'))
@@ -317,10 +274,10 @@ export function ConsolidatedViewScreen() {
   }
   async function getPreviousWeek() {
     getWeekCurrentLastDays(weekDayUtcDatesRef.current[0])
-    getConsolidatedDetails(
-      weekFirstLastDaysRef.current[0],
-      weekFirstLastDaysRef.current[6]
-    )
+    setIsFilterActive(false)
+    setIsDataReceived(false)
+    setQueryFromDate(weekFirstLastDaysRef.current[0])
+    setQueryToDate(weekFirstLastDaysRef.current[6])
   }
   async function getPreviousDate() {
     setDayCount((prev) => prev - 1)
@@ -331,14 +288,17 @@ export function ConsolidatedViewScreen() {
     const newDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
     setToDate(newDate)
     setFromDate(newDate)
-    getConsolidatedDetails(newDate, newDate)
+    setIsFilterActive(false)
+    setIsDataReceived(false)
+    setQueryFromDate(newDate)
+    setQueryToDate(newDate)
   }
   async function getNextWeek() {
     getWeekCurrentLastDays(weekDayUtcDatesRef.current[6])
-    getConsolidatedDetails(
-      weekFirstLastDaysRef.current[0],
-      weekFirstLastDaysRef.current[6]
-    )
+    setIsFilterActive(false)
+    setIsDataReceived(false)
+    setQueryFromDate(weekFirstLastDaysRef.current[0])
+    setQueryToDate(weekFirstLastDaysRef.current[6])
   }
   async function getNextDate() {
     setDayCount((prev) => prev + 1)
@@ -349,7 +309,10 @@ export function ConsolidatedViewScreen() {
     const newDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
     setToDate(newDate)
     setFromDate(newDate)
-    getConsolidatedDetails(newDate, newDate)
+    setIsFilterActive(false)
+    setIsDataReceived(false)
+    setQueryFromDate(newDate)
+    setQueryToDate(newDate)
   }
   function getActivityName(type: any) {
     let activityName = ''
@@ -645,7 +608,10 @@ export function ConsolidatedViewScreen() {
           onPress={() => {
             setIsDayView(true)
             setIsWeekView(false)
-            getConsolidatedDetails(fromDate, toDate)
+            setIsFilterActive(false)
+            setIsDataReceived(false)
+            setQueryFromDate(fromDate)
+            setQueryToDate(toDate)
           }}
           className={`w-[40%] items-center justify-center ${isDayView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -661,10 +627,10 @@ export function ConsolidatedViewScreen() {
             clearLists()
             setIsWeekView(true)
             setIsDayView(false)
-            getConsolidatedDetails(
-              weekFirstLastDaysRef.current[0],
-              weekFirstLastDaysRef.current[6]
-            )
+            setIsFilterActive(false)
+            setIsDataReceived(false)
+            setQueryFromDate(weekFirstLastDaysRef.current[0])
+            setQueryToDate(weekFirstLastDaysRef.current[6])
           }}
           className={`w-[40%] items-center justify-center ${isWeekView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -713,14 +679,15 @@ export function ConsolidatedViewScreen() {
                   title="Filter"
                   leadingIcon="filter"
                   onPress={() => {
+                    setIsFilterActive(true)
+                    setIsDataReceived(false)
                     if (isDayView) {
-                      getFilterConsolidatedDetails(fromDate, toDate)
+                      setQueryFromDate(fromDate)
+                      setQueryToDate(toDate)
                     } else {
                       getWeekCurrentLastDays(selectedDateUtc)
-                      getFilterConsolidatedDetails(
-                        weekFirstLastDaysRef.current[0],
-                        weekFirstLastDaysRef.current[6]
-                      )
+                      setQueryFromDate(weekFirstLastDaysRef.current[0])
+                      setQueryToDate(weekFirstLastDaysRef.current[6])
                     }
                   }}
                 />
@@ -734,6 +701,8 @@ export function ConsolidatedViewScreen() {
                       getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
                     )
                     setIsShowFilter(false)
+                    setIsFilterActive(false)
+                    setIsDataReceived(false)
                     if (isDayView) {
                       const resetDate = getFullDateForCalendar(
                         new Date(),
@@ -744,15 +713,14 @@ export function ConsolidatedViewScreen() {
                         getFullDateForCalendar(new Date(), 'DD MMM YYYY')
                       )
                       setToDate(resetDate)
-                      getConsolidatedDetails(resetDate, resetDate)
+                      setQueryFromDate(resetDate)
+                      setQueryToDate(resetDate)
                     } else {
                       getWeekCurrentLastDays(new Date())
-                      getConsolidatedDetails(
-                        weekFirstLastDaysRef.current[0],
-                        weekFirstLastDaysRef.current[6]
-                      )
+                      setQueryFromDate(weekFirstLastDaysRef.current[0])
+                      setQueryToDate(weekFirstLastDaysRef.current[6])
                     }
-                  }}
+                  }
                 />
               </View>
             </View>
