@@ -180,7 +180,7 @@ export function useUpdateAppointmentReminder(header: AuthHeader) {
 export function useDeleteAppointmentReminder(header: AuthHeader) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (params: { reminder: { id: number } }) =>
+    mutationFn: (params: { reminder: Record<string, unknown> }) =>
       deleteAppointmentReminder(header, params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.all })

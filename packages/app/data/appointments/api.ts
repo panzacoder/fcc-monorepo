@@ -155,7 +155,7 @@ export async function updateAppointmentReminder(
 
 export async function deleteAppointmentReminder(
   header: AuthHeader,
-  params: { reminder: { id: number } }
+  params: { reminder: Record<string, unknown> }
 ) {
   return fetchData<Record<string, unknown>>({
     header,
