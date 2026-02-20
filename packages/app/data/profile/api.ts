@@ -38,7 +38,7 @@ import type {
 
 export async function getUserProfile(
   header: AuthHeader,
-  params: GetUserProfileParams
+  params?: GetUserProfileParams
 ) {
   return fetchData<UserProfileResponse>({
     header,

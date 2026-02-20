@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   View,
   Alert,
@@ -10,21 +10,19 @@ import {
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { formatUrl } from 'app/utils/format-url'
 import moment from 'moment'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
-  BASE_URL,
-  GET_USER_PROFILE,
-  AUTO_SUBSCRIPTION,
-  MANUAL_SUBSCRIPTION,
-  CANCEL_SUBSCRIPTION,
-  DELETE_ACCOUNT,
-  CHECK_VALID_CREDENTIAL,
-  UPDATE_SPONSOR_CODE
-} from 'app/utils/urlConstants'
+  useUserProfile,
+  useAutoSubscription,
+  useManualSubscription,
+  useCancelSubscription,
+  useDeleteAccount,
+  useCheckValidCredential,
+  useUpdateSponsorCode
+} from 'app/data/profile'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import ToggleSwitch from 'toggle-switch-react-native'
@@ -38,7 +36,6 @@ import {
   getFullDateForCalendar
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
@@ -54,9 +51,6 @@ export function ProfileScreen() {
   const isShowRenewButtonRef = useRef(false)
   const header = useAppSelector((state) => state.headerState.header)
   const userProfile = useAppSelector((state) => state.userProfileState.header)
-  // console.log('userProfile', JSON.stringify(userProfile))
-  const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowOrderList, setIsShowOrderList] = useState(false)
   const [isShowSponsorship, setIsShowSponsorship] = useState(false)
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
@@ -84,135 +78,136 @@ export function ProfileScreen() {
     },
     resolver: zodResolver(sponsorSchema)
   })
-  const getUserProfile = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_USER_PROFILE}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let appUser = data.data.appuser ? data.data.appuser : {}
-          setAppuserDetails(appUser)
-          let member = data.data.member ? data.data.member : {}
-          setMemberDetails(member)
-          let orders = data.data.orderList ? data.data.orderList : []
-          setOrderList(orders)
-          let subscription = data.data.userSubscription
-            ? data.data.userSubscription
-            : {}
-          setUserSubscription(subscription)
-          // console.log(
-          //   'data.data.userSubscription',
-          //   JSON.stringify(data.data.userSubscription)
-          // )
-          let isSubscribedUser = data.data.userSubscription
-            ? data.data.userSubscription.status.toLowerCase() !== 'active'
-              ? false
-              : true
-            : false
-          setISubscribedUser(isSubscribedUser)
-          setIsDataReceived(true)
-          if (!isShowAlerts) {
-            if (
-              data.data.expiringSubscription &&
-              userSubscription.status.toLowerCase() === 'active'
-            ) {
-              isShowRenewButtonRef.current = true
-              // console.log('expiringSubscription../', JSON.stringify(data.data))
-              Alert.alert(
-                '',
-                `Your subscription will expire on ${moment(
-                  data.data.subscriptionEndDate
-                ).format(
-                  'DD-MMM-YYYY'
-                )}. Please renew to use ad-free services.`,
-                [
-                  {
-                    text: 'Renew',
-                    onPress: () => {
-                      if (data.data.userSubscription) {
-                        if (data.data.userSubscription.plan) {
-                          if (
-                            String(
-                              data.data.userSubscription.source
-                            ).toLowerCase() === 'Stripe'.toLowerCase()
-                          ) {
-                            let plan = data.data.userSubscription.plan
-                            router.push(
-                              formatUrl('/plans', {
-                                planDetails: JSON.stringify(plan),
-                                isRenewPlan: 'true',
-                                isFromUpgradePlan: 'false'
-                              })
-                            )
-                          }
-                        }
-                      }
-                    }
-                  },
-                  { text: 'Cancel' }
-                ]
-              )
-            }
-            if (data.data.expiredSubscription) {
-              Alert.alert(
-                '',
-                `Your Subscription has expired. Please Renew it to continue Ad free experience.`,
-                [
-                  {
-                    text: 'Subscribe',
-                    onPress: () => {
+
+  const { data: profileData, isLoading: isProfileLoading } =
+    useUserProfile(header)
+
+  const autoSubscriptionMutation = useAutoSubscription(header)
+  const manualSubscriptionMutation = useManualSubscription(header)
+  const cancelSubscriptionMutation = useCancelSubscription(header)
+  const deleteAccountMutation = useDeleteAccount(header)
+  const checkValidCredentialMutation = useCheckValidCredential(header)
+  const updateSponsorCodeMutation = useUpdateSponsorCode(header)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!profileData) return
+    const data = profileData as any
+    let appUser = data.appuser ? data.appuser : {}
+    setAppuserDetails(appUser)
+    let member = data.member ? data.member : {}
+    setMemberDetails(member)
+    let orders = data.orderList ? data.orderList : []
+    setOrderList(orders)
+    let subscription = data.userSubscription ? data.userSubscription : {}
+    setUserSubscription(subscription)
+    let subscribedUser = data.userSubscription
+      ? data.userSubscription.status.toLowerCase() !== 'active'
+        ? false
+        : true
+      : false
+    setISubscribedUser(subscribedUser)
+    if (!isShowAlerts) {
+      if (
+        data.expiringSubscription &&
+        subscription.status &&
+        subscription.status.toLowerCase() === 'active'
+      ) {
+        isShowRenewButtonRef.current = true
+        Alert.alert(
+          '',
+          `Your subscription will expire on ${moment(
+            data.subscriptionEndDate
+          ).format('DD-MMM-YYYY')}. Please renew to use ad-free services.`,
+          [
+            {
+              text: 'Renew',
+              onPress: () => {
+                if (data.userSubscription) {
+                  if (data.userSubscription.plan) {
+                    if (
+                      String(data.userSubscription.source).toLowerCase() ===
+                      'Stripe'.toLowerCase()
+                    ) {
+                      let plan = data.userSubscription.plan
                       router.push(
                         formatUrl('/plans', {
+                          planDetails: JSON.stringify(plan),
+                          isRenewPlan: 'true',
                           isFromUpgradePlan: 'false'
                         })
                       )
                     }
-                  },
-                  { text: 'Cancel' }
-                ]
-              )
-            }
-          }
-          setIsShowAlerts(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
-  useEffect(() => {
-    getUserProfile()
-  }, [])
-  async function switchManualToAutoSubscription() {
-    setLoading(true)
-    let url = `${BASE_URL}${isAutoSubscription ? MANUAL_SUBSCRIPTION : AUTO_SUBSCRIPTION}`
-    let dataObject = {
-      header: header,
-      email: appuserDetails.email ? appuserDetails.email : ''
+                  }
+                }
+              }
+            },
+            { text: 'Cancel' }
+          ]
+        )
+      }
+      if (data.expiredSubscription) {
+        Alert.alert(
+          '',
+          `Your Subscription has expired. Please Renew it to continue Ad free experience.`,
+          [
+            {
+              text: 'Subscribe',
+              onPress: () => {
+                router.push(
+                  formatUrl('/plans', {
+                    isFromUpgradePlan: 'false'
+                  })
+                )
+              }
+            },
+            { text: 'Cancel' }
+          ]
+        )
+      }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsAutoSubscription(!isAutoSubscription)
-        } else {
-          Alert.alert('', data.message)
+    setIsShowAlerts(true)
+  }, [profileData])
+
+  const isLoading =
+    isProfileLoading ||
+    autoSubscriptionMutation.isPending ||
+    manualSubscriptionMutation.isPending ||
+    cancelSubscriptionMutation.isPending ||
+    deleteAccountMutation.isPending ||
+    checkValidCredentialMutation.isPending ||
+    updateSponsorCodeMutation.isPending
+
+  function switchManualToAutoSubscription() {
+    const email = appuserDetails.email ? appuserDetails.email : ''
+    if (isAutoSubscription) {
+      manualSubscriptionMutation.mutate(
+        { email },
+        {
+          onSuccess: () => {
+            setIsAutoSubscription(false)
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to switch subscription')
+          }
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      )
+    } else {
+      autoSubscriptionMutation.mutate(
+        { email },
+        {
+          onSuccess: () => {
+            setIsAutoSubscription(true)
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to switch subscription')
+          }
+        }
+      )
+    }
   }
-  async function upgradeButtonClicked() {
-    // console.log('upgradeButtonClicked')
+  function upgradeButtonClicked() {
     router.push(
       formatUrl('/plans', {
         planDetails: JSON.stringify(userSubscription),
@@ -221,8 +216,7 @@ export function ProfileScreen() {
       })
     )
   }
-  async function renewButtonClicked() {
-    // console.log('renewButtonClicked')
+  function renewButtonClicked() {
     router.push(
       formatUrl('/plans', {
         planDetails: JSON.stringify(userSubscription),
@@ -232,104 +226,72 @@ export function ProfileScreen() {
     )
   }
 
-  async function cancelSubscriptionButtonClicked() {
-    setLoading(true)
-    let url = `${BASE_URL}${CANCEL_SUBSCRIPTION}`
-    let dataObject = {
-      header: header,
-      email: appuserDetails.email ? appuserDetails.email : ''
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getUserProfile()
-        } else {
-          Alert.alert('', data.message)
+  function cancelSubscriptionButtonClicked() {
+    cancelSubscriptionMutation.mutate(
+      { email: appuserDetails.email ? appuserDetails.email : '' },
+      {
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to cancel subscription')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
 
-  async function saveSponsorCode(formData: SponsorSchema) {
-    // console.log('formData', formData.sponsorCode)
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_SPONSOR_CODE}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        sponsorCode: formData.sponsorCode,
-        email: memberDetails.email ? memberDetails.email : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+  function saveSponsorCode(formData: SponsorSchema) {
+    updateSponsorCodeMutation.mutate(
+      {
+        appuserVo: {
+          sponsorCode: formData.sponsorCode,
+          email: memberDetails.email ? memberDetails.email : ''
+        }
+      },
+      {
+        onSuccess: () => {
           reset1({
             sponsorCode: ''
           })
-          getUserProfile()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update sponsor code')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
-  async function checkCredential(formData: Schema) {
-    setLoading(true)
-    let url = `${BASE_URL}${CHECK_VALID_CREDENTIAL}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        credential: formData.password
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+    )
+  }
+  function checkCredential(formData: Schema) {
+    checkValidCredentialMutation.mutate(
+      {
+        appuserVo: {
+          credential: formData.password
+        }
+      },
+      {
+        onSuccess: () => {
           deleteAccount(formData.password)
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Invalid credential')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
-  async function deleteAccount(password: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_ACCOUNT}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        email: appuserDetails.email ? appuserDetails.email : '',
-        credential: password
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          router.push('/login')
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+    )
   }
-  const router = useRouter()
+  function deleteAccount(password: any) {
+    deleteAccountMutation.mutate(
+      {
+        appuserVo: {
+          email: appuserDetails.email ? appuserDetails.email : '',
+          credential: password
+        }
+      },
+      {
+        onSuccess: () => {
+          router.push('/login')
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete account')
+        }
+      }
+    )
+  }
   let titleStyle = 'ml-2 font-400 w-[25%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
@@ -447,7 +409,7 @@ export function ProfileScreen() {
       <View className="mt-[25px]">
         <PtsBackHeader title="Profile" memberData={{}} />
       </View>
-      {isDataReceived ? (
+      {profileData ? (
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className="flex-row">
@@ -551,7 +513,7 @@ export function ProfileScreen() {
             )}
             {getDetailsView(
               'Timezone',
-              memberDetails.address.timezone
+              memberDetails.address && memberDetails.address.timezone
                 ? `${memberDetails.address.timezone.name} (${memberDetails.address.timezone.abbreviation})`
                 : ''
             )}

@@ -38,7 +38,7 @@ import type {
 export const profileKeys = {
   all: ['profile'] as const,
   user: () => [...profileKeys.all, 'user'] as const,
-  userDetail: (params: GetUserProfileParams) =>
+  userDetail: (params: GetUserProfileParams | Record<string, never>) =>
     [...profileKeys.user(), params] as const,
   members: () => [...profileKeys.all, 'member'] as const,
   member: (params: GetMemberProfileParams) =>
@@ -47,12 +47,12 @@ export const profileKeys = {
 
 export function useUserProfile(
   header: AuthHeader,
-  params: GetUserProfileParams
+  params?: GetUserProfileParams
 ) {
   return useQuery({
-    queryKey: profileKeys.userDetail(params),
-    queryFn: () => getUserProfile(header, params),
-    enabled: !!header && !!params.member.id
+    queryKey: profileKeys.userDetail(params ?? {}),
+    queryFn: () => getUserProfile(header, params ?? {}),
+    enabled: !!header
   })
 }
 
