@@ -55,11 +55,11 @@ export interface ResendTransportationRequestEventParams {
 }
 
 export interface CancelTransportationRequestParams {
-  transportation: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface CancelTransportationRequestEventParams {
-  transportation: Record<string, unknown>
+  transportationVo: Record<string, unknown>
 }
 
 export interface CreateTransportationReminderParams {

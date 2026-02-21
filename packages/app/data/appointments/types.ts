@@ -66,3 +66,7 @@ export interface AppointmentReminderParams {
 export interface UpdateAppointmentStatusParams {
   appointment: Record<string, unknown>
 }
+
+export interface SendCalendarInviteParams {
+  appointment: { id: number | string }
+}

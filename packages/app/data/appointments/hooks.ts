@@ -16,7 +16,8 @@ import {
   deleteAppointmentReminder,
   updateAppointmentStatus,
   getAppointmentDoctors,
-  getAppointmentFacilities
+  getAppointmentFacilities,
+  sendCalendarInvite
 } from './api'
 import type {
   GetAppointmentsParams,
@@ -26,7 +27,8 @@ import type {
   DeleteAppointmentParams,
   AppointmentNoteParams,
   AppointmentReminderParams,
-  UpdateAppointmentStatusParams
+  UpdateAppointmentStatusParams,
+  SendCalendarInviteParams
 } from './types'
 
 export const appointmentKeys = {
@@ -207,5 +209,12 @@ export function useUpdateAppointmentStatus(header: AuthHeader) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.all })
     }
+  })
+}
+
+export function useSendCalendarInvite(header: AuthHeader) {
+  return useMutation({
+    mutationFn: (params: SendCalendarInviteParams) =>
+      sendCalendarInvite(header, params)
   })
 }

@@ -14,17 +14,6 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import moment from 'moment'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD,
-  RESEND_TRANSPORTATION_REQUEST,
-  DELETE_TRANSPORTATION,
-  CANCEL_TRANSPORTATION_REQUEST,
-  SEND_CALENDAR_INVITE,
-  GET_MEMBER_DETAILS
-} from 'app/utils/urlConstants'
 import {
   useAppointmentDetails as useAppointmentDetailsQuery,
   useDeleteAppointment,
@@ -34,8 +23,17 @@ import {
   useCreateAppointmentReminder,
   useUpdateAppointmentReminder,
   useDeleteAppointmentReminder,
-  useUpdateAppointmentStatus
+  useUpdateAppointmentStatus,
+  useSendCalendarInvite
 } from 'app/data/appointments'
+import { useAllMemberDetails } from 'app/data/circle'
+import { useCreateMessageThread } from 'app/data/messages'
+import { getThreadParticipants } from 'app/data/messages'
+import {
+  useDeleteTransportation,
+  useResendTransportationRequest,
+  useCancelTransportationRequest
+} from 'app/data/transportation'
 import { useLocalSearchParams } from 'expo-router'
 import {
   formatTimeToUserLocalTime,

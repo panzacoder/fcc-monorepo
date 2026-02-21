@@ -15,7 +15,8 @@ import {
   DELETE_APPOINTMENT_REMINDER,
   UPDATE_APPOINTMENT_STATUS,
   GET_APPOINTMENT_DOCTORS,
-  GET_APPOINTMENT_FACILITIES
+  GET_APPOINTMENT_FACILITIES,
+  SEND_CALENDAR_INVITE
 } from 'app/utils/urlConstants'
 import type {
   AppointmentListResponse,
@@ -27,7 +28,8 @@ import type {
   DeleteAppointmentParams,
   AppointmentNoteParams,
   AppointmentReminderParams,
-  UpdateAppointmentStatusParams
+  UpdateAppointmentStatusParams,
+  SendCalendarInviteParams
 } from './types'
 
 export async function getAppointments(
@@ -206,5 +208,16 @@ export async function getAppointmentFacilities(
     header,
     route: GET_APPOINTMENT_FACILITIES,
     data: { member: { id: params.memberId } }
+  })
+}
+
+export async function sendCalendarInvite(
+  header: AuthHeader,
+  params: SendCalendarInviteParams
+) {
+  return fetchData<Record<string, unknown>>({
+    header,
+    route: SEND_CALENDAR_INVITE,
+    data: params
   })
 }
