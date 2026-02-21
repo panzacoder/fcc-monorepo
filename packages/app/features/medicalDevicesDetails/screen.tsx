@@ -87,6 +87,21 @@ export function MedicalDevicesDetailsScreen() {
   const createReminderMutation = useCreateMedicalDeviceReminder(header)
   const updateReminderMutation = useUpdateMedicalDeviceReminder(header)
   const deleteReminderMutation = useDeleteMedicalDeviceReminder(header)
+  const createMessageThreadMutation = useCreateMessageThread(header)
+
+  const threadParticipantsParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
+    },
+    messageThreadType: {
+      type: 'Purchase'
+    }
+  }
+  const {
+    data: threadParticipantsData,
+    isLoading: isParticipantsLoading,
+    refetch: refetchParticipants
+  } = useThreadParticipants(header, threadParticipantsParams)
 
   const navigateAfterThreadRef = useRef<{ noteData: any } | null>(null)
 
@@ -334,41 +349,26 @@ export function MedicalDevicesDetailsScreen() {
   }
   async function getThreadParticipants(noteData: any) {
     setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      messageThreadType: {
-        type: 'Purchase'
+    try {
+      const result = await refetchParticipants()
+      setLoading(false)
+      if (result.data) {
+        const list = (result.data as any[]).map((item: any) => {
+          let object = item
+          object.isSelected = false
+          return object
+        })
+        setParticipantsList(list)
+        setNoteData(noteData)
+        setIsMessageThread(true)
       }
+    } catch (error) {
+      setLoading(false)
+      logger.debug(error)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            object.isSelected = false
-            return object
-          })
-          setParticipantsList(list)
-          setNoteData(noteData)
-          setIsMessageThread(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   function createMessageThread(subject: any, noteData: any) {
-    setLoading(true)
     setNoteData(noteData)
-    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -380,37 +380,33 @@ export function MedicalDevicesDetailsScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        subject: subject,
-        member: memberData.member ? memberData.member : '',
-        noteId: noteData.id ? noteData.id : '',
-        type: {
-          type: 'Purchase'
-        },
-        participantList: list,
-        medicalDeviceNote: {
-          id: noteData.id ? noteData.id : ''
-        },
-        messageList: []
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    createMessageThreadMutation.mutate(
+      {
+        messageThread: {
+          subject: subject,
+          member: memberData.member ? memberData.member : '',
+          noteId: noteData.id ? noteData.id : '',
+          type: {
+            type: 'Purchase'
+          },
+          participantList: list,
+          medicalDeviceNote: {
+            id: noteData.id ? noteData.id : ''
+          },
+          messageList: []
+        }
+      },
+      {
+        onSuccess: () => {
           setIsMessageThread(false)
           navigateAfterThreadRef.current = { noteData }
           refetchDetails()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          logger.debug(error)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   function isParticipantSelected(index: any) {
     participantsList[index].isSelected = !participantsList[index].isSelected
@@ -475,7 +471,8 @@ export function MedicalDevicesDetailsScreen() {
     deleteNoteMutation.isPending ||
     createReminderMutation.isPending ||
     updateReminderMutation.isPending ||
-    deleteReminderMutation.isPending
+    deleteReminderMutation.isPending ||
+    createMessageThreadMutation.isPending
 
   return (
     <View className="flex-1">
