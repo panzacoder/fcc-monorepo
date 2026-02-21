@@ -18,19 +18,11 @@ import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import messageListAction from 'app/redux/messageList/messageListAction'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
-import {
-  BASE_URL,
-  GET_APPOINTMENT_NOTE,
-  GET_EVENT_NOTE,
-  GET_INCIDENT_NOTE,
-  GET_MEDICAL_DEVICE_NOTE
-} from 'app/utils/urlConstants'
 import {
   useThread,
   useThreadParticipants,
@@ -38,6 +30,13 @@ import {
   useUpdateMessageThread,
   messageKeys
 } from 'app/data/messages'
+import { useAppointmentNote, appointmentKeys } from 'app/data/appointments'
+import { useEventNote, eventKeys } from 'app/data/events'
+import { useIncidentNote, incidentKeys } from 'app/data/incidents'
+import {
+  useMedicalDeviceNote,
+  medicalDeviceKeys
+} from 'app/data/medical-devices'
 import { useQueryClient } from '@tanstack/react-query'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 Notifications.setNotificationHandler({
@@ -114,6 +113,50 @@ export function NoteMessageScreen() {
   const updateParticipantsMutation = useUpdateThreadParticipants(header)
   const updateThreadMutation = useUpdateMessageThread(header)
 
+  const noteId = noteData.id ? Number(noteData.id) : 0
+  const isAppointment = !isGeneral && item.component === 'Appointment'
+  const isEvent =
+    !isGeneral &&
+    item.component !== 'Appointment' &&
+    item.component !== 'Incident' &&
+    item.component !== 'Medical Device'
+  const isIncident = !isGeneral && item.component === 'Incident'
+  const isMedicalDevice = !isGeneral && item.component === 'Medical Device'
+
+  const { data: appointmentNoteData, isLoading: isAppointmentNoteLoading } =
+    useAppointmentNote(header, isAppointment ? noteId : 0)
+
+  const { data: eventNoteData, isLoading: isEventNoteLoading } = useEventNote(
+    header,
+    { note: { id: isEvent ? noteId : 0 } }
+  )
+
+  const { data: incidentNoteData, isLoading: isIncidentNoteLoading } =
+    useIncidentNote(header, isIncident ? noteId : 0)
+
+  const { data: medicalDeviceNoteData, isLoading: isMedicalDeviceNoteLoading } =
+    useMedicalDeviceNote(header, isMedicalDevice ? noteId : 0)
+
+  function invalidateNonGeneralNote() {
+    if (isAppointment) {
+      queryClient.invalidateQueries({
+        queryKey: appointmentKeys.note(noteId)
+      })
+    } else if (isIncident) {
+      queryClient.invalidateQueries({
+        queryKey: incidentKeys.note(noteId)
+      })
+    } else if (isMedicalDevice) {
+      queryClient.invalidateQueries({
+        queryKey: medicalDeviceKeys.note(noteId)
+      })
+    } else {
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.note(noteId)
+      })
+    }
+  }
+
   function processMessageThread(messageThread: any) {
     setThreadDetails(messageThread)
     let msgList =
@@ -150,64 +193,35 @@ export function NoteMessageScreen() {
     }
   }, [threadData])
 
-  const getNoteDetailsNonGeneral = useCallback(async () => {
+  useEffect(() => {
     if (isGeneral) return
-    setLoading(true)
-    let url = ''
-    let dataObject = {} as any
-    if (item.component === 'Appointment') {
-      url = `${BASE_URL}${GET_APPOINTMENT_NOTE}`
-      dataObject = {
-        header: header,
-        appointmentNote: {
-          id: noteData.id ? noteData.id : ''
-        }
-      }
-    } else {
-      if (item.component === 'Incident') {
-        url = `${BASE_URL}${GET_INCIDENT_NOTE}`
-      } else if (item.component === 'Medical Device') {
-        url = `${BASE_URL}${GET_MEDICAL_DEVICE_NOTE}`
-      } else {
-        url = `${BASE_URL}${GET_EVENT_NOTE}`
-      }
-      dataObject = {
-        header: header,
-        note: {
-          id: noteData.id ? noteData.id : ''
-        }
-      }
+    let noteResult: any = null
+    if (isAppointment) noteResult = appointmentNoteData
+    else if (isIncident) noteResult = incidentNoteData
+    else if (isMedicalDevice) noteResult = medicalDeviceNoteData
+    else if (isEvent) noteResult = eventNoteData
+    if (!noteResult) return
+    if (noteResult.messageThread) {
+      processMessageThread(noteResult.messageThread)
     }
-
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.messageThread) {
-            processMessageThread(data.data.messageThread)
-          }
-          if (
-            item.component === 'Medical Device' &&
-            data.data.purchaseNote !== undefined &&
-            data.data.purchaseNote &&
-            data.data.purchaseNote.messageThread
-          ) {
-            let messageThread = data.data.purchaseNote.messageThread
-              ? data.data.purchaseNote.messageThread
-              : {}
-            processMessageThread(messageThread)
-          }
-          setLoading(false)
-          setIsDataReceived(true)
-        } else {
-          setLoading(false)
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+    if (
+      isMedicalDevice &&
+      noteResult.purchaseNote !== undefined &&
+      noteResult.purchaseNote &&
+      noteResult.purchaseNote.messageThread
+    ) {
+      let messageThread = noteResult.purchaseNote.messageThread
+        ? noteResult.purchaseNote.messageThread
+        : {}
+      processMessageThread(messageThread)
+    }
+    setIsDataReceived(true)
+  }, [
+    appointmentNoteData,
+    eventNoteData,
+    incidentNoteData,
+    medicalDeviceNoteData
+  ])
 
   const handleFcmMessage = useCallback(async () => {
     try {
@@ -240,9 +254,6 @@ export function NoteMessageScreen() {
     setIsRender(!isRender)
   }
   useEffect(() => {
-    if (!isGeneral) {
-      getNoteDetailsNonGeneral()
-    }
     handleFcmMessage()
   }, [])
 
@@ -318,7 +329,7 @@ export function NoteMessageScreen() {
               queryKey: messageKeys.detail(threadParams)
             })
           } else {
-            getNoteDetailsNonGeneral()
+            invalidateNonGeneralNote()
           }
           getThreadParticipants()
           setIsMessageThread(false)
@@ -356,7 +367,7 @@ export function NoteMessageScreen() {
                 queryKey: messageKeys.detail(threadParams)
               })
             } else {
-              getNoteDetailsNonGeneral()
+              invalidateNonGeneralNote()
             }
             setMessage('')
           },
@@ -369,8 +380,17 @@ export function NoteMessageScreen() {
     }
   }
 
+  const nonGeneralNoteLoading =
+    (isAppointment && isAppointmentNoteLoading) ||
+    (isEvent && isEventNoteLoading) ||
+    (isIncident && isIncidentNoteLoading) ||
+    (isMedicalDevice && isMedicalDeviceNoteLoading)
+
   const combinedLoading =
-    isLoading || (isGeneral && isThreadLoading) || isParticipantsLoading
+    isLoading ||
+    (isGeneral && isThreadLoading) ||
+    nonGeneralNoteLoading ||
+    isParticipantsLoading
 
   return (
     <View className=" flex-1">

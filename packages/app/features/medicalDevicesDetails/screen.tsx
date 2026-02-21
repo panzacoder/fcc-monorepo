@@ -10,12 +10,6 @@ import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import moment from 'moment'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD
-} from 'app/utils/urlConstants'
 import {
   useMedicalDeviceDetails,
   useDeleteMedicalDevice,
@@ -26,6 +20,10 @@ import {
   useUpdateMedicalDeviceReminder,
   useDeleteMedicalDeviceReminder
 } from 'app/data/medical-devices'
+import {
+  useThreadParticipants,
+  useCreateMessageThread
+} from 'app/data/messages'
 import { useLocalSearchParams } from 'expo-router'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'

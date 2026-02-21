@@ -10,6 +10,7 @@ import {
   createAppointmentNote,
   updateAppointmentNote,
   deleteAppointmentNote,
+  getAppointmentNote,
   createAppointmentReminder,
   updateAppointmentReminder,
   deleteAppointmentReminder,
@@ -35,6 +36,8 @@ export const appointmentKeys = {
     [...appointmentKeys.lists(), params] as const,
   details: () => [...appointmentKeys.all, 'detail'] as const,
   detail: (id: number) => [...appointmentKeys.details(), id] as const,
+  notes: () => [...appointmentKeys.all, 'note'] as const,
+  note: (id: number) => [...appointmentKeys.notes(), id] as const,
   doctorFacilities: (params: GetDoctorFacilitiesParams) =>
     [...appointmentKeys.all, 'doctorFacilities', params] as const,
   doctors: (memberId: number) =>
@@ -86,6 +89,14 @@ export function useAppointmentFacilities(header: AuthHeader, memberId: number) {
     queryKey: appointmentKeys.facilities(memberId),
     queryFn: () => getAppointmentFacilities(header, { memberId }),
     enabled: !!header && !!memberId
+  })
+}
+
+export function useAppointmentNote(header: AuthHeader, id: number) {
+  return useQuery({
+    queryKey: appointmentKeys.note(id),
+    queryFn: () => getAppointmentNote(header, { appointmentNote: { id } }),
+    enabled: !!header && !!id
   })
 }
 

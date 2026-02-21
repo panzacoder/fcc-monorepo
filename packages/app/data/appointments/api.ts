@@ -9,6 +9,7 @@ import {
   CREATE_APPOINTMENT_NOTE,
   UPDATE_APPOINTMENT_NOTE,
   DELETE_APPOINTMENT_NOTE,
+  GET_APPOINTMENT_NOTE,
   CREATE_APPOINTMENT_REMINDER,
   UPDATE_APPOINTMENT_REMINDER,
   DELETE_APPOINTMENT_REMINDER,
@@ -127,6 +128,17 @@ export async function deleteAppointmentNote(
   return fetchData<Record<string, unknown>>({
     header,
     route: DELETE_APPOINTMENT_NOTE,
+    data: params
+  })
+}
+
+export async function getAppointmentNote(
+  header: AuthHeader,
+  params: { appointmentNote: { id: number } }
+) {
+  return fetchData<Record<string, unknown>>({
+    header,
+    route: GET_APPOINTMENT_NOTE,
     data: params
   })
 }
