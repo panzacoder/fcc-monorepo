@@ -58,11 +58,13 @@ export interface CreateMessageThreadParams {
   messageThread: {
     subject: string
     member: number | string
+    noteId?: number | string
     type: {
       type: string
     }
     participantList: { user: { id: number } }[]
     messageList: Record<string, unknown>[]
+    [key: string]: unknown
   }
 }
 

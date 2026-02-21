@@ -14,13 +14,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import {
-  BASE_URL,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD
-} from 'app/utils/urlConstants'
 import {
   useIncidentDetails,
   useDeleteIncident,
@@ -28,6 +22,10 @@ import {
   useUpdateIncidentNote,
   useDeleteIncidentNote
 } from 'app/data/incidents'
+import {
+  useThreadParticipants,
+  useCreateMessageThread
+} from 'app/data/messages'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -81,6 +79,21 @@ export function IncidentDetailsScreen() {
   const createNoteMutation = useCreateIncidentNote(header)
   const updateNoteMutation = useUpdateIncidentNote(header)
   const deleteNoteMutation = useDeleteIncidentNote(header)
+  const createMessageThreadMutation = useCreateMessageThread(header)
+
+  const threadParticipantsParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
+    },
+    messageThreadType: {
+      type: 'Incident'
+    }
+  }
+  const {
+    data: threadParticipantsData,
+    isLoading: isParticipantsLoading,
+    refetch: refetchParticipants
+  } = useThreadParticipants(header, threadParticipantsParams)
 
   useEffect(() => {
     if (incidentDetailsData) {
@@ -241,41 +254,26 @@ export function IncidentDetailsScreen() {
   }
   async function getThreadParticipants(noteData: any) {
     setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      messageThreadType: {
-        type: 'Incident'
+    try {
+      const result = await refetchParticipants()
+      setLoading(false)
+      if (result.data) {
+        const list = (result.data as any[]).map((item: any) => {
+          let object = item
+          object.isSelected = false
+          return object
+        })
+        setParticipantsList(list)
+        setNoteData(noteData)
+        setIsMessageThread(true)
       }
+    } catch (error) {
+      setLoading(false)
+      logger.debug(error)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            object.isSelected = false
-            return object
-          })
-          setParticipantsList(list)
-          setNoteData(noteData)
-          setIsMessageThread(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   function createMessageThread(subject: any, noteData: any) {
-    setLoading(true)
     setNoteData(noteData)
-    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -287,26 +285,24 @@ export function IncidentDetailsScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        subject: subject,
-        member: memberData.member ? memberData.member : '',
-        noteId: noteData.id ? noteData.id : '',
-        type: {
-          type: 'Incident'
-        },
-        participantList: list,
-        incidentNote: {
-          id: noteData.id ? noteData.id : ''
-        },
-        messageList: []
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    createMessageThreadMutation.mutate(
+      {
+        messageThread: {
+          subject: subject,
+          member: memberData.member ? memberData.member : '',
+          noteId: noteData.id ? noteData.id : '',
+          type: {
+            type: 'Incident'
+          },
+          participantList: list,
+          incidentNote: {
+            id: noteData.id ? noteData.id : ''
+          },
+          messageList: []
+        }
+      },
+      {
+        onSuccess: () => {
           setIsMessageThread(false)
           refetchDetails()
           router.push(
@@ -316,14 +312,12 @@ export function IncidentDetailsScreen() {
               noteData: JSON.stringify(noteData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          logger.debug(error)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   function isParticipantSelected(index: any) {
     participantsList[index].isSelected = !participantsList[index].isSelected
@@ -353,7 +347,8 @@ export function IncidentDetailsScreen() {
     deleteIncidentMutation.isPending ||
     createNoteMutation.isPending ||
     updateNoteMutation.isPending ||
-    deleteNoteMutation.isPending
+    deleteNoteMutation.isPending ||
+    createMessageThreadMutation.isPending
 
   return (
     <View className="flex-1">
