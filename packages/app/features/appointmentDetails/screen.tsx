@@ -29,7 +29,7 @@ import {
 import { useAllMemberDetails } from 'app/data/circle'
 import {
   useCreateMessageThread,
-  getThreadParticipants
+  useThreadParticipants
 } from 'app/data/messages'
 import {
   useDeleteTransportation,
@@ -73,7 +73,6 @@ export function AppointmentDetailsScreen() {
     : {}
   // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
-  const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
@@ -115,6 +114,11 @@ export function AppointmentDetailsScreen() {
   const resendTransportationMutation = useResendTransportationRequest(header)
   const cancelTransportationMutation = useCancelTransportationRequest(header)
   const { data: allMemberDetailsData } = useAllMemberDetails(header)
+
+  const { refetch: refetchParticipants } = useThreadParticipants(header, {
+    member: { id: memberData.member ? memberData.member : '' },
+    messageThreadType: { type: 'Appointment' }
+  })
 
   useEffect(() => {
     if (allMemberDetailsData) {
@@ -362,18 +366,8 @@ export function AppointmentDetailsScreen() {
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
-  async function fetchThreadParticipants(noteData: any) {
-    setLoading(true)
-    try {
-      const data = await getThreadParticipants(header, {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        messageThreadType: {
-          type: 'Appointment'
-        }
-      })
-      setLoading(false)
+  function fetchThreadParticipants(noteData: any) {
+    refetchParticipants().then(({ data }) => {
       if (data) {
         const list = (data as any[]).map((item: any) => {
           let object = item
@@ -384,10 +378,7 @@ export function AppointmentDetailsScreen() {
         setNoteData(noteData)
         setIsMessageThread(true)
       }
-    } catch (error) {
-      setLoading(false)
-      logger.debug(error)
-    }
+    })
   }
   async function deleteAppointment() {
     deleteAppointmentMutation.mutate(
@@ -686,7 +677,7 @@ export function AppointmentDetailsScreen() {
 
   return (
     <View className="flex-1 ">
-      <PtsLoader loading={isLoading || isDetailsLoading || isMutating} />
+      <PtsLoader loading={isDetailsLoading || isMutating} />
       <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
         <View className=" h-full w-full flex-1 py-2">
