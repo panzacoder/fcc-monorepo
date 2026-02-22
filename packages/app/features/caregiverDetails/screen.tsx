@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,19 +8,13 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
-import {
-  BASE_URL,
-  DELETE_CAREGIVER,
-  GET_CAREGIVER_DETAILS
-} from 'app/utils/urlConstants'
 import { formatUrl } from 'app/utils/format-url'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import { useCaregiverDetails, useDeleteCaregiver } from 'app/data/caregivers'
 export function CaregiverDetailsScreen() {
   const caregiverPrivilegesRef = useRef<any>({})
   const header = useAppSelector((state) => state.headerState.header)
@@ -30,9 +24,7 @@ export function CaregiverDetailsScreen() {
   let caregiverInfo = item.caregiverDetails
     ? JSON.parse(item.caregiverDetails)
     : {}
-  // console.log('memberData', '' + JSON.stringify(memberData))
 
-  const [isLoading, setLoading] = useState(false)
   const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
 
   const [fullName, setFullName] = useState('')
@@ -47,62 +39,53 @@ export function CaregiverDetailsScreen() {
     memberFullName += memberData.lastname ? ' ' + memberData.lastname : ''
   }
   const [memberName, setMemberName] = useState(memberFullName)
-  const getCaregiverDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_CAREGIVER_DETAILS}`
-    let dataObject = {
-      header: header,
-      familyMember: {
-        id: caregiverInfo.id ? caregiverInfo.id : '',
-        memberId: memberData.member ? memberData.member : ''
+
+  const caregiverId = caregiverInfo.id ? caregiverInfo.id : ''
+  const memberId = memberData.member ? memberData.member : ''
+
+  const { data: caregiverData, isLoading: isDetailsLoading } =
+    useCaregiverDetails(header, { id: caregiverId, memberId })
+
+  const deleteCaregiverMutation = useDeleteCaregiver(header)
+
+  useEffect(() => {
+    if (caregiverData) {
+      const data = caregiverData as any
+      setCaregiverDetails(data.familyMember || {})
+      if (data.domainObjectPrivileges) {
+        caregiverPrivilegesRef.current = data.domainObjectPrivileges.Caregiver
+          ? data.domainObjectPrivileges.Caregiver
+          : {}
+      }
+      if (data.familyMember) {
+        let details = data.familyMember
+        let name = ''
+        if (details.firstName) {
+          name += details.firstName
+        }
+        if (details.lastName) {
+          name += ' ' + details.lastName
+        }
+        setFullName(name)
+        if (details.email) {
+          setEmail(details.email)
+        }
+        if (details.familyMemberMemberStatus) {
+          let statusVal = details.familyMemberMemberStatus.status
+            ? details.familyMemberMemberStatus.status
+            : ''
+          setStatus(statusVal)
+        }
+        if (details.relationRole) {
+          let profileVal = details.relationRole.name
+            ? details.relationRole.name
+            : ''
+          setProfile(profileVal)
+        }
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setCaregiverDetails(data.data.familyMember || {})
-          if (data.data.domainObjectPrivileges) {
-            caregiverPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Caregiver
-              ? data.data.domainObjectPrivileges.Caregiver
-              : {}
-          }
-          if (data.data.familyMember) {
-            let details = data.data.familyMember
-            let fullName = ''
-            if (details.firstName) {
-              fullName += details.firstName
-            }
-            if (details.lastName) {
-              fullName += ' ' + details.lastName
-            }
-            setFullName(fullName)
-            if (details.email) {
-              setEmail(details.email)
-            }
-            if (details.familyMemberMemberStatus) {
-              let status = details.familyMemberMemberStatus.status
-                ? details.familyMemberMemberStatus.status
-                : ''
-              setStatus(status)
-            }
-            if (details.relationRole) {
-              let profile = details.relationRole.name
-                ? details.relationRole.name
-                : ''
-              setProfile(profile)
-            }
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  }, [caregiverData])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -113,7 +96,6 @@ export function CaregiverDetailsScreen() {
     return true
   }
   useEffect(() => {
-    getCaregiverDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -147,34 +129,28 @@ export function CaregiverDetailsScreen() {
   }
 
   async function deleteCaregiver() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: {
+    deleteCaregiverMutation.mutate(
+      {
         id: caregiverInfo.id ? caregiverInfo.id : '',
         memberId: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.replace(
             formatUrl('/circles/caregiversList', {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete caregiver')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
+
+  const isLoading = isDetailsLoading || deleteCaregiverMutation.isPending
 
   return (
     <View className="flex-1">
@@ -190,7 +166,6 @@ export function CaregiverDetailsScreen() {
                 title="Edit"
                 variant="border"
                 onPress={() => {
-                  // setIsAddCaregiver(true)
                   router.push(
                     formatUrl('/circles/addEditCaregiver', {
                       memberData: JSON.stringify(memberData),

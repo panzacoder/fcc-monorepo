@@ -12,12 +12,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  CREATE_INCIDENT,
-  UPDATE_INCIDENT
-} from 'app/utils/urlConstants'
+import { useCreateIncident, useUpdateIncident } from 'app/data/incidents'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -38,12 +33,15 @@ export function AddEditIncidentScreen() {
   const staticData: any = useAppSelector(
     (state) => state.staticDataState.staticData
   )
+  const createIncidentMutation = useCreateIncident(header)
+  const updateIncidentMutation = useUpdateIncident(header)
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
-  const [isLoading, setLoading] = useState(false)
+  const isLoading =
+    createIncidentMutation.isPending || updateIncidentMutation.isPending
   const [selectedAddress, setSelectedAddress] = useState({
     shortDescription: '',
     nickName: '',
@@ -178,59 +176,66 @@ export function AddEditIncidentScreen() {
     }
   }
   async function addEditIncident(formData: Schema) {
-    setLoading(true)
-    let url = ''
-
-    let dataObject: any = {
-      header: header,
-      incident: {
-        date: selectedDate,
-        title: formData.title,
-        description: formData.description,
-        type: incidentTypeRef.current,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        location: selectedAddress,
-        contactList: []
-      }
+    let incidentData: any = {
+      date: selectedDate,
+      title: formData.title,
+      description: formData.description,
+      type: incidentTypeRef.current,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      location: selectedAddress,
+      contactList: []
     }
     if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
-      url = `${BASE_URL}${CREATE_INCIDENT}`
-      dataObject.incident.location.address.id = ''
-    } else {
-      url = `${BASE_URL}${UPDATE_INCIDENT}`
-      dataObject.incident.id = incidentDetails.id
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          //   console.log('addEditIncident', JSON.stringify(data.data))
-          let details =
-            _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
-              ? data.data.incident
-              : data.data
-          if (_.isEmpty(incidentDetails)) {
-            router.dismiss(1)
-          } else {
-            router.dismiss(2)
+      incidentData.location.address.id = ''
+      createIncidentMutation.mutate(
+        { incident: incidentData },
+        {
+          onSuccess: (data: any) => {
+            let details = data?.incident ? data.incident : data
+            if (_.isEmpty(incidentDetails)) {
+              router.dismiss(1)
+            } else {
+              router.dismiss(2)
+            }
+            router.push(
+              formatUrl('/circles/incidentDetails', {
+                incidentDetails: JSON.stringify(details),
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create incident')
           }
-          router.push(
-            formatUrl('/circles/incidentDetails', {
-              incidentDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        } else {
-          Alert.alert('', data.message)
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      incidentData.id = incidentDetails.id
+      updateIncidentMutation.mutate(
+        { incident: incidentData },
+        {
+          onSuccess: (data: any) => {
+            let details = data
+            if (_.isEmpty(incidentDetails)) {
+              router.dismiss(1)
+            } else {
+              router.dismiss(2)
+            }
+            router.push(
+              formatUrl('/circles/incidentDetails', {
+                incidentDetails: JSON.stringify(details),
+                memberData: JSON.stringify(memberData)
+              })
+            )
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update incident')
+          }
+        }
+      )
+    }
   }
   const onSelectionIncidentType = (data: any) => {
     incidentTypeRef.current = data

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View,
   Alert,
@@ -11,19 +11,16 @@ import {
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  CHECK_VALID_CREDENTIAL,
-  GET_MEMBER_PROFILE,
-  DELETE_AUTHORIZED_CAREGIVER,
-  DELETE_CAREGIVER,
-  DELETE_MEMBER
-} from 'app/utils/urlConstants'
+  useMemberProfile,
+  useCheckValidCredential,
+  useDeleteAuthorizedCaregiver,
+  useDeleteCaregiver,
+  useDeleteMember
+} from 'app/data/profile'
 import { formatUrl } from 'app/utils/format-url'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import { ControlledSecureField } from 'app/ui/form-fields/controlled-secure-field'
@@ -42,8 +39,6 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 
 export function MemberProfileScreen() {
-  const [isLoading, setLoading] = useState(false)
-  const [isDataReceived, setIsDataReceived] = useState(false)
   const [memberDetails, setMemberDetails] = useState({}) as any
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
   const [isFromSelfCircle, setIsFromSelfCircle] = useState(false)
@@ -52,7 +47,6 @@ export function MemberProfileScreen() {
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
-  // console.log('memberData', JSON.stringify(memberData))
 
   const { handleSubmit: handleSubmit1, control: control1 } = useForm({
     defaultValues: {
@@ -60,35 +54,23 @@ export function MemberProfileScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const getMemberProfile = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_MEMBER_PROFILE}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let member = data.data ? data.data : {}
-          logger.debug('member', JSON.stringify(member))
-          setMemberDetails(data.data ? data.data : {})
-          setIsDataReceived(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+
+  const memberId = memberData.member ? memberData.member : ''
+  const { data: memberProfileData, isLoading: isProfileLoading } =
+    useMemberProfile(header, { member: { id: memberId } })
+
+  const checkCredentialMutation = useCheckValidCredential(header)
+  const deleteAuthorizedCaregiverMutation = useDeleteAuthorizedCaregiver(header)
+  const deleteCaregiverMutation = useDeleteCaregiver(header)
+  const deleteMemberMutation = useDeleteMember(header)
+
   useEffect(() => {
-    getMemberProfile()
-  }, [])
+    if (memberProfileData) {
+      const data = memberProfileData as any
+      setMemberDetails(data || {})
+    }
+  }, [memberProfileData])
+
   let titleStyle = 'ml-2 font-400 w-[25%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
@@ -102,18 +84,73 @@ export function MemberProfileScreen() {
     )
   }
 
-  async function checkCredential(formData: Schema) {
-    setLoading(true)
-    let url = `${BASE_URL}${CHECK_VALID_CREDENTIAL}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        credential: formData.password
+  function deleteAuthorizedCaregiverCircle() {
+    deleteAuthorizedCaregiverMutation.mutate(
+      {
+        appuserVo: {
+          id: memberData.member ? memberData.member : ''
+        }
+      },
+      {
+        onSuccess: () => {
+          router.back()
+        },
+        onError: (error) => {
+          Alert.alert(
+            '',
+            error.message || 'Failed to delete authorized caregiver'
+          )
+        }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
+    )
+  }
+
+  function deleteCircle() {
+    deleteMemberMutation.mutate(
+      {
+        memberVo: {
+          memberDetailsId: memberData.member ? memberData.member : ''
+        }
+      },
+      {
+        onSuccess: () => {
+          router.back()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete circle')
+        }
+      }
+    )
+  }
+
+  function deleteCaregiver() {
+    deleteCaregiverMutation.mutate(
+      {
+        familyMember: {
+          id: memberData.id ? memberData.id : '',
+          memberId: memberData.member ? memberData.member : ''
+        }
+      },
+      {
+        onSuccess: () => {
+          router.back()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete caregiver')
+        }
+      }
+    )
+  }
+
+  function checkCredential(formData: Schema) {
+    checkCredentialMutation.mutate(
+      {
+        appuserVo: {
+          credential: formData.password
+        }
+      },
+      {
+        onSuccess: () => {
           if (isFromSelfCircle) {
             deleteCaregiver()
           } else {
@@ -123,89 +160,14 @@ export function MemberProfileScreen() {
               deleteCircle()
             }
           }
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Invalid credential')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
-  async function deleteAuthorizedCaregiverCircle() {
-    setLoading(true)
-    let url = ''
-    url = `${BASE_URL}${DELETE_AUTHORIZED_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        id: memberData.member ? memberData.member : ''
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          router.back()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+    )
   }
-  async function deleteCircle() {
-    setLoading(true)
-    let url = ''
-    url = `${BASE_URL}${DELETE_MEMBER}`
-    let dataObject = {
-      header: header,
-      memberVo: {
-        memberDetailsId: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          router.back()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
-  async function deleteCaregiver() {
-    setLoading(true)
-    let url = ''
-    url = `${BASE_URL}${DELETE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: {
-        id: memberData.id ? memberData.id : '',
-        memberId: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          router.back()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }
+
   const showDeleteModal = () => {
     return (
       <View
@@ -245,11 +207,19 @@ export function MemberProfileScreen() {
 
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader
+        loading={
+          isProfileLoading ||
+          checkCredentialMutation.isPending ||
+          deleteAuthorizedCaregiverMutation.isPending ||
+          deleteCaregiverMutation.isPending ||
+          deleteMemberMutation.isPending
+        }
+      />
       <View className="mt-[25px]">
         <PtsBackHeader title={'Member Profile'} memberData={{}} />
       </View>
-      {isDataReceived ? (
+      {memberProfileData ? (
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[20] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className="flex-row">
@@ -396,7 +366,7 @@ export function MemberProfileScreen() {
             )}
             {getDetailsView(
               'Timezone',
-              memberDetails.address.timezone
+              memberDetails.address?.timezone
                 ? `${memberDetails.address.timezone.name} (${memberDetails.address.timezone.abbreviation})`
                 : ''
             )}

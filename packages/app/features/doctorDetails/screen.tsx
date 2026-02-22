@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   View,
   Alert,
@@ -17,17 +17,14 @@ import {
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { Feather } from 'app/ui/icons'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_DOCTOR_DETAILS,
-  DELETE_DOCTOR,
-  SHARE_CONTACT_INFO
-} from 'app/utils/urlConstants'
+  useDoctorDetails,
+  useDeleteDoctor,
+  useShareDoctor
+} from 'app/data/doctors'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
@@ -46,7 +43,6 @@ export function DoctorDetailsScreen() {
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  const [isLoading, setLoading] = useState(false)
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const [doctorDetails, setDoctorDetails] = useState({}) as any
@@ -55,54 +51,41 @@ export function DoctorDetailsScreen() {
   const [appointmentList, setAppointmentList] = useState([])
   const [isShareDoctor, setIsShareDoctor] = useState(false)
 
-  const getDoctorDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_DOCTOR_DETAILS}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        id: doctorInfo.id ? doctorInfo.id : ''
+  const doctorId = doctorInfo.id ? doctorInfo.id : ''
+  const { data: doctorDetailsData, isLoading: isDetailsLoading } =
+    useDoctorDetails(header, { id: doctorId })
+
+  const deleteDoctorMutation = useDeleteDoctor(header)
+  const shareDoctorMutation = useShareDoctor(header)
+
+  useEffect(() => {
+    if (doctorDetailsData) {
+      const data = doctorDetailsData as any
+      if (data.domainObjectPrivileges) {
+        doctorPrivilegesRef.current = data.domainObjectPrivileges.Doctor
+          ? data.domainObjectPrivileges.Doctor
+          : {}
       }
+      setDoctorDetails(data.doctor || {})
+      if (data.doctor) {
+        let details = data.doctor
+        let fullName = ''
+        fullName += details.salutation ? details.salutation + '. ' : ''
+        fullName += details.firstName ? details.firstName + ' ' : ''
+        fullName += details.lastName ? details.lastName + ' ' : ''
+        setDoctorName(fullName)
+      }
+      setLocationList(
+        data.doctor && data.doctor.doctorLocationList
+          ? data.doctor.doctorLocationList
+          : []
+      )
+      setAppointmentList(
+        data.doctorAppointmentList ? data.doctorAppointmentList : []
+      )
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.domainObjectPrivileges) {
-            doctorPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Doctor
-              ? data.data.domainObjectPrivileges.Doctor
-              : {}
-          }
-          setDoctorDetails(data.data.doctor || {})
-          if (data.data.doctor) {
-            let details = data.data.doctor
-            let fullName = ''
-            fullName += details.salutation ? details.salutation + '. ' : ''
-            fullName += details.firstName ? details.firstName + ' ' : ''
-            fullName += details.lastName ? details.lastName + ' ' : ''
-            setDoctorName(fullName)
-          }
-          setLocationList(
-            data.data.doctor && data.data.doctor.doctorLocationList
-              ? data.data.doctor.doctorLocationList
-              : []
-          )
-          setAppointmentList(
-            data.data && data.data.doctorAppointmentList
-              ? data.data.doctorAppointmentList
-              : []
-          )
-          // console.log('appointmentList', JSON.stringify(appointmentList))
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  }, [doctorDetailsData])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -113,7 +96,6 @@ export function DoctorDetailsScreen() {
     return true
   }
   useEffect(() => {
-    getDoctorDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -186,63 +168,54 @@ export function DoctorDetailsScreen() {
     )
   }
   async function deleteDoctor() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_DOCTOR}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        id: doctorDetails.id
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    deleteDoctorMutation.mutate(
+      { doctor: { id: doctorDetails.id } },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/doctorsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete doctor')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const cancelClicked = () => {
     setIsShareDoctor(false)
   }
   async function shareDoctor(email: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${SHARE_CONTACT_INFO}`
-    let dataObject = {
-      header: header,
-      doctorSharingInfo: {
-        doctorid: doctorDetails.id ? doctorDetails.id : '',
-        targetemail: email
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsShareDoctor(false)
+    shareDoctorMutation.mutate(
+      {
+        doctorSharingInfo: {
+          doctorid: doctorDetails.id ? doctorDetails.id : '',
+          targetemail: email
         }
-        Alert.alert('', data.message)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: () => {
+          setIsShareDoctor(false)
+          Alert.alert('', 'Doctor shared successfully')
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to share doctor')
+        }
+      }
+    )
   }
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader
+        loading={
+          isDetailsLoading ||
+          deleteDoctorMutation.isPending ||
+          shareDoctorMutation.isPending
+        }
+      />
       <PtsBackHeader title="Doctor Details" memberData={memberData} />
       <View className="h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">

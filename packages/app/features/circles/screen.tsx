@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { View, Alert, TouchableOpacity } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { CircleCard } from 'app/ui/circleCard'
@@ -10,20 +10,13 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_MEMBER_DETAILS,
-  ACCEPT_SHARED_INFO,
-  REJECT_SHARED_INFO,
-  REJECT_MEMBER_REQUEST,
-  ACCEPT_MEMBER_REQUEST,
-  GET_TRANSPORTATION_REQUESTS,
-  EVENT_ACCEPT_TRANSPORTATION_REQUEST,
-  APPROVE_TRANSPORT,
-  EVENT_REJECT_TRANSPORTATION_REQUEST,
-  REJECT_TRANSPORT
-} from 'app/utils/urlConstants'
+  useTransportationRequests,
+  useApproveTransport,
+  useRejectTransport,
+  useEventAcceptTransportationRequest,
+  useEventRejectTransportationRequest
+} from 'app/data/transportation'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { SharedContactList } from 'app/ui/sharedContactList'
@@ -35,6 +28,15 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
+import {
+  useAllMemberDetails,
+  useAcceptSharedInfo,
+  useRejectSharedInfo,
+  useAcceptMemberRequest,
+  useRejectMemberRequest,
+  circleKeys
+} from 'app/data/circle'
+import { useQueryClient } from '@tanstack/react-query'
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
@@ -42,6 +44,7 @@ export type Schema = z.infer<typeof schema>
 export function CirclesListScreen() {
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const queryClient = useQueryClient()
   const memberNamesList: any = useAppSelector(
     (state) => state.memberNames.memberNamesList
   )
@@ -52,7 +55,7 @@ export function CirclesListScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const [isLoading, setLoading] = useState(false)
+  const [transportMemberId, setTransportMemberId] = useState('')
   const [isShowSharedContacts, setIsShowSharedContacts] = useState(false)
   const [isShowNewCircles, setIsShowNewCircles] = useState(false)
   const [isShowPrivacyPolicy, setIsShowPrivacyPolicy] = useState(false)
@@ -77,44 +80,67 @@ export function CirclesListScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const getMemberDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let memberList = data.data.memberList ? data.data.memberList : []
-          setMemberList(memberList)
-          memberList.map((data: any) => {
-            let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
-            if (memberNamesList.includes(fullName) === false) {
-              memberNamesList.push(fullName)
-            }
-          })
-          dispatch(memberNamesAction.setMemberNames(memberNamesList))
-          setDataReceived(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+
+  const { data: memberDetailsData, isLoading: isMemberDetailsLoading } =
+    useAllMemberDetails(header)
+
+  const acceptSharedInfoMutation = useAcceptSharedInfo(header)
+  const rejectSharedInfoMutation = useRejectSharedInfo(header)
+  const acceptMemberRequestMutation = useAcceptMemberRequest(header)
+  const rejectMemberRequestMutation = useRejectMemberRequest(header)
+
+  const { data: transportData, isFetching: isTransportFetching } =
+    useTransportationRequests(header, {
+      memberId: transportMemberId
+    })
+
+  const approveTransportMutation = useApproveTransport(header)
+  const rejectTransportMutation = useRejectTransport(header)
+  const eventAcceptMutation = useEventAcceptTransportationRequest(header)
+  const eventRejectMutation = useEventRejectTransportationRequest(header)
+
+  const isMutating =
+    acceptSharedInfoMutation.isPending ||
+    rejectSharedInfoMutation.isPending ||
+    acceptMemberRequestMutation.isPending ||
+    rejectMemberRequestMutation.isPending ||
+    approveTransportMutation.isPending ||
+    rejectTransportMutation.isPending ||
+    eventAcceptMutation.isPending ||
+    eventRejectMutation.isPending
+
   useEffect(() => {
-    getMemberDetails()
+    if (memberDetailsData) {
+      let list = memberDetailsData.memberList
+        ? memberDetailsData.memberList
+        : []
+      setMemberList(list)
+      list.map((data: any) => {
+        let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+        if (memberNamesList.includes(fullName) === false) {
+          memberNamesList.push(fullName)
+        }
+      })
+      dispatch(memberNamesAction.setMemberNames(memberNamesList))
+      setDataReceived(true)
+    }
+  }, [memberDetailsData])
+
+  useEffect(() => {
+    if (transportData && transportMemberId !== '') {
+      setTransportationList(transportData ? transportData : [])
+      setIsShowTransportationRequests(true)
+    }
+  }, [transportData, transportMemberId])
+
+  useEffect(() => {
     dispatch(currentMemberAddressAction.setMemberAddress({}))
   }, [])
+
   async function acceptNewRequest(data: any) {
     acceptRejectMemberRequest(data, true)
   }
   async function acceptRejectClickedNewCircles(data: any, isAccept: any) {
-    // console.log('acceptRejectClickedNewCircles')
     if (isAccept) {
       setIsShowNewCircles(false)
       setRequestData(data)
@@ -124,60 +150,38 @@ export function CirclesListScreen() {
     }
   }
   async function acceptRejectMemberRequest(data: any, isAccept: any) {
-    setLoading(true)
-    let url = ''
-    url = isAccept
-      ? `${BASE_URL}${ACCEPT_MEMBER_REQUEST}`
-      : `${BASE_URL}${REJECT_MEMBER_REQUEST}`
-    let dataObject = {
-      header: header,
+    const params = {
       memberVo: {
         familyMemberMemberId: data.id ? data.id : '',
         isActive: false
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          getMemberDetails()
-        }
+    const mutation = isAccept
+      ? acceptMemberRequestMutation
+      : rejectMemberRequestMutation
+    mutation.mutate(params, {
+      onSettled: () => {
         setIsHideCirclesView(false)
         setIsShowNewCircles(false)
         setIsShowPrivacyPolicy(false)
-        Alert.alert('', data.message)
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    })
   }
   async function acceptRejectClicked(data: any, isAccept: any) {
-    setLoading(true)
-    let url = ''
-    url = isAccept
-      ? `${BASE_URL}${ACCEPT_SHARED_INFO}`
-      : `${BASE_URL}${REJECT_SHARED_INFO}`
-    let dataObject = {
-      header: header,
+    const params = {
       doctorSharingInfo: {
         id: data.id ? data.id : ''
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
+    const mutation = isAccept
+      ? acceptSharedInfoMutation
+      : rejectSharedInfoMutation
+    mutation.mutate(params, {
+      onSettled: () => {
         setIsHideCirclesView(false)
         setIsShowSharedContacts(false)
-        Alert.alert('', data.message)
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getMemberDetails()
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    })
   }
   const cancelClicked = () => {
     setIsHideCirclesView(false)
@@ -186,7 +190,6 @@ export function CirclesListScreen() {
     setIsShowPrivacyPolicy(false)
   }
   async function trasportationClicked(memberData: any) {
-    // console.log('trasportationClicked', JSON.stringify(memberData))
     let fullName = ''
     if (memberData.firstname) {
       fullName += memberData.firstname.trim() + ' '
@@ -195,28 +198,7 @@ export function CirclesListScreen() {
       fullName += memberData.lastname.trim()
     }
     setTransportMemberName(fullName)
-    setLoading(true)
-    let url = `${BASE_URL}${GET_TRANSPORTATION_REQUESTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setTransportationList(data.data ? data.data : [])
-          setIsShowTransportationRequests(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    setTransportMemberId(memberData.member ? memberData.member : '')
   }
   const hideCirclesView = (
     isHide: any,
@@ -244,69 +226,49 @@ export function CirclesListScreen() {
     setIsHideCirclesView(isHide)
   }
   async function approveRejectTrasportRequest(transportData: any) {
-    setLoading(true)
-    let url = ''
-    if (transportData.type === 'Event') {
-      url = `${BASE_URL}${EVENT_ACCEPT_TRANSPORTATION_REQUEST}`
-    } else {
-      url = `${BASE_URL}${APPROVE_TRANSPORT}`
-    }
-    let dataObject = {
-      header: header,
+    const params = {
       transportationVo: {
         id: transportData.id ? transportData.id : '',
         reason: '',
         isApprove: true
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsShowTransportationRequests(false)
-          setIsHideCirclesView(false)
-          getMemberDetails()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    const onSuccess = () => {
+      setIsShowTransportationRequests(false)
+      setIsHideCirclesView(false)
+      queryClient.invalidateQueries({ queryKey: circleKeys.all })
+    }
+    const onError = (error: any) => {
+      logger.debug(error)
+    }
+    if (transportData.type === 'Event') {
+      eventAcceptMutation.mutate(params, { onSuccess, onError })
+    } else {
+      approveTransportMutation.mutate(params, { onSuccess, onError })
+    }
   }
   async function rejectRequest(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    if (transportRequestData.type === 'Event') {
-      url = `${BASE_URL}${EVENT_REJECT_TRANSPORTATION_REQUEST}`
-    } else {
-      url = `${BASE_URL}${REJECT_TRANSPORT}`
-    }
-    let dataObject = {
-      header: header,
+    const params = {
       transportationVo: {
         id: transportRequestData.id ? transportRequestData.id : '',
         reason: formData.rejectReason,
         isApprove: false
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsRejectTransportRequest(false)
-          setIsShowTransportationRequests(false)
-          setIsHideCirclesView(false)
-          getMemberDetails()
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    const onSuccess = () => {
+      setIsRejectTransportRequest(false)
+      setIsShowTransportationRequests(false)
+      setIsHideCirclesView(false)
+      queryClient.invalidateQueries({ queryKey: circleKeys.all })
+    }
+    const onError = (error: any) => {
+      logger.debug(error)
+    }
+    if (transportRequestData.type === 'Event') {
+      eventRejectMutation.mutate(params, { onSuccess, onError })
+    } else {
+      rejectTransportMutation.mutate(params, { onSuccess, onError })
+    }
   }
   const showRequestModal = () => {
     return (
@@ -363,7 +325,6 @@ export function CirclesListScreen() {
                     title={'Reject'}
                     variant="default"
                     onPress={() => {
-                      // approveRejectTrasportRequest(data, false)
                       setTransportRequestData(data)
                       setIsRejectTransportRequest(true)
                       setIsShowTransportationRequests(false)
@@ -425,7 +386,13 @@ export function CirclesListScreen() {
   }
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader
+        loading={
+          isMemberDetailsLoading ||
+          isMutating ||
+          (transportMemberId !== '' && isTransportFetching)
+        }
+      />
       <View className="z-50 mr-[30] mt-[30] flex-row justify-end">
         <TouchableOpacity
           className="h-[30px] w-[30px] items-center justify-center rounded-full bg-blue-100"
@@ -441,7 +408,6 @@ export function CirclesListScreen() {
           {memberList.map((data: any, index: number) => {
             return (
               <View key={index}>
-                {/* <CircleCard data={data} refreshPage={refreshPage}></CircleCard> */}
                 <CircleCard
                   data={data}
                   index={index}

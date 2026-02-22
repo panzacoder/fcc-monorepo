@@ -1,79 +1,62 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_CALENDER_ITEMS } from 'app/utils/urlConstants'
+import { useCalendarItems } from 'app/data/dashboard'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 export function CalendarScreen() {
   const calendarPrivilegesRef = useRef<any>({})
-  const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowAddModal, setIsShowAddModal] = useState(false)
   const [calenderEvents, setCalenderEvents] = useState([])
+  const [currentMonth, setCurrentMonth] = useState(
+    String(moment().format('MMM')).toUpperCase()
+  )
+  const [currentYear, setCurrentYear] = useState(
+    String(moment().format('YYYY')).toUpperCase()
+  )
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
-  let currentMonth = String(moment().format('MMM')).toUpperCase()
-  let currentYear = String(moment().format('YYYY')).toUpperCase()
-  const getCalenderItemsFromServer = useCallback(
-    async (currentMonth: any, currentYear: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_CALENDER_ITEMS}`
-      let dataObject = {
-        header: header,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        month: currentMonth,
-        year: currentYear
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.domainObjectPrivileges) {
-              calendarPrivilegesRef.current = data.data.allowedDomainObjects
-                ? data.data.allowedDomainObjects
-                : {}
-            }
-            setCalenderEvents(
-              data.data.calenderItemList ? data.data.calenderItemList : []
-            )
-            setIsDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
+
+  const { data: calendarData, isLoading } = useCalendarItems(header, {
+    memberId: memberData.member ? memberData.member : '',
+    month: currentMonth,
+    year: currentYear
+  })
+
   useEffect(() => {
-    getCalenderItemsFromServer(currentMonth, currentYear)
-  }, [])
-  async function handleCurrentMonthChange(currentMonth: any) {
-    // console.log('in handleCurrentMonthChange', JSON.parse(currentMonth))
+    if (calendarData) {
+      if (calendarData.domainObjectPrivileges) {
+        calendarPrivilegesRef.current = calendarData.allowedDomainObjects
+          ? calendarData.allowedDomainObjects
+          : {}
+      }
+      setCalenderEvents(
+        calendarData.calenderItemList ? calendarData.calenderItemList : []
+      )
+      setIsDataReceived(true)
+    }
+  }, [calendarData])
+
+  function handleCurrentMonthChange(currentMonth: any) {
     let changedMonth = moment(currentMonth.dateString).format('MMM')
     let changedYear = moment(currentMonth.dateString).format('YYYY')
-    await getCalenderItemsFromServer(changedMonth, changedYear)
+    setCurrentMonth(changedMonth)
+    setCurrentYear(changedYear)
   }
   const showAddModal = () => {
     return (

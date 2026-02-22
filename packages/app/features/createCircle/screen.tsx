@@ -1,20 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { View, Alert, Platform } from 'react-native'
+import { View, Alert } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { useAppSelector } from 'app/redux/hooks'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  FIND_CIRCLE,
-  JOIN_CIRCLE,
-  CREATE_CIRCLE,
-  CREATE_CIRCLE_NO_EMAIL
-} from 'app/utils/urlConstants'
+import { useFindCircle, useJoinCircle, useCreateCircle } from 'app/data/circle'
 import { Feather } from 'app/ui/icons'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { Button } from 'app/ui/button'
@@ -64,7 +57,6 @@ export function CreateCircleScreen() {
       }
     }
   })
-  const [isLoading, setLoading] = useState(false)
   const [isShowBackView, setIsShowBackView] = useState(true)
   const [isCircleExists, setIsCircleExists] = useState(false)
   const [isShowMemberModal, setIsShowMemberModal] = useState(false)
@@ -76,10 +68,38 @@ export function CreateCircleScreen() {
   const [circleDetails, setCircleDetails] = useState({}) as any
   const [isYesNoClicked, setIsYesNoClicked] = useState(true)
   const [isFirstTime, setIsFirstTime] = useState(true)
+  const [findEmail, setFindEmail] = useState('')
   const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
 
-  useEffect(() => {}, [])
+  const { data: findCircleData, isLoading: isFindLoading } = useFindCircle(
+    header,
+    { email: findEmail }
+  )
+
+  const joinCircleMutation = useJoinCircle(header)
+  const createCircleMutation = useCreateCircle(header)
+
+  useEffect(() => {
+    if (findEmail && findCircleData !== undefined) {
+      logger.debug('data', JSON.stringify(findCircleData))
+      setIsCircleExists(findCircleData !== null)
+      setCircleDetails(findCircleData !== null ? findCircleData : {})
+      if (findCircleData !== null) {
+        const found = findCircleData as any
+        reset({
+          firstName: found.firstName ? found.firstName : '',
+          lastName: found.lastName ? found.lastName : ''
+        })
+      }
+    }
+  }, [findCircleData, findEmail])
+
+  const isLoading =
+    isFindLoading ||
+    joinCircleMutation.isPending ||
+    createCircleMutation.isPending
+
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName: '',
@@ -136,52 +156,15 @@ export function CreateCircleScreen() {
         timeZoneIdRef.current = value.id
       }
     }
-
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  async function findCircle(email: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${FIND_CIRCLE}`
-    let dataObject = {
-      header: header,
-      member: {
-        email: email
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          logger.debug('data', JSON.stringify(data))
-          setIsCircleExists(data.data !== null ? true : false)
-          setCircleDetails(data.data !== null ? data.data : {})
-          if (data.data !== null) {
-            reset({
-              firstName: data.data.firstName ? data.data.firstName : '',
-              lastName: data.data.lastName ? data.data.lastName : ''
-            })
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }
-  async function sendRequest(formData: Schema) {
-    setLoading(true)
-    let url = `${BASE_URL}${JOIN_CIRCLE}`
-    let dataObject: any = {
-      header: header
-    }
+  function sendRequest(formData: Schema) {
+    let memberVo: any
     if (isCircleExists) {
-      dataObject.memberVo = {
+      memberVo = {
         id: circleDetails.id ? circleDetails.id : ''
       }
     } else {
-      dataObject.memberVo = {
+      memberVo = {
         id: '',
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -190,46 +173,36 @@ export function CreateCircleScreen() {
         address: selectedAddressRef.current.address
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    joinCircleMutation.mutate(
+      { memberVo },
+      {
+        onSuccess: () => {
           fullNameRef.current = formData.firstName + ' ' + formData.lastName
           setIsShowBackView(false)
           setIsShowMemberModal(true)
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to send request')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
-  async function createCircle(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    url = isYesNoClicked
-      ? `${BASE_URL}${CREATE_CIRCLE}`
-      : `${BASE_URL}${CREATE_CIRCLE_NO_EMAIL}`
+  function createCircle(formData: Schema) {
     selectedAddressRef.current.address.timezone = {
       id: timeZoneIdRef.current
     }
-    let dataObject = {
-      header: header,
-      memberVo: {
-        id: '',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        email: isYesNoClicked ? emailRef.current : null,
-        address: selectedAddressRef.current.address
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    createCircleMutation.mutate(
+      {
+        memberVo: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          email: isYesNoClicked ? emailRef.current : null,
+          address: selectedAddressRef.current.address
+        }
+      },
+      {
+        onSuccess: () => {
           fullNameRef.current = formData.firstName + ' ' + formData.lastName
           setIsShowBackView(false)
           if (isYesNoClicked) {
@@ -237,14 +210,12 @@ export function CreateCircleScreen() {
           } else {
             setIsShowCaregiverModalWithoutEmail(true)
           }
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to create circle')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const showMemberModal = () => {
     return (
@@ -444,6 +415,7 @@ export function CreateCircleScreen() {
                       setIsYesNoClicked(false)
                       setCircleDetails({})
                       setIsCircleExists(false)
+                      setFindEmail('')
                     }}
                   />
                 </View>
@@ -467,7 +439,7 @@ export function CreateCircleScreen() {
                               }}
                               onBlur={() => {
                                 if (emailRef.current !== '') {
-                                  findCircle(emailRef.current)
+                                  setFindEmail(emailRef.current)
                                 }
                               }}
                             />

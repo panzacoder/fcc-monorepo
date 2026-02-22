@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   View,
   Alert,
@@ -14,26 +14,28 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import moment from 'moment'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_APPOINTMENT_DETAILS,
-  DELETE_APPOINTMENT_REMINDER,
-  CREATE_APPOINTMENT_REMINDER,
-  UPDATE_APPOINTMENT_REMINDER,
-  CREATE_APPOINTMENT_NOTE,
-  DELETE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_NOTE,
-  UPDATE_APPOINTMENT_STATUS,
-  DELETE_APPOINTMENT,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD,
-  RESEND_TRANSPORTATION_REQUEST,
-  DELETE_TRANSPORTATION,
-  CANCEL_TRANSPORTATION_REQUEST,
-  SEND_CALENDAR_INVITE,
-  GET_MEMBER_DETAILS
-} from 'app/utils/urlConstants'
+  useAppointmentDetails as useAppointmentDetailsQuery,
+  useDeleteAppointment,
+  useCreateAppointmentNote,
+  useUpdateAppointmentNote,
+  useDeleteAppointmentNote,
+  useCreateAppointmentReminder,
+  useUpdateAppointmentReminder,
+  useDeleteAppointmentReminder,
+  useUpdateAppointmentStatus,
+  useSendCalendarInvite
+} from 'app/data/appointments'
+import { useAllMemberDetails } from 'app/data/circle'
+import {
+  useCreateMessageThread,
+  useThreadParticipants
+} from 'app/data/messages'
+import {
+  useDeleteTransportation,
+  useResendTransportationRequest,
+  useCancelTransportationRequest
+} from 'app/data/transportation'
 import { useLocalSearchParams } from 'expo-router'
 import {
   formatTimeToUserLocalTime,
@@ -71,7 +73,6 @@ export function AppointmentDetailsScreen() {
     : {}
   // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
-  const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
@@ -92,95 +93,86 @@ export function AppointmentDetailsScreen() {
   const [remindersList, setRemindersList] = useState([])
   const [transportationList, setTransportationList] = useState([])
   const [appointmentDetails, setAppointmentDetails] = useState({}) as any
-  const getAppointmentDetails = useCallback(
-    async (isFromCreateThread: any, noteData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_APPOINTMENT_DETAILS}`
-      let dataObject = {
-        header: header,
-        appointment: {
-          id: appointmentInfo.id ? appointmentInfo.id : ''
+  const appointmentId = appointmentInfo.id ? Number(appointmentInfo.id) : 0
+  const {
+    data: appointmentDetailsData,
+    isLoading: isDetailsLoading,
+    refetch: refetchDetails
+  } = useAppointmentDetailsQuery(header, appointmentId)
+
+  const deleteAppointmentMutation = useDeleteAppointment(header)
+  const createNoteMutation = useCreateAppointmentNote(header)
+  const updateNoteMutation = useUpdateAppointmentNote(header)
+  const deleteNoteMutation = useDeleteAppointmentNote(header)
+  const createReminderMutation = useCreateAppointmentReminder(header)
+  const updateReminderMutation = useUpdateAppointmentReminder(header)
+  const deleteReminderMutation = useDeleteAppointmentReminder(header)
+  const updateStatusMutation = useUpdateAppointmentStatus(header)
+  const sendCalendarInviteMutation = useSendCalendarInvite(header)
+  const createMessageThreadMutation = useCreateMessageThread(header)
+  const deleteTransportationMutation = useDeleteTransportation(header)
+  const resendTransportationMutation = useResendTransportationRequest(header)
+  const cancelTransportationMutation = useCancelTransportationRequest(header)
+  const { data: allMemberDetailsData } = useAllMemberDetails(header)
+
+  const { refetch: refetchParticipants } = useThreadParticipants(header, {
+    member: { id: memberData.member ? memberData.member : '' },
+    messageThreadType: { type: 'Appointment' }
+  })
+
+  useEffect(() => {
+    if (allMemberDetailsData) {
+      const memberDetailsResult = allMemberDetailsData as any
+      if (memberDetailsResult.memberList) {
+        memberDetailsResult.memberList.forEach((member: any) => {
+          if (memberData.member === member.member) {
+            setMemberData(member)
+            logger.debug('setMemberData', JSON.stringify(member))
+          }
+        })
+      }
+    }
+  }, [allMemberDetailsData])
+
+  useEffect(() => {
+    if (appointmentDetailsData) {
+      const data = appointmentDetailsData as any
+      if (data.domainObjectPrivileges) {
+        appointmentPrivilegesRef.current = data.domainObjectPrivileges
+          .Appointment
+          ? data.domainObjectPrivileges.Appointment
+          : {}
+        notePrivilegesRef.current = data.domainObjectPrivileges.APPOINTMENTNOTE
+          ? data.domainObjectPrivileges.APPOINTMENTNOTE
+          : data.domainObjectPrivileges.AppointmentNote
+            ? data.domainObjectPrivileges.AppointmentNote
+            : {}
+        transportationPrivilegesRef.current = data.domainObjectPrivileges
+          .APPOINTMENTTRANSPORTATION
+          ? data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
+          : data.domainObjectPrivileges.AppointmentTransportation
+            ? data.domainObjectPrivileges.AppointmentTransportation
+            : {}
+      }
+      if (
+        data.appointmentWithPreviousAppointment &&
+        data.appointmentWithPreviousAppointment.appointment
+      ) {
+        const details = data.appointmentWithPreviousAppointment.appointment
+        setAppointmentDetails(details)
+        if (details.noteList) {
+          setNotesList(details.noteList)
+        }
+        if (details.reminderList) {
+          setRemindersList(details.reminderList)
+        }
+        if (details.transportationList) {
+          setTransportationList(details.transportationList)
         }
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('appointmentInfo', '' + JSON.stringify(data.data))
-            if (data.data.domainObjectPrivileges) {
-              appointmentPrivilegesRef.current = data.data
-                .domainObjectPrivileges.Appointment
-                ? data.data.domainObjectPrivileges.Appointment
-                : {}
-              notePrivilegesRef.current = data.data.domainObjectPrivileges
-                .APPOINTMENTNOTE
-                ? data.data.domainObjectPrivileges.APPOINTMENTNOTE
-                : data.data.domainObjectPrivileges.AppointmentNote
-                  ? data.data.domainObjectPrivileges.AppointmentNote
-                  : {}
-              transportationPrivilegesRef.current = data.data
-                .domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                ? data.data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-                : data.data.domainObjectPrivileges.AppointmentTransportation
-                  ? data.data.domainObjectPrivileges.AppointmentTransportation
-                  : {}
-            }
-            if (
-              data.data.appointmentWithPreviousAppointment &&
-              data.data.appointmentWithPreviousAppointment.appointment
-            ) {
-              let details =
-                data.data.appointmentWithPreviousAppointment.appointment
-              setAppointmentDetails(details)
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .noteList
-              ) {
-                let notesList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .noteList
-                setNotesList(notesList)
-              }
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .reminderList
-              ) {
-                let reminderList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .reminderList
-                setRemindersList(reminderList)
-              }
-              if (
-                data.data.appointmentWithPreviousAppointment.appointment
-                  .transportationList
-              ) {
-                let transportationList =
-                  data.data.appointmentWithPreviousAppointment.appointment
-                    .transportationList
-                setTransportationList(transportationList)
-              }
-            }
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'Appointment',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(noteData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setIsDataReceived(true)
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
-    },
-    []
-  )
+      setIsDataReceived(true)
+    }
+  }, [appointmentDetailsData])
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -190,36 +182,7 @@ export function AppointmentDetailsScreen() {
     )
     return true
   }
-  const getMemberDetails = useCallback(async () => {
-    let url = `${BASE_URL}${GET_MEMBER_DETAILS}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          data.data.memberList.map((data: any, index: any) => {
-            if (memberData.member === data.member) {
-              setMemberData(data)
-              logger.debug('setMemberData', JSON.stringify(data))
-            }
-          })
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
   useEffect(() => {
-    getMemberDetails()
-    if (!isAddNote) {
-      getAppointmentDetails(false, noteData)
-    }
-
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -330,37 +293,29 @@ export function AppointmentDetailsScreen() {
     setIsMessageThread(false)
   }
   async function sendInvite() {
-    setLoading(true)
-    let url = `${BASE_URL}${SEND_CALENDAR_INVITE}`
-    let dataObject = {
-      header: header,
-      appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    sendCalendarInviteMutation.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : ''
+        }
+      },
+      {
+        onSuccess: () => {
           Alert.alert(
             '',
             `Send to\n${
               memberData.email ? memberData.email : ''
             } . \n\nCheck your email for the appointment invite. `
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to send calendar invite')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   function createMessageThread(subject: any, noteData: any) {
-    setLoading(true)
     setNoteData(noteData)
-    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -372,127 +327,91 @@ export function AppointmentDetailsScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        subject: subject,
-        member: memberData.member ? memberData.member : '',
-        noteId: noteData.id ? noteData.id : '',
-        type: {
-          type: 'Appointment'
-        },
-        participantList: list,
-        appointmentNote: {
-          id: noteData.id ? noteData.id : ''
-        },
-        messageList: []
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsMessageThread(false)
-          getAppointmentDetails(true, noteData)
-        } else {
-          Alert.alert('', data.message)
+    createMessageThreadMutation.mutate(
+      {
+        messageThread: {
+          subject: subject,
+          member: memberData.member ? memberData.member : '',
+          noteId: noteData.id ? noteData.id : '',
+          type: {
+            type: 'Appointment'
+          },
+          participantList: list,
+          appointmentNote: {
+            id: noteData.id ? noteData.id : ''
+          },
+          messageList: []
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: () => {
+          setIsMessageThread(false)
+          refetchDetails()
+          router.push(
+            formatUrl('/circles/noteMessage', {
+              component: 'Appointment',
+              memberData: JSON.stringify(memberData),
+              noteData: JSON.stringify(noteData)
+            })
+          )
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to create message thread')
+        }
+      }
+    )
   }
   function isParticipantSelected(index: any) {
     participantsList[index].isSelected = !participantsList[index].isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
-  async function getThreadParticipants(noteData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      messageThreadType: {
-        type: 'Appointment'
+  function fetchThreadParticipants(noteData: any) {
+    refetchParticipants().then(({ data }) => {
+      if (data) {
+        const list = (data as any[]).map((item: any) => {
+          let object = item
+          object.isSelected = false
+          return object
+        })
+        setParticipantsList(list)
+        setNoteData(noteData)
+        setIsMessageThread(true)
       }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            object.isSelected = false
-            return object
-          })
-          setParticipantsList(list)
-          setNoteData(noteData)
-          setIsMessageThread(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    })
   }
   async function deleteAppointment() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT}`
-    let dataObject = {
-      header: header,
-      appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+    deleteAppointmentMutation.mutate(
+      {
+        appointment: { id: appointmentDetails.id ? appointmentDetails.id : 0 }
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/appointmentsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete appointment')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function deleteNote(noteId: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT_NOTE}`
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: noteId
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getAppointmentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+    deleteNoteMutation.mutate(
+      { appointmentNote: { id: noteId } },
+      {
+        onSuccess: () => {
+          refetchDetails()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete note')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function createUpdateNote(
     occurance: any,
@@ -500,159 +419,130 @@ export function AppointmentDetailsScreen() {
     title: any,
     noteData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      appointmentNote: {
-        id: '',
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : ''
-        },
-        occurance: {
-          occurance: occurance
-        },
-        note: noteDetails,
-        shortDescription: title
-      }
+    const appointmentNotePayload: Record<string, unknown> = {
+      appointment: {
+        id: appointmentDetails.id ? appointmentDetails.id : ''
+      },
+      occurance: {
+        occurance: occurance
+      },
+      note: noteDetails,
+      shortDescription: title
     }
+
     if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_NOTE}`
+      createNoteMutation.mutate(
+        { appointmentNote: appointmentNotePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create note')
+          }
+        }
+      )
     } else {
-      dataObject.appointmentNote.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_NOTE}`
+      appointmentNotePayload.id = noteData.id ? noteData.id : ''
+      updateNoteMutation.mutate(
+        { appointmentNote: appointmentNotePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update note')
+          }
+        }
+      )
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddNote(false)
-          getAppointmentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }
-  async function createUpdateTransportation(url: any, dataObject: any) {
-    setLoading(true)
-    setIsShowTransportation(false)
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          cancelClicked()
-          getAppointmentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   async function createUpdateReminder(
     title: string,
     date: any,
     reminderData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: '',
-        content: title,
-        date: date,
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : ''
-        }
+    const reminderPayload: Record<string, unknown> = {
+      content: title,
+      date: date,
+      appointment: {
+        id: appointmentDetails.id ? appointmentDetails.id : ''
       }
-    }
-    if (_.isEmpty(reminderData)) {
-      url = `${BASE_URL}${CREATE_APPOINTMENT_REMINDER}`
-    } else {
-      url = `${BASE_URL}${UPDATE_APPOINTMENT_REMINDER}`
-      dataObject.reminder.id = reminderData.id
     }
 
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // setTransportationData(data.data ? data.data : {})
-          setIsAddReminder(false)
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-        } else {
-          Alert.alert('', data.message)
+    if (_.isEmpty(reminderData)) {
+      createReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create reminder')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      reminderPayload.id = reminderData.id
+      updateReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setIsAddReminder(false)
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update reminder')
+          }
+        }
+      )
+    }
   }
   async function updateStatus(status: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_APPOINTMENT_STATUS}`
-    let dataObject = {
-      header: header,
-      appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : '',
-        status: {
-          status: status
+    updateStatusMutation.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : '',
+          status: {
+            status: status
+          },
+          member: {
+            id: memberData.member ? memberData.member : ''
+          }
+        }
+      },
+      {
+        onSuccess: () => {
+          refetchDetails()
         },
-        member: {
-          id: memberData.member ? memberData.member : ''
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update status')
         }
       }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   async function deleteReminder(reminderData: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_APPOINTMENT_REMINDER}`
-    let dataObject = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : '',
-        appointment: {
-          id: reminderData.apointmentId ? reminderData.apointmentId : ''
+    deleteReminderMutation.mutate(
+      {
+        reminder: {
+          id: reminderData.id ? reminderData.id : '',
+          appointment: {
+            id: reminderData.apointmentId ? reminderData.apointmentId : ''
+          }
+        }
+      },
+      {
+        onSuccess: (data: any) => {
+          setRemindersList(data?.reminderList ? data.reminderList : [])
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete reminder')
         }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   const editNote = (noteData: any) => {
     setNoteData(noteData)
@@ -669,7 +559,7 @@ export function AppointmentDetailsScreen() {
         })
       )
     } else {
-      getThreadParticipants(noteData)
+      fetchThreadParticipants(noteData)
     }
   }
   const editReminder = (remiderData: any) => {
@@ -680,59 +570,56 @@ export function AppointmentDetailsScreen() {
     count: any,
     transportData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {}
+    const transportId = transportData.id ? transportData.id : ''
     if (count === 0) {
-      url = `${BASE_URL}${DELETE_TRANSPORTATION}`
+      deleteTransportationMutation.mutate(
+        { transportation: { id: transportId } },
+        {
+          onSuccess: () => {
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to delete transportation')
+          }
+        }
+      )
     } else if (count === 1) {
-      url = `${BASE_URL}${RESEND_TRANSPORTATION_REQUEST}`
+      resendTransportationMutation.mutate(
+        { transportation: { id: transportId } },
+        {
+          onSuccess: () => {
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert(
+              '',
+              error.message || 'Failed to resend transportation request'
+            )
+          }
+        }
+      )
     } else {
       setTransportationList([])
-      url = `${BASE_URL}${CANCEL_TRANSPORTATION_REQUEST}`
-    }
-    if (count === 0 || count === 1) {
-      dataObject = {
-        header: header,
-        transportation: {
-          id: transportData.id ? transportData.id : ''
-        }
-      }
-    } else {
-      dataObject = {
-        header: header,
-        transportationVo: {
-          id: transportData.id ? transportData.id : ''
-        }
-      }
-    }
-
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          refreshData()
-          if (count !== 0) {
-            Alert.alert('', data.message)
+      cancelTransportationMutation.mutate(
+        { transportationVo: { id: transportId } },
+        {
+          onSuccess: () => {
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert(
+              '',
+              error.message || 'Failed to cancel transportation request'
+            )
           }
-        } else {
-          Alert.alert('', data.message)
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    }
   }
   const editTransportation = (transportationData: any) => {
     // console.log('remiderData', JSON.stringify(transportationData))
     setTransportationData(transportationData)
     setIsAddTransportation(true)
-  }
-  async function refreshData() {
-    getAppointmentDetails(false, noteData)
   }
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
@@ -773,9 +660,24 @@ export function AppointmentDetailsScreen() {
     )
   }
 
+  const isMutating =
+    deleteAppointmentMutation.isPending ||
+    createNoteMutation.isPending ||
+    updateNoteMutation.isPending ||
+    deleteNoteMutation.isPending ||
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending ||
+    updateStatusMutation.isPending ||
+    sendCalendarInviteMutation.isPending ||
+    createMessageThreadMutation.isPending ||
+    deleteTransportationMutation.isPending ||
+    resendTransportationMutation.isPending ||
+    cancelTransportationMutation.isPending
+
   return (
     <View className="flex-1 ">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isDetailsLoading || isMutating} />
       <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
         <View className=" h-full w-full flex-1 py-2">
@@ -1202,7 +1104,6 @@ export function AppointmentDetailsScreen() {
             }
             appointmentId={appointmentDetails.id}
             cancelClicked={cancelClicked}
-            createUpdateTransportation={createUpdateTransportation}
           />
         </View>
       ) : (

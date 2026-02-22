@@ -4,16 +4,6 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  CREATE_TRANSPORTATION_REMINDER,
-  UPDATE_TRANSPORTATION_REMINDER,
-  DELETE_TRANSPORTATION_REMINDER,
-  CREATE_TRANSPORTATION_REMINDER_EVENT,
-  UPDATE_TRANSPORTATION_REMINDER_EVENT,
-  DELETE_TRANSPORTATION_REMINDER_EVENT
-} from 'app/utils/urlConstants'
 import { convertTimeToUserLocalTime, getAddressFromObject } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
@@ -21,6 +11,14 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { AddEditReminder } from 'app/ui/addEditReminder'
 import { Reminder } from 'app/ui/reminder'
 import { logger } from 'app/utils/logger'
+import {
+  useCreateTransportationReminder,
+  useUpdateTransportationReminder,
+  useDeleteTransportationReminder,
+  useCreateTransportationReminderEvent,
+  useUpdateTransportationReminderEvent,
+  useDeleteTransportationReminderEvent
+} from 'app/data/transportation'
 export const Transportation = ({
   component,
   data,
@@ -31,7 +29,6 @@ export const Transportation = ({
 
   const [remindersData, setReminderData] = useState({})
   const [transportationData, setTransportationData] = useState(data ? data : {})
-  const [isLoading, setLoading] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
@@ -40,10 +37,8 @@ export const Transportation = ({
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  // console.log('transportationData', JSON.stringify(data))
   let list: object[] = []
   if (transportationData.reminderList) {
-    // reminderList = transportationData.reminderList
     list = transportationData.reminderList
   }
   const [remindersList, setRemindersList] = useState(list)
@@ -74,6 +69,25 @@ export const Transportation = ({
   let address = transportationData.address
     ? getAddressFromObject(transportationData.address)
     : ''
+
+  const createReminderMutation = useCreateTransportationReminder(header)
+  const updateReminderMutation = useUpdateTransportationReminder(header)
+  const deleteReminderMutation = useDeleteTransportationReminder(header)
+  const createReminderEventMutation =
+    useCreateTransportationReminderEvent(header)
+  const updateReminderEventMutation =
+    useUpdateTransportationReminderEvent(header)
+  const deleteReminderEventMutation =
+    useDeleteTransportationReminderEvent(header)
+
+  const isLoading =
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending ||
+    createReminderEventMutation.isPending ||
+    updateReminderEventMutation.isPending ||
+    deleteReminderEventMutation.isPending
+
   async function callDeleteResendCancelTransportation(count: any) {
     deleteResendCancelTransportation(count, transportationData)
   }
@@ -109,102 +123,126 @@ export const Transportation = ({
     setIsAddReminder(false)
   }
   async function deleteReminder(reminderData: any) {
-    setLoading(true)
-    let url = ''
-    if (component === 'Appointment') {
-      url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER}`
-    } else {
-      url = `${BASE_URL}${DELETE_TRANSPORTATION_REMINDER_EVENT}`
-    }
-
-    let dataObject: any = {
-      header: header,
-      reminder: {
-        id: reminderData.id ? reminderData.id : ''
-      }
+    let reminderPayload: any = {
+      id: reminderData.id ? reminderData.id : ''
     }
     if (component === 'Appointment') {
-      dataObject.reminder.appointmentTransportation = {
+      reminderPayload.appointmentTransportation = {
         id: transportationData.id ? transportationData.id : ''
       }
-    } else {
-      dataObject.reminder.eventTransportation = {
-        id: transportationData.id ? transportationData.id : ''
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setTransportationData(data.data ? data.data : {})
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-          setIsRender(!isRender)
-        } else {
-          Alert.alert('', data.message)
+      deleteReminderMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setTransportationData(data ? data : {})
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+            setIsRender(!isRender)
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to delete reminder')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      reminderPayload.eventTransportation = {
+        id: transportationData.id ? transportationData.id : ''
+      }
+      deleteReminderEventMutation.mutate(
+        { reminder: reminderPayload },
+        {
+          onSuccess: (data: any) => {
+            setTransportationData(data ? data : {})
+            setRemindersList(data?.reminderList ? data.reminderList : [])
+            setIsRender(!isRender)
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to delete reminder')
+          }
+        }
+      )
+    }
   }
   async function createUpdateReminder(
     title: string,
     date: any,
     reminderData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject: any = {
-      header: header,
-      reminder: {
-        content: title,
-        date: date
-      }
+    let reminderPayload: any = {
+      content: title,
+      date: date
     }
-    if (_.isEmpty(reminderData)) {
-      if (component === 'Appointment') {
-        url = `${BASE_URL}${CREATE_TRANSPORTATION_REMINDER}`
-      } else {
-        url = `${BASE_URL}${CREATE_TRANSPORTATION_REMINDER_EVENT}`
-      }
-    } else {
-      if (component === 'Appointment') {
-        url = `${BASE_URL}${UPDATE_TRANSPORTATION_REMINDER}`
-      } else {
-        url = `${BASE_URL}${UPDATE_TRANSPORTATION_REMINDER_EVENT}`
-      }
-      dataObject.reminder.id = reminderData.id
+    if (!_.isEmpty(reminderData)) {
+      reminderPayload.id = reminderData.id
     }
     if (component === 'Appointment') {
-      dataObject.reminder.appointmentTransportation = {
+      reminderPayload.appointmentTransportation = {
         id: transportationData.id ? transportationData.id : ''
+      }
+      if (_.isEmpty(reminderData)) {
+        createReminderMutation.mutate(
+          { reminder: reminderPayload },
+          {
+            onSuccess: (data: any) => {
+              setTransportationData(data ? data : {})
+              setIsAddReminder(false)
+              setRemindersList(data?.reminderList ? data.reminderList : [])
+            },
+            onError: (error) => {
+              Alert.alert('', error.message || 'Failed to create reminder')
+            }
+          }
+        )
+      } else {
+        updateReminderMutation.mutate(
+          { reminder: reminderPayload },
+          {
+            onSuccess: (data: any) => {
+              setTransportationData(data ? data : {})
+              setIsAddReminder(false)
+              setRemindersList(data?.reminderList ? data.reminderList : [])
+            },
+            onError: (error) => {
+              Alert.alert('', error.message || 'Failed to update reminder')
+            }
+          }
+        )
       }
     } else {
-      dataObject.reminder.eventTransportation = {
+      reminderPayload.eventTransportation = {
         id: transportationData.id ? transportationData.id : ''
       }
+      if (_.isEmpty(reminderData)) {
+        createReminderEventMutation.mutate(
+          { reminder: reminderPayload },
+          {
+            onSuccess: (data: any) => {
+              setTransportationData(data ? data : {})
+              setIsAddReminder(false)
+              setRemindersList(data?.reminderList ? data.reminderList : [])
+            },
+            onError: (error) => {
+              Alert.alert('', error.message || 'Failed to create reminder')
+            }
+          }
+        )
+      } else {
+        updateReminderEventMutation.mutate(
+          { reminder: reminderPayload },
+          {
+            onSuccess: (data: any) => {
+              setTransportationData(data ? data : {})
+              setIsAddReminder(false)
+              setRemindersList(data?.reminderList ? data.reminderList : [])
+            },
+            onError: (error) => {
+              Alert.alert('', error.message || 'Failed to update reminder')
+            }
+          }
+        )
+      }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setTransportationData(data.data ? data.data : {})
-          setIsAddReminder(false)
-          setRemindersList(data.data.reminderList ? data.data.reminderList : [])
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   const editReminder = (remiderData: any) => {
-    // console.log('remiderData', JSON.stringify(remiderData))
     setReminderData(remiderData)
     setIsAddReminder(true)
   }

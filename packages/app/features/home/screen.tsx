@@ -18,18 +18,7 @@ import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
-import { CallPostService } from 'app/utils/fetchServerData'
 import messaging from '@react-native-firebase/messaging'
-import {
-  BASE_URL,
-  GET_WEEK_DETAILS,
-  GET_TRANSPORTATION_REQUESTS,
-  REJECT_TRANSPORT,
-  APPROVE_TRANSPORT,
-  EVENT_ACCEPT_TRANSPORTATION_REQUEST,
-  EVENT_REJECT_TRANSPORTATION_REQUEST,
-  UPDATE_FCM_TOKEN
-} from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
 import { useForm } from 'react-hook-form'
@@ -41,6 +30,19 @@ import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import Constants from 'expo-constants'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+  useWeekDetails,
+  useUpdateFcmToken,
+  dashboardKeys
+} from 'app/data/dashboard'
+import {
+  useTransportationRequests,
+  useApproveTransport,
+  useRejectTransport,
+  useEventAcceptTransportationRequest,
+  useEventRejectTransportationRequest
+} from 'app/data/transportation'
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -80,12 +82,12 @@ export function HomeScreen() {
     memberNamesList.push(fullName)
   }
   dispatch(memberNamesAction.setMemberNames(memberNamesList))
-  const [isLoading, setLoading] = useState(false)
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] = useState({}) as any
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
   const [transportMemberName, setTransportMemberName] = useState('')
+  const [transportMemberId, setTransportMemberId] = useState('')
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
     useState(false)
   const [upcomingSentence, setUpcomingSentence] = useState('')
@@ -98,54 +100,80 @@ export function HomeScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const getWeekDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_WEEK_DETAILS}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let memberList = data.data.memberList ? data.data.memberList : []
-          setMemberList(memberList)
-          logger.debug('memberList', JSON.stringify(memberList))
-          memberList.map((data: any) => {
-            if (
-              data.upcomingAppointment ||
-              data.recentIncident ||
-              data.upcomingEvent
-            ) {
-              setIsWeekDataAvailable(true)
-            }
-            let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
-            if (memberNamesList.includes(fullName) === false) {
-              memberNamesList.push(fullName)
-            }
-          })
-          dispatch(memberNamesAction.setMemberNames(memberNamesList))
-          let sentence = ''
-          sentence +=
-            data.data.upcomingAppointmentCount &&
-            data.data.upcomingAppointmentCount > 0
-              ? data.data.upcomingAppointmentCount + ' Appointments, '
-              : ''
-          sentence +=
-            data.data.upcomingEventCount && data.data.upcomingEventCount > 0
-              ? data.data.upcomingEventCount + ' Events'
-              : ''
-          setUpcomingSentence(sentence)
-          setDataReceived(true)
-        } else {
-          Alert.alert('', data.message)
+
+  const queryClient = useQueryClient()
+
+  const { data: weekDetailsData, isLoading: isWeekDetailsLoading } =
+    useWeekDetails(header)
+
+  const updateFcmTokenMutation = useUpdateFcmToken(header)
+
+  const {
+    data: transportData,
+    isLoading: isTransportLoading,
+    isFetching: isTransportFetching
+  } = useTransportationRequests(header, {
+    memberId: transportMemberId
+  })
+
+  const approveTransportMutation = useApproveTransport(header)
+  const rejectTransportMutation = useRejectTransport(header)
+  const eventAcceptMutation = useEventAcceptTransportationRequest(header)
+  const eventRejectMutation = useEventRejectTransportationRequest(header)
+
+  const isLoading =
+    isWeekDetailsLoading ||
+    (transportMemberId !== '' && isTransportFetching) ||
+    approveTransportMutation.isPending ||
+    rejectTransportMutation.isPending ||
+    eventAcceptMutation.isPending ||
+    eventRejectMutation.isPending ||
+    updateFcmTokenMutation.isPending
+
+  useEffect(() => {
+    if (weekDetailsData) {
+      let memberList = weekDetailsData.memberList
+        ? weekDetailsData.memberList
+        : []
+      setMemberList(memberList)
+      logger.debug('memberList', JSON.stringify(memberList))
+      memberList.map((data: any) => {
+        if (
+          data.upcomingAppointment ||
+          data.recentIncident ||
+          data.upcomingEvent
+        ) {
+          setIsWeekDataAvailable(true)
         }
-        setLoading(false)
+        let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
+        if (memberNamesList.includes(fullName) === false) {
+          memberNamesList.push(fullName)
+        }
       })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+      dispatch(memberNamesAction.setMemberNames(memberNamesList))
+      let sentence = ''
+      sentence +=
+        weekDetailsData.upcomingAppointmentCount &&
+        weekDetailsData.upcomingAppointmentCount > 0
+          ? weekDetailsData.upcomingAppointmentCount + ' Appointments, '
+          : ''
+      sentence +=
+        weekDetailsData.upcomingEventCount &&
+        weekDetailsData.upcomingEventCount > 0
+          ? weekDetailsData.upcomingEventCount + ' Events'
+          : ''
+      setUpcomingSentence(sentence)
+      setDataReceived(true)
+    }
+  }, [weekDetailsData])
+
+  useEffect(() => {
+    if (transportData && transportMemberId !== '') {
+      setTransportationList(transportData ? transportData : [])
+      setIsShowTransportationRequests(true)
+    }
+  }, [transportData, transportMemberId])
+
   function handleBackButtonClick() {
     BackHandler.exitApp()
     return true
@@ -162,26 +190,18 @@ export function HomeScreen() {
     } catch (e) {}
   }
   async function updateFcmToken(fcmToken: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_FCM_TOKEN}`
-    let dataObject = {
-      header: header,
-      appuserVo: {
-        fcmToken: fcmToken
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
+    updateFcmTokenMutation.mutate(
+      {
+        appuserVo: {
+          fcmToken: fcmToken
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onError: (error) => {
+          logger.debug(error)
+        }
+      }
+    )
   }
   const handleFcmMessage = useCallback(async () => {
     try {
@@ -268,7 +288,6 @@ export function HomeScreen() {
 
   useEffect(() => {
     getToken()
-    getWeekDetails()
 
     handleFcmMessage()
     registerForPushNotificationsAsync().then(
@@ -379,7 +398,6 @@ export function HomeScreen() {
     }
     const subscription = Notifications.addNotificationResponseReceivedListener(
       (response: any) => {
-        // Alert.alert('notification response', JSON.stringify(response))
         redirect(response.notification)
       }
     )
@@ -394,7 +412,6 @@ export function HomeScreen() {
   }, [])
 
   async function trasportationClicked(memberData: any) {
-    // console.log('trasportationClicked', JSON.stringify(memberData))
     let fullName = ''
     if (memberData.firstname) {
       fullName += memberData.firstname.trim() + ' '
@@ -403,59 +420,30 @@ export function HomeScreen() {
       fullName += memberData.lastname.trim()
     }
     setTransportMemberName(fullName)
-    setLoading(true)
-    let url = `${BASE_URL}${GET_TRANSPORTATION_REQUESTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setTransportationList(data.data ? data.data : [])
-          setIsShowTransportationRequests(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    setTransportMemberId(memberData.member ? memberData.member : '')
   }
   async function approveRejectTrasportRequest(transportData: any) {
-    setLoading(true)
-    let url = ''
-    if (transportData.type === 'Event') {
-      url = `${BASE_URL}${EVENT_ACCEPT_TRANSPORTATION_REQUEST}`
-    } else {
-      url = `${BASE_URL}${APPROVE_TRANSPORT}`
-    }
-    let dataObject = {
-      header: header,
-      transportationVo: {
+    const params = {
+      transport: {
         id: transportData.id ? transportData.id : '',
         reason: '',
         isApprove: true
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsShowTransportationRequests(false)
-          getWeekDetails()
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
+    const onSuccess = () => {
+      setIsShowTransportationRequests(false)
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.weekDetails()
       })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    }
+    const onError = (error: any) => {
+      logger.debug(error)
+    }
+    if (transportData.type === 'Event') {
+      eventAcceptMutation.mutate(params, { onSuccess, onError })
+    } else {
+      approveTransportMutation.mutate(params, { onSuccess, onError })
+    }
   }
   const showRequestModal = () => {
     return (
@@ -511,7 +499,6 @@ export function HomeScreen() {
                     title={'Reject'}
                     variant="default"
                     onPress={() => {
-                      // approveRejectTrasportRequest(data, false)
                       setTransportRequestData(data)
                       setIsRejectTransportRequest(true)
                       setIsShowTransportationRequests(false)
@@ -526,35 +513,27 @@ export function HomeScreen() {
     )
   }
   async function rejectRequest(formData: Schema) {
-    setLoading(true)
-    let url = ''
-    if (transportRequestData.type === 'Event') {
-      url = `${BASE_URL}${EVENT_REJECT_TRANSPORTATION_REQUEST}`
-    } else {
-      url = `${BASE_URL}${REJECT_TRANSPORT}`
-    }
-    let dataObject = {
-      header: header,
-      transportationVo: {
+    const params = {
+      transport: {
         id: transportRequestData.id ? transportRequestData.id : '',
         reason: formData.rejectReason,
         isApprove: false
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          setIsRejectTransportRequest(false)
-          getWeekDetails()
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
-        }
+    const onSuccess = () => {
+      setIsRejectTransportRequest(false)
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.weekDetails()
       })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    }
+    const onError = (error: any) => {
+      logger.debug(error)
+    }
+    if (transportRequestData.type === 'Event') {
+      eventRejectMutation.mutate(params, { onSuccess, onError })
+    } else {
+      rejectTransportMutation.mutate(params, { onSuccess, onError })
+    }
   }
   const shwoRejectModal = () => {
     return (

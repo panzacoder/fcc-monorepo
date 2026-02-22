@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -6,14 +6,12 @@ import { Button } from 'app/ui/button'
 import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import {
-  BASE_URL,
-  FIND_CAREGIVER_BY_EMAIL_PHONE,
-  CREATE_CAREGIVER,
-  UPDATE_CAREGIVER
-} from 'app/utils/urlConstants'
+  useFindCaregiverByEmailPhone,
+  useCreateCaregiver,
+  useUpdateCaregiver
+} from 'app/data/caregivers'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -55,17 +53,16 @@ export function AddEditCaregiverScreen() {
     (state) => state.staticDataState.staticData
   )
   const header = useAppSelector((state) => state.headerState.header)
-  const [isLoading, setLoading] = useState(false)
   const [memberId, setMemberId] = useState('')
   const [memberEmail, setMemberEmail] = useState('')
   const [isShowProfileInfo, setIsShowProfileInfo] = useState(false)
   const [isMemberFound, setIsMemberFound] = useState(false)
+  const [searchEmail, setSearchEmail] = useState('')
   const [status, setStatus] = useState(
     !_.isEmpty(caregiverDetails) && caregiverDetails.familyMemberMemberStatus
       ? caregiverDetails.familyMemberMemberStatus.status
       : ''
   )
-  // console.log('caregiverDetails', JSON.stringify(caregiverDetails))
   let fullName = ''
   if (!_.isEmpty(caregiverDetails)) {
     fullName += caregiverDetails.firstName ? caregiverDetails.firstName : ''
@@ -124,61 +121,60 @@ export function AddEditCaregiverScreen() {
     resolver: zodResolver(phoneSchema)
   })
 
-  async function findCaregiver() {
+  const { data: searchData, isFetching: isSearching } =
+    useFindCaregiverByEmailPhone(header, { email: searchEmail })
+
+  const createCaregiverMutation = useCreateCaregiver(header)
+  const updateCaregiverMutation = useUpdateCaregiver(header)
+
+  useEffect(() => {
+    if (!searchEmail) return
+    if (isSearching) return
+
+    if (searchData) {
+      setIsMemberFound(true)
+      let name = ''
+      name += (searchData as any).firstName ? (searchData as any).firstName : ''
+      name += (searchData as any).middleName
+        ? '' + (searchData as any).middleName
+        : ''
+      name += (searchData as any).lastName
+        ? ' ' + (searchData as any).lastName
+        : ''
+      setMemberName(name)
+      setMemberId((searchData as any).id ? (searchData as any).id : '')
+      setMemberEmail((searchData as any).email ? (searchData as any).email : '')
+      reset({
+        email: 'default',
+        firstName: 'default',
+        lastName: 'default'
+      })
+      reset1({
+        phone: 'default'
+      })
+    } else {
+      setIsMemberFound(false)
+    }
+  }, [searchData, isSearching, searchEmail])
+
+  const isMutating =
+    createCaregiverMutation.isPending || updateCaregiverMutation.isPending
+
+  function findCaregiver() {
     if (emailRef.current !== '') {
-      setLoading(true)
-      let url = `${BASE_URL}${FIND_CAREGIVER_BY_EMAIL_PHONE}`
-      let dataObject = {
-        header: header,
-        member: {
-          email: emailRef.current
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('findCaregiver', JSON.stringify(data))
-            data.data ? setIsMemberFound(true) : setIsMemberFound(false)
-            if (data.data) {
-              fullName += data.data.firstName ? data.data.firstName : ''
-              fullName += data.data.middleName ? '' + data.data.middleName : ''
-              fullName += data.data.lastName ? ' ' + data.data.lastName : ''
-              setMemberName(fullName)
-              setMemberId(data.data.id ? data.data.id : '')
-              setMemberEmail(data.data.email ? data.data.email : '')
-              reset({
-                email: 'default',
-                firstName: 'default',
-                lastName: 'default'
-              })
-              reset1({
-                phone: 'default'
-              })
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
+      setSearchEmail(emailRef.current)
     }
   }
   async function createUpdateCaregiver(object: any) {
-    setLoading(true)
-    let url = _.isEmpty(caregiverDetails)
-      ? `${BASE_URL}${CREATE_CAREGIVER}`
-      : `${BASE_URL}${UPDATE_CAREGIVER}`
-    let dataObject = {
-      header: header,
-      familyMember: object
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let details = data.data.familyMember ? data.data.familyMember : {}
+    const mutation = _.isEmpty(caregiverDetails)
+      ? createCaregiverMutation
+      : updateCaregiverMutation
+
+    mutation.mutate(
+      { familyMember: object },
+      {
+        onSuccess: (data: any) => {
+          let details = data && data.familyMember ? data.familyMember : {}
           if (_.isEmpty(caregiverDetails)) {
             router.dismiss(1)
           } else {
@@ -190,15 +186,12 @@ export function AddEditCaregiverScreen() {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to save caregiver')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   async function callCreateUpdateDevice(formData: Schema) {
     let object = {}
@@ -276,7 +269,7 @@ export function AddEditCaregiverScreen() {
   }
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isSearching || isMutating} />
       <PtsBackHeader
         title={_.isEmpty(caregiverDetails) ? 'Add Caregiver' : 'Edit Caregiver'}
         memberData={memberData}

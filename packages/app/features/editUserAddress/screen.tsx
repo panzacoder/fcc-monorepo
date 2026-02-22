@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { View, Alert } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -8,12 +8,10 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import { formatUrl } from 'app/utils/format-url'
 import _ from 'lodash'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  UPDATE_MEMBER_ADDRESS,
-  UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS
-} from 'app/utils/urlConstants'
+  useUpdateMemberAddress,
+  useUpdateMemberAuthorizedCaregiverAddress
+} from 'app/data/profile'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { useLocalSearchParams } from 'expo-router'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -50,8 +48,10 @@ export function EditUserAddressScreen() {
       }
     }
   })
-  const [isLoading, setLoading] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
+  const updateMemberAddressMutation = useUpdateMemberAddress(header)
+  const updateCaregiverAddressMutation =
+    useUpdateMemberAuthorizedCaregiverAddress(header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
@@ -107,47 +107,45 @@ export function EditUserAddressScreen() {
         selectedAddressRef.current.address.timezone.id = value.id
       }
     }
-
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
+  }
+  const isLoading =
+    updateMemberAddressMutation.isPending ||
+    updateCaregiverAddressMutation.isPending
+  const navigateBack = () => {
+    router.dismiss(2)
+    if (item.component === 'Profile') {
+      router.push('/profile')
+    } else {
+      router.push(
+        formatUrl('/memberProfile', {
+          memberData: JSON.stringify(memberData),
+          userDetails: JSON.stringify(userDetails)
+        })
+      )
+    }
   }
   async function updateAddress() {
-    setLoading(true)
-    let url = ''
-    url =
+    const mutation =
       item.component === 'Profile'
-        ? `${BASE_URL}${UPDATE_MEMBER_ADDRESS}`
-        : `${BASE_URL}${UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS}`
-    let dataObject = {
-      header: header,
-      memberVo: {
-        id: memberDetails.id ? memberDetails.id : '',
-        isMemberUpdate: true,
-        address: selectedAddressRef.current.address
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          router.dismiss(2)
-          if (item.component === 'Profile') {
-            router.push('/profile')
-          } else {
-            router.push(
-              formatUrl('/memberProfile', {
-                memberData: JSON.stringify(memberData),
-                userDetails: JSON.stringify(userDetails)
-              })
-            )
-          }
-        } else {
-          Alert.alert('', data.message)
+        ? updateMemberAddressMutation
+        : updateCaregiverAddressMutation
+    mutation.mutate(
+      {
+        memberVo: {
+          id: memberDetails.id ? memberDetails.id : '',
+          isMemberUpdate: true,
+          address: selectedAddressRef.current.address
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      },
+      {
+        onSuccess: () => {
+          navigateBack()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update address')
+        }
+      }
+    )
   }
   return (
     <View className="flex-1">
@@ -172,19 +170,7 @@ export function EditUserAddressScreen() {
               title={'Cancel'}
               variant="default"
               leadingIcon="x"
-              onPress={() => {
-                router.dismiss(2)
-                if (item.component === 'Profile') {
-                  router.push('/profile')
-                } else {
-                  router.push(
-                    formatUrl('/memberProfile', {
-                      memberData: JSON.stringify(memberData),
-                      userDetails: JSON.stringify(userDetails)
-                    })
-                  )
-                }
-              }}
+              onPress={navigateBack}
             />
             <Button
               className="ml-5 bg-[#287CFA]"

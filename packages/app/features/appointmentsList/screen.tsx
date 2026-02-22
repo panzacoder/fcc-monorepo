@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -10,12 +10,8 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import _ from 'lodash'
 import moment from 'moment'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_APPOINTMENTS,
-  GET_DOCTOR_FACILITIES
-} from 'app/utils/urlConstants'
+import { useAppointments, useDoctorFacilities } from 'app/data/appointments'
+import type { GetAppointmentsParams } from 'app/data/appointments'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -45,13 +41,12 @@ const monthsList = getMonthsList() as any
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
   const appointmentPrivilegesRef = useRef({})
-  const selectedMonthRef = useRef('All')
-  const selectedYearRef = useRef('All')
-  const selectedTypeRef = useRef('All')
-  const doctorIdRef = useRef('All')
-  const facilityIdRef = useRef('All')
+  const [selectedMonth, setSelectedMonth] = useState('All')
+  const [selectedYear, setSelectedYear] = useState('All')
+  const [selectedType, setSelectedType] = useState('All')
+  const [doctorId, setDoctorId] = useState<string | number>('All')
+  const [facilityId, setFacilityId] = useState<string | number>('All')
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
@@ -98,85 +93,60 @@ export function AppointmentsListScreen() {
       title: name
     })
   })
-  const getDoctorFacilities = useCallback(async (isFirstLoad: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_DOCTOR_FACILITIES}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
-      },
-      appointmentType: selectedTypeRef.current
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (!isFirstLoad) {
-            setLoading(false)
-          }
 
-          const list: Array<{ id: number; title: string }> = [
-            { title: 'All', id: 1 }
-          ]
-          data.data.map((data: any, index: any) => {
-            let object = {
-              title: data.name,
-              id: index + 2
-            }
-            list.push(object)
-          })
-          setDoctorFacilityList(list)
-          setDoctorFacilityListFull(data.data ? data.data : [])
-        } else {
-          Alert.alert('', data.message)
-          setLoading(false)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
-  const getAppointmentDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_APPOINTMENTS}`
-    let dataObject = {
-      header: header,
-      memberDetails: {
-        id: memberData.member ? memberData.member : '',
-        month: selectedMonthRef.current,
-        year: selectedYearRef.current,
-        type: selectedTypeRef.current,
-        doctorId: doctorIdRef.current,
-        facilityId: facilityIdRef.current
+  const appointmentParams: GetAppointmentsParams = {
+    id: memberData.member ? memberData.member : '',
+    month: selectedMonth,
+    year: selectedYear,
+    type: selectedType,
+    doctorId: doctorId,
+    facilityId: facilityId
+  }
+
+  const { data: appointmentsData, isLoading: isAppointmentsLoading } =
+    useAppointments(header, appointmentParams)
+
+  const { data: doctorFacilityData, isLoading: isDoctorFacilityLoading } =
+    useDoctorFacilities(header, {
+      memberId: memberData.member ? memberData.member : '',
+      appointmentType: selectedType
+    })
+
+  const isLoading = isAppointmentsLoading || isDoctorFacilityLoading
+
+  useEffect(() => {
+    if (appointmentsData) {
+      if (appointmentsData.domainObjectPrivileges) {
+        appointmentPrivilegesRef.current = appointmentsData
+          .domainObjectPrivileges.Appointment
+          ? appointmentsData.domainObjectPrivileges.Appointment
+          : {}
       }
+      setAppointmentsListFull(
+        appointmentsData.list ? appointmentsData.list : []
+      )
+      getFilteredList(
+        appointmentsData.list ? appointmentsData.list : [],
+        currentFilter
+      )
+      setIsDataReceived(true)
+      setIsFilter(false)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.domainObjectPrivileges) {
-            appointmentPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Appointment
-              ? data.data.domainObjectPrivileges.Appointment
-              : {}
-          }
-          setAppointmentsListFull(data.data.list ? data.data.list : [])
-          getFilteredList(data.data.list ? data.data.list : [], currentFilter)
-          // console.log('setAppointments', data.data)
-          setIsDataReceived(true)
-          setIsFilter(false)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
+  }, [appointmentsData])
+
+  useEffect(() => {
+    if (doctorFacilityData) {
+      const list: Array<{ id: number; title: string }> = [
+        { title: 'All', id: 1 }
+      ]
+      doctorFacilityData.map((data: any, index: any) => {
+        list.push({ title: data.name, id: index + 2 })
       })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+      setDoctorFacilityList(list)
+      setDoctorFacilityListFull(doctorFacilityData)
+    }
+  }, [doctorFacilityData])
+
   function handleBackButtonClick() {
     let fullName = ''
     if (memberData.firstname) {
@@ -196,8 +166,6 @@ export function AppointmentsListScreen() {
   }
 
   useEffect(() => {
-    getDoctorFacilities(true)
-    getAppointmentDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -209,7 +177,6 @@ export function AppointmentsListScreen() {
 
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
-    // console.log('filter', filter)
     if (filter === 'Open Items' || filter === 'Upcoming') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
@@ -248,7 +215,6 @@ export function AppointmentsListScreen() {
         filteredList = list
       }
     })
-    // console.log('filteredList', JSON.stringify(filteredList))
     setAppointmentsList(filteredList)
   }
   async function setFilteredList(filter: any) {
@@ -257,29 +223,31 @@ export function AppointmentsListScreen() {
     getFilteredList(appointmentsListFull, filter)
   }
   function filterAppointment(formData: Schema) {
-    selectedMonthRef.current =
+    setSelectedMonth(
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYearRef.current =
+    )
+    setSelectedYear(
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
-    doctorIdRef.current =
+    )
+    setDoctorId(
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
         ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorId
         : 'All'
-    facilityIdRef.current =
+    )
+    setFacilityId(
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
         ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityId
         : 'All'
-    getAppointmentDetails()
+    )
   }
   function resetFilter() {
-    selectedMonthRef.current = 'All'
-    selectedYearRef.current = 'All'
-    selectedTypeRef.current = 'All'
-    doctorIdRef.current = 'All'
-    facilityIdRef.current = 'All'
-    getAppointmentDetails()
+    setSelectedMonth('All')
+    setSelectedYear('All')
+    setSelectedType('All')
+    setDoctorId('All')
+    setFacilityId('All')
     reset({
       monthIndex: 1,
       yearIndex: 1,
@@ -313,15 +281,14 @@ export function AppointmentsListScreen() {
       let id = value.id - 1
       logger.debug('value', JSON.stringify(value))
       if (id === 0) {
-        selectedTypeRef.current = 'All'
+        setSelectedType('All')
       } else if (id === 1) {
-        selectedTypeRef.current = 'Doctor Appointment'
+        setSelectedType('Doctor Appointment')
       } else {
-        selectedTypeRef.current = 'Facility Appointment'
+        setSelectedType('Facility Appointment')
       }
-      getDoctorFacilities(false)
     } else {
-      selectedTypeRef.current = 'All'
+      setSelectedType('All')
       reset({
         typeIndex: -1
       })
@@ -362,7 +329,6 @@ export function AppointmentsListScreen() {
                     component: 'Appointment'
                   })
                 )
-                // setIsAddAppointment(true)
               }}
             >
               <Feather name={'plus'} size={25} color={COLORS.primary} />

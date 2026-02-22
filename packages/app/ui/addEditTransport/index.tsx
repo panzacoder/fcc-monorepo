@@ -1,19 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { getAddressFromObject } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import {
-  BASE_URL,
-  GET_TRANSPORTATION_MEMBER_LIST,
-  GET_STATES_AND_TIMEZONES,
-  CREATE_TRANSPORTATION,
-  CREATE_TRANSPORTATION_EVENT,
-  UPDATE_TRANSPORTATION,
-  UPDATE_TRANSPORTATION_EVENT
-} from 'app/utils/urlConstants'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
@@ -26,6 +16,14 @@ import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { logger } from 'app/utils/logger'
+import {
+  useTransportationMemberList,
+  useCreateTransportation,
+  useCreateTransportationEvent,
+  useUpdateTransportation,
+  useUpdateTransportationEvent
+} from 'app/data/transportation'
+import { useStatesAndTimezones } from 'app/data/locations'
 const schema = z.object({
   member: z.number().min(0, { message: 'Select Member' }),
   description: z.string(),
@@ -42,8 +40,7 @@ export const AddEditTransport = ({
   transportData,
   date,
   appointmentId,
-  cancelClicked,
-  createUpdateTransportation
+  cancelClicked
 }) => {
   logger.debug('address', JSON.stringify(address))
   const header = useAppSelector((state) => state.headerState.header)
@@ -51,7 +48,6 @@ export const AddEditTransport = ({
   const staticData: any = useAppSelector(
     (state) => state.staticDataState.staticData
   )
-  const [isLoading, setLoading] = useState(false)
   const [selectedDate, setSelectedDate] = useState(
     !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
   )
@@ -63,49 +59,62 @@ export const AddEditTransport = ({
   )
   const countryIndexRef = useRef(-1)
   const stateIndexRef = useRef(-1)
+  const [selectedCountryId, setSelectedCountryId] = useState(101)
+
+  const memberListQuery = useTransportationMemberList(header, {
+    memberId: user.memberId ? user.memberId : ''
+  })
+
+  const statesQuery = useStatesAndTimezones(header, {
+    countryId: selectedCountryId
+  })
+
   useEffect(() => {
-    async function getMemberList() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_TRANSPORTATION_MEMBER_LIST}`
-      let dataObject = {
-        header: header,
-        member: {
-          id: user.memberId ? user.memberId : ''
+    if (!memberListQuery.data || !_.isEmpty(transportData)) return
+    let list: Array<{ id: number; title: string }> = memberListQuery.data.map(
+      ({ name, id }: Response, index: any) => {
+        return {
+          title: name,
+          id: index + 1
         }
       }
-      // console.log('dataObject', JSON.stringify(dataObject))
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            let list: Array<{ id: number; title: string }> = data.data.map(
-              ({ name, id }: Response, index: any) => {
-                return {
-                  title: name,
-                  id: index + 1
-                }
-              }
-            )
-            setMemberList(list)
-            await setMemberListFull(data.data || [])
-            // console.log('setMemberListFull', JSON.stringify(memberListFull))
-          } else {
-            Alert.alert('', data.message)
-          }
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug(error)
-        })
+    )
+    setMemberList(list)
+    setMemberListFull(memberListQuery.data || [])
+  }, [memberListQuery.data])
+
+  useEffect(() => {
+    if (!statesQuery.data) return
+    let stateName = ''
+    if (!_.isEmpty(address)) {
+      stateName = address.state.name ? address.state.name : ''
+    } else {
+      if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+        stateName = memberAddress.state.name ? memberAddress.state.name : ''
+      }
     }
-    if (_.isEmpty(transportData)) {
-      getMemberList()
-    }
-    getStates(101)
-  }, [])
+
+    let statesList: Array<{ id: number; title: string }> = []
+    statesQuery.data.stateList.map(({ name, id }: Response, index: any) => {
+      if (name === stateName) {
+        stateIndexRef.current = index + 1
+        reset({
+          country: countryIndexRef.current,
+          state: stateIndexRef.current
+        })
+      }
+      let object = {
+        title: name,
+        id: index + 1
+      }
+      statesList.push(object)
+    })
+
+    setStatesList(statesList)
+    setStatesListFull(statesQuery.data.stateList || [])
+  }, [statesQuery.data])
 
   const { control, handleSubmit, reset } = useForm({
-    //some default data has been set for required fields in case of update
     defaultValues: {
       description: '',
       member: _.isEmpty(transportData) ? -1 : 1,
@@ -144,132 +153,131 @@ export const AddEditTransport = ({
     }
     countryList.push(object)
   })
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId || 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let stateName = ''
-          if (!_.isEmpty(address)) {
-            stateName = address.state.name ? address.state.name : ''
-          } else {
-            if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
-              stateName = memberAddress.state.name
-                ? memberAddress.state.name
-                : ''
-            }
-          }
 
-          let statesList: Array<{ id: number; title: string }> = []
-          data.data.stateList.map(({ name, id }: Response, index: any) => {
-            if (name === stateName) {
-              stateIndexRef.current = index + 1
-              reset({
-                country: countryIndexRef.current,
-                state: stateIndexRef.current
-              })
-            }
-            let object = {
-              title: name,
-              id: index + 1
-            }
-            statesList.push(object)
-          })
+  const createTransportationMutation = useCreateTransportation(header)
+  const createTransportationEventMutation = useCreateTransportationEvent(header)
+  const updateTransportationMutation = useUpdateTransportation(header)
+  const updateTransportationEventMutation = useUpdateTransportationEvent(header)
 
-          setStatesList(statesList)
-          setStatesListFull(data.data.stateList || [])
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+  const isLoading =
+    memberListQuery.isLoading ||
+    statesQuery.isLoading ||
+    createTransportationMutation.isPending ||
+    createTransportationEventMutation.isPending ||
+    updateTransportationMutation.isPending ||
+    updateTransportationEventMutation.isPending
 
   async function createUpdateTransport(formData: Schema) {
-    let dataObject = {} as any
-    let url = ''
     if (_.isEmpty(transportData)) {
       let stateObject = statesListFull[formData.state - 1]
       let countryObject: object = staticData.countryList[formData.country - 1]
 
-      let address = {
+      let transportAddress = {
         line: formData.addressLine,
         city: formData.city,
         zipCode: formData.postalCode,
         state: stateObject
       }
-      dataObject = {
-        header: header,
-        transportation: {
-          date: selectedDate,
-          description: formData.description,
-          accompany: memberListFull[formData.member - 1].memberId
-            ? memberListFull[formData.member - 1].memberId
-            : '',
-          accompanyType: {
-            type: 'Family Member'
-          },
-          reminderList: []
-        }
+      let transportPayload: any = {
+        date: selectedDate,
+        description: formData.description,
+        accompany: memberListFull[formData.member - 1].memberId
+          ? memberListFull[formData.member - 1].memberId
+          : '',
+        accompanyType: {
+          type: 'Family Member'
+        },
+        reminderList: []
       }
-      dataObject.transportation.address = address
-      dataObject.transportation.address.state.country = countryObject
+      transportPayload.address = transportAddress
+      transportPayload.address.state.country = countryObject
       if (component === 'Appointment') {
-        url = `${BASE_URL}${CREATE_TRANSPORTATION}`
-        dataObject.transportation.appointment = { id: appointmentId }
+        transportPayload.appointment = { id: appointmentId }
+        createTransportationMutation.mutate(
+          { transportation: transportPayload },
+          {
+            onSuccess: () => {
+              cancelClicked()
+            },
+            onError: (error) => {
+              Alert.alert(
+                '',
+                error.message || 'Failed to create transportation'
+              )
+            }
+          }
+        )
       } else {
-        url = `${BASE_URL}${CREATE_TRANSPORTATION_EVENT}`
-        dataObject.transportation.event = {
-          id: appointmentId
-        }
+        transportPayload.event = { id: appointmentId }
+        createTransportationEventMutation.mutate(
+          { transportation: transportPayload },
+          {
+            onSuccess: () => {
+              cancelClicked()
+            },
+            onError: (error) => {
+              Alert.alert(
+                '',
+                error.message || 'Failed to create transportation'
+              )
+            }
+          }
+        )
       }
     } else {
-      dataObject = {
-        header: header,
-        transportation: {
-          id: transportData.id ? transportData.id : '',
-          date: selectedDate,
-          description: transportData.description
-            ? transportData.description
-            : '',
-          accompany: transportData.accompany ? transportData.accompany : '',
-          accompanyType: {
-            type:
-              transportData.accompanyType && transportData.accompanyType.type
-                ? transportData.accompanyType.type
-                : ''
-          },
-          reminderList: transportData.reminderList
-            ? transportData.reminderList
-            : []
-        }
+      let transportPayload: any = {
+        id: transportData.id ? transportData.id : '',
+        date: selectedDate,
+        description: transportData.description ? transportData.description : '',
+        accompany: transportData.accompany ? transportData.accompany : '',
+        accompanyType: {
+          type:
+            transportData.accompanyType && transportData.accompanyType.type
+              ? transportData.accompanyType.type
+              : ''
+        },
+        reminderList: transportData.reminderList
+          ? transportData.reminderList
+          : []
       }
       if (component === 'Appointment') {
-        url = `${BASE_URL}${UPDATE_TRANSPORTATION}`
-        dataObject.transportation.appointment = { id: appointmentId }
+        transportPayload.appointment = { id: appointmentId }
+        updateTransportationMutation.mutate(
+          { transportation: transportPayload },
+          {
+            onSuccess: () => {
+              cancelClicked()
+            },
+            onError: (error) => {
+              Alert.alert(
+                '',
+                error.message || 'Failed to update transportation'
+              )
+            }
+          }
+        )
       } else {
-        url = `${BASE_URL}${UPDATE_TRANSPORTATION_EVENT}`
-        dataObject.transportation.event = { id: appointmentId }
+        transportPayload.event = { id: appointmentId }
+        updateTransportationEventMutation.mutate(
+          { transportation: transportPayload },
+          {
+            onSuccess: () => {
+              cancelClicked()
+            },
+            onError: (error) => {
+              Alert.alert(
+                '',
+                error.message || 'Failed to update transportation'
+              )
+            }
+          }
+        )
       }
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    createUpdateTransportation(url, dataObject)
   }
   const onSelection = (date: any) => {
     setSelectedDate(date)
     setKey(Math.random())
-    // console.log('selectedDate', '' + selectedDate)
   }
 
   async function setSelectedCountryChange(value: any) {
@@ -277,15 +285,8 @@ export const AddEditTransport = ({
       let countryId = staticData.countryList[value.id - 1].id
         ? staticData.countryList[value.id - 1].id
         : 101
-      await getStates(countryId)
+      setSelectedCountryId(countryId)
     }
-    //  else {
-    //   reset({
-    //     country: -1
-    //   })
-    //   setStatesList([])
-    //   setStatesListFull([])
-    // }
   }
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'

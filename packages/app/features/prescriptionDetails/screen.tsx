@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -8,24 +8,17 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
-import {
-  BASE_URL,
-  GET_PRESCRIPTION,
-  DELETE_PRESCRIPTION
-} from 'app/utils/urlConstants'
+import { usePrescription, useDeletePrescription } from 'app/data/prescriptions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 
 export function PrescriptionDetailsScreen() {
   const prescriptionPrivilegesRef = useRef<any>({})
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
   const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
@@ -37,40 +30,27 @@ export function PrescriptionDetailsScreen() {
     item.prescriptionDetails && item.prescriptionDetails !== undefined
       ? JSON.parse(item.prescriptionDetails)
       : {}
-  // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
-  const getPrescriptionDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_PRESCRIPTION}`
-    let dataObject = {
-      header: header,
-      medicine: {
-        id: prescriptionData.id ? prescriptionData.id : '',
-        member: {
-          id: memberData.member ? memberData.member : ''
-        }
+
+  const prescriptionId = prescriptionData.id ? prescriptionData.id : ''
+  const memberId = memberData.member ? memberData.member : ''
+
+  const { data: prescriptionQueryData, isLoading: isDetailsLoading } =
+    usePrescription(header, { id: prescriptionId, memberId })
+
+  const deletePrescriptionMutation = useDeletePrescription(header)
+
+  useEffect(() => {
+    if (prescriptionQueryData) {
+      const data = prescriptionQueryData as any
+      if (data.domainObjectPrivileges) {
+        prescriptionPrivilegesRef.current = data.domainObjectPrivileges.Medicine
+          ? data.domainObjectPrivileges.Medicine
+          : {}
       }
+      setPrescriptionDetails(data.medicine ? data.medicine : {})
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('data', JSON.stringify(data.data))
-          if (data.data.domainObjectPrivileges) {
-            prescriptionPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Medicine
-              ? data.data.domainObjectPrivileges.Medicine
-              : {}
-          }
-          setPrescriptionDetails(data.data.medicine ? data.data.medicine : {})
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  }, [prescriptionQueryData])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -81,7 +61,6 @@ export function PrescriptionDetailsScreen() {
     return true
   }
   useEffect(() => {
-    getPrescriptionDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -170,43 +149,32 @@ export function PrescriptionDetailsScreen() {
   }
 
   async function deletePrescription() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_PRESCRIPTION}`
-    let dataObject = {
-      header: header,
-      medicine: {
+    deletePrescriptionMutation.mutate(
+      {
         id: prescriptionDetails.id ? prescriptionDetails.id : '',
-        member: {
-          id: memberData.id ? memberData.id : ''
-        }
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
+        memberId: memberData.id ? memberData.id : ''
+      },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/prescriptionsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete prescription')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
 
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader
+        loading={isDetailsLoading || deletePrescriptionMutation.isPending}
+      />
       <PtsBackHeader title="Prescription Details" memberData={memberData} />
       <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">

@@ -1,21 +1,19 @@
 'use client'
 import _ from 'lodash'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_STATES_AND_TIMEZONES,
-  CREATE_DOCTOR_LOCATION,
-  CREATE_FACILITY_LOCATION,
-  UPDATE_FACILITY_LOCATION,
-  UPDATE_DOCTOR_LOCATION
-} from 'app/utils/urlConstants'
+  useStatesAndTimezones,
+  useCreateDoctorLocation,
+  useCreateFacilityLocation,
+  useUpdateDoctorLocation,
+  useUpdateFacilityLocation
+} from 'app/data/locations'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -55,7 +53,6 @@ export function AddEditLocationScreen() {
   const staticData: any = useAppSelector(
     (state) => state.staticDataState.staticData
   )
-  // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<any>()
   const router = useRouter()
@@ -67,10 +64,9 @@ export function AddEditLocationScreen() {
   logger.debug('locationDetails', JSON.stringify(locationDetails))
   let details = item.details ? JSON.parse(item.details) : {}
   logger.debug('details', JSON.stringify(details))
-  const [isLoading, setLoading] = useState(false)
+  const [selectedCountryId, setSelectedCountryId] = useState<number>(0)
   const [statesList, setStatesList] = useState([]) as any
   const [statesListFull, setStatesListFull] = useState([])
-  const [isRender, setIsRender] = useState(false)
   type Response = {
     id: number
     name: string
@@ -82,51 +78,42 @@ export function AddEditLocationScreen() {
         id: index + 1
       }
     })
-  const getStates = useCallback(async (countryId: any) => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_STATES_AND_TIMEZONES}`
-    let dataObject = {
-      country: {
-        id: countryId || 101
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let statesList: Array<{ id: number; title: string }> =
-            data.data.stateList.map(({ name, id }: Response, index: any) => {
-              return {
-                title: name,
-                id: index + 1
-              }
-            })
-          // setCountriesList(countryList)
-          setStatesList(statesList)
-          setStatesListFull(data.data.stateList || [])
-          if (!_.isEmpty(locationDetails)) {
-            let stateName = locationDetails.address.state.name
-              ? locationDetails.address.state.name
-              : ''
-            data.data.stateList.map((data: any, index: any) => {
-              if (data.name === stateName) {
-                stateIndexRef.current = index + 1
-                reset({
-                  state: stateIndexRef.current
-                })
-              }
+
+  const statesQuery = useStatesAndTimezones(header, {
+    countryId: selectedCountryId
+  })
+  const createDoctorLocationMutation = useCreateDoctorLocation(header)
+  const createFacilityLocationMutation = useCreateFacilityLocation(header)
+  const updateDoctorLocationMutation = useUpdateDoctorLocation(header)
+  const updateFacilityLocationMutation = useUpdateFacilityLocation(header)
+
+  useEffect(() => {
+    if (statesQuery.data) {
+      let mappedStates: Array<{ id: number; title: string }> =
+        statesQuery.data.stateList.map(({ name, id }: Response, index: any) => {
+          return {
+            title: name,
+            id: index + 1
+          }
+        })
+      setStatesList(mappedStates)
+      setStatesListFull(statesQuery.data.stateList || [])
+      if (!_.isEmpty(locationDetails)) {
+        let stateName = locationDetails.address.state.name
+          ? locationDetails.address.state.name
+          : ''
+        statesQuery.data.stateList.map((data: any, index: any) => {
+          if (data.name === stateName) {
+            stateIndexRef.current = index + 1
+            reset({
+              state: stateIndexRef.current
             })
           }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+        })
+      }
+    }
+  }, [statesQuery.data])
+
   function handleBackButtonClick() {
     router.dismiss(1)
     if (item.component === 'Doctor') {
@@ -147,33 +134,30 @@ export function AddEditLocationScreen() {
     return true
   }
   useEffect(() => {
-    async function setCountryState() {
-      let countryName = ''
-      if (!_.isEmpty(locationDetails)) {
-        countryName = locationDetails.address.state.country.name
-          ? locationDetails.address.state.country.name
-          : ''
-      } else {
-        let newTimeZone = moment.tz.guess()
-        const countryObject = ct.getCountriesForTimezone(newTimeZone)
-        countryName = countryObject[0]?.name ? countryObject[0].name : ''
-      }
-      consoleData('countryName', countryName)
-      staticData.countryList.map(async (data: any, index: any) => {
-        if (data.name === countryName) {
-          countryIndexRef.current = index + 1
-          consoleData('countryName index', '' + countryIndexRef.current)
-          reset({
-            country: countryIndexRef.current
-          })
-        }
-      })
-      let countryId = staticData.countryList[countryIndexRef.current - 1].id
-        ? staticData.countryList[countryIndex - 1].id
-        : 101
-      await getStates(countryId)
+    let countryName = ''
+    if (!_.isEmpty(locationDetails)) {
+      countryName = locationDetails.address.state.country.name
+        ? locationDetails.address.state.country.name
+        : ''
+    } else {
+      let newTimeZone = moment.tz.guess()
+      const countryObject = ct.getCountriesForTimezone(newTimeZone)
+      countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
-    setCountryState()
+    consoleData('countryName', countryName)
+    staticData.countryList.map(async (data: any, index: any) => {
+      if (data.name === countryName) {
+        countryIndexRef.current = index + 1
+        consoleData('countryName index', '' + countryIndexRef.current)
+        reset({
+          country: countryIndexRef.current
+        })
+      }
+    })
+    let countryId = staticData.countryList[countryIndexRef.current - 1]?.id
+      ? staticData.countryList[countryIndexRef.current - 1].id
+      : 101
+    setSelectedCountryId(countryId)
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -213,27 +197,25 @@ export function AddEditLocationScreen() {
     },
     resolver: zodResolver(phoneSchema)
   })
-  async function setSelectedCountryChange(value: any) {
-    let countryId = ''
+  function setSelectedCountryChange(value: any) {
     if (value) {
-      if (!isLoading) {
-        countryId = staticData.countryList[value.id - 1].id
-          ? staticData.countryList[value.id - 1].id
-          : 101
-        await getStates(countryId)
-      }
+      let countryId = staticData.countryList[value.id - 1]?.id
+        ? staticData.countryList[value.id - 1].id
+        : 101
+      setSelectedCountryId(countryId)
     }
-    // else {
-    //   setStatesList([])
-    //   setStatesListFull([])
-    // }
   }
 
+  const isLoading =
+    statesQuery.isLoading ||
+    createDoctorLocationMutation.isPending ||
+    createFacilityLocationMutation.isPending ||
+    updateDoctorLocationMutation.isPending ||
+    updateFacilityLocationMutation.isPending
+
   async function addUpdateLocation(formData: Schema) {
-    setLoading(true)
     let stateObject = statesListFull[formData.state - 1]
     let countryObject: object = staticData.countryList[formData.country - 1]
-    let dataObject = {} as any
     let addressObject = {
       operation: 'add',
       shortDescription: formData.locationName,
@@ -249,107 +231,98 @@ export function AddEditLocationScreen() {
         state: stateObject
       }
     }
-    if (item.component === 'Doctor') {
-      dataObject = {
-        header: header,
-        doctorLocation: addressObject
-      }
 
+    const onDoctorSuccess = (data: any) => {
+      let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
+      router.dismiss(1)
+      router.replace(
+        formatUrl('/circles/doctorDetails', {
+          doctorDetails: details,
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    const onFacilitySuccess = (data: any) => {
+      let details: any = data?.facility ? JSON.stringify(data.facility) : {}
+      router.dismiss(1)
+      router.replace(
+        formatUrl('/circles/facilityDetails', {
+          facilityDetails: details,
+          memberData: JSON.stringify(memberData)
+        })
+      )
+    }
+
+    const onError = (error: any) => {
+      Alert.alert('', error.message || 'Failed to save location')
+    }
+
+    if (item.component === 'Doctor') {
+      let doctorLocation: any = { ...addressObject }
       if (_.isEmpty(locationDetails)) {
-        dataObject.doctorLocation.doctor = {
+        doctorLocation.doctor = {
           id: details.id ? details.id : '',
           member: {
             id: memberData.member ? memberData.member : ''
           }
         }
       } else {
-        dataObject.doctorLocation.doctor = {
+        doctorLocation.doctor = {
           id: locationDetails.doctorFacilityId
             ? locationDetails.doctorFacilityId
             : ''
         }
       }
-      dataObject.doctorLocation.address.state.country = countryObject
-    } else {
-      dataObject = {
-        header: header,
-        facilityLocation: addressObject
+      doctorLocation.address.state.country = countryObject
+      if (!_.isEmpty(locationDetails)) {
+        doctorLocation.id = locationDetails.id
       }
+
       if (_.isEmpty(locationDetails)) {
-        dataObject.facilityLocation.facility = {
+        createDoctorLocationMutation.mutate(
+          { doctorLocation },
+          { onSuccess: onDoctorSuccess, onError }
+        )
+      } else {
+        updateDoctorLocationMutation.mutate(
+          { doctorLocation },
+          { onSuccess: onDoctorSuccess, onError }
+        )
+      }
+    } else {
+      let facilityLocation: any = { ...addressObject }
+      if (_.isEmpty(locationDetails)) {
+        facilityLocation.facility = {
           id: details.id ? details.id : '',
           member: {
             id: memberData.member ? memberData.member : ''
           }
         }
       } else {
-        dataObject.facilityLocation.facility = {
+        facilityLocation.facility = {
           id: locationDetails.doctorFacilityId
             ? locationDetails.doctorFacilityId
             : ''
         }
       }
+      facilityLocation.address.state.country = countryObject
+      if (!_.isEmpty(locationDetails)) {
+        facilityLocation.id = locationDetails.id
+      }
 
-      dataObject.facilityLocation.address.state.country = countryObject
-    }
-
-    if (!_.isEmpty(locationDetails)) {
-      if (item.component === 'Doctor') {
-        dataObject.doctorLocation.id = locationDetails.id
+      if (_.isEmpty(locationDetails)) {
+        createFacilityLocationMutation.mutate(
+          { facilityLocation },
+          { onSuccess: onFacilitySuccess, onError }
+        )
       } else {
-        dataObject.facilityLocation.id = locationDetails.id
+        updateFacilityLocationMutation.mutate(
+          { facilityLocation },
+          { onSuccess: onFacilitySuccess, onError }
+        )
       }
     }
-
-    let url = ''
-    if (item.component === 'Doctor') {
-      url = _.isEmpty(locationDetails)
-        ? `${BASE_URL}${CREATE_DOCTOR_LOCATION}`
-        : `${BASE_URL}${UPDATE_DOCTOR_LOCATION}`
-    } else {
-      url = _.isEmpty(locationDetails)
-        ? `${BASE_URL}${CREATE_FACILITY_LOCATION}`
-        : `${BASE_URL}${UPDATE_FACILITY_LOCATION}`
-    }
-
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          router.dismiss(1)
-          if (item.component === 'Doctor') {
-            let details: any = data.data.doctor
-              ? JSON.stringify(data.data.doctor)
-              : {}
-
-            router.replace(
-              formatUrl('/circles/doctorDetails', {
-                doctorDetails: details,
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          } else {
-            // router.back()
-            let details: any = data.data.facility
-              ? JSON.stringify(data.data.facility)
-              : {}
-
-            router.replace(
-              formatUrl('/circles/facilityDetails', {
-                facilityDetails: details,
-                memberData: JSON.stringify(memberData)
-              })
-            )
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   return (
     <View className="flex-1">

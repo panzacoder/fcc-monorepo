@@ -18,23 +18,26 @@ import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
 import messageListAction from 'app/redux/messageList/messageListAction'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
 import {
-  BASE_URL,
-  GET_APPOINTMENT_NOTE,
-  GET_EVENT_NOTE,
-  GET_INCIDENT_NOTE,
-  GET_MEDICAL_DEVICE_NOTE,
-  GET_THREAD,
-  GET_THREAD_PARTICIPANTS,
-  UPDATE_THREAD_PARTICIPANTS,
-  UPDATE_MESSAGE_THREAD
-} from 'app/utils/urlConstants'
+  useThread,
+  useThreadParticipants,
+  useUpdateThreadParticipants,
+  useUpdateMessageThread,
+  messageKeys
+} from 'app/data/messages'
+import { useAppointmentNote, appointmentKeys } from 'app/data/appointments'
+import { useEventNote, eventKeys } from 'app/data/events'
+import { useIncidentNote, incidentKeys } from 'app/data/incidents'
+import {
+  useMedicalDeviceNote,
+  medicalDeviceKeys
+} from 'app/data/medical-devices'
+import { useQueryClient } from '@tanstack/react-query'
 import { AddMessageThread } from 'app/ui/addMessageThread'
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -57,6 +60,7 @@ export function NoteMessageScreen() {
     []
   ) as any
   const [threadDetails, setThreadDetails] = useState(null) as any
+  const [fetchParticipants, setFetchParticipants] = useState(false)
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
   const userDetails = useAppSelector((state) => state.userProfileState.header)
@@ -75,124 +79,157 @@ export function NoteMessageScreen() {
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
-  const getNoteDetails = useCallback(async () => {
-    setLoading(true)
-    let url = ''
-    let dataObject = {} as any
-    if (item.component === 'General') {
-      url = `${BASE_URL}${GET_THREAD}`
-      dataObject = {
-        header: header,
-        messageThread: {
-          id: noteData.id ? noteData.id : ''
-        }
-      }
-    } else if (item.component === 'Appointment') {
-      url = `${BASE_URL}${GET_APPOINTMENT_NOTE}`
-      dataObject = {
-        header: header,
-        appointmentNote: {
-          id: noteData.id ? noteData.id : ''
-        }
-      }
-    } else {
-      if (item.component === 'Incident') {
-        url = `${BASE_URL}${GET_INCIDENT_NOTE}`
-      } else if (item.component === 'Medical Device') {
-        url = `${BASE_URL}${GET_MEDICAL_DEVICE_NOTE}`
-      } else {
-        url = `${BASE_URL}${GET_EVENT_NOTE}`
-      }
-      dataObject = {
-        header: header,
-        note: {
-          id: noteData.id ? noteData.id : ''
-        }
-      }
+
+  const isGeneral = item.component === 'General'
+  const queryClient = useQueryClient()
+
+  const threadParams = {
+    messageThread: {
+      id: noteData.id ? noteData.id : ''
     }
+  }
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.messageThread) {
-            let messageThread = data.data.messageThread
-            setThreadDetails(messageThread)
-            let messageList =
-              messageThread.messageList !== undefined &&
-              messageThread.messageList !== null
-                ? messageThread.messageList
-                : []
-            setMessageList(messageList)
-            dispatch(messageListAction.setMessageList(messageList))
-            let participantList =
-              messageThread.participantList !== undefined &&
-              messageThread.participantList !== null
-                ? messageThread.participantList
-                : []
-            let list: any[] = []
-            participantList.map((data: any) => {
-              if (data.participantName) {
-                let object = {
-                  participantName: data.participantName
-                }
-                list.push(object)
-              }
-            })
-            setParticipantsList(list)
-          }
-          if (
-            item.component === 'Medical Device' &&
-            data.data.purchaseNote !== undefined &&
-            data.data.purchaseNote &&
-            data.data.purchaseNote.messageThread
-          ) {
-            let messageThread = data.data.purchaseNote.messageThread
-              ? data.data.purchaseNote.messageThread
-              : {}
-            setThreadDetails(messageThread)
-            let messageList = messageThread.messageList
-              ? messageThread.messageList
-              : []
+  const { data: threadData, isLoading: isThreadLoading } = useThread(
+    header,
+    threadParams
+  )
 
-            setMessageList(messageList)
-            dispatch(messageListAction.setMessageList(messageList))
-            let participantList = messageThread.participantList
-              ? messageThread.participantList
-              : []
-            let list: any[] = []
-            participantList.map((data: any) => {
-              if (data.participantName) {
-                let object = {
-                  participantName: data.participantName
-                }
-                list.push(object)
-              }
-            })
-            setParticipantsList(list)
-          }
-          // let messages: any = store.getState().messageList.messageList
-          // console.log('messages', JSON.stringify(messages))
-          setLoading(false)
-          setIsDataReceived(true)
-        } else {
-          setLoading(false)
-          Alert.alert('', data.message)
+  const participantsParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
+    },
+    messageThreadType: {
+      type: item.component
+        ? item.component === 'Medical Device'
+          ? 'Purchase'
+          : item.component
+        : ''
+    }
+  }
+
+  const { data: threadParticipantsData, isLoading: isParticipantsLoading } =
+    useThreadParticipants(header, participantsParams)
+
+  const updateParticipantsMutation = useUpdateThreadParticipants(header)
+  const updateThreadMutation = useUpdateMessageThread(header)
+
+  const noteId = noteData.id ? Number(noteData.id) : 0
+  const isAppointment = !isGeneral && item.component === 'Appointment'
+  const isEvent =
+    !isGeneral &&
+    item.component !== 'Appointment' &&
+    item.component !== 'Incident' &&
+    item.component !== 'Medical Device'
+  const isIncident = !isGeneral && item.component === 'Incident'
+  const isMedicalDevice = !isGeneral && item.component === 'Medical Device'
+
+  const { data: appointmentNoteData, isLoading: isAppointmentNoteLoading } =
+    useAppointmentNote(header, isAppointment ? noteId : 0)
+
+  const { data: eventNoteData, isLoading: isEventNoteLoading } = useEventNote(
+    header,
+    { note: { id: isEvent ? noteId : 0 } }
+  )
+
+  const { data: incidentNoteData, isLoading: isIncidentNoteLoading } =
+    useIncidentNote(header, isIncident ? noteId : 0)
+
+  const { data: medicalDeviceNoteData, isLoading: isMedicalDeviceNoteLoading } =
+    useMedicalDeviceNote(header, isMedicalDevice ? noteId : 0)
+
+  function invalidateNonGeneralNote() {
+    if (isAppointment) {
+      queryClient.invalidateQueries({
+        queryKey: appointmentKeys.note(noteId)
+      })
+    } else if (isIncident) {
+      queryClient.invalidateQueries({
+        queryKey: incidentKeys.note(noteId)
+      })
+    } else if (isMedicalDevice) {
+      queryClient.invalidateQueries({
+        queryKey: medicalDeviceKeys.note(noteId)
+      })
+    } else {
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.note(noteId)
+      })
+    }
+  }
+
+  function processMessageThread(messageThread: any) {
+    setThreadDetails(messageThread)
+    let msgList =
+      messageThread.messageList !== undefined &&
+      messageThread.messageList !== null
+        ? messageThread.messageList
+        : []
+    setMessageList(msgList)
+    dispatch(messageListAction.setMessageList(msgList))
+    let participantList =
+      messageThread.participantList !== undefined &&
+      messageThread.participantList !== null
+        ? messageThread.participantList
+        : []
+    let list: any[] = []
+    participantList.map((data: any) => {
+      if (data.participantName) {
+        let object = {
+          participantName: data.participantName
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
+        list.push(object)
+      }
+    })
+    setParticipantsList(list)
+  }
+
+  useEffect(() => {
+    if (isGeneral && threadData) {
+      const data = threadData as any
+      if (data.messageThread) {
+        processMessageThread(data.messageThread)
+      }
+      setIsDataReceived(true)
+    }
+  }, [threadData])
+
+  useEffect(() => {
+    if (isGeneral) return
+    let noteResult: any = null
+    if (isAppointment) noteResult = appointmentNoteData
+    else if (isIncident) noteResult = incidentNoteData
+    else if (isMedicalDevice) noteResult = medicalDeviceNoteData
+    else if (isEvent) noteResult = eventNoteData
+    if (!noteResult) return
+    if (noteResult.messageThread) {
+      processMessageThread(noteResult.messageThread)
+    }
+    if (
+      isMedicalDevice &&
+      noteResult.purchaseNote !== undefined &&
+      noteResult.purchaseNote &&
+      noteResult.purchaseNote.messageThread
+    ) {
+      let messageThread = noteResult.purchaseNote.messageThread
+        ? noteResult.purchaseNote.messageThread
+        : {}
+      processMessageThread(messageThread)
+    }
+    setIsDataReceived(true)
+  }, [
+    appointmentNoteData,
+    eventNoteData,
+    incidentNoteData,
+    medicalDeviceNoteData
+  ])
+
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
       await messaging().setBackgroundMessageHandler(async (message: any) => {
-        // getNoteDetails()
         updateMessageList(message)
       })
       await messaging().onMessage((message: any) => {
-        // getNoteDetails()
         updateMessageList(message)
       })
     } catch (e) {}
@@ -217,52 +254,36 @@ export function NoteMessageScreen() {
     setIsRender(!isRender)
   }
   useEffect(() => {
-    getNoteDetails()
     handleFcmMessage()
   }, [])
 
-  async function getThreadParticipants() {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      messageThreadType: {
-        type: item.component
-          ? item.component === 'Medical Device'
-            ? 'Purchase'
-            : item.component
-          : ''
-      }
+  useEffect(() => {
+    if (fetchParticipants && threadParticipantsData) {
+      const data = threadParticipantsData as any
+      const list = data.map((data: any, index: any) => {
+        let object = data
+        let isParticipant = false
+        participantsList.map((participant: any, index: any) => {
+          if (participant.participantName === data.name) {
+            isParticipant = true
+          }
+        })
+        object.isSelected = isParticipant
+        return object
+      })
+      setThreadParticipantsList(list)
+      logger.debug('setThreadParticipantsList', list)
+      setFetchParticipants(false)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            let isParticipant = false
-            participantsList.map((participant: any, index: any) => {
-              if (participant.participantName === data.name) {
-                isParticipant = true
-              }
-            })
-            object.isSelected = isParticipant
-            return object
-          })
-          setThreadParticipantsList(list)
-          logger.debug('setThreadParticipantsList', list)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+  }, [fetchParticipants, threadParticipantsData])
+
+  async function getThreadParticipants() {
+    setFetchParticipants(true)
+    queryClient.invalidateQueries({
+      queryKey: messageKeys.participants(participantsParams)
+    })
   }
+
   function isParticipantSelected(index: any) {
     threadParticipantsList[index].isSelected =
       !threadParticipantsList[index].isSelected
@@ -274,7 +295,6 @@ export function NoteMessageScreen() {
   }
   async function updateMessageThreadParticipants() {
     setLoading(true)
-    let url = `${BASE_URL}${UPDATE_THREAD_PARTICIPANTS}`
     let list: object[] = []
     threadParticipantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -287,74 +307,94 @@ export function NoteMessageScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        id: threadDetails.id ? threadDetails.id : '',
-        type: {
-          type: item.component
-            ? item.component === 'Medical Device'
-              ? 'Purchase'
-              : item.component
-            : ''
-        },
-        participantList: list
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getNoteDetails()
+    updateParticipantsMutation.mutate(
+      {
+        messageThread: {
+          id: threadDetails.id ? threadDetails.id : '',
+          type: {
+            type: item.component
+              ? item.component === 'Medical Device'
+                ? 'Purchase'
+                : item.component
+              : ''
+          },
+          participantList: list
+        }
+      },
+      {
+        onSuccess: () => {
+          setLoading(false)
+          if (isGeneral) {
+            queryClient.invalidateQueries({
+              queryKey: messageKeys.detail(threadParams)
+            })
+          } else {
+            invalidateNonGeneralNote()
+          }
           getThreadParticipants()
           setIsMessageThread(false)
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          setLoading(false)
+          logger.debug(error)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function updateMessageThread() {
     if (message === '') {
       Alert.alert('', 'Please type a message')
     } else {
       setLoading(true)
-      let url = `${BASE_URL}${UPDATE_MESSAGE_THREAD}`
       let list: object[] = []
       let object = {
         body: message,
         operation: 'Add'
       }
       list.push(object)
-      let dataObject = {
-        header: header,
-        messageThread: {
-          id: threadDetails.id ? threadDetails.id : '',
-          messageList: list
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            getNoteDetails()
-            setMessage('')
-          } else {
-            Alert.alert('', data.message)
+      updateThreadMutation.mutate(
+        {
+          messageThread: {
+            id: threadDetails.id ? threadDetails.id : '',
+            messageList: list
           }
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug(error)
-        })
+        },
+        {
+          onSuccess: () => {
+            setLoading(false)
+            if (isGeneral) {
+              queryClient.invalidateQueries({
+                queryKey: messageKeys.detail(threadParams)
+              })
+            } else {
+              invalidateNonGeneralNote()
+            }
+            setMessage('')
+          },
+          onError: (error) => {
+            setLoading(false)
+            logger.debug(error)
+          }
+        }
+      )
     }
   }
+
+  const nonGeneralNoteLoading =
+    (isAppointment && isAppointmentNoteLoading) ||
+    (isEvent && isEventNoteLoading) ||
+    (isIncident && isIncidentNoteLoading) ||
+    (isMedicalDevice && isMedicalDeviceNoteLoading)
+
+  const combinedLoading =
+    isLoading ||
+    (isGeneral && isThreadLoading) ||
+    nonGeneralNoteLoading ||
+    isParticipantsLoading
+
   return (
     <View className=" flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={combinedLoading} />
       {isValidObject(memberData) ? (
         <PtsBackHeader title="Note Message" memberData={memberData} />
       ) : (
@@ -386,7 +426,6 @@ export function NoteMessageScreen() {
                   <View key={index} className="ml-2">
                     <TouchableOpacity
                       onPress={() => {
-                        // console.log('fullName', data.participantName)
                         if (participant.participantName) {
                           Alert.alert('', participant.participantName)
                         }

@@ -8,9 +8,8 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { LocationDetails } from 'app/ui/locationDetails'
-import { BASE_URL, CREATE_DOCTOR, UPDATE_DOCTOR } from 'app/utils/urlConstants'
+import { useCreateDoctor, useUpdateDoctor } from 'app/data/doctors'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -73,6 +72,8 @@ export function AddEditDoctorScreen() {
   ) as any
   // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
+  const createDoctorMutation = useCreateDoctor(header)
+  const updateDoctorMutation = useUpdateDoctor(header)
   const item = useLocalSearchParams<any>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
@@ -180,7 +181,8 @@ export function AddEditDoctorScreen() {
     },
     resolver: zodResolver(phoneSchema)
   })
-  const [isLoading, setLoading] = useState(false)
+  const isLoading =
+    createDoctorMutation.isPending || updateDoctorMutation.isPending
   const [isActive, setIsActive] = useState(
     isDoctorActiveRef.current ? true : false
   )
@@ -191,35 +193,29 @@ export function AddEditDoctorScreen() {
   }
 
   async function updateDoctor(formData: Schema) {
-    setLoading(true)
-    let url = `${BASE_URL}${UPDATE_DOCTOR}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        id: doctorDetails.id ? doctorDetails.id : '',
-        member: {
-          id: memberData.member
-        },
-        salutation: 'Dr',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: removeAllSpecialCharFromString(doctorPhone),
-        website: formData.website,
-        websiteuser: formData.username,
-        specialist: findSpecializationFromId(formData.specialization),
-        status: {
-          status: isDoctorActiveRef.current === true ? 'Active' : 'InActive',
-          id: isDoctorActiveRef.current === true ? 1 : 2
+    updateDoctorMutation.mutate(
+      {
+        doctor: {
+          id: doctorDetails.id ? doctorDetails.id : '',
+          member: {
+            id: memberData.member
+          },
+          salutation: 'Dr',
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: removeAllSpecialCharFromString(doctorPhone),
+          website: formData.website,
+          websiteuser: formData.username,
+          specialist: findSpecializationFromId(formData.specialization),
+          status: {
+            status: isDoctorActiveRef.current === true ? 'Active' : 'InActive',
+            id: isDoctorActiveRef.current === true ? 1 : 2
+          }
         }
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details: any = data.data.doctor
-            ? JSON.stringify(data.data.doctor)
-            : {}
+      },
+      {
+        onSuccess: (data: any) => {
+          let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
 
           router.dismiss(1)
           router.push(
@@ -228,46 +224,38 @@ export function AddEditDoctorScreen() {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update doctor')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   async function createDoctor(formData: Schema) {
-    setLoading(true)
     let locationList: object[] = []
     selectedAddressRef.current.address.id = ''
     locationList.push(selectedAddressRef.current)
-    let url = `${BASE_URL}${CREATE_DOCTOR}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        member: {
-          id: memberData.member
-        },
-        salutation: 'Dr',
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: '',
-        phone: removeAllSpecialCharFromString(doctorPhone),
-        website: formData.website,
-        websiteuser: formData.username,
-        specialist: findSpecializationFromId(formData.specialization),
-        isSelf: true,
-        doctorLocationList: locationList
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          let details: any = data.data.doctor
-            ? JSON.stringify(data.data.doctor)
-            : {}
+    createDoctorMutation.mutate(
+      {
+        doctor: {
+          member: {
+            id: memberData.member
+          },
+          salutation: 'Dr',
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: '',
+          phone: removeAllSpecialCharFromString(doctorPhone),
+          website: formData.website,
+          websiteuser: formData.username,
+          specialist: findSpecializationFromId(formData.specialization),
+          isSelf: true,
+          doctorLocationList: locationList
+        }
+      },
+      {
+        onSuccess: (data: any) => {
+          let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
           if (item.component === 'addEditAppointment') {
             router.dismiss(2)
             router.push(
@@ -286,14 +274,12 @@ export function AddEditDoctorScreen() {
               })
             )
           }
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to create doctor')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   type Response = {
     id: number

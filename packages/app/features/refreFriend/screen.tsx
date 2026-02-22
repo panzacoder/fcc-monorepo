@@ -1,55 +1,45 @@
 'use client'
 
-import { useState } from 'react'
 import { View, Alert, ScrollView } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Image } from 'app/ui/image'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, REFER_FRIEND } from 'app/utils/urlConstants'
+import { useReferFriend } from 'app/data/profile'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
 export type Schema = z.infer<typeof schema>
 export function ReferFriendScreen() {
-  const [isLoading, setLoading] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
+  const referFriendMutation = useReferFriend(header)
+
+  const isLoading = referFriendMutation.isPending
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       email: ''
     },
     resolver: zodResolver(schema)
   })
-  async function inviteFriend(formData: Schema) {
-    setLoading(true)
-    let url = `${BASE_URL}${REFER_FRIEND}`
-    let dataObject = {
-      header: header,
-      email: formData.email
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+  function inviteFriend(formData: Schema) {
+    referFriendMutation.mutate(
+      { email: formData.email },
+      {
+        onSuccess: (data: any) => {
+          if (!data) return
           Alert.alert('', 'Thank You For Helping Us GROW')
-        } else {
-          Alert.alert('', data.message)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   return (
     <ScrollView className="flex-1">

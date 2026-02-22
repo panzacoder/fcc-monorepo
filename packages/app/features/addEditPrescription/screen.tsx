@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Alert } from 'react-native'
+import { View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { Button } from 'app/ui/button'
@@ -16,12 +16,10 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  CREATE_PRESCRIPTION,
-  UPDATE_PRESCRIPTION
-} from 'app/utils/urlConstants'
+  useCreatePrescription,
+  useUpdatePrescription
+} from 'app/data/prescriptions'
 import {
   CalendarView,
   CalendarViewInput
@@ -40,6 +38,10 @@ export function AddEditPrescriptionScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
+  const createPrescriptionMutation = useCreatePrescription(header)
+  const updatePrescriptionMutation = useUpdatePrescription(header)
+  const isLoading =
+    createPrescriptionMutation.isPending || updatePrescriptionMutation.isPending
   let prescriptionDetails =
     item.prescriptionDetails !== undefined
       ? JSON.parse(item.prescriptionDetails)
@@ -52,7 +54,6 @@ export function AddEditPrescriptionScreen() {
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [calenderClickedCount, setCalenderClickedCount] = useState(0)
-  const [isLoading, setLoading] = useState(false)
   const [prescribedBy, setPrescribedBy] = useState(
     prescriptionDetails.doctorName ? prescriptionDetails.doctorName : ''
   )
@@ -167,39 +168,34 @@ export function AddEditPrescriptionScreen() {
         }
       })
     }
-    setLoading(true)
-    let url = _.isEmpty(prescriptionDetails)
-      ? `${BASE_URL}${CREATE_PRESCRIPTION}`
-      : `${BASE_URL}${UPDATE_PRESCRIPTION}`
-    let dataObject = {
-      header: header,
-      medicine: {
-        id: !_.isEmpty(prescriptionDetails) ? prescriptionDetails.id : null,
-        name: object.drugName ? object.drugName : '',
-        prescribedDate: object.prescribedDate ? object.prescribedDate : '',
-        startDate: object.startDate ? object.startDate : '',
-        endDate: object.endDate ? object.endDate : '',
-        instructions: object.instructions ? object.instructions : '',
-        notes: object.notes ? object.notes : '',
-        strength: object.strength ? object.strength : '',
-        pharmacy: object.selectedPharmacy ? object.selectedPharmacy : '',
-        doctorName: object.prescribedBy ? object.prescribedBy : '',
-        facilityid: facilityId,
-        doctorid: doctorId,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        type: {
-          id: object.type ? object.type : ''
-        }
+    let medicine = {
+      id: !_.isEmpty(prescriptionDetails) ? prescriptionDetails.id : null,
+      name: object.drugName ? object.drugName : '',
+      prescribedDate: object.prescribedDate ? object.prescribedDate : '',
+      startDate: object.startDate ? object.startDate : '',
+      endDate: object.endDate ? object.endDate : '',
+      instructions: object.instructions ? object.instructions : '',
+      notes: object.notes ? object.notes : '',
+      strength: object.strength ? object.strength : '',
+      pharmacy: object.selectedPharmacy ? object.selectedPharmacy : '',
+      doctorName: object.prescribedBy ? object.prescribedBy : '',
+      facilityid: facilityId,
+      doctorid: doctorId,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      type: {
+        id: object.type ? object.type : ''
       }
     }
-
-    // console.log('in createUpdatePrescription', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let details = data.data.medicine ? data.data.medicine : {}
+    const mutation = _.isEmpty(prescriptionDetails)
+      ? createPrescriptionMutation
+      : updatePrescriptionMutation
+    mutation.mutate(
+      { medicine },
+      {
+        onSuccess: (data: any) => {
+          let details = data?.medicine ? data.medicine : {}
           if (_.isEmpty(prescriptionDetails)) {
             router.dismiss(1)
           } else {
@@ -211,15 +207,12 @@ export function AddEditPrescriptionScreen() {
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          logger.debug('error', error)
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   async function callCreateUpdatePrescription(formData: Schema) {
     // console.log('in callCreateUpdatePrescription', formData.strength)

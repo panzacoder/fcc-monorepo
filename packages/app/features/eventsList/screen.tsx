@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
+import { useState, useEffect, useRef } from 'react'
+import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -11,12 +11,10 @@ import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import moment from 'moment'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_EVENTS } from 'app/utils/urlConstants'
+import { useEvents } from 'app/data/events'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import {
   formatTimeToUserLocalTime,
   getMonthsList,
@@ -37,10 +35,9 @@ const monthsList = getMonthsList() as any
 // let currentFilter = 'Upcoming'
 export function EventsListScreen() {
   const eventsPrivilegesRef = useRef<any>({})
-  const selectedMonthRef = useRef<any>('All')
-  const selectedYearRef = useRef<any>('All')
+  const [selectedMonth, setSelectedMonth] = useState('All')
+  const [selectedYear, setSelectedYear] = useState('All')
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Upcoming')
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
@@ -80,45 +77,29 @@ export function EventsListScreen() {
       title: name
     })
   })
-  const getEventDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_EVENTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      month: selectedMonthRef.current,
-      year: selectedYearRef.current
+
+  const { data: eventsData, isLoading } = useEvents(header, {
+    memberId: memberData.member ? memberData.member : '',
+    month: selectedMonth,
+    year: selectedYear
+  })
+
+  useEffect(() => {
+    if (eventsData) {
+      if (eventsData.domainObjectPrivileges) {
+        eventsPrivilegesRef.current = eventsData.domainObjectPrivileges.Event
+          ? eventsData.domainObjectPrivileges.Event
+          : {}
+      }
+      let list = eventsData.eventList ? eventsData.eventList : []
+      setEventsList(list)
+      setEventsListFull(list)
+      getFilteredList(list, currentFilter)
+      setIsDataReceived(true)
+      setIsFilter(false)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          // console.log('data', JSON.stringify(data.data.eventList))
-          if (data.data.domainObjectPrivileges) {
-            eventsPrivilegesRef.current = data.data.domainObjectPrivileges.Event
-              ? data.data.domainObjectPrivileges.Event
-              : {}
-          }
-          setEventsList(data.data.eventList ? data.data.eventList : [])
-          setEventsListFull(data.data.eventList ? data.data.eventList : [])
-          getFilteredList(
-            data.data.eventList ? data.data.eventList : [],
-            currentFilter
-          )
-          setIsDataReceived(true)
-          setIsFilter(false)
-          // console.log('eventList', eventsList)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  }, [eventsData])
+
   function handleBackButtonClick() {
     let fullName = ''
     if (memberData.firstname) {
@@ -138,7 +119,6 @@ export function EventsListScreen() {
   }
 
   useEffect(() => {
-    getEventDetails()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -195,18 +175,18 @@ export function EventsListScreen() {
     setEventsList(filteredList)
   }
   function filterEvents(formData: Schema) {
-    selectedMonthRef.current =
+    setSelectedMonth(
       formData.monthIndex !== -1
         ? monthsList[formData.monthIndex - 1].title
         : 'All'
-    selectedYearRef.current =
+    )
+    setSelectedYear(
       formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
-    getEventDetails()
+    )
   }
   function resetFilter() {
-    selectedMonthRef.current = 'All'
-    selectedYearRef.current = 'All'
-    getEventDetails()
+    setSelectedMonth('All')
+    setSelectedYear('All')
     reset({
       monthIndex: 1,
       yearIndex: 1

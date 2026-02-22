@@ -14,18 +14,18 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import _ from 'lodash'
-import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
-  BASE_URL,
-  GET_INCIDENT_DETAILS,
-  GET_THREAD_PARTICIPANTS,
-  CREATE_MESSAGE_THREAD,
-  DELETE_INCIDENT_NOTE,
-  CREATE_INCIDENT_NOTE,
-  UPDATE_INCIDENT_NOTE,
-  DELETE_INCIDENT
-} from 'app/utils/urlConstants'
+  useIncidentDetails,
+  useDeleteIncident,
+  useCreateIncidentNote,
+  useUpdateIncidentNote,
+  useDeleteIncidentNote
+} from 'app/data/incidents'
+import {
+  useThreadParticipants,
+  useCreateMessageThread
+} from 'app/data/messages'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -67,60 +67,55 @@ export function IncidentDetailsScreen() {
     item.incidentDetails && item.incidentDetails !== undefined
       ? JSON.parse(item.incidentDetails)
       : {}
-  // console.log('incidentDetails', JSON.stringify(incidentDetails))
-  const getIncidentDetails = useCallback(
-    async (isFromCreateThread: any, noteData: any) => {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_INCIDENT_DETAILS}`
-      let dataObject = {
-        header: header,
-        incident: {
-          id: incidentData.id ? incidentData.id : ''
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            // console.log('data', JSON.stringify(data.data))
-            if (data.data.domainObjectPrivileges) {
-              incidentPrivilegesRef.current = data.data.domainObjectPrivileges
-                .Incident
-                ? data.data.domainObjectPrivileges.Incident
-                : {}
-              notePrivilegesRef.current = data.data.domainObjectPrivileges
-                .INCIDENTNOTE
-                ? data.data.domainObjectPrivileges.INCIDENTNOTE
-                : data.data.domainObjectPrivileges.IncidentNote
-                  ? data.data.domainObjectPrivileges.IncidentNote
-                  : {}
-            }
 
-            setIncidentDetails(data.data.incident ? data.data.incident : {})
-            if (data.data.incident.noteList) {
-              setNotesList(data.data.incident.noteList)
-            }
-            setIsRender(!isRender)
-            if (isFromCreateThread) {
-              router.push(
-                formatUrl('/circles/noteMessage', {
-                  component: 'Incident',
-                  memberData: JSON.stringify(memberData),
-                  noteData: JSON.stringify(noteData)
-                })
-              )
-            }
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
+  const incidentId = incidentData.id ? Number(incidentData.id) : 0
+  const {
+    data: incidentDetailsData,
+    isLoading: isDetailsLoading,
+    refetch: refetchDetails
+  } = useIncidentDetails(header, incidentId)
+
+  const deleteIncidentMutation = useDeleteIncident(header)
+  const createNoteMutation = useCreateIncidentNote(header)
+  const updateNoteMutation = useUpdateIncidentNote(header)
+  const deleteNoteMutation = useDeleteIncidentNote(header)
+  const createMessageThreadMutation = useCreateMessageThread(header)
+
+  const threadParticipantsParams = {
+    member: {
+      id: memberData.member ? memberData.member : ''
     },
-    []
-  )
+    messageThreadType: {
+      type: 'Incident'
+    }
+  }
+  const {
+    data: threadParticipantsData,
+    isLoading: isParticipantsLoading,
+    refetch: refetchParticipants
+  } = useThreadParticipants(header, threadParticipantsParams)
+
+  useEffect(() => {
+    if (incidentDetailsData) {
+      const data = incidentDetailsData as any
+      if (data.domainObjectPrivileges) {
+        incidentPrivilegesRef.current = data.domainObjectPrivileges.Incident
+          ? data.domainObjectPrivileges.Incident
+          : {}
+        notePrivilegesRef.current = data.domainObjectPrivileges.INCIDENTNOTE
+          ? data.domainObjectPrivileges.INCIDENTNOTE
+          : data.domainObjectPrivileges.IncidentNote
+            ? data.domainObjectPrivileges.IncidentNote
+            : {}
+      }
+
+      setIncidentDetails(data.incident ? data.incident : {})
+      if (data.incident && data.incident.noteList) {
+        setNotesList(data.incident.noteList)
+      }
+    }
+  }, [incidentDetailsData])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -131,9 +126,6 @@ export function IncidentDetailsScreen() {
     return true
   }
   useEffect(() => {
-    if (!isAddNote) {
-      getIncidentDetails(false, noteData)
-    }
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
       BackHandler.removeEventListener(
@@ -187,79 +179,68 @@ export function IncidentDetailsScreen() {
     title: any,
     noteData: any
   ) {
-    setLoading(true)
-    let url = ''
-    let dataObject = {
-      header: header,
-      note: {
-        id: '',
-        incident: {
-          id: incidentDetails.id ? incidentDetails.id : ''
-        },
-        note: noteDetails,
-        shortDescription: title
-      }
+    const notePayload: Record<string, unknown> = {
+      incident: {
+        id: incidentDetails.id ? incidentDetails.id : ''
+      },
+      note: noteDetails,
+      shortDescription: title
     }
+
     if (_.isEmpty(noteData)) {
-      url = `${BASE_URL}${CREATE_INCIDENT_NOTE}`
-    } else {
-      dataObject.note.id = noteData.id ? noteData.id : ''
-      url = `${BASE_URL}${UPDATE_INCIDENT_NOTE}`
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsAddNote(false)
-          getIncidentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+      createNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to create note')
+          }
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      )
+    } else {
+      notePayload.id = noteData.id ? noteData.id : ''
+      updateNoteMutation.mutate(
+        { note: notePayload },
+        {
+          onSuccess: () => {
+            setIsAddNote(false)
+            refetchDetails()
+          },
+          onError: (error) => {
+            Alert.alert('', error.message || 'Failed to update note')
+          }
+        }
+      )
+    }
   }
   const cancelClicked = () => {
     setIsAddNote(false)
     setIsMessageThread(false)
   }
   const editNote = (noteData: any) => {
-    // console.log('noteData', JSON.stringify(noteData))
     setNoteData(noteData)
     setIsAddNote(true)
   }
   async function deleteNote(noteId: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_INCIDENT_NOTE}`
-    let dataObject = {
-      header: header,
-      note: {
-        id: noteId
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          getIncidentDetails(false, noteData)
-        } else {
-          Alert.alert('', data.message)
+    deleteNoteMutation.mutate(
+      { note: { id: noteId } },
+      {
+        onSuccess: () => {
+          refetchDetails()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete note')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   const messageThreadClicked = (noteData: any) => {
     logger.debug('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
-      // console.log('noteData', noteData)
       router.push(
         formatUrl('/circles/noteMessage', {
           component: 'Incident',
@@ -273,43 +254,26 @@ export function IncidentDetailsScreen() {
   }
   async function getThreadParticipants(noteData: any) {
     setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD_PARTICIPANTS}`
-    let dataObject = {
-      header: header,
-      member: {
-        id: memberData.member ? memberData.member : ''
-      },
-      messageThreadType: {
-        type: 'Incident'
+    try {
+      const result = await refetchParticipants()
+      setLoading(false)
+      if (result.data) {
+        const list = (result.data as any[]).map((item: any) => {
+          let object = item
+          object.isSelected = false
+          return object
+        })
+        setParticipantsList(list)
+        setNoteData(noteData)
+        setIsMessageThread(true)
       }
+    } catch (error) {
+      setLoading(false)
+      logger.debug(error)
     }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('in getThreadParticipants')
-          const list = data.data.map((data: any, index: any) => {
-            let object = data
-            object.isSelected = false
-            return object
-          })
-          setParticipantsList(list)
-          setNoteData(noteData)
-          setIsMessageThread(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
   }
   function createMessageThread(subject: any, noteData: any) {
-    setLoading(true)
     setNoteData(noteData)
-    let url = `${BASE_URL}${CREATE_MESSAGE_THREAD}`
     let list: object[] = []
     participantsList.map((data: any, index: any) => {
       if (data.isSelected === true) {
@@ -321,37 +285,39 @@ export function IncidentDetailsScreen() {
         list.push(object)
       }
     })
-    let dataObject = {
-      header: header,
-      messageThread: {
-        subject: subject,
-        member: memberData.member ? memberData.member : '',
-        noteId: noteData.id ? noteData.id : '',
-        type: {
-          type: 'Incident'
-        },
-        participantList: list,
-        incidentNote: {
-          id: noteData.id ? noteData.id : ''
-        },
-        messageList: []
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          setIsMessageThread(false)
-          getIncidentDetails(true, noteData)
-        } else {
-          Alert.alert('', data.message)
+    createMessageThreadMutation.mutate(
+      {
+        messageThread: {
+          subject: subject,
+          member: memberData.member ? memberData.member : '',
+          noteId: noteData.id ? noteData.id : '',
+          type: {
+            type: 'Incident'
+          },
+          participantList: list,
+          incidentNote: {
+            id: noteData.id ? noteData.id : ''
+          },
+          messageList: []
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: () => {
+          setIsMessageThread(false)
+          refetchDetails()
+          router.push(
+            formatUrl('/circles/noteMessage', {
+              component: 'Incident',
+              memberData: JSON.stringify(memberData),
+              noteData: JSON.stringify(noteData)
+            })
+          )
+        },
+        onError: (error) => {
+          logger.debug(error)
+        }
+      }
+    )
   }
   function isParticipantSelected(index: any) {
     participantsList[index].isSelected = !participantsList[index].isSelected
@@ -359,40 +325,34 @@ export function IncidentDetailsScreen() {
     setParticipantsList(participantsList)
   }
   async function deleteIncident() {
-    setLoading(true)
-    let url = `${BASE_URL}${DELETE_INCIDENT}`
-    let dataObject = {
-      header: header,
-      incident: {
-        id: incidentDetails.id ? incidentDetails.id : ''
-      }
-    }
-    // console.log('dataObject', JSON.stringify(dataObject))
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          // console.log('createDoctor', JSON.stringify(data))
+    deleteIncidentMutation.mutate(
+      { incident: { id: incidentDetails.id ? incidentDetails.id : 0 } },
+      {
+        onSuccess: () => {
           router.dismiss(2)
           router.push(
             formatUrl('/circles/incidentsList', {
               memberData: JSON.stringify(memberData)
             })
           )
-          // router.back()
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete incident')
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
+
+  const isMutating =
+    deleteIncidentMutation.isPending ||
+    createNoteMutation.isPending ||
+    updateNoteMutation.isPending ||
+    deleteNoteMutation.isPending ||
+    createMessageThreadMutation.isPending
 
   return (
     <View className="flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isLoading || isDetailsLoading || isMutating} />
       <PtsBackHeader title="Incident Details" memberData={memberData} />
       <View className=" h-full w-full flex-1 py-2 ">
         <ScrollView persistentScrollbar={true} className="flex-1">

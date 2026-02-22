@@ -1,15 +1,13 @@
 import { FC, useState } from 'react'
-import { TouchableOpacity, View, Alert } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { useAppSelector } from 'app/redux/hooks'
 import PtsNameInitials from '../PtsNameInitials'
 import { Feather } from '../icons'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, USER_LOGOUT } from 'app/utils/urlConstants'
+import { useLogout } from 'app/data/auth'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { clearCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
-import { logger } from 'app/utils/logger'
 
 export type TabsHeaderProps = {
   navigation: any
@@ -43,30 +41,24 @@ const MenuButton: FC<{
 export const TabsHeader = ({}) => {
   const router = useRouter()
   const [isShowMenu, setIsShowMenu] = useState(false)
-  const [isLoading, setLoading] = useState(false)
   const user = useAppSelector((state) => state.userProfileState.header)
   const header = useAppSelector((state) => state.headerState.header)
-  async function logout() {
-    setLoading(true)
-    let url = `${BASE_URL}${USER_LOGOUT}`
-    let dataObject = {
-      header: header
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
+  const logoutMutation = useLogout(header)
+
+  const isLoading = logoutMutation.isPending
+
+  function logout() {
+    logoutMutation.mutate(
+      { header: header },
+      {
+        onSuccess: async (data: any) => {
+          if (!data) return
           await clearCredentials()
           router.dismissAll()
           router.push('/login')
-        } else {
-          Alert.alert('', data.message)
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      }
+    )
   }
   return (
     <View style={{ zIndex: 100 }}>

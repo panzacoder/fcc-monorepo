@@ -1,13 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { View, Alert, Text } from 'react-native'
+import { useVerifyAccount, useResendOtp } from 'app/data/auth'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useRouter, useLocalSearchParams } from 'expo-router'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, VERIFY_ACCOUNT, RESEND_OTP } from 'app/utils/urlConstants'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -15,7 +13,6 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatUrl } from 'app/utils/format-url'
-import { logger } from 'app/utils/logger'
 
 const schema = z.object({
   authCode: z.string().length(6, { message: 'Enter 6 digit code from email' })
@@ -27,7 +24,8 @@ export function VerificationScreen() {
   const router = useRouter()
   const item = useLocalSearchParams()
   const email = item.email ? item.email : ''
-  const [isLoading, setLoading] = useState(false)
+  const verifyMutation = useVerifyAccount({})
+  const resendMutation = useResendOtp({})
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -36,47 +34,38 @@ export function VerificationScreen() {
     resolver: zodResolver(schema)
   })
 
-  async function verifyAuthCode(formData: Schema) {
-    setLoading(true)
+  const isLoading = verifyMutation.isPending || resendMutation.isPending
 
-    const url = `${BASE_URL}${VERIFY_ACCOUNT}`
-    const dataObject = {
-      registrationVo: {
-        emailOrPhone: email,
-        varificationCode: formData.authCode
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        if (data.status === 'SUCCESS') {
-          router.replace(formatUrl('/login', {}))
-        } else {
-          Alert.alert('', data.message)
+  async function verifyAuthCode(formData: Schema) {
+    verifyMutation.mutate(
+      {
+        registrationVo: {
+          emailOrPhone: email as string,
+          varificationCode: formData.authCode
         }
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+      },
+      {
+        onSuccess: (data) => {
+          if (data) {
+            router.replace(formatUrl('/login', {}))
+          }
+        }
+      }
+    )
   }
   async function resendAuthCode() {
-    setLoading(true)
-    let url = `${BASE_URL}${RESEND_OTP}`
-    let dataObject = {
-      registration: {
-        email: email
+    resendMutation.mutate(
+      {
+        registration: {
+          email: email as string
+        }
+      },
+      {
+        onSuccess: () => {
+          Alert.alert('', 'Verification code has been resent')
+        }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        setLoading(false)
-        Alert.alert('', data.message)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    )
   }
   return (
     <CardView>

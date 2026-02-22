@@ -9,13 +9,6 @@ import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import {
-  BASE_URL,
-  CREATE_MEDICAL_DEVICE,
-  GET_MEMBER_DOCTORS,
-  UPDATE_MEDICAL_DEVICE
-} from 'app/utils/urlConstants'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from 'app/ui/typography'
 import { useLocalSearchParams } from 'expo-router'
@@ -26,8 +19,13 @@ import { useRouter } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { CheckBox } from 'react-native-elements'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+
+import { useMemberDoctors } from 'app/data/doctors'
+import {
+  useCreateMedicalDevice,
+  useUpdateMedicalDevice
+} from 'app/data/medical-devices'
 const schema = z.object({
   prescriberIndex: z.number().min(0, { message: 'Type is required' }),
   description: z.string().min(1, { message: 'Required' })
@@ -52,7 +50,6 @@ export function AddEditMedicalDeviceScreen() {
   const [key, setKey] = useState(0)
   const [selectedPrescriberIndex, setSelectedPrescriberIndex] = useState(-1)
   const [doctorListFull, setDoctorListFull] = useState([]) as any
-  const [isLoading, setLoading] = useState(false)
   const [prescribedBy, setPrescribedBy] = useState('')
   const [selectedType, setSelectedType] = useState(
     medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
@@ -66,50 +63,42 @@ export function AddEditMedicalDeviceScreen() {
     (state) => state.staticDataState.staticData
   )
   const header = useAppSelector((state) => state.headerState.header)
+  const memberId = memberData.member ? memberData.member : ''
+  const doctorsQuery = useMemberDoctors(header, { memberId })
+  const createMedicalDeviceMutation = useCreateMedicalDevice(header)
+  const updateMedicalDeviceMutation = useUpdateMedicalDevice(header)
   useEffect(() => {
-    let url = `${BASE_URL}${GET_MEMBER_DOCTORS}`
-    let dataObject = {
-      header: header,
-      doctor: {
-        member: {
-          id: memberData.member ? memberData.member : ''
+    if (doctorsQuery.data) {
+      let list = (doctorsQuery.data as any).list
+        ? (doctorsQuery.data as any).list
+        : []
+      doctorListRef.current = list.map((data: any, index: any) => {
+        if (!_.isEmpty(medicalDeviceDetails)) {
+          if (
+            medicalDeviceDetails.doctor &&
+            data.id === medicalDeviceDetails.doctor.id
+          ) {
+            let prescribedIndex = index + 1
+            setSelectedPrescriberIndex(prescribedIndex)
+            setPrescribedBy(data.doctorName)
+            reset({
+              prescriberIndex: prescribedIndex
+            })
+          }
         }
-      }
+        return {
+          title: data.doctorName,
+          id: index + 1
+        }
+      })
+      setDoctorListFull(list)
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let list = data.data.list ? data.data.list : []
-          doctorListRef.current = list.map((data: any, index: any) => {
-            if (!_.isEmpty(medicalDeviceDetails)) {
-              if (
-                medicalDeviceDetails.doctor &&
-                data.id === medicalDeviceDetails.doctor.id
-              ) {
-                let prescribedIndex = index + 1
-                setSelectedPrescriberIndex(prescribedIndex)
-                setPrescribedBy(data.doctorName)
-                reset({
-                  prescriberIndex: prescribedIndex
-                })
-              }
-            }
-            return {
-              title: data.doctorName,
-              id: index + 1
-            }
-          })
+  }, [doctorsQuery.data])
 
-          setDoctorListFull(list)
-        } else {
-          Alert.alert('', data.message)
-        }
-      })
-      .catch((error) => {
-        logger.debug('error', error)
-      })
-  }, [])
-
+  const isLoading =
+    doctorsQuery.isLoading ||
+    createMedicalDeviceMutation.isPending ||
+    updateMedicalDeviceMutation.isPending
   // console.log('medicalDeviceDetails', JSON.stringify(medicalDeviceDetails))
   const typesList = staticData.purchaseTypeList.map((data: any, index: any) => {
     return {
@@ -144,56 +133,49 @@ export function AddEditMedicalDeviceScreen() {
     createUpdateMedicalDevice(object)
   }
   async function createUpdateMedicalDevice(object: any) {
-    // console.log('in createUpdateMedicalDevice', JSON.stringify(object))
-    setLoading(true)
-    let url =
-      _.isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
-        ? `${BASE_URL}${CREATE_MEDICAL_DEVICE}`
-        : `${BASE_URL}${UPDATE_MEDICAL_DEVICE}`
-    let dataObject: any = {
-      header: header,
-      purchase: {
-        id:
-          !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
-            ? medicalDeviceDetails.id
-            : null,
-        date: object.date ? object.date : '',
-        description: object.description ? object.description : '',
-        type: object.selectedType ? object.selectedType : '',
-        isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
-        member: {
-          id: memberData.member ? memberData.member : ''
-        },
-        doctor: {
-          id: object.doctorId ? object.doctorId : ''
-        }
+    let purchaseData: any = {
+      id:
+        !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
+          ? medicalDeviceDetails.id
+          : null,
+      date: object.date ? object.date : '',
+      description: object.description ? object.description : '',
+      type: object.selectedType ? object.selectedType : '',
+      isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,
+      member: {
+        id: memberData.member ? memberData.member : ''
+      },
+      doctor: {
+        id: object.doctorId ? object.doctorId : ''
       }
     }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          let details = data.data.purchase ? data.data.purchase : {}
+    const isCreate =
+      _.isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
+    const mutation = isCreate
+      ? createMedicalDeviceMutation
+      : updateMedicalDeviceMutation
+    mutation.mutate(
+      { purchase: purchaseData },
+      {
+        onSuccess: (data: any) => {
+          let details = data?.purchase ? data.purchase : {}
           if (_.isEmpty(medicalDeviceDetails)) {
             router.dismiss(1)
           } else {
             router.dismiss(2)
           }
-
           router.push(
             formatUrl('/circles/medicalDeviceDetails', {
               medicalDevicesDetails: JSON.stringify(details),
               memberData: JSON.stringify(memberData)
             })
           )
-        } else {
-          Alert.alert('', data.message)
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to save medical device')
         }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+      }
+    )
   }
   const onSelectionType = (data: any) => {
     setSelectedType(data)

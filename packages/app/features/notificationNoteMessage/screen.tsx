@@ -16,16 +16,16 @@ import messageListAction from 'app/redux/messageList/messageListAction'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import { Typography } from 'app/ui/typography'
-import { CallPostService } from 'app/utils/fetchServerData'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {
-  BASE_URL,
-  GET_THREAD,
-  UPDATE_MESSAGE_THREAD
-} from 'app/utils/urlConstants'
+  useThread,
+  useUpdateMessageThread,
+  messageKeys
+} from 'app/data/messages'
+import { useQueryClient } from '@tanstack/react-query'
 import { logger } from 'app/utils/logger'
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -60,40 +60,39 @@ export function NotificationNoteMessageScreen() {
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
       : {}
-  const getNoteDetails = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_THREAD}`
-    let dataObject = {
-      header: header,
-      messageThread: {
-        id: noteData.id ? noteData.id : ''
+
+  const queryClient = useQueryClient()
+
+  const threadParams = {
+    messageThread: {
+      id: noteData.id ? noteData.id : ''
+    }
+  }
+
+  const { data: threadData, isLoading: isThreadLoading } = useThread(
+    header,
+    threadParams
+  )
+
+  const updateThreadMutation = useUpdateMessageThread(header)
+
+  useEffect(() => {
+    if (threadData) {
+      const data = threadData as any
+      if (data.messageThread) {
+        let messageThread = data.messageThread
+        setThreadDetails(messageThread)
+        let msgList =
+          messageThread.messageList !== undefined &&
+          messageThread.messageList !== null
+            ? messageThread.messageList
+            : []
+        setMessageList(msgList)
+        dispatch(messageListAction.setMessageList(msgList))
       }
     }
+  }, [threadData])
 
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.messageThread) {
-            let messageThread = data.data.messageThread
-            setThreadDetails(messageThread)
-            let messageList =
-              messageThread.messageList !== undefined &&
-              messageThread.messageList !== null
-                ? messageThread.messageList
-                : []
-            setMessageList(messageList)
-            dispatch(messageListAction.setMessageList(messageList))
-          }
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
-  }, [])
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
@@ -125,7 +124,6 @@ export function NotificationNoteMessageScreen() {
     setIsRender(!isRender)
   }
   useEffect(() => {
-    getNoteDetails()
     handleFcmMessage()
   }, [])
 
@@ -134,39 +132,38 @@ export function NotificationNoteMessageScreen() {
       Alert.alert('', 'Please type a message')
     } else {
       setLoading(true)
-      let url = `${BASE_URL}${UPDATE_MESSAGE_THREAD}`
       let list: object[] = []
       let object = {
         body: message,
         operation: 'Add'
       }
       list.push(object)
-      let dataObject = {
-        header: header,
-        messageThread: {
-          id: threadDetails.id ? threadDetails.id : '',
-          messageList: list
-        }
-      }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          setLoading(false)
-          if (data.status === 'SUCCESS') {
-            getNoteDetails()
-            setMessage('')
-          } else {
-            Alert.alert('', data.message)
+      updateThreadMutation.mutate(
+        {
+          messageThread: {
+            id: threadDetails.id ? threadDetails.id : '',
+            messageList: list
           }
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug(error)
-        })
+        },
+        {
+          onSuccess: () => {
+            setLoading(false)
+            queryClient.invalidateQueries({
+              queryKey: messageKeys.detail(threadParams)
+            })
+            setMessage('')
+          },
+          onError: (error) => {
+            setLoading(false)
+            logger.debug(error)
+          }
+        }
+      )
     }
   }
   return (
     <View className=" flex-1">
-      <PtsLoader loading={isLoading} />
+      <PtsLoader loading={isLoading || isThreadLoading} />
       {isValidObject(memberData) ? (
         <PtsBackHeader title="Note Message" memberData={memberData} />
       ) : (

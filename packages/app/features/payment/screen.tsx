@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   View,
   Alert,
@@ -14,17 +14,15 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import { getAddressFromObject } from 'app/ui/utils'
-import { CallPostService } from 'app/utils/fetchServerData'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
-  APPLE_SUCCESS_PAYMENT_FOR_OUR_SERVER,
-  BASE_URL,
-  IOS_RECEIPT_VERIFICATION_URL,
-  PAYMENT_CHECK_OUT_SESSION,
-  PAYMENT_FAIL,
-  PAYMENT_GET_PAYMENT_CONFIG,
-  PAYMENT_SUCCESS
-} from 'app/utils/urlConstants'
+  usePaymentConfig,
+  useCheckOutSession,
+  usePaymentSuccess,
+  usePaymentFail,
+  useAppleSuccessPayment,
+  useIosReceiptVerification
+} from 'app/data/payment'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import RNIap, {
@@ -70,12 +68,8 @@ export function PaymentsScreen() {
   const dispatch = useAppDispatch()
   const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
     useStripe()
-  const [isLoading, setLoading] = useState(false)
   const [isUserDataLoaded, setUserDataLoaded] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState({})
-  const [publishableKey, setPublishableKey] = useState(
-    'pk_test_51JAmgDG03dd4BHZM3C08oeGQu5A8rXJgh76L7Jwi4x2QaH2MhHtu6EMj3W8AMDQfaQ16WPiBZ4zpDHcL3zSZ0IfT00j27YaRq0'
-  )
 
   const [email, setEmail] = useState('')
   const header = useAppSelector((state) => state.headerState.header)
@@ -83,228 +77,237 @@ export function PaymentsScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let planDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
-  // console.log('planDetails', JSON.stringify(planDetails))
-  // console.log('userDetails', JSON.stringify(userDetails))
+
+  const paymentConfigQuery = usePaymentConfig(header)
+  const checkOutSessionMutation = useCheckOutSession(header)
+  const paymentSuccessMutation = usePaymentSuccess(header)
+  const paymentFailMutation = usePaymentFail(header)
+  const appleSuccessPaymentMutation = useAppleSuccessPayment(header)
+  const iosReceiptVerificationMutation = useIosReceiptVerification(header)
+
+  const publishableKey =
+    paymentConfigQuery.data?.publicKey ??
+    'pk_test_51JAmgDG03dd4BHZM3C08oeGQu5A8rXJgh76L7Jwi4x2QaH2MhHtu6EMj3W8AMDQfaQ16WPiBZ4zpDHcL3zSZ0IfT00j27YaRq0'
+
+  const isLoading =
+    checkOutSessionMutation.isPending ||
+    paymentSuccessMutation.isPending ||
+    paymentFailMutation.isPending ||
+    appleSuccessPaymentMutation.isPending ||
+    iosReceiptVerificationMutation.isPending
+
   const verifyInAppPurchaseReceipt = (receipt: any) => {
-    let url = `${IOS_RECEIPT_VERIFICATION_URL}`
-    // password is app secret key from appstore connect
-    let object = {
-      'receipt-data': receipt,
-      password: '05460a36752c42a09e55e0ea57ee914f',
-      'exclude-old-transactions': true
-    }
-    // console.log('../../', email,emailAddress,refEmail.current)
-    CallPostService(url, object)
-      .then((response: any) => {
-        if (response) {
-          let latestRecipt = response.latest_receipt_info
-          // console.log(response, '../', userDetails.email, '../../', userDetails, refEmail);
-          if (latestRecipt) {
-            logger.debug('latestRecipt', latestRecipt)
-            if (latestRecipt[0]) {
-              completeIOSTransactionOnOurServer(latestRecipt[0])
+    iosReceiptVerificationMutation.mutate(
+      {
+        'receipt-data': receipt,
+        password: '05460a36752c42a09e55e0ea57ee914f',
+        'exclude-old-transactions': true
+      },
+      {
+        onSuccess: (response: any) => {
+          if (response) {
+            let latestRecipt = response.latest_receipt_info
+            if (latestRecipt) {
+              logger.debug('latestRecipt', latestRecipt)
+              if (latestRecipt[0]) {
+                completeIOSTransactionOnOurServer(latestRecipt[0])
+              }
             }
           }
+        },
+        onError: (error) => {
+          logger.debug(error)
         }
-      })
-      .catch((error) => {
-        logger.debug(error)
-        setLoading(false)
-      })
+      }
+    )
   }
   const completeIOSTransactionOnOurServer = (data: any) => {
-    // console.log('../../../../', email,emailAddress,refEmail.current)
-    let object = {}
-
-    object = {
-      header: header,
-      notificationType: 'PTS_PURCHASED',
-      notificationUUID: '',
-      subtype: '',
-      email: userDetails.email,
-      version: '',
-      renewableInfo: {
-        expirationIntent: '1',
-        originalTransactionId: data.original_transaction_id,
-        autoRenewProductId: data.product_id,
-        productId: data.product_id,
-        autoRenewStatus: '0',
-        signedDate: '',
-        isInBillingRetryPeriod: 'false'
+    appleSuccessPaymentMutation.mutate(
+      {
+        notificationType: 'PTS_PURCHASED',
+        notificationUUID: '',
+        subtype: '',
+        email: userDetails.email,
+        version: '',
+        renewableInfo: {
+          expirationIntent: '1',
+          originalTransactionId: data.original_transaction_id,
+          autoRenewProductId: data.product_id,
+          productId: data.product_id,
+          autoRenewStatus: '0',
+          signedDate: '',
+          isInBillingRetryPeriod: 'false'
+        },
+        transactionInfo: {
+          transactionId: data.transaction_id,
+          originalTransactionId: data.original_transaction_id,
+          webOrderLineItemId: data.web_order_line_item_id,
+          bundleId: 'com.familycarecircle.fccmobileapp',
+          productId: data.product_id,
+          subscriptionGroupIdentifier: data.subscription_group_identifier,
+          purchaseDate: data.purchase_date_ms,
+          originalPurchaseDate: data.original_purchase_date_ms,
+          expiresDate: data.expires_date_ms,
+          quantity: '1',
+          type: 'Auto-Renewable Subscription',
+          inAppOwnershipType: 'PURCHASED',
+          signedDate: ''
+        }
       },
-      transactionInfo: {
-        transactionId: data.transaction_id,
-        originalTransactionId: data.original_transaction_id,
-        webOrderLineItemId: data.web_order_line_item_id,
-        bundleId: 'com.familycarecircle.fccmobileapp',
-        productId: data.product_id,
-        subscriptionGroupIdentifier: data.subscription_group_identifier,
-        purchaseDate: data.purchase_date_ms,
-        originalPurchaseDate: data.original_purchase_date_ms,
-        expiresDate: data.expires_date_ms,
-        quantity: '1',
-        type: 'Auto-Renewable Subscription',
-        inAppOwnershipType: 'PURCHASED',
-        signedDate: ''
-      }
-    }
-
-    let url = `${BASE_URL}${APPLE_SUCCESS_PAYMENT_FOR_OUR_SERVER}`
-
-    CallPostService(url, object)
-      .then((response) => {
-        logger.debug('our server response', response)
-        if (response.status === 'SUCCESS') {
+      {
+        onSuccess: (response: any) => {
+          logger.debug('our server response', response)
           router.back()
+        },
+        onError: (error) => {
+          logger.debug(error)
         }
-      })
-      .catch((error) => {
-        logger.debug(error)
-        setLoading(false)
-      })
-  }
-  async function getPaymentConfig() {
-    let url = `${BASE_URL}${PAYMENT_GET_PAYMENT_CONFIG}`
-    let object = { header: header }
-
-    CallPostService(url, object)
-      .then(async (response) => {
-        logger.debug(response)
-        if (response.status === 'SUCCESS') {
-          let data: any = response.data
-          await setPublishableKey(data.publicKey)
-          logger.debug('publishableKey', publishableKey)
-        } else {
-          Alert.alert('', response.message)
-        }
-      })
-      .catch((error) => {
-        logger.debug(error)
-        setLoading(false)
-      })
+      }
+    )
   }
   async function initializePaymentSheet() {
-    const {
-      paymentIntent,
-      ephemeralKey,
-      customerId,
-      sessionId,
-      paymentIntentId,
-      subscriptionId
-    }: any = await createSessionCheckout()
-
-    logger.debug(
-      paymentIntent,
-      ephemeralKey,
-      customerId,
-      sessionId,
-      paymentIntentId
-    )
-    const { error } = await initPaymentSheet({
-      customerId: customerId,
-      customerEphemeralKeySecret: ephemeralKey,
-      paymentIntentClientSecret: paymentIntent,
-      merchantDisplayName: 'FCC'
-    })
-    if (!error) {
-      // setLoading(true);
-    } else {
-      logger.debug(error)
-      Alert.alert('', error)
-      return
-    }
-
-    setTimeout(
-      () => openPaymentSheet(paymentIntent, sessionId, subscriptionId),
-      1000
-    )
-  }
-
-  async function paymentSuccess(sessionId: any, subscriptionId: any) {
-    let url = `${BASE_URL}${PAYMENT_SUCCESS}`
-    let object = {
-      header: header,
-      sessionId: sessionId,
-      subscriptionId: subscriptionId
-    }
-
-    await CallPostService(url, object)
-      .then(async (response: any) => {
-        // setLoading(false)
-        logger.debug('payment response', response)
-        if (response.status === 'SUCCESS') {
-          let userSubscription =
-            response.data.userDetails &&
-            response.data.userDetails.userSubscription
-              ? response.data.userDetails.userSubscription
-              : {}
-          let subscriptionDetailsobject = {
-            subscriptionEndDate: userSubscription.subscriptionEndDate
-              ? userSubscription.subscriptionEndDate
-              : '',
-            days: userSubscription.days ? userSubscription.days : '',
-            expiredSubscription: userSubscription.expiredSubscription,
-            expiringSubscription: userSubscription.expiringSubscription
-          }
-          let appuserVo =
-            response.data.userDetails && response.data.userDetails.appuserVo
-              ? response.data.userDetails.appuserVo
-              : {}
-          if (!_.isEmpty(appuserVo)) {
-            dispatch(userProfileAction.setUserProfile(appuserVo))
-          }
-          if (!_.isEmpty(userSubscription)) {
-            dispatch(subscriptionAction.setSubscription(userSubscription))
-          }
-          if (!_.isEmpty(userSubscription)) {
-            dispatch(
-              userSubscriptionAction.setSubscriptionDetails(
-                subscriptionDetailsobject
-              )
-            )
-          }
-          await dispatch(
-            sponsororAction.setSponsor({
-              sponsorDetails: {},
-              sponsorShipDetails: {}
-            })
-          )
-          await dispatch(
-            paidAdAction.setPaidAd({
-              commercialsDetails: {},
-              commercialPageMappings: {}
-            })
-          )
-          router.push('/profile')
-          // router.back()
-        } else {
-          Alert.alert('', response.message)
+    logger.debug('in createSessionCheckout')
+    try {
+      const data: any = await checkOutSessionMutation.mutateAsync({
+        user: { email: userDetails.email },
+        order: {
+          id: null,
+          description: null,
+          email: userDetails.email,
+          price: planDetails.price ? '' + planDetails.price : '',
+          currency: null,
+          status: null,
+          date: null,
+          orderid: null,
+          orderItems: [
+            {
+              id: null,
+              description: planDetails.description
+                ? planDetails.description
+                : '',
+              plan: { id: planDetails.id ? planDetails.id : '' }
+            }
+          ]
         }
       })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
+
+      if (!data) {
+        return
+      }
+
+      let ephemeralKey = data.ephemeralKey
+      let paymentIntent = data.paymentIntentClientSecret
+      let customerId = data.customerId
+      let sessionId = data.sessionId
+      let paymentIntentId = data.paymentIntentId
+      let subscriptionId = data.subscriptionId
+
+      logger.debug(
+        paymentIntent,
+        ephemeralKey,
+        customerId,
+        sessionId,
+        paymentIntentId
+      )
+      const { error } = await initPaymentSheet({
+        customerId: customerId,
+        customerEphemeralKeySecret: ephemeralKey,
+        paymentIntentClientSecret: paymentIntent,
+        merchantDisplayName: 'FCC'
       })
+      if (!error) {
+      } else {
+        logger.debug(error)
+        Alert.alert('', error)
+        return
+      }
+
+      setTimeout(
+        () => openPaymentSheet(paymentIntent, sessionId, subscriptionId),
+        1000
+      )
+    } catch (error) {
+      logger.debug(error)
+    }
+  }
+
+  async function handlePaymentSuccess(sessionId: any, subscriptionId: any) {
+    paymentSuccessMutation.mutate(
+      {
+        sessionId: sessionId,
+        subscriptionId: subscriptionId
+      },
+      {
+        onSuccess: async (data: any) => {
+          logger.debug('payment response', data)
+          if (data) {
+            let userSubscription =
+              data.userDetails && data.userDetails.userSubscription
+                ? data.userDetails.userSubscription
+                : {}
+            let subscriptionDetailsobject = {
+              subscriptionEndDate: userSubscription.subscriptionEndDate
+                ? userSubscription.subscriptionEndDate
+                : '',
+              days: userSubscription.days ? userSubscription.days : '',
+              expiredSubscription: userSubscription.expiredSubscription,
+              expiringSubscription: userSubscription.expiringSubscription
+            }
+            let appuserVo =
+              data.userDetails && data.userDetails.appuserVo
+                ? data.userDetails.appuserVo
+                : {}
+            if (!_.isEmpty(appuserVo)) {
+              dispatch(userProfileAction.setUserProfile(appuserVo))
+            }
+            if (!_.isEmpty(userSubscription)) {
+              dispatch(subscriptionAction.setSubscription(userSubscription))
+            }
+            if (!_.isEmpty(userSubscription)) {
+              dispatch(
+                userSubscriptionAction.setSubscriptionDetails(
+                  subscriptionDetailsobject
+                )
+              )
+            }
+            await dispatch(
+              sponsororAction.setSponsor({
+                sponsorDetails: {},
+                sponsorShipDetails: {}
+              })
+            )
+            await dispatch(
+              paidAdAction.setPaidAd({
+                commercialsDetails: {},
+                commercialPageMappings: {}
+              })
+            )
+            router.push('/profile')
+          }
+        },
+        onError: (error) => {
+          logger.debug(error)
+        }
+      }
+    )
   }
 
   async function failPayment(reason: any, sessionId: any, subscriptionId: any) {
-    let url = `${BASE_URL}${PAYMENT_FAIL}`
-    let object = {
-      sessionId: sessionId,
-      reason: reason,
-      header: header,
-      subscriptionId: subscriptionId
-    }
-
-    CallPostService(url, object)
-      .then((response) => {
-        // setLoading(false)
-        logger.debug(JSON.stringify(response))
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug(error)
-      })
+    paymentFailMutation.mutate(
+      {
+        sessionId: sessionId,
+        reason: reason,
+        subscriptionId: subscriptionId
+      },
+      {
+        onSuccess: (response: any) => {
+          logger.debug(JSON.stringify(response))
+        },
+        onError: (error) => {
+          logger.debug(error)
+        }
+      }
+    )
   }
 
   const openPaymentSheet = async (
@@ -322,72 +325,8 @@ export function PaymentsScreen() {
     } else {
       Alert.alert('Success', 'Your order is confirmed!')
       logger.debug()
-      paymentSuccess(sessionId, subscriptionId)
+      handlePaymentSuccess(sessionId, subscriptionId)
     }
-  }
-
-  async function createSessionCheckout() {
-    logger.debug('in createSessionCheckout')
-    setLoading(true)
-    let url = `${BASE_URL}${PAYMENT_CHECK_OUT_SESSION}`
-    let object = {
-      header: header,
-      user: { email: userDetails.email },
-      order: {
-        id: null,
-        description: null,
-        email: userDetails.email,
-        price: planDetails.price ? '' + planDetails.price : '',
-        currency: null,
-        status: null,
-        date: null,
-        orderid: null,
-        orderItems: [
-          {
-            id: null,
-            description: planDetails.description ? planDetails.description : '',
-            plan: { id: planDetails.id ? planDetails.id : '' }
-          }
-        ]
-      }
-    }
-
-    let paymentParams = {}
-
-    await CallPostService(url, object)
-      .then((response) => {
-        if (response.status === 'SUCCESS') {
-          logger.debug(response.data)
-          let data: any = response.data
-          let ephemeralKey = data.ephemeralKey
-          let paymentIntent = data.paymentIntentClientSecret
-          let customerId = data.customerId
-          let sessionId = data.sessionId
-          let paymentIntentId = data.paymentIntentId
-          let subscriptionId = data.subscriptionId
-          // await setPaymentIntent(paymentIntent)
-          // await setEphemeralKey(ephemeralKey)
-          // await setAllPaymentIntentData(data)
-          paymentParams = {
-            paymentIntent,
-            ephemeralKey,
-            customerId,
-            sessionId,
-            paymentIntentId,
-            subscriptionId
-          }
-        } else {
-          // setLoading(false)
-          Alert.alert('', response.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        logger.debug(error)
-        setLoading(false)
-      })
-
-    return paymentParams
   }
 
   useEffect(() => {
@@ -402,7 +341,6 @@ export function PaymentsScreen() {
 
         let purchaseUpdateSubscription = purchaseUpdatedListener(
           async (purchase: InAppPurchase | SubscriptionPurchase) => {
-            // console.info('purchase', purchase);
             const receipt = purchase.transactionReceipt
               ? purchase.transactionReceipt
               : purchase.originalJson
@@ -423,11 +361,8 @@ export function PaymentsScreen() {
           }
         )
       }
-      getPaymentConfig()
 
       setUserDataLoaded(true)
-
-      // getPlanDetails();
     }
   }, [])
   let planItems = _.orderBy(
@@ -448,7 +383,6 @@ export function PaymentsScreen() {
       } else {
         identifier = 'com.familycarecircle.yearly'
       }
-      // console.log('identifier', identifier)
       RNIap.requestSubscription(identifier)
     } catch (err) {
       logger.debug('err', err.message)

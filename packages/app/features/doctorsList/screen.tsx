@@ -1,24 +1,21 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import { CallPostService } from 'app/utils/fetchServerData'
-import { BASE_URL, GET_MEMBER_DOCTORS } from 'app/utils/urlConstants'
+import { useMemberDoctors } from 'app/data/doctors'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { logger } from 'app/utils/logger'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function DoctorsListScreen() {
   const doctorPrivilegesRef = useRef<any>({})
-  const [isLoading, setLoading] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [doctorList, setDoctorList] = useState([]) as any
   const [doctorListFull, setDoctorListFull] = useState([]) as any
@@ -28,44 +25,25 @@ export function DoctorsListScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
+
+  const { data: doctorsData, isLoading } = useMemberDoctors(header, {
+    memberId: memberData.member ? memberData.member : ''
+  })
+
   useEffect(() => {
-    async function getDoctorDetails() {
-      setLoading(true)
-      let url = `${BASE_URL}${GET_MEMBER_DOCTORS}`
-      let dataObject = {
-        header: header,
-        doctor: {
-          member: {
-            id: memberData.member ? memberData.member : ''
-          }
-        }
+    if (doctorsData) {
+      if (doctorsData.domainObjectPrivileges) {
+        doctorPrivilegesRef.current = doctorsData.domainObjectPrivileges.Doctor
+          ? doctorsData.domainObjectPrivileges.Doctor
+          : {}
       }
-      CallPostService(url, dataObject)
-        .then(async (data: any) => {
-          if (data.status === 'SUCCESS') {
-            if (data.data.domainObjectPrivileges) {
-              doctorPrivilegesRef.current = data.data.domainObjectPrivileges
-                .Doctor
-                ? data.data.domainObjectPrivileges.Doctor
-                : {}
-            }
-            let list = data.data.list ? data.data.list : []
-            setDoctorList(list)
-            setDoctorListFull(list)
-            getFilteredList(list, currentFilter)
-            setIsDataReceived(true)
-          } else {
-            Alert.alert('', data.message)
-          }
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-          logger.debug('error', error)
-        })
+      let list = doctorsData.list ? doctorsData.list : []
+      setDoctorList(list)
+      setDoctorListFull(list)
+      getFilteredList(list, currentFilter)
+      setIsDataReceived(true)
     }
-    getDoctorDetails()
-  }, [])
+  }, [doctorsData])
   function setFilteredList(filter: any) {
     setIsShowFilter(false)
     setCurrentFilter(filter)

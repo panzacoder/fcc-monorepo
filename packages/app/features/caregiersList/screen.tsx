@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -9,21 +9,17 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
-import { CallPostService } from 'app/utils/fetchServerData'
 import {
-  BASE_URL,
-  GET_MEMBER_CAREGIVERS,
-  RESEND_CAREGIVER_REQEST
-} from 'app/utils/urlConstants'
+  useMemberCaregivers,
+  useResendCaregiverRequest
+} from 'app/data/caregivers'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
-import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 export function CaregiversListScreen() {
   const caregiverPrivilegesRef = useRef<any>({})
-  const [isLoading, setLoading] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
@@ -33,53 +29,41 @@ export function CaregiversListScreen() {
   const item = useLocalSearchParams<any>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
-  const getCaregiversList = useCallback(async () => {
-    setLoading(true)
-    let url = `${BASE_URL}${GET_MEMBER_CAREGIVERS}`
-    let dataObject = {
-      header: header,
-      familyMember: {
-        memberId: memberData.member ? memberData.member : ''
-      }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        if (data.status === 'SUCCESS') {
-          if (data.data.domainObjectPrivileges) {
-            caregiverPrivilegesRef.current = data.data.domainObjectPrivileges
-              .Caregiver
-              ? data.data.domainObjectPrivileges.Caregiver
-              : {}
-          }
-          let list = data.data.familyMemberList
-            ? data.data.familyMemberList
-            : []
-          list.sort(function (a: any, b: any) {
-            if (a.memberStatus < b.memberStatus) {
-              return -1
-            }
-            if (a.memberStatus > b.memberStatus) {
-              return 1
-            }
-            return 0
-          })
 
-          getFilteredList(list, currentFilter)
-          setCaregiversListFull(list)
-          setIsDataReceived(true)
-        } else {
-          Alert.alert('', data.message)
-        }
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
-  }, [])
+  const { data: caregiversData, isLoading: isCaregiversLoading } =
+    useMemberCaregivers(header, { memberId: memberData.member })
+
+  const resendMutation = useResendCaregiverRequest(header)
+
+  const isLoading = isCaregiversLoading || resendMutation.isPending
+
   useEffect(() => {
-    getCaregiversList()
-  }, [])
+    if (caregiversData) {
+      if (caregiversData.domainObjectPrivileges) {
+        caregiverPrivilegesRef.current = caregiversData.domainObjectPrivileges
+          .Caregiver
+          ? caregiversData.domainObjectPrivileges.Caregiver
+          : {}
+      }
+      let list = caregiversData.familyMemberList
+        ? caregiversData.familyMemberList
+        : []
+      list.sort(function (a: any, b: any) {
+        if (a.memberStatus < b.memberStatus) {
+          return -1
+        }
+        if (a.memberStatus > b.memberStatus) {
+          return 1
+        }
+        return 0
+      })
+
+      getFilteredList(list, currentFilter)
+      setCaregiversListFull(list)
+      setIsDataReceived(true)
+    }
+  }, [caregiversData])
+
   function setFilteredList(filter: any) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
@@ -87,7 +71,6 @@ export function CaregiversListScreen() {
   }
   async function getFilteredList(list: any, filter: any) {
     let filteredList: any[] = []
-    // console.log('filter', filter)
     list.map((data: any, index: any) => {
       if (data.registrationStatus === filter) {
         filteredList.push(data)
@@ -98,24 +81,17 @@ export function CaregiversListScreen() {
     setCaregiversList(filteredList)
   }
   async function resendRequest(object: any) {
-    setLoading(true)
-    let url = `${BASE_URL}${RESEND_CAREGIVER_REQEST}`
-    let dataObject = {
-      header: header,
-      memberVo: {
+    resendMutation.mutate(
+      {
         id: object.member ? object.member : '',
         familyMemberMemberId: object.id ? object.id : ''
+      },
+      {
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to resend request')
+        }
       }
-    }
-    CallPostService(url, dataObject)
-      .then(async (data: any) => {
-        Alert.alert('', data.message)
-        setLoading(false)
-      })
-      .catch((error) => {
-        setLoading(false)
-        logger.debug('error', error)
-      })
+    )
   }
   return (
     <View className="flex-1">
@@ -145,7 +121,6 @@ export function CaregiversListScreen() {
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"
                 onPress={() => {
-                  // setIsAddCaregiver(true)
                   router.push(
                     formatUrl('/circles/addEditCaregiver', {
                       memberData: JSON.stringify(memberData)
