@@ -12,19 +12,19 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 | 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
 | **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
 | **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
-| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **In Progress**                                                           |
-| 5      | [#102](https://github.com/panzacoder/fcc-monorepo/issues/102)     | Testing Foundation                       | Blocked by Phase 4                                                        |
-| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 4, 5                                                     |
-| 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 4, 6                                                     |
-| 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Blocked by Phase 2                                                        |
-| 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Blocked by Phase 2                                                        |
+| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** (branch `fix/gh-101/phase4-data-layer`, pending PR)              |
+| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Ready** (Phase 4 done)                                                  |
+| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 5                                                        |
+| 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 6                                                        |
+| 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 2 done)                                                      |
+| 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Ready (Phase 2 done)                                                      |
 | 8C     | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)     | Redux → Zustand                          | Ready (Phase 3 done)                                                      |
-| 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Blocked by Phase 4                                                        |
-| 8E-F   | [#109](https://github.com/panzacoder/fcc-monorepo/issues/109)     | Replace moment-timezone & lodash         | Blocked by Phase 2                                                        |
-| 8G     | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)     | Storybook 7 → 10                         | Blocked by Phase 2                                                        |
+| 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Ready (Phase 4 done)                                                      |
+| 8E-F   | [#109](https://github.com/panzacoder/fcc-monorepo/issues/109)     | Replace moment-timezone & lodash         | Ready (Phase 2 done)                                                      |
+| 8G     | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)     | Storybook 7 → 10                         | Ready (Phase 2 done)                                                      |
 | 8H     | [#111](https://github.com/panzacoder/fcc-monorepo/issues/111)     | NativeWind → Uniwind + TW4               | Blocked by Phase 8A                                                       |
 | 9      | [#112](https://github.com/panzacoder/fcc-monorepo/issues/112)     | Web App Buildout                         | Blocked by Phases 1-8                                                     |
-| Future | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)     | Realtime Data Capabilities               | Blocked by Phase 4                                                        |
+| Future | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)     | Realtime Data Capabilities               | Ready (Phase 4 done)                                                      |
 
 ---
 
@@ -80,4 +80,7 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 - **Node 24** set across CI, Vercel, `.mise.toml`, and `.nvmrc` as of Phase 2.
 - **Redux persistence debouncing** tracked in [#117](https://github.com/panzacoder/fcc-monorepo/issues/117) — full store serialized on every dispatch with no debounce.
 - **`no-restricted-imports` for store** upgraded to `error` as of Phase 3. Only `provider/redux/index.tsx` has an eslint-disable (legitimate Provider usage).
-- **RBAC handling needs review**: API responses include `domainObjectPrivileges` (server-driven RBAC) parsed by `utils/getUserPemissions.tsx` (note: filename typo). Current usage is untyped (`useRef<any>`) and inconsistent across screens. Should be typed as a shared `DomainPrivileges` type in the data layer and potentially extracted into a `usePermissions` hook during Phase 4 or 7.
+- **RBAC handling needs review**: API responses include `domainObjectPrivileges` (server-driven RBAC) parsed by `utils/getUserPemissions.tsx` (note: filename typo). Current usage is untyped (`useRef<any>`) and inconsistent across screens. Should be typed as a shared `DomainPrivileges` type in the data layer and potentially extracted into a `usePermissions` hook during Phase 7.
+- **Phase 4 delivered 17 data modules**: appointments, auth, caregivers, circle, dashboard, doctors, events, facilities, incidents, locations, medical-devices, messages, payment, prescriptions, profile, transportation + base. All follow `types.ts/api.ts/hooks.ts/index.ts` pattern. Zero CallPostService calls remain in features/ui.
+- **Phase 4 type safety gaps** (to address in Phase 6): `AuthHeader = any` in `data/base.ts`, `Record<string, unknown>` params in transportation/profile modules, `fetchData` returns `DataType | void` requiring `if (data)` guards. These match pre-migration type safety — not regressions.
+- **QueryClient SSR concern**: `QueryClient` instantiated at module scope in `provider/query.tsx`. Fine for React Native, but could share state across SSR requests in Next.js. Monitor during Phase 8B (Next.js upgrade).
