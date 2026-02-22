@@ -174,11 +174,15 @@ export function SplashScreen() {
               router.push(formatUrl('/verification', { email: email }))
             } else if (res.status === 'FAILURE') {
               Alert.alert('', res.message)
+              setIsShowButtons(true)
             }
           }
         }
       },
       {
+        onError: () => {
+          setIsShowButtons(true)
+        },
         onSuccess: async (data: any) => {
           if (!data) return
           let subscriptionDetailsobject = {

@@ -720,7 +720,7 @@ export function ConsolidatedViewScreen() {
                       setQueryFromDate(weekFirstLastDaysRef.current[0])
                       setQueryToDate(weekFirstLastDaysRef.current[6])
                     }
-                  }
+                  }}
                 />
               </View>
             </View>
