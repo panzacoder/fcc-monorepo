@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { useCreateAccount } from 'app/data/auth'
 import { Button } from 'app/ui/button'
@@ -24,7 +24,8 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
-let selectedAddress: any = {
+
+const initialAddress: any = {
   shortDescription: '',
   nickName: '',
   address: {
@@ -50,6 +51,7 @@ let selectedAddress: any = {
     }
   }
 }
+
 const schema = z
   .object({
     firstName: z.string().min(1, { message: 'First Name is required' }),
@@ -81,7 +83,8 @@ const phoneSchema = z.object({
 type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
-  let userPhone = ''
+  const selectedAddress = useRef<any>(structuredClone(initialAddress))
+  const userPhone = useRef('')
   const createAccountMutation = useCreateAccount({})
   const [timeZone, setTimeZone] = useState('')
   const [address, setAddress] = useState({})
@@ -114,7 +117,7 @@ export function SignUpScreen() {
     resolver: zodResolver(phoneSchema)
   })
   async function submitRegistration(formData: Schema) {
-    if (selectedAddress.address.state.id === '') {
+    if (selectedAddress.current.address.state.id === '') {
       Alert.alert('', 'Please select State')
       return
     }
@@ -123,14 +126,14 @@ export function SignUpScreen() {
         registration: {
           firstName: formData.firstName,
           lastName: formData.lastName,
-          phone: removeAllSpecialCharFromString(userPhone),
+          phone: removeAllSpecialCharFromString(userPhone.current),
           email: formData.email,
           credential: formData.password,
           userTimezone: timeZone,
           referralCode: '',
           address: {
             state: {
-              id: selectedAddress.address.state.id
+              id: selectedAddress.current.address.state.id
             }
           }
         }
@@ -150,38 +153,39 @@ export function SignUpScreen() {
   async function setAddressObject(value: any, index: any) {
     if (value) {
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddress.current.nickName = value
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddress.current.shortDescription = value
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddress.current.address.line = value
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddress.current.address.city = value
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddress.current.address.zipCode = value
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.snum = value.snum
-        selectedAddress.address.state.country.description = value.description
+        selectedAddress.current.address.state.country.id = value.id
+        selectedAddress.current.address.state.country.name = value.name
+        selectedAddress.current.address.state.country.code = value.code
+        selectedAddress.current.address.state.country.namecode = value.namecode
+        selectedAddress.current.address.state.country.snum = value.snum
+        selectedAddress.current.address.state.country.description =
+          value.description
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        selectedAddress.current.address.state.id = value.id
+        selectedAddress.current.address.state.name = value.name
+        selectedAddress.current.address.state.code = value.code
+        selectedAddress.current.address.state.namecode = value.namecode
+        selectedAddress.current.address.state.snum = value.snum
+        selectedAddress.current.address.state.description = value.description
       }
       if (index === 6) {
-        selectedAddress = value
+        selectedAddress.current = value
       }
       if (index === 8) {
         let tz = value.name ? value.name : ''
@@ -189,7 +193,7 @@ export function SignUpScreen() {
         logger.debug('timeZone', tz)
       }
     }
-    setAddress(selectedAddress)
+    setAddress(selectedAddress.current)
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function acceptNewRequest(data: any) {}
@@ -262,9 +266,10 @@ export function SignUpScreen() {
                   setFocus('password')
                 }}
                 onChangeText={(value) => {
-                  userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+                  userPhone.current =
+                    convertPhoneNumberToUsaPhoneNumberFormat(value)
                   reset1({
-                    phone: userPhone
+                    phone: userPhone.current
                   })
                 }}
               />

@@ -7,6 +7,7 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { useLogin } from 'app/data/auth'
+import { ApiError } from 'app/data/base'
 import { getCredentials } from 'app/utils/secure-storage'
 import headerAction from 'app/redux/header/headerAction'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
@@ -167,20 +168,15 @@ export function SplashScreen() {
           emailOrPhone: email,
           credential: password,
           rememberMe: true
-        },
-        options: {
-          onFailure: (res) => {
-            if (res.status === 'FAILURE' && res.errorCode === 'RVF_101') {
-              router.push(formatUrl('/verification', { email: email }))
-            } else if (res.status === 'FAILURE') {
-              Alert.alert('', res.message)
-              setIsShowButtons(true)
-            }
-          }
         }
       },
       {
-        onError: () => {
+        onError: (error: Error) => {
+          if (error instanceof ApiError && error.errorCode === 'RVF_101') {
+            router.push(formatUrl('/verification', { email: email }))
+          } else {
+            Alert.alert('', error.message)
+          }
           setIsShowButtons(true)
         },
         onSuccess: async (data: any) => {

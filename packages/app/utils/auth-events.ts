@@ -12,3 +12,7 @@ export function onSessionExpired(handler: AuthEventHandler): () => void {
 export function emitSessionExpired(): void {
   listeners.forEach((handler) => handler())
 }
+
+export function _clearListeners(): void {
+  listeners.clear()
+}
