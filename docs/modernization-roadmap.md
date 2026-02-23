@@ -71,6 +71,12 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 ---
 
+## Scope Policy
+
+**GH issue tasks are acceptance criteria.** Each phase's GH issue defines what must be delivered before the branch can merge. Items cannot be scoped out, deferred, or skipped without updating the GH issue, this roadmap, and getting explicit user approval. Planning sessions that propose cutting scope must flag it as a scope change, not silently omit it.
+
+---
+
 ## Notes
 
 - Sensitive long-term exploration tracked separately (see `git stash list` for `.future-exploration.md`).
@@ -82,5 +88,5 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 - **`no-restricted-imports` for store** upgraded to `error` as of Phase 3. Only `provider/redux/index.tsx` has an eslint-disable (legitimate Provider usage).
 - **RBAC handling needs review**: API responses include `domainObjectPrivileges` (server-driven RBAC) parsed by `utils/getUserPemissions.tsx` (note: filename typo). Current usage is untyped (`useRef<any>`) and inconsistent across screens. Should be typed as a shared `DomainPrivileges` type in the data layer and potentially extracted into a `usePermissions` hook during Phase 7.
 - **Phase 4 delivered 17 data modules**: appointments, auth, caregivers, circle, dashboard, doctors, events, facilities, incidents, locations, medical-devices, messages, payment, prescriptions, profile, transportation + base. All follow `types.ts/api.ts/hooks.ts/index.ts` pattern. Zero CallPostService calls remain in features/ui.
-- **Phase 4 type safety gaps** (to address in Phase 6): `AuthHeader = any` in `data/base.ts`, `Record<string, unknown>` params in transportation/profile modules, `fetchData` returns `DataType | void` requiring `if (data)` guards. These match pre-migration type safety — not regressions.
-- **QueryClient SSR concern**: `QueryClient` instantiated at module scope in `provider/query.tsx`. Fine for React Native, but could share state across SSR requests in Next.js. Monitor during Phase 8B (Next.js upgrade).
+- **Phase 4 type safety gaps** (to address in Phase 6): `AuthHeader = any` and `data?: any` in `data/base.ts`, `Record<string, unknown>` used as params and return types across **all 14 domain modules** (~150+ instances, not just transportation/profile as originally noted), `profile/types.ts` has 8 interfaces with `[key: string]: any` index signatures (effectively untyped), `dashboard/types.ts` has 5 explicit `any` usages including `domainObjectPrivileges: any` despite `DomainPrivileges` type existing. These match pre-migration type safety — not regressions — but the scope is larger than originally documented.
+- **QueryClient SSR concern**: Fixed in PR #119 — `QueryClient` now instantiated inside component via `useState(makeQueryClient)`. No longer a risk for Next.js SSR.
