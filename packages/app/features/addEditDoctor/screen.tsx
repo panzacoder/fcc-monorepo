@@ -10,6 +10,12 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { useCreateDoctor, useUpdateDoctor } from 'app/data/doctors'
+import type {
+  DoctorDetailsResponse,
+  DoctorLocationData
+} from 'app/data/doctors/types'
+import type { Specialization, Country, State } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -38,7 +44,7 @@ const phoneSchema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export function AddEditDoctorScreen() {
-  const selectedAddressRef = useRef<any>({
+  const selectedAddressRef = useRef<DoctorLocationData>({
     shortDescription: '',
     nickName: '',
     address: {
@@ -50,16 +56,12 @@ export function AddEditDoctorScreen() {
         name: '',
         code: '',
         namecode: '',
-        description: '',
         snum: '',
-        id: '',
         country: {
           name: '',
           code: '',
           namecode: '',
-          isoCode: '',
-          description: '',
-          id: ''
+          isoCode: ''
         }
       }
     }
@@ -69,12 +71,16 @@ export function AddEditDoctorScreen() {
   const router = useRouter()
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  ) as any
+  ) as StaticData
   // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const createDoctorMutation = useCreateDoctor(header)
   const updateDoctorMutation = useUpdateDoctor(header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    memberData: string
+    doctorDetails?: string
+    component?: string
+  }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
   // console.log('doctorDetails', JSON.stringify(doctorDetails))
@@ -91,7 +97,7 @@ export function AddEditDoctorScreen() {
   }
   const specializationList: Array<{ id: number; title: string }> =
     staticData.specializationList.map(
-      ({ specialization, id }: SpecializationResponse, index: any) => {
+      ({ specialization }: Specialization, index: number) => {
         return {
           id: index + 1,
           title: specialization
@@ -103,50 +109,44 @@ export function AddEditDoctorScreen() {
   }
   const getSpecializationIndex = (specialization: string) => {
     let specializationIndex = -1
-    staticData.specializationList.map((data: any, index: any) => {
+    staticData.specializationList.map((data: Specialization, index: number) => {
       if (data.specialization === specialization) {
         specializationIndex = index + 1
       }
     })
     return specializationIndex
   }
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const strValue = value as string
       if (index === 0) {
-        selectedAddressRef.current.nickName = value
+        selectedAddressRef.current.nickName = strValue
       }
       if (index === 7) {
-        selectedAddressRef.current.shortDescription = value
+        selectedAddressRef.current.shortDescription = strValue
       }
       if (index === 1) {
-        selectedAddressRef.current.address.line = value
+        selectedAddressRef.current.address.line = strValue
       }
       if (index === 2) {
-        selectedAddressRef.current.address.city = value
+        selectedAddressRef.current.address.city = strValue
       }
       if (index === 3) {
-        selectedAddressRef.current.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = strValue
       }
       if (index === 4) {
-        selectedAddressRef.current.address.state.country.id = value.id
-        selectedAddressRef.current.address.state.country.name = value.name
-        selectedAddressRef.current.address.state.country.code = value.code
-        selectedAddressRef.current.address.state.country.namecode =
-          value.namecode
-        selectedAddressRef.current.address.state.country.snum = value.snum
-        selectedAddressRef.current.address.state.country.description =
-          value.description
+        const country = value as Partial<Country>
+        selectedAddressRef.current.address.state.country = country
       }
       if (index === 5) {
-        selectedAddressRef.current.address.state.id = value.id
-        selectedAddressRef.current.address.state.name = value.name
-        selectedAddressRef.current.address.state.code = value.code
-        selectedAddressRef.current.address.state.namecode = value.namecode
-        selectedAddressRef.current.address.state.snum = value.snum
-        selectedAddressRef.current.address.state.description = value.description
+        const state = value as Partial<State>
+        selectedAddressRef.current.address.state = {
+          ...selectedAddressRef.current.address.state,
+          ...state
+        }
       }
       if (index === 6) {
-        selectedAddressRef.current = value
+        selectedAddressRef.current = value as DoctorLocationData
       }
     }
 
@@ -187,11 +187,6 @@ export function AddEditDoctorScreen() {
     isDoctorActiveRef.current ? true : false
   )
 
-  type SpecializationResponse = {
-    id: number
-    specialization: string
-  }
-
   async function updateDoctor(formData: Schema) {
     updateDoctorMutation.mutate(
       {
@@ -214,8 +209,8 @@ export function AddEditDoctorScreen() {
         }
       },
       {
-        onSuccess: (data: any) => {
-          let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
+        onSuccess: (data: DoctorDetailsResponse) => {
+          let details = data?.doctor ? JSON.stringify(data.doctor) : '{}'
 
           router.dismiss(1)
           router.push(
@@ -232,7 +227,7 @@ export function AddEditDoctorScreen() {
     )
   }
   async function createDoctor(formData: Schema) {
-    let locationList: object[] = []
+    let locationList: DoctorLocationData[] = []
     selectedAddressRef.current.address.id = ''
     locationList.push(selectedAddressRef.current)
     createDoctorMutation.mutate(
@@ -254,8 +249,8 @@ export function AddEditDoctorScreen() {
         }
       },
       {
-        onSuccess: (data: any) => {
-          let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
+        onSuccess: (data: DoctorDetailsResponse) => {
+          let details = data?.doctor ? JSON.stringify(data.doctor) : '{}'
           if (item.component === 'addEditAppointment') {
             router.dismiss(2)
             router.push(
@@ -281,11 +276,6 @@ export function AddEditDoctorScreen() {
       }
     )
   }
-  type Response = {
-    id: number
-    name: string
-  }
-
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />

@@ -9,20 +9,24 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMemberFacilities } from 'app/data/facilities'
+import type { FacilityListItem } from 'app/data/facilities/types'
+import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useRouter } from 'expo-router'
 import { useAppSelector } from 'app/redux/hooks'
 export function FacilitiesListScreen() {
-  const facilityPrivilegesRef = useRef<any>({})
+  const facilityPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [facilityList, setFacilityList] = useState([]) as any
-  const [facilityListFull, setFacilityListFull] = useState([]) as any
+  const [facilityList, setFacilityList] = useState<FacilityListItem[]>([])
+  const [facilityListFull, setFacilityListFull] = useState<FacilityListItem[]>(
+    []
+  )
   const [currentFilter, setCurrentFilter] = useState('Active')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
 
@@ -39,7 +43,7 @@ export function FacilitiesListScreen() {
         facilityPrivilegesRef.current = facilitiesData.domainObjectPrivileges
           .Facility
           ? facilitiesData.domainObjectPrivileges.Facility
-          : {}
+          : []
       }
       let list = facilitiesData.list ? facilitiesData.list : []
       setFacilityListFull(list)
@@ -47,14 +51,14 @@ export function FacilitiesListScreen() {
       setIsDataReceived(true)
     }
   }, [facilitiesData])
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(facilityListFull, filter)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
-    list.map((data: any, index: any) => {
+  async function getFilteredList(list: FacilityListItem[], filter: string) {
+    let filteredList: FacilityListItem[] = []
+    list.map((data: FacilityListItem, index: number) => {
       let type = data.type && data.type.type ? data.type.type : ''
       if (filter === 'All') {
         filteredList = list
@@ -151,7 +155,7 @@ export function FacilitiesListScreen() {
       )}
       {isDataReceived ? (
         <ScrollView className="m-2 w-full self-center">
-          {facilityList.map((data: any, index: number) => {
+          {facilityList.map((data: FacilityListItem, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {

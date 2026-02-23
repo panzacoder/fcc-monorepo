@@ -9,6 +9,9 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMedicalDevices } from 'app/data/medical-devices'
+import type { MedicalDeviceListItem } from 'app/data/medical-devices/types'
+import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -20,15 +23,15 @@ import { useAppSelector } from 'app/redux/hooks'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-const monthsList = getMonthsList() as any
+const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
 })
 export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
-  const medicalDevicesPrivilegesRef = useRef<any>({})
-  const [devicesList, setDevicesList] = useState([]) as any
+  const medicalDevicesPrivilegesRef = useRef<PrivilegeAction[]>([])
+  const [devicesList, setDevicesList] = useState<MedicalDeviceListItem[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [filterMonth, setFilterMonth] = useState<string | undefined>(undefined)
@@ -40,23 +43,19 @@ export function MedicalDevicesListScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
 
-  type Response = {
-    id: number
-    name: string
-  }
   let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
-  staticData.yearList.map(({ name, id }: Response, index: any) => {
+  staticData.yearList.map(({ name }: YearList, index: number) => {
     yearList.push({
       id: index + 2,
-      title: name
+      title: String(name)
     })
   })
 
@@ -72,7 +71,7 @@ export function MedicalDevicesListScreen() {
         medicalDevicesPrivilegesRef.current = devicesData.domainObjectPrivileges
           .Purchase
           ? devicesData.domainObjectPrivileges.Purchase
-          : {}
+          : []
       }
       let list = devicesData.list ? devicesData.list : []
       setDevicesList(list)
@@ -108,14 +107,14 @@ export function MedicalDevicesListScreen() {
     })
   }
 
-  async function setYearChange(value: any) {
+  async function setYearChange(value: number | null) {
     if (value === null) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: any) {
+  async function setMonthChange(value: number | null) {
     if (value === null) {
       reset({
         monthIndex: -1
@@ -222,7 +221,7 @@ export function MedicalDevicesListScreen() {
       )}
 
       <ScrollView className="m-2 mx-5 w-full self-center">
-        {devicesList.map((data: any, index: number) => {
+        {devicesList.map((data: MedicalDeviceListItem, index: number) => {
           return (
             <TouchableOpacity
               onPress={() => {

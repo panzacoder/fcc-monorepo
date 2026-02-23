@@ -13,20 +13,24 @@ import {
   useMemberCaregivers,
   useResendCaregiverRequest
 } from 'app/data/caregivers'
+import type { CaregiverListItem } from 'app/data/caregivers/types'
+import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function CaregiversListScreen() {
-  const caregiverPrivilegesRef = useRef<any>({})
+  const caregiverPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
-  const [caregiversList, setCaregiversList] = useState([]) as any
-  const [caregiversListFull, setCaregiversListFull] = useState([])
+  const [caregiversList, setCaregiversList] = useState<CaregiverListItem[]>([])
+  const [caregiversListFull, setCaregiversListFull] = useState<
+    CaregiverListItem[]
+  >([])
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
 
@@ -43,12 +47,12 @@ export function CaregiversListScreen() {
         caregiverPrivilegesRef.current = caregiversData.domainObjectPrivileges
           .Caregiver
           ? caregiversData.domainObjectPrivileges.Caregiver
-          : {}
+          : []
       }
       let list = caregiversData.familyMemberList
         ? caregiversData.familyMemberList
         : []
-      list.sort(function (a: any, b: any) {
+      list.sort(function (a: CaregiverListItem, b: CaregiverListItem) {
         if (a.memberStatus < b.memberStatus) {
           return -1
         }
@@ -64,14 +68,14 @@ export function CaregiversListScreen() {
     }
   }, [caregiversData])
 
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(caregiversListFull, filter)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
-    list.map((data: any, index: any) => {
+  async function getFilteredList(list: CaregiverListItem[], filter: string) {
+    let filteredList: CaregiverListItem[] = []
+    list.map((data: CaregiverListItem, index: number) => {
       if (data.registrationStatus === filter) {
         filteredList.push(data)
       } else if (filter === 'All') {
@@ -80,7 +84,7 @@ export function CaregiversListScreen() {
     })
     setCaregiversList(filteredList)
   }
-  async function resendRequest(object: any) {
+  async function resendRequest(object: CaregiverListItem) {
     resendMutation.mutate(
       {
         id: object.member ? object.member : '',
@@ -194,7 +198,7 @@ export function CaregiversListScreen() {
         )}
       </View>
       <ScrollView className="m-2 mx-5 w-full self-center">
-        {caregiversList.map((data: any, index: number) => {
+        {caregiversList.map((data: CaregiverListItem, index: number) => {
           return (
             <TouchableOpacity
               onPress={() => {

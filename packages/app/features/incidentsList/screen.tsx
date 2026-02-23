@@ -10,6 +10,9 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import { useIncidents } from 'app/data/incidents'
+import type { IncidentListItem } from 'app/data/incidents/types'
+import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -26,13 +29,13 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 
-const monthsList = getMonthsList() as any
+const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 export function IncidentsListScreen() {
-  const incidentsPrivilegesRef = useRef<any>({})
+  const incidentsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
-  const [incidentsList, setIncidentsList] = useState([]) as any
+  const [incidentsList, setIncidentsList] = useState<IncidentListItem[]>([])
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const header = useAppSelector((state) => state.headerState.header)
@@ -42,10 +45,10 @@ export function IncidentsListScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
-  const item = useLocalSearchParams<any>()
+  ) as StaticData
+  const item = useLocalSearchParams<{ memberData: string }>()
   let memberData =
     item.memberData !== undefined ? JSON.parse(item.memberData) : {}
   const { control, handleSubmit, reset } = useForm({
@@ -55,15 +58,11 @@ export function IncidentsListScreen() {
     },
     resolver: zodResolver(schema)
   })
-  type Response = {
-    id: number
-    name: string
-  }
   let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
-  staticData.yearList.map(({ name, id }: Response, index: any) => {
+  staticData.yearList.map(({ name }: YearList, index: number) => {
     yearList.push({
       id: index + 2,
-      title: name
+      title: String(name)
     })
   })
 
@@ -79,7 +78,7 @@ export function IncidentsListScreen() {
         incidentsPrivilegesRef.current = incidentsData.domainObjectPrivileges
           .Incident
           ? incidentsData.domainObjectPrivileges.Incident
-          : {}
+          : []
       }
       setIncidentsList(incidentsData.list ? incidentsData.list : [])
       setIsDataReceived(true)
@@ -133,14 +132,14 @@ export function IncidentsListScreen() {
       yearIndex: 1
     })
   }
-  async function setYearChange(value: any) {
+  async function setYearChange(value: number | null) {
     if (value === null) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: any) {
+  async function setMonthChange(value: number | null) {
     if (value === null) {
       reset({
         monthIndex: -1
@@ -244,7 +243,7 @@ export function IncidentsListScreen() {
 
       {incidentsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
-          {incidentsList.map((data: any, index: number) => {
+          {incidentsList.map((data: IncidentListItem, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {

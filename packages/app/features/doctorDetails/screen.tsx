@@ -22,6 +22,13 @@ import {
   useDeleteDoctor,
   useShareDoctor
 } from 'app/data/doctors'
+import type {
+  DoctorDetails,
+  DoctorDetailsResponse,
+  DoctorLocation
+} from 'app/data/doctors/types'
+import type { AppointmentListItem } from 'app/data/facilities/types'
+import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -31,7 +38,7 @@ import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import * as Clipboard from 'expo-clipboard'
 export function DoctorDetailsScreen() {
-  const doctorPrivilegesRef = useRef<any>({})
+  const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -39,16 +46,21 @@ export function DoctorDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    memberData: string
+    doctorDetails: string
+  }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let doctorInfo = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
-  const [doctorDetails, setDoctorDetails] = useState({}) as any
+  const [doctorDetails, setDoctorDetails] = useState<Partial<DoctorDetails>>({})
   const [doctorName, setDoctorName] = useState('')
-  const [locationList, setLocationList] = useState([])
-  const [appointmentList, setAppointmentList] = useState([])
+  const [locationList, setLocationList] = useState<DoctorLocation[]>([])
+  const [appointmentList, setAppointmentList] = useState<AppointmentListItem[]>(
+    []
+  )
   const [isShareDoctor, setIsShareDoctor] = useState(false)
 
   const doctorId = doctorInfo.id ? doctorInfo.id : ''
@@ -60,11 +72,11 @@ export function DoctorDetailsScreen() {
 
   useEffect(() => {
     if (doctorDetailsData) {
-      const data = doctorDetailsData as any
+      const data = doctorDetailsData
       if (data.domainObjectPrivileges) {
         doctorPrivilegesRef.current = data.domainObjectPrivileges.Doctor
           ? data.domainObjectPrivileges.Doctor
-          : {}
+          : []
       }
       setDoctorDetails(data.doctor || {})
       if (data.doctor) {
@@ -111,7 +123,7 @@ export function DoctorDetailsScreen() {
 
   let titleStyle = 'font-400 w-[30%] text-[16px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 text-[16px] font-bold text-[#1A1A1A]'
-  async function iconPressed(title: any, value: any) {
+  async function iconPressed(title: string, value: string) {
     if (title === 'Phone' && value !== '') {
       Linking.openURL(`tel:${value}`)
     } else if (title === 'Email' && value !== '') {
@@ -127,7 +139,7 @@ export function DoctorDetailsScreen() {
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: any
+    iconValue: string
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -188,7 +200,7 @@ export function DoctorDetailsScreen() {
   const cancelClicked = () => {
     setIsShareDoctor(false)
   }
-  async function shareDoctor(email: any) {
+  async function shareDoctor(email: string) {
     shareDoctorMutation.mutate(
       {
         doctorSharingInfo: {
@@ -344,13 +356,16 @@ export function DoctorDetailsScreen() {
             </View>
             {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
-                {locationList.map((data: any, index: number) => {
-                  data.component = 'Doctor'
-                  data.doctorFacilityId = doctorInfo.id
-                  data.memberData = memberData
+                {locationList.map((data: DoctorLocation, index: number) => {
+                  const locationData = {
+                    ...data,
+                    component: 'Doctor' as const,
+                    doctorFacilityId: doctorInfo.id,
+                    memberData
+                  }
                   return (
                     <View key={index}>
-                      <Location data={data}></Location>
+                      <Location data={locationData}></Location>
                     </View>
                   )
                 })}
@@ -402,131 +417,133 @@ export function DoctorDetailsScreen() {
             </View>
             {appointmentList.length > 0 && isShowAppointments ? (
               <ScrollView className="mt-2 h-[60%] flex-1">
-                {appointmentList.map((data: any, index: number) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => {
-                        router.push(
-                          formatUrl('/circles/appointmentDetails', {
-                            appointmentDetails: JSON.stringify(data),
-                            memberData: JSON.stringify(memberData)
-                          })
-                        )
-                      }}
-                      key={index}
-                      className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
-                    >
-                      <View className=" flex-row">
-                        <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
-                          {data.date
-                            ? formatTimeToUserLocalTime(
-                                data.date,
-                                userAddress,
-                                memberAddress
-                              )
-                            : ''}
-                        </Typography>
-                        <View className="">
-                          <Typography className="text-sm font-bold text-black">
-                            {data.status ? data.status : ''}
+                {appointmentList.map(
+                  (data: AppointmentListItem, index: number) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          router.push(
+                            formatUrl('/circles/appointmentDetails', {
+                              appointmentDetails: JSON.stringify(data),
+                              memberData: JSON.stringify(memberData)
+                            })
+                          )
+                        }}
+                        key={index}
+                        className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+                      >
+                        <View className=" flex-row">
+                          <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
+                            {data.date
+                              ? formatTimeToUserLocalTime(
+                                  data.date,
+                                  userAddress,
+                                  memberAddress
+                                )
+                              : ''}
                           </Typography>
-                        </View>
-                      </View>
-                      <View className="flex-row">
-                        <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
-                          {data.purpose ? data.purpose : ''}
-                        </Typography>
-                        {data.markCompleteCancel ? (
-                          <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
-                            {'Mark Complete/Cancel'}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                      <View className="flex-row">
-                        <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
-                          {data.appointment ? data.appointment : ''}
-                        </Typography>
-                        <Typography className="font-400 ml-[10px] text-sm text-black">
-                          {data.type.toLowerCase() === 'doctor appointment'
-                            ? 'Doctor'
-                            : 'Facility'}
-                        </Typography>
-                      </View>
-                      {data.hasNotes ||
-                      data.hasReminders ||
-                      data.hasTransportation ? (
-                        <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                      ) : (
-                        <View />
-                      )}
-
-                      <View className="ml-5 flex-row self-center">
-                        <View className="w-[30%]">
-                          {data.hasNotes ? (
-                            <View className="flex-row">
-                              <Feather
-                                className="ml-5 mt-1"
-                                name={'message-circle'}
-                                size={25}
-                                color={'green'}
-                              />
-                              {data.unreadMessageCount > 0 ? (
-                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                  {data.unreadMessageCount}
-                                </Typography>
-                              ) : (
-                                <View />
-                              )}
-                            </View>
-                          ) : (
-                            <View />
-                          )}
-                        </View>
-                        <View className="w-[30%]">
-                          {data.hasReminders ? (
-                            <View className="flex-row">
-                              <Feather
-                                className="ml-5 mt-1"
-                                name={'clock'}
-                                size={25}
-                                color={'red'}
-                              />
-                              {data.activeReminderCount > 0 ? (
-                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                  {data.activeReminderCount}
-                                </Typography>
-                              ) : (
-                                <View />
-                              )}
-                            </View>
-                          ) : (
-                            <View />
-                          )}
-                        </View>
-                        {data.hasTransportation ? (
-                          <View className="w-[30%]">
-                            <Feather
-                              className="ml-5 mt-1"
-                              name={'truck'}
-                              size={25}
-                              color={
-                                data.transportationStatus === 'Requested'
-                                  ? '#cf8442'
-                                  : data.transportationStatus === 'Rejected'
-                                    ? 'red'
-                                    : '#4DA529'
-                              }
-                            />
+                          <View className="">
+                            <Typography className="text-sm font-bold text-black">
+                              {data.status ? data.status : ''}
+                            </Typography>
                           </View>
+                        </View>
+                        <View className="flex-row">
+                          <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
+                            {data.purpose ? data.purpose : ''}
+                          </Typography>
+                          {data.markCompleteCancel ? (
+                            <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
+                              {'Mark Complete/Cancel'}
+                            </Typography>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                        <View className="flex-row">
+                          <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
+                            {data.appointment ? data.appointment : ''}
+                          </Typography>
+                          <Typography className="font-400 ml-[10px] text-sm text-black">
+                            {data.type.toLowerCase() === 'doctor appointment'
+                              ? 'Doctor'
+                              : 'Facility'}
+                          </Typography>
+                        </View>
+                        {data.hasNotes ||
+                        data.hasReminders ||
+                        data.hasTransportation ? (
+                          <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
                         ) : (
                           <View />
                         )}
-                      </View>
-                    </TouchableOpacity>
-                  )
-                })}
+
+                        <View className="ml-5 flex-row self-center">
+                          <View className="w-[30%]">
+                            {data.hasNotes ? (
+                              <View className="flex-row">
+                                <Feather
+                                  className="ml-5 mt-1"
+                                  name={'message-circle'}
+                                  size={25}
+                                  color={'green'}
+                                />
+                                {data.unreadMessageCount > 0 ? (
+                                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                    {data.unreadMessageCount}
+                                  </Typography>
+                                ) : (
+                                  <View />
+                                )}
+                              </View>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                          <View className="w-[30%]">
+                            {data.hasReminders ? (
+                              <View className="flex-row">
+                                <Feather
+                                  className="ml-5 mt-1"
+                                  name={'clock'}
+                                  size={25}
+                                  color={'red'}
+                                />
+                                {data.activeReminderCount > 0 ? (
+                                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                    {data.activeReminderCount}
+                                  </Typography>
+                                ) : (
+                                  <View />
+                                )}
+                              </View>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                          {data.hasTransportation ? (
+                            <View className="w-[30%]">
+                              <Feather
+                                className="ml-5 mt-1"
+                                name={'truck'}
+                                size={25}
+                                color={
+                                  data.transportationStatus === 'Requested'
+                                    ? '#cf8442'
+                                    : data.transportationStatus === 'Rejected'
+                                      ? 'red'
+                                      : '#4DA529'
+                                }
+                              />
+                            </View>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                    )
+                  }
+                )}
               </ScrollView>
             ) : (
               <View />
