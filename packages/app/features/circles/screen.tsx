@@ -37,6 +37,29 @@ import {
   circleKeys
 } from 'app/data/circle'
 import { useQueryClient } from '@tanstack/react-query'
+
+interface CircleMemberItem {
+  firstname: string
+  lastname: string
+  member: number | string
+  role?: string
+  sharingInfoRequests?: unknown[]
+  requestsForMember?: unknown[]
+  roleuid?: string
+  transportationRequests: { type: string; count: number }[]
+  unreadMessages: { unreadMessageCount: number }[]
+  address?: unknown
+}
+
+interface TransportRequestItem {
+  id: number | string
+  type: string
+  createdbyname: string
+  name: string
+  location: string
+  date: string
+}
+
 const schema = z.object({
   rejectReason: z.string().min(1, { message: 'Enter reject reason' })
 })
@@ -45,9 +68,9 @@ export function CirclesListScreen() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-  const memberNamesList: any = useAppSelector(
+  const memberNamesList = useAppSelector(
     (state) => state.memberNames.memberNamesList
-  )
+  ) as string[]
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -60,17 +83,22 @@ export function CirclesListScreen() {
   const [isShowNewCircles, setIsShowNewCircles] = useState(false)
   const [isShowPrivacyPolicy, setIsShowPrivacyPolicy] = useState(false)
   const [roleUid, setRoleUid] = useState('')
-  const [requestData, setRequestData] = useState({})
+  const [requestData, setRequestData] = useState<{ id: number | string }>(
+    {} as { id: number | string }
+  )
   const [isHideCirclesView, setIsHideCirclesView] = useState(false)
 
-  const [memberList, setMemberList] = useState([]) as any
-  const [sharedContactsList, setSharedContactsList] = useState([])
-  const [transportRequestData, setTransportRequestData] = useState({}) as any
+  const [memberList, setMemberList] = useState<CircleMemberItem[]>([])
+  const [sharedContactsList, setSharedContactsList] = useState<unknown[]>([])
+  const [transportRequestData, setTransportRequestData] =
+    useState<TransportRequestItem | null>(null)
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
-  const [newCirclesList, setNewCirclesList] = useState([])
+  const [newCirclesList, setNewCirclesList] = useState<unknown[]>([])
   const [isDataReceived, setDataReceived] = useState(false)
-  const [transportationList, setTransportationList] = useState([])
+  const [transportationList, setTransportationList] = useState<
+    TransportRequestItem[]
+  >([])
   const [transportMemberName, setTransportMemberName] = useState('')
   const [isShowTransportationRequests, setIsShowTransportationRequests] =
     useState(false)
@@ -111,11 +139,11 @@ export function CirclesListScreen() {
 
   useEffect(() => {
     if (memberDetailsData) {
-      let list = memberDetailsData.memberList
-        ? memberDetailsData.memberList
-        : []
+      let list = (
+        memberDetailsData.memberList ? memberDetailsData.memberList : []
+      ) as CircleMemberItem[]
       setMemberList(list)
-      list.map((data: any) => {
+      list.map((data) => {
         let fullName = data.firstname.trim() + ' ' + data.lastname.trim()
         if (memberNamesList.includes(fullName) === false) {
           memberNamesList.push(fullName)
@@ -137,10 +165,13 @@ export function CirclesListScreen() {
     dispatch(currentMemberAddressAction.setMemberAddress({}))
   }, [])
 
-  async function acceptNewRequest(data: any) {
+  async function acceptNewRequest(data: { id: number | string }) {
     acceptRejectMemberRequest(data, true)
   }
-  async function acceptRejectClickedNewCircles(data: any, isAccept: any) {
+  async function acceptRejectClickedNewCircles(
+    data: { id: number | string },
+    isAccept: boolean
+  ) {
     if (isAccept) {
       setIsShowNewCircles(false)
       setRequestData(data)
@@ -149,7 +180,10 @@ export function CirclesListScreen() {
       acceptRejectMemberRequest(data, false)
     }
   }
-  async function acceptRejectMemberRequest(data: any, isAccept: any) {
+  async function acceptRejectMemberRequest(
+    data: { id: number | string },
+    isAccept: boolean
+  ) {
     const params = {
       memberVo: {
         familyMemberMemberId: data.id ? data.id : '',
@@ -167,7 +201,10 @@ export function CirclesListScreen() {
       }
     })
   }
-  async function acceptRejectClicked(data: any, isAccept: any) {
+  async function acceptRejectClicked(
+    data: { id: number | string },
+    isAccept: boolean
+  ) {
     const params = {
       doctorSharingInfo: {
         id: data.id ? data.id : ''
@@ -189,7 +226,7 @@ export function CirclesListScreen() {
     setIsShowNewCircles(false)
     setIsShowPrivacyPolicy(false)
   }
-  async function trasportationClicked(memberData: any) {
+  async function trasportationClicked(memberData: CircleMemberItem) {
     let fullName = ''
     if (memberData.firstname) {
       fullName += memberData.firstname.trim() + ' '
@@ -198,34 +235,32 @@ export function CirclesListScreen() {
       fullName += memberData.lastname.trim()
     }
     setTransportMemberName(fullName)
-    setTransportMemberId(memberData.member ? memberData.member : '')
+    setTransportMemberId(memberData.member ? String(memberData.member) : '')
   }
   const hideCirclesView = (
-    isHide: any,
-    index: any,
-    isSharedContact: any,
-    isShowTransportRequests: any
+    isHide: boolean,
+    index: number,
+    isSharedContact: boolean,
+    isShowTransportRequests: boolean
   ) => {
     if (isShowTransportRequests) {
-      let memberData = memberList[index]
+      let memberData = memberList[index]!
       trasportationClicked(memberData)
     } else if (isSharedContact) {
-      let list = memberList[index].sharingInfoRequests
-        ? memberList[index].sharingInfoRequests
-        : []
+      let list = memberList[index]?.sharingInfoRequests ?? []
       setSharedContactsList(list)
       setIsShowSharedContacts(true)
     } else {
-      let list = memberList[index].requestsForMember
-        ? memberList[index].requestsForMember
-        : []
+      let list = memberList[index]?.requestsForMember ?? []
       setNewCirclesList(list)
-      setRoleUid(memberList[index].roleuid)
+      setRoleUid(memberList[index]?.roleuid ?? '')
       setIsShowNewCircles(true)
     }
     setIsHideCirclesView(isHide)
   }
-  async function approveRejectTrasportRequest(transportData: any) {
+  async function approveRejectTrasportRequest(
+    transportData: TransportRequestItem
+  ) {
     const params = {
       transportationVo: {
         id: transportData.id ? transportData.id : '',
@@ -238,7 +273,7 @@ export function CirclesListScreen() {
       setIsHideCirclesView(false)
       queryClient.invalidateQueries({ queryKey: circleKeys.all })
     }
-    const onError = (error: any) => {
+    const onError = (error: Error) => {
       logger.debug(error)
     }
     if (transportData.type === 'Event') {
@@ -250,7 +285,7 @@ export function CirclesListScreen() {
   async function rejectRequest(formData: Schema) {
     const params = {
       transportationVo: {
-        id: transportRequestData.id ? transportRequestData.id : '',
+        id: transportRequestData?.id ? transportRequestData.id : '',
         reason: formData.rejectReason,
         isApprove: false
       }
@@ -261,10 +296,10 @@ export function CirclesListScreen() {
       setIsHideCirclesView(false)
       queryClient.invalidateQueries({ queryKey: circleKeys.all })
     }
-    const onError = (error: any) => {
+    const onError = (error: Error) => {
       logger.debug(error)
     }
-    if (transportRequestData.type === 'Event') {
+    if (transportRequestData?.type === 'Event') {
       eventRejectMutation.mutate(params, { onSuccess, onError })
     } else {
       rejectTransportMutation.mutate(params, { onSuccess, onError })
@@ -288,7 +323,7 @@ export function CirclesListScreen() {
           </View>
         </View>
         <ScrollView className="">
-          {transportationList.map((data: any, index: number) => {
+          {transportationList.map((data, index) => {
             return (
               <View className="p-2" key={index}>
                 <Typography className="font-400 ml-2">
@@ -405,7 +440,7 @@ export function CirclesListScreen() {
       </View>
       {isDataReceived && !isHideCirclesView ? (
         <ScrollView className="z-10">
-          {memberList.map((data: any, index: number) => {
+          {memberList.map((data, index) => {
             return (
               <View key={index}>
                 <CircleCard
@@ -425,8 +460,23 @@ export function CirclesListScreen() {
         <View className="w-full ">
           <SharedContactList
             cancelClicked={cancelClicked}
-            sharedContactsList={sharedContactsList}
-            acceptRejectClicked={acceptRejectClicked}
+            sharedContactsList={
+              sharedContactsList as {
+                doctorName?: string
+                facilityName?: string
+                frommemberName?: string
+              }[]
+            }
+            acceptRejectClicked={
+              acceptRejectClicked as (
+                data: {
+                  doctorName?: string
+                  facilityName?: string
+                  frommemberName?: string
+                },
+                accepted: boolean
+              ) => void
+            }
           />
         </View>
       ) : (
@@ -436,8 +486,25 @@ export function CirclesListScreen() {
         <View className="w-full ">
           <NewCirclesList
             cancelClicked={cancelClicked}
-            newCirclesList={newCirclesList}
-            acceptRejectClicked={acceptRejectClickedNewCircles}
+            newCirclesList={
+              newCirclesList as {
+                requestraisedby: string
+                caregivername?: string
+                membername?: string
+                role?: string
+              }[]
+            }
+            acceptRejectClicked={
+              acceptRejectClickedNewCircles as unknown as (
+                data: {
+                  requestraisedby: string
+                  caregivername?: string
+                  membername?: string
+                  role?: string
+                },
+                accepted: boolean
+              ) => void
+            }
             roleUid={roleUid}
           />
         </View>

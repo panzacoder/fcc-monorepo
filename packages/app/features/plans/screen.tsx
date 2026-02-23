@@ -26,6 +26,12 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'app/ui/button'
 import { useAppSelector } from 'app/redux/hooks'
+import type {
+  PlanDetail,
+  PlanGroup,
+  CardListItem,
+  UpgradePlanParams
+} from 'app/data/payment/types'
 const schema = z.object({
   planIndex: z.number()
 })
@@ -37,24 +43,28 @@ const cardSchema = z.object({
   cardHolderName: z.string().min(1, { message: 'Name is required' })
 })
 export type CardSchema = z.infer<typeof cardSchema>
-const monthsList = getMonthsListOnly() as any
+const monthsList = getMonthsListOnly() as { title: string; id: number }[]
 export function PlansScreen() {
   const cardNumberWithoutDashRef = useRef('')
   const [selectedPlanId, setSelectedPlanId] = useState(-1)
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(1)
   const [isShowCardModal, setIsShowCardModal] = useState(false)
   const [isAddCard, setIsAddCardModal] = useState(false)
-  const [plansList, setPlansList] = useState([]) as any
-  const [planNames, setPlanNames] = useState([]) as any
+  const [plansList, setPlansList] = useState<PlanDetail[]>([])
+  const [planNames, setPlanNames] = useState<{ id: number; title: string }[]>(
+    []
+  )
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   const userDetails = useAppSelector((state) => state.userProfileState.header)
   let isRenewPlan =
     item.isRenewPlan && item.isRenewPlan === 'true' ? true : false
   let isFromUpgradePlan =
     item.isFromUpgradePlan && item.isFromUpgradePlan === 'true' ? true : false
-  let previousPlanDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
+  let previousPlanDetails = item.planDetails
+    ? (JSON.parse(item.planDetails as string) as { plan: { plantype: string } })
+    : { plan: { plantype: '' } }
 
   const { data: allPlansData, isLoading: isPlansLoading } = useAllPlans(header)
   const { data: cardListData, isLoading: isCardsLoading } = useCardList(header)
@@ -64,7 +74,7 @@ export function PlansScreen() {
   const addCardMutation = useAddCard(header)
   const deleteCardMutation = useDeleteCard(header)
 
-  const cardList = (cardListData as any) || []
+  const cardList: CardListItem[] = (cardListData as CardListItem[]) || []
 
   const isLoading =
     isPlansLoading ||
@@ -97,24 +107,24 @@ export function PlansScreen() {
 
   useEffect(() => {
     if (allPlansData) {
-      let planDetails = allPlansData as any
-      let plan: any = {}
-      planDetails.map((plans: any) => {
+      let planDetails = allPlansData as PlanGroup[]
+      let plan: PlanGroup | undefined
+      planDetails.map((plans) => {
         if (plans.planName === 'FCC Subscription') {
           plan = plans
         }
       })
 
-      let plansData: any = plan.planList
+      let plansData: PlanDetail[] = plan?.planList ?? []
       if (isFromUpgradePlan || isRenewPlan) {
         plansData = []
         let previousPlanIndex = 0
-        plan.planList.map((data: any, index: any) => {
+        ;(plan?.planList ?? []).map((data, index) => {
           if (data.plantype === previousPlanDetails.plan.plantype) {
             previousPlanIndex = index
           }
         })
-        plan.planList.map((data: any, index: any) => {
+        ;(plan?.planList ?? []).map((data, index) => {
           if (isFromUpgradePlan) {
             if (index > previousPlanIndex) {
               plansData.push(data)
@@ -126,24 +136,20 @@ export function PlansScreen() {
           }
         })
       }
-      type Response = {
-        id: number
-        plantype: string
-      }
       let planNamesList: Array<{ id: number; title: string }> = plansData.map(
-        ({ plantype, id }: Response, index: any) => {
+        ({ plantype }, index) => {
           return {
             title: plantype,
             id: index + 1
           }
         }
       )
-      let planNamesArr: any = []
-      plansData.map((planData: any) => {
+      let planNamesArr: string[] = []
+      plansData.map((planData) => {
         planNamesArr.push(planData.plantype)
       })
       let first_plan = _.find(plansData, (e) => e.plantype === planNamesArr[0])
-      let selectedId = first_plan.id
+      let selectedId = first_plan!.id
       setPlansList(plansData)
       setPlanNames(planNamesList)
       setSelectedPlanId(selectedId)
@@ -152,7 +158,7 @@ export function PlansScreen() {
   async function upgradePlan() {
     setIsShowCardModal(true)
   }
-  async function deleteCard(data: any) {
+  async function deleteCard(data: CardListItem) {
     deleteCardMutation.mutate(
       { card: data },
       {
@@ -162,31 +168,31 @@ export function PlansScreen() {
       }
     )
   }
-  async function upgradePlanOnServer(data: any) {
-    const mutationParams = {
+  async function upgradePlanOnServer(data: CardListItem) {
+    const mutationParams: UpgradePlanParams = {
       email: userDetails.email ? userDetails.email : '',
       subscriptionId: '',
       paymentMethodId: data.paymentMethodId ? data.paymentMethodId : '',
       plan: {
         id: selectedPlanId,
-        plantype: plansList[selectedPlanIndex - 1].plantype
+        plantype: plansList[selectedPlanIndex - 1]!.plantype
       }
     }
     const mutationOptions = {
       onSuccess: () => {
         router.back()
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         Alert.alert('', error.message || 'Failed to process plan')
       }
     }
     if (isFromUpgradePlan) {
-      upgradePlanMutation.mutate(mutationParams as any, mutationOptions)
+      upgradePlanMutation.mutate(mutationParams, mutationOptions)
     } else {
-      renewSubscriptionMutation.mutate(mutationParams as any, mutationOptions)
+      renewSubscriptionMutation.mutate(mutationParams, mutationOptions)
     }
   }
-  async function navigateToPayments(data: any) {
+  async function navigateToPayments(data: PlanDetail) {
     router.push(
       formatUrl('/payments', {
         planDetails: JSON.stringify(data)
@@ -231,7 +237,7 @@ export function PlansScreen() {
       return <View />
     }
     let data = _.find(plansList, (e) => e.id === planId)
-    let colorSet: any = [
+    const colorSet = [
       { headingBackground: 'bg-[#dd4b5e]' },
       { headingBackground: 'bg-[#53cfe9]' },
       { headingBackground: 'bg-[#48c9b0]' },
@@ -257,14 +263,14 @@ export function PlansScreen() {
           className="mx-[5%] my-20  rounded-[10px] bg-white "
         >
           <View
-            className={`w-full items-center justify-center p-[8px] ${colorSet[selectedPlanIndex].headingBackground}`}
+            className={`w-full items-center justify-center p-[8px] ${colorSet[selectedPlanIndex]!.headingBackground}`}
           >
             <Typography className="flex-1 text-[18px] font-bold text-white">
-              {planNames[selectedPlanIndex - 1].title.toUpperCase()}
+              {planNames[selectedPlanIndex - 1]!.title.toUpperCase()}
             </Typography>
             <View
               style={{ width: 100, height: 100, borderRadius: 50 }}
-              className={`mt-[5px] flex-1 items-center justify-center border-[5px] border-white ${data.price > 0 ? 'h-[60]' : 'h-[0]'} ${colorSet[selectedPlanIndex].headingBackground}`}
+              className={`mt-[5px] flex-1 items-center justify-center border-[5px] border-white ${data.price > 0 ? 'h-[60]' : 'h-[0]'} ${colorSet[selectedPlanIndex]!.headingBackground}`}
             >
               <Typography className="text-[25px] text-white">
                 {data.price > 0 ? `$${data.price}` : ''}
@@ -303,14 +309,14 @@ export function PlansScreen() {
                     plansList,
                     (e) => e.plantype === data.title
                   )
-                  setSelectedPlanId(selectedIndex.id)
+                  setSelectedPlanId(selectedIndex!.id)
                   setSelectedPlanIndex(Number(data.id))
                 }
               }}
             />
 
             <Button
-              className={`my-[10px] self-center ${isFromUpgradePlan ? 'w-[50%]' : 'w-[40%]'}    ${colorSet[selectedPlanIndex].headingBackground}`}
+              className={`my-[10px] self-center ${isFromUpgradePlan ? 'w-[50%]' : 'w-[40%]'}    ${colorSet[selectedPlanIndex]!.headingBackground}`}
               title={
                 isFromUpgradePlan
                   ? 'Upgrade to this plan'
@@ -375,7 +381,7 @@ export function PlansScreen() {
         <View className=" items-center">
           {cardList.length > 0 ? (
             <ScrollView className="my-2 h-full w-[95%]">
-              {cardList.map((data: any, index: number) => {
+              {cardList.map((data, index) => {
                 return (
                   <View key={index}>
                     <View className="my-1 max-h-[90%] w-full self-center rounded-[5px] border-[1px] border-[#e0deda] bg-[#3c7eb0] px-5 py-10">
@@ -430,8 +436,8 @@ export function PlansScreen() {
       </View>
     )
   }
-  async function setMonthChange(value: any) {
-    if (value === null) {
+  async function setMonthChange(value: { title: string; id: string }) {
+    if (!value) {
       reset1({
         monthIndex: -1
       })
@@ -466,11 +472,11 @@ export function PlansScreen() {
             placeholder={'Card Number*'}
             className="w-[95%] self-center"
             autoCapitalize="none"
-            onChangeText={(data: any) => {
+            onChangeText={(data: string) => {
               let cardNumber = data
               let arr = cardNumber.split('')
               let cardNum = ''
-              arr.map((value: any) => {
+              arr.map((value) => {
                 if (value !== '-') {
                   cardNum += value
                 }
@@ -479,7 +485,7 @@ export function PlansScreen() {
               cardNumber = cardNum
               if (cardNumber.length > 0) {
                 cardNumber = cardNumber
-                  .match(new RegExp('.{1,4}', 'g'))
+                  .match(new RegExp('.{1,4}', 'g'))!
                   .join('-')
               }
               reset1({
