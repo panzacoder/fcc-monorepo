@@ -12,9 +12,9 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 | 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
 | **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
 | **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
-| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** (branch `fix/gh-101/phase4-data-layer`, pending PR)              |
-| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Ready** (Phase 4 done)                                                  |
-| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 5                                                        |
+| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** ([PR #119](https://github.com/panzacoder/fcc-monorepo/pull/119)) |
+| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Done** ([PR #120](https://github.com/panzacoder/fcc-monorepo/pull/120)) |
+| **6**  | [**#103**](https://github.com/panzacoder/fcc-monorepo/issues/103) | **TypeScript Strictness**                | **In Progress**                                                           |
 | 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 6                                                        |
 | 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 2 done)                                                      |
 | 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Ready (Phase 2 done)                                                      |
