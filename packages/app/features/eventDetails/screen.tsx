@@ -30,6 +30,15 @@ import {
   useResendTransportationRequestEvent,
   useCancelTransportationRequestEvent
 } from 'app/data/transportation'
+import type {
+  EventDetail,
+  EventDetailResponse,
+  EventNote,
+  EventReminder
+} from 'app/data/events/types'
+import type { PrivilegeAction } from 'app/data/types.d'
+import type { ThreadParticipant } from 'app/data/messages/types'
+import type { ComponentProps } from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -45,28 +54,43 @@ import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
+type TransportationDisplayData = ComponentProps<typeof Transportation>['data']
+type TransportDisplayData = ComponentProps<
+  typeof AddEditTransport
+>['transportData']
+type ReminderData = ComponentProps<typeof AddEditReminder>['reminderData'] & {
+  id?: number
+}
+
 export function EventDetailsScreen() {
-  const eventPrivilegesRef = useRef<any>({})
-  const notePrivilegesRef = useRef<any>({})
-  const transportationPrivilegesRef = useRef<any>({})
+  const eventPrivilegesRef = useRef<PrivilegeAction[]>([])
+  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
+  const transportationPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [eventStatus, setEventStatus] = useState('')
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
-  const [participantsList, setParticipantsList] = useState([]) as any
+  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
+    []
+  )
   const [isAddTransportation, setIsAddTransportation] = useState(false)
   const [isShowTransportation, setIsShowTransportation] = useState(false)
   const [isShowNotes, setIsShowNotes] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
-  const [eventDetails, setEventDetails] = useState({}) as any
-  const [noteData, setNoteData] = useState({})
-  const [transportationData, setTransportationData] = useState({})
-  const [notesList, setNotesList] = useState([])
-  const [reminderData, setReminderData] = useState({})
-  const [remindersList, setRemindersList] = useState([])
-  const [transportationList, setTransportationList] = useState([])
+  const [eventDetails, setEventDetails] = useState<Partial<EventDetail>>({})
+  const [noteData, setNoteData] = useState<Partial<EventNote>>({})
+  const [transportationData, setTransportationData] =
+    useState<TransportDisplayData>({} as TransportDisplayData)
+  const [notesList, setNotesList] = useState<EventNote[]>([])
+  const [reminderData, setReminderData] = useState<ReminderData>(
+    {} as ReminderData
+  )
+  const [remindersList, setRemindersList] = useState<EventReminder[]>([])
+  const [transportationList, setTransportationList] = useState<
+    TransportationDisplayData[]
+  >([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -74,15 +98,25 @@ export function EventDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
-      ? JSON.parse(item.memberData)
-      : {}
+      ? (JSON.parse(item.memberData as string) as {
+          member?: number | string
+          firstname?: string
+          lastname?: string
+          email?: string
+        })
+      : ({} as {
+          member?: number | string
+          firstname?: string
+          lastname?: string
+          email?: string
+        })
   let eventData =
     item.eventDetails && item.eventDetails !== undefined
-      ? JSON.parse(item.eventDetails)
-      : {}
+      ? (JSON.parse(item.eventDetails as string) as { id: number | string })
+      : ({} as { id?: number | string })
 
   const eventId = eventData.id ? eventData.id : ''
   const memberId = memberData.member ? memberData.member : ''
@@ -115,22 +149,22 @@ export function EventDetailsScreen() {
 
   useEffect(() => {
     if (eventDetailsData) {
-      const data = eventDetailsData as any
+      const data = eventDetailsData as EventDetailResponse
       if (data.domainObjectPrivileges) {
         eventPrivilegesRef.current = data.domainObjectPrivileges.Event
           ? data.domainObjectPrivileges.Event
-          : {}
+          : []
         notePrivilegesRef.current = data.domainObjectPrivileges.EVENTNOTE
           ? data.domainObjectPrivileges.EVENTNOTE
           : data.domainObjectPrivileges.EventNote
             ? data.domainObjectPrivileges.EventNote
-            : {}
+            : []
         transportationPrivilegesRef.current = data.domainObjectPrivileges
           .EVENTTRANSPORTATION
           ? data.domainObjectPrivileges.EVENTTRANSPORTATION
           : data.domainObjectPrivileges.EventTransportation
             ? data.domainObjectPrivileges.EventTransportation
-            : {}
+            : []
       }
       setEventDetails(data.event ? data.event : {})
       if (data.event && data.event.status) {
@@ -143,7 +177,10 @@ export function EventDetailsScreen() {
         setRemindersList(data.event.reminderList)
       }
       if (data.event && data.event.transportationList) {
-        setTransportationList(data.event.transportationList)
+        setTransportationList(
+          data.event
+            .transportationList as unknown as TransportationDisplayData[]
+        )
       }
     }
   }, [eventDetailsData])
@@ -206,12 +243,12 @@ export function EventDetailsScreen() {
   }
 
   async function createUpdateNote(
-    occurance: any,
-    noteDetails: any,
-    title: any,
-    noteData: any
+    occurance: string,
+    noteDetails: string,
+    title: string,
+    noteData: Partial<EventNote>
   ) {
-    const notePayload: Record<string, unknown> = {
+    const notePayload = {
       event: {
         id: eventDetails.id ? eventDetails.id : ''
       },
@@ -233,9 +270,8 @@ export function EventDetailsScreen() {
         }
       )
     } else {
-      notePayload.id = noteData.id ? noteData.id : ''
       updateNoteMutation.mutate(
-        { note: notePayload },
+        { note: { ...notePayload, id: noteData.id ? noteData.id : '' } },
         {
           onSuccess: () => {
             setIsAddNote(false)
@@ -254,13 +290,13 @@ export function EventDetailsScreen() {
     setIsAddTransportation(false)
     setIsMessageThread(false)
   }
-  const editNote = (noteData: any) => {
+  const editNote = (noteData: EventNote) => {
     setNoteData(noteData)
     setIsAddNote(true)
   }
-  async function deleteNote(noteId: any) {
+  async function deleteNote(noteId: number | string) {
     deleteNoteMutation.mutate(
-      { note: { id: noteId } },
+      { note: { id: Number(noteId) } },
       {
         onSuccess: () => {
           refetchDetails()
@@ -271,7 +307,7 @@ export function EventDetailsScreen() {
       }
     )
   }
-  const messageThreadClicked = (noteData: any) => {
+  const messageThreadClicked = (noteData: EventNote) => {
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
       router.push(
@@ -284,7 +320,7 @@ export function EventDetailsScreen() {
     } else {
       refetchParticipants().then(({ data }) => {
         if (data) {
-          const list = (data as any[]).map((item: any) => {
+          const list = (data as ThreadParticipant[]).map((item) => {
             let object = item
             object.isSelected = false
             return object
@@ -296,10 +332,10 @@ export function EventDetailsScreen() {
       })
     }
   }
-  function createMessageThread(subject: any, noteData: any) {
+  function createMessageThread(subject: string, noteData: EventNote) {
     setNoteData(noteData)
-    let list: object[] = []
-    participantsList.map((data: any, index: any) => {
+    const list: { user: { id: number } }[] = []
+    participantsList.map((data) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -319,9 +355,6 @@ export function EventDetailsScreen() {
             type: 'Event'
           },
           participantList: list,
-          eventNote: {
-            id: noteData.id ? noteData.id : ''
-          },
           messageList: []
         }
       },
@@ -343,23 +376,26 @@ export function EventDetailsScreen() {
       }
     )
   }
-  function isParticipantSelected(index: any) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+  function isParticipantSelected(index: number) {
+    const participant = participantsList[index]
+    if (participant) {
+      participant.isSelected = !participant.isSelected
+    }
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
-  const editReminder = (remiderData: any) => {
+  const editReminder = (remiderData: ReminderData) => {
     setReminderData(remiderData)
     setIsAddReminder(true)
   }
   async function createUpdateReminder(
     title: string,
-    date: any,
-    reminderData: any
+    date: Date,
+    reminderData: ReminderData
   ) {
-    const reminderPayload: Record<string, unknown> = {
+    const reminderPayload = {
       content: title,
-      date: date,
+      date: String(date),
       event: {
         id: eventDetails.id ? eventDetails.id : ''
       }
@@ -369,9 +405,9 @@ export function EventDetailsScreen() {
       createReminderMutation.mutate(
         { reminder: reminderPayload },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
-            setRemindersList(data ? data : [])
+            setRemindersList((data as EventReminder[]) ?? [])
           },
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to create reminder')
@@ -379,13 +415,12 @@ export function EventDetailsScreen() {
         }
       )
     } else {
-      reminderPayload.id = reminderData.id
       updateReminderMutation.mutate(
-        { reminder: reminderPayload },
+        { reminder: { ...reminderPayload, id: reminderData.id } },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
-            setRemindersList(data ? data : [])
+            setRemindersList((data as EventReminder[]) ?? [])
           },
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to update reminder')
@@ -394,19 +429,22 @@ export function EventDetailsScreen() {
       )
     }
   }
-  async function deleteReminder(reminderData: any) {
+  async function deleteReminder(reminderData: {
+    id?: number | string
+    apointmentId?: number | string
+  }) {
     deleteReminderMutation.mutate(
       {
         reminder: {
-          id: reminderData.id ? reminderData.id : '',
+          id: Number(reminderData.id),
           event: {
-            id: reminderData.apointmentId ? reminderData.apointmentId : ''
+            id: Number(reminderData.apointmentId ?? 0)
           }
         }
       },
       {
-        onSuccess: (data: any) => {
-          setRemindersList(data ? data : [])
+        onSuccess: (data) => {
+          setRemindersList((data as EventReminder[]) ?? [])
         },
         onError: (error) => {
           Alert.alert('', error.message || 'Failed to delete reminder')
@@ -414,8 +452,10 @@ export function EventDetailsScreen() {
       }
     )
   }
-  const editTransportation = (transportationData: any) => {
-    setTransportationData(transportationData)
+  const editTransportation = (
+    transportationData: TransportationDisplayData
+  ) => {
+    setTransportationData(transportationData as TransportDisplayData)
     setIsAddTransportation(true)
   }
   async function deleteEvent() {
@@ -437,8 +477,8 @@ export function EventDetailsScreen() {
     )
   }
   async function deleteResendCancelTransportation(
-    count: any,
-    transportData: any
+    count: number,
+    transportData: TransportationDisplayData
   ) {
     const transportId = transportData.id ? transportData.id : ''
     const onSuccess = () => {
@@ -490,11 +530,11 @@ export function EventDetailsScreen() {
       )
     }
   }
-  async function updateStatus(status: any) {
+  async function updateStatus(status: string) {
     updateStatusMutation.mutate(
       {
         event: {
-          id: eventDetails.id ? eventDetails.id : '',
+          id: Number(eventDetails.id ?? 0),
           status: {
             status: status
           },
@@ -681,7 +721,7 @@ export function EventDetailsScreen() {
 
             {notesList.length > 0 && isShowNotes ? (
               <ScrollView className="">
-                {notesList.map((data: any, index: number) => {
+                {notesList.map((data, index) => {
                   return (
                     <View key={index}>
                       <Note
@@ -746,7 +786,7 @@ export function EventDetailsScreen() {
 
             {remindersList.length > 0 && isShowReminder ? (
               <ScrollView className="">
-                {remindersList.map((data: any, index: number) => {
+                {remindersList.map((data, index) => {
                   return (
                     <View key={index}>
                       <Reminder
@@ -799,7 +839,7 @@ export function EventDetailsScreen() {
                   leadingIcon="plus"
                   variant="border"
                   onPress={() => {
-                    setTransportationData({})
+                    setTransportationData({} as TransportDisplayData)
                     setIsAddTransportation(true)
                   }}
                 />
@@ -809,7 +849,7 @@ export function EventDetailsScreen() {
             </View>
             {transportationList.length > 0 && isShowTransportation ? (
               <ScrollView className="">
-                {transportationList.map((data: any, index: number) => {
+                {transportationList.map((data, index) => {
                   return (
                     <View key={index}>
                       <Transportation
@@ -889,7 +929,7 @@ export function EventDetailsScreen() {
             }
             date={eventDetails.date ? eventDetails.date : ''}
             transportData={transportationData}
-            appointmentId={eventDetails.id}
+            appointmentId={eventDetails.id ?? 0}
             cancelClicked={cancelClicked}
           />
         </View>
