@@ -21,6 +21,7 @@ import type {
   UserProfileResponse,
   GetUserProfileParams,
   UpdateProfileParams,
+  ProfileMember,
   GetMemberProfileParams,
   MemberProfileResponse,
   AutoSubscriptionParams,
@@ -53,7 +54,7 @@ export async function updateProfile(
   header: AuthHeader,
   params: UpdateProfileParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<ProfileMember>({
     header,
     route: UPDATE_PROFILE,
     data: params
@@ -75,7 +76,7 @@ export async function autoSubscription(
   header: AuthHeader,
   params: AutoSubscriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: AUTO_SUBSCRIPTION,
     data: params
@@ -86,7 +87,7 @@ export async function manualSubscription(
   header: AuthHeader,
   params: ManualSubscriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: MANUAL_SUBSCRIPTION,
     data: params
@@ -97,7 +98,7 @@ export async function cancelSubscription(
   header: AuthHeader,
   params: CancelSubscriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CANCEL_SUBSCRIPTION,
     data: params
@@ -108,7 +109,7 @@ export async function deleteAccount(
   header: AuthHeader,
   params: DeleteAccountParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_ACCOUNT,
     data: params
@@ -119,7 +120,7 @@ export async function checkValidCredential(
   header: AuthHeader,
   params: CheckValidCredentialParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CHECK_VALID_CREDENTIAL,
     data: params
@@ -130,7 +131,7 @@ export async function updateSponsorCode(
   header: AuthHeader,
   params: UpdateSponsorCodeParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_SPONSOR_CODE,
     data: params
@@ -141,7 +142,7 @@ export async function updateMemberAuthorizedCaregiver(
   header: AuthHeader,
   params: UpdateMemberAuthorizedCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<ProfileMember>({
     header,
     route: UPDATE_MEMBER_AUTHORIZED_CAREGIVER,
     data: params
@@ -152,7 +153,7 @@ export async function updateMemberAddress(
   header: AuthHeader,
   params: UpdateMemberAddressParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_MEMBER_ADDRESS,
     data: params
@@ -163,7 +164,7 @@ export async function updateMemberAuthorizedCaregiverAddress(
   header: AuthHeader,
   params: UpdateMemberAuthorizedCaregiverAddressParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_MEMBER_AUTHORIZED_CAREGIVER_ADDRESS,
     data: params
@@ -174,7 +175,7 @@ export async function deleteAuthorizedCaregiver(
   header: AuthHeader,
   params: DeleteAuthorizedCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_AUTHORIZED_CAREGIVER,
     data: params
@@ -185,7 +186,7 @@ export async function deleteCaregiver(
   header: AuthHeader,
   params: DeleteCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_CAREGIVER,
     data: params
@@ -196,7 +197,7 @@ export async function deleteMember(
   header: AuthHeader,
   params: DeleteMemberParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_MEMBER,
     data: params
@@ -207,7 +208,7 @@ export async function referFriend(
   header: AuthHeader,
   params: ReferFriendParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: REFER_FRIEND,
     data: params

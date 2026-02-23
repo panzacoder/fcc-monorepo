@@ -22,6 +22,7 @@ import type {
   PaymentFailParams,
   AppleSuccessPaymentParams,
   IosReceiptVerificationParams,
+  IosReceiptVerificationResponse,
   GetAllPlansResponse,
   GetCardListResponse,
   UpgradePlanParams,
@@ -63,7 +64,7 @@ export async function paymentFail(
   header: AuthHeader,
   params: PaymentFailParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: PAYMENT_FAIL,
     data: params
@@ -74,7 +75,7 @@ export async function appleSuccessPayment(
   header: AuthHeader,
   params: AppleSuccessPaymentParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: APPLE_SUCCESS_PAYMENT_FOR_OUR_SERVER,
     data: params
@@ -84,13 +85,13 @@ export async function appleSuccessPayment(
 export async function iosReceiptVerification(
   _header: AuthHeader,
   params: IosReceiptVerificationParams
-): Promise<any> {
+): Promise<IosReceiptVerificationResponse> {
   const response = await fetch(IOS_RECEIPT_VERIFICATION_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params)
   })
-  return response.json()
+  return response.json() as Promise<IosReceiptVerificationResponse>
 }
 
 export async function getAllPlans(header: AuthHeader) {
@@ -111,7 +112,7 @@ export async function upgradePlan(
   header: AuthHeader,
   params: UpgradePlanParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPGRADE_PLAN,
     data: params
@@ -122,7 +123,7 @@ export async function renewSubscription(
   header: AuthHeader,
   params: RenewSubscriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: RENEW_SUBSCRIPTION,
     data: params
@@ -130,7 +131,7 @@ export async function renewSubscription(
 }
 
 export async function addCard(header: AuthHeader, params: AddCardParams) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: ADD_CARD,
     data: params
@@ -138,7 +139,7 @@ export async function addCard(header: AuthHeader, params: AddCardParams) {
 }
 
 export async function deleteCard(header: AuthHeader, params: DeleteCardParams) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_CARD,
     data: params

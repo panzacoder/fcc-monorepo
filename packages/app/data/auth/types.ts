@@ -1,3 +1,6 @@
+import type { AuthHeader } from '../base'
+import type { Address } from '../types.d'
+
 export interface LoginParams {
   appuserVo: {
     emailOrPhone: string
@@ -6,27 +9,74 @@ export interface LoginParams {
   }
 }
 
+export interface LoginHeader {
+  accessToken: string
+  email: string
+  timezone: string
+}
+
+export interface LoginAppUser {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  memberName: string
+  address: Address
+  isFreeUser: boolean
+  premiumFeatureTrialinfo: {
+    startDate: string
+    endDate: string
+    status: { status: string }
+  } | null
+}
+
+export interface LoginUserSubscription {
+  status: string
+  plan: {
+    id: number
+    description: string
+    price: number
+    plantype: string
+  }
+  source: string
+  startDate: string
+  endDate: string
+}
+
+export interface Commercial {
+  id: number
+  name: string
+  description: string | null
+  url: string | null
+}
+
+export interface CommercialPageMapping {
+  id: number
+  page: string
+  position: string
+}
+
 export interface LoginResponse {
-  header: Record<string, unknown>
-  appuserVo: Record<string, unknown>
-  userSubscription: Record<string, unknown>
+  header: LoginHeader
+  appuserVo: LoginAppUser
+  userSubscription: LoginUserSubscription
   subscriptionEndDate: string
   days: string
   expiredSubscription: boolean
   expiringSubscription: boolean
-  sponsorUser: Record<string, unknown>
-  sponsorship: Record<string, unknown>
+  sponsorUser: { id: number; name: string } | null
+  sponsorship: { id: number; sponsorCode: string } | null
   commercialsDetails: {
-    commercials: Record<string, unknown>[]
-    commercialPageMappings: Record<string, unknown>[]
+    commercials: Commercial[]
+    commercialPageMappings: CommercialPageMapping[]
   } | null
 }
 
 export interface LogoutParams {
-  header: Record<string, unknown>
+  header: AuthHeader
 }
 
-export type LogoutResponse = Record<string, unknown>
+export type LogoutResponse = unknown
 
 export interface CreateAccountParams {
   registration: {
@@ -45,7 +95,7 @@ export interface CreateAccountParams {
   }
 }
 
-export type CreateAccountResponse = Record<string, unknown>
+export type CreateAccountResponse = unknown
 
 export interface ForgotPasswordParams {
   appuserVo: {
@@ -53,7 +103,7 @@ export interface ForgotPasswordParams {
   }
 }
 
-export type ForgotPasswordResponse = Record<string, unknown>
+export type ForgotPasswordResponse = unknown
 
 export interface ResetPasswordParams {
   appuserVo: {
@@ -63,7 +113,7 @@ export interface ResetPasswordParams {
   }
 }
 
-export type ResetPasswordResponse = Record<string, unknown>
+export type ResetPasswordResponse = unknown
 
 export interface VerifyAccountParams {
   registrationVo: {
@@ -72,7 +122,7 @@ export interface VerifyAccountParams {
   }
 }
 
-export type VerifyAccountResponse = Record<string, unknown>
+export type VerifyAccountResponse = unknown
 
 export interface ResendOtpParams {
   registration: {
@@ -80,7 +130,7 @@ export interface ResendOtpParams {
   }
 }
 
-export type ResendOtpResponse = Record<string, unknown>
+export type ResendOtpResponse = unknown
 
 export interface CheckValidCredentialParams {
   appuserVo: {
@@ -88,4 +138,4 @@ export interface CheckValidCredentialParams {
   }
 }
 
-export type CheckValidCredentialResponse = Record<string, unknown>
+export type CheckValidCredentialResponse = unknown

@@ -1,4 +1,4 @@
-import type { DomainPrivileges } from '../types.d'
+import type { Address, DomainPrivileges } from '../types.d'
 
 export interface MedicalDeviceDoctor {
   id: number
@@ -39,6 +39,12 @@ export interface MedicalDeviceListResponse {
   list: MedicalDeviceListItem[]
 }
 
+export interface MedicalDeviceLocation {
+  shortDescription: string
+  nickName: string
+  address: Address
+}
+
 export interface MedicalDeviceDetails {
   id: number
   date: string
@@ -47,7 +53,7 @@ export interface MedicalDeviceDetails {
   description: string
   isPrescribedBy: boolean
   doctor: MedicalDeviceDoctor | null
-  location: Record<string, unknown> | null
+  location: MedicalDeviceLocation | null
   noteList: MedicalDeviceNote[]
   reminderList: MedicalDeviceReminder[]
 }
@@ -64,11 +70,27 @@ export interface GetMedicalDevicesParams {
 }
 
 export interface CreateMedicalDeviceParams {
-  purchase: Record<string, unknown>
+  purchase: {
+    id: number | null
+    date: string
+    description: string
+    type: string
+    isPrescribedBy: boolean
+    member: { id: number | string }
+    doctor: { id: number | string }
+  }
 }
 
 export interface UpdateMedicalDeviceParams {
-  purchase: Record<string, unknown>
+  purchase: {
+    id: number
+    date: string
+    description: string
+    type: string
+    isPrescribedBy: boolean
+    member: { id: number | string }
+    doctor: { id: number | string }
+  }
 }
 
 export interface DeleteMedicalDeviceParams {
@@ -76,7 +98,13 @@ export interface DeleteMedicalDeviceParams {
 }
 
 export interface MedicalDeviceNoteParams {
-  note: Record<string, unknown>
+  note: {
+    id?: number | string
+    purchase: { id: number | string }
+    occurance?: { occurance: string }
+    note: string
+    shortDescription: string
+  }
 }
 
 export interface DeleteMedicalDeviceNoteParams {
@@ -84,7 +112,12 @@ export interface DeleteMedicalDeviceNoteParams {
 }
 
 export interface MedicalDeviceReminderParams {
-  reminder: Record<string, unknown>
+  reminder: {
+    id?: number
+    content: string
+    date: string
+    purchase: { id: number | string }
+  }
 }
 
 export interface DeleteMedicalDeviceReminderParams {
