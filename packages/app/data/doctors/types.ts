@@ -1,4 +1,5 @@
-import type { DomainPrivileges } from '../types.d'
+import type { Address, DomainPrivileges } from '../types.d'
+import type { AppointmentListItem } from '../facilities/types'
 
 export interface DoctorListItem {
   id: number
@@ -45,25 +46,61 @@ export interface DoctorLocation {
   phone: string
   fax: string
   website: string
-  address: Record<string, unknown>
+  address: Partial<Address> & { id?: number | string }
 }
 
 export interface DoctorDetailsResponse {
   domainObjectPrivileges: DomainPrivileges
   doctor: DoctorDetails
-  doctorAppointmentList: Record<string, unknown>[]
+  doctorAppointmentList: AppointmentListItem[]
 }
 
 export interface GetDoctorDetailsParams {
   id: number | string
 }
 
+export interface DoctorLocationData {
+  shortDescription: string
+  nickName: string
+  fax?: string
+  website?: string
+  phone?: string
+  address: Partial<Address> & { id?: number | string }
+}
+
+export interface CreateDoctorData {
+  member: { id: number | string }
+  salutation: string
+  firstName: string
+  lastName: string
+  email?: string
+  phone: string
+  website: string
+  websiteuser: string
+  specialist: string
+  isSelf?: boolean
+  doctorLocationList?: DoctorLocationData[]
+}
+
+export interface UpdateDoctorData {
+  id: number | string
+  member: { id: number | string }
+  salutation: string
+  firstName: string
+  lastName: string
+  phone: string
+  website: string
+  websiteuser: string
+  specialist: string
+  status: { status: string; id: number }
+}
+
 export interface CreateDoctorParams {
-  doctor: Record<string, unknown>
+  doctor: CreateDoctorData
 }
 
 export interface UpdateDoctorParams {
-  doctor: Record<string, unknown>
+  doctor: UpdateDoctorData
 }
 
 export interface DeleteDoctorParams {
@@ -71,11 +108,23 @@ export interface DeleteDoctorParams {
 }
 
 export interface CreateDoctorLocationParams {
-  doctorLocation: Record<string, unknown>
+  doctorLocation: DoctorLocationData & {
+    id?: number | string
+    doctor: {
+      id: number | string
+      member?: { id: number | string }
+    }
+  }
 }
 
 export interface UpdateDoctorLocationParams {
-  doctorLocation: Record<string, unknown>
+  doctorLocation: DoctorLocationData & {
+    id?: number | string
+    doctor: {
+      id: number | string
+      member?: { id: number | string }
+    }
+  }
 }
 
 export interface DeleteDoctorLocationParams {
@@ -89,8 +138,13 @@ export interface GetActiveDoctorsParams {
   memberId: number | string
 }
 
+export interface ActiveDoctorItem {
+  id: number
+  name: string
+}
+
 export interface ActiveDoctorsResponse {
-  doctorList: Record<string, unknown>[]
+  doctorList: ActiveDoctorItem[]
 }
 
 export interface ShareDoctorParams {

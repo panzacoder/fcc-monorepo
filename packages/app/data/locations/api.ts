@@ -12,7 +12,9 @@ import type {
   StatesAndTimezonesResponse,
   GetStatesAndTimezonesParams,
   CreateDoctorLocationParams,
+  CreateDoctorLocationResponse,
   CreateFacilityLocationParams,
+  CreateFacilityLocationResponse,
   UpdateDoctorLocationParams,
   UpdateFacilityLocationParams,
   DeleteDoctorLocationParams,
@@ -34,7 +36,7 @@ export async function createDoctorLocation(
   header: AuthHeader,
   params: CreateDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CreateDoctorLocationResponse>({
     header,
     route: CREATE_DOCTOR_LOCATION,
     data: params
@@ -45,7 +47,7 @@ export async function createFacilityLocation(
   header: AuthHeader,
   params: CreateFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CreateFacilityLocationResponse>({
     header,
     route: CREATE_FACILITY_LOCATION,
     data: params
@@ -56,7 +58,7 @@ export async function updateDoctorLocation(
   header: AuthHeader,
   params: UpdateDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CreateDoctorLocationResponse>({
     header,
     route: UPDATE_DOCTOR_LOCATION,
     data: params
@@ -67,7 +69,7 @@ export async function updateFacilityLocation(
   header: AuthHeader,
   params: UpdateFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CreateFacilityLocationResponse>({
     header,
     route: UPDATE_FACILITY_LOCATION,
     data: params
@@ -78,7 +80,7 @@ export async function deleteDoctorLocation(
   header: AuthHeader,
   params: DeleteDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_DOCTOR_LOCATION,
     data: params
@@ -89,7 +91,7 @@ export async function deleteFacilityLocation(
   header: AuthHeader,
   params: DeleteFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_FACILITY_LOCATION,
     data: params

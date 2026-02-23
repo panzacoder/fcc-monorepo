@@ -19,7 +19,8 @@ import type {
   DeleteIncidentParams,
   IncidentNoteParams,
   DeleteIncidentNoteParams,
-  GetIncidentNoteParams
+  GetIncidentNoteParams,
+  IncidentNoteResponse
 } from './types'
 
 export async function getIncidents(
@@ -54,7 +55,7 @@ export async function createIncident(
   header: AuthHeader,
   params: CreateIncidentParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<IncidentDetailResponse>({
     header,
     route: CREATE_INCIDENT,
     data: params
@@ -65,7 +66,7 @@ export async function updateIncident(
   header: AuthHeader,
   params: UpdateIncidentParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<IncidentDetailResponse>({
     header,
     route: UPDATE_INCIDENT,
     data: params
@@ -76,7 +77,7 @@ export async function deleteIncident(
   header: AuthHeader,
   params: DeleteIncidentParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_INCIDENT,
     data: params
@@ -87,7 +88,7 @@ export async function createIncidentNote(
   header: AuthHeader,
   params: IncidentNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_INCIDENT_NOTE,
     data: params
@@ -98,7 +99,7 @@ export async function updateIncidentNote(
   header: AuthHeader,
   params: IncidentNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_INCIDENT_NOTE,
     data: params
@@ -109,7 +110,7 @@ export async function deleteIncidentNote(
   header: AuthHeader,
   params: DeleteIncidentNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_INCIDENT_NOTE,
     data: params
@@ -120,7 +121,7 @@ export async function getIncidentNote(
   header: AuthHeader,
   params: GetIncidentNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<IncidentNoteResponse>({
     header,
     route: GET_INCIDENT_NOTE,
     data: params

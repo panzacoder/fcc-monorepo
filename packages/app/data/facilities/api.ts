@@ -52,7 +52,7 @@ export async function createFacility(
   header: AuthHeader,
   params: CreateFacilityParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<FacilityDetailsResponse>({
     header,
     route: CREATE_FACILITY,
     data: params
@@ -63,7 +63,7 @@ export async function updateFacility(
   header: AuthHeader,
   params: UpdateFacilityParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<FacilityDetailsResponse>({
     header,
     route: UPDATE_FACILITY,
     data: params
@@ -74,7 +74,7 @@ export async function deleteFacility(
   header: AuthHeader,
   params: DeleteFacilityParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_FACILITY,
     data: params
@@ -85,7 +85,7 @@ export async function createFacilityLocation(
   header: AuthHeader,
   params: CreateFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<FacilityDetailsResponse>({
     header,
     route: CREATE_FACILITY_LOCATION,
     data: params
@@ -96,7 +96,7 @@ export async function updateFacilityLocation(
   header: AuthHeader,
   params: UpdateFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<FacilityDetailsResponse>({
     header,
     route: UPDATE_FACILITY_LOCATION,
     data: params
@@ -107,7 +107,7 @@ export async function deleteFacilityLocation(
   header: AuthHeader,
   params: DeleteFacilityLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_FACILITY_LOCATION,
     data: params
@@ -129,7 +129,7 @@ export async function shareFacility(
   header: AuthHeader,
   params: ShareFacilityParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: SHARE_CONTACT_INFO,
     data: params

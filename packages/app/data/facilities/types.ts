@@ -1,4 +1,4 @@
-import type { DomainPrivileges } from '../types.d'
+import type { Address, DomainPrivileges } from '../types.d'
 
 export interface FacilityListItem {
   id: number
@@ -20,7 +20,22 @@ export interface FacilityLocation {
   phone: string | null
   fax: string | null
   website: string | null
-  address: Record<string, unknown>
+  address: Partial<Address> & { id?: number | string }
+}
+
+export interface AppointmentListItem {
+  date: string
+  status: string
+  purpose: string
+  type: string
+  appointment: string
+  hasNotes: boolean
+  hasReminders: boolean
+  hasTransportation: boolean
+  unreadMessageCount: number
+  activeReminderCount: number
+  transportationStatus: string
+  markCompleteCancel: boolean
 }
 
 export interface Facility {
@@ -30,7 +45,7 @@ export interface Facility {
   website: string | null
   websiteuser: string | null
   ispharmacy: boolean
-  type: string | Record<string, unknown>
+  type: string | { id: number; type: string }
   status: { id: number; status: string }
   member: { id: number }
   facilityLocationList: FacilityLocation[]
@@ -38,7 +53,7 @@ export interface Facility {
 
 export interface FacilityWithAppointment {
   facility: Facility
-  facilityAppointmentList: Record<string, unknown>[]
+  facilityAppointmentList: AppointmentListItem[]
 }
 
 export interface FacilityDetailsResponse {
@@ -54,6 +69,15 @@ export interface GetFacilityDetailsParams {
   id: number | string
 }
 
+export interface FacilityLocationData {
+  shortDescription: string
+  nickName: string
+  fax?: string
+  website?: string
+  phone?: string
+  address: Partial<Address> & { id?: number | string }
+}
+
 export interface CreateFacilityParams {
   facility: {
     member: { id: number | string }
@@ -63,7 +87,7 @@ export interface CreateFacilityParams {
     website: string
     websiteuser: string
     type: string
-    facilityLocationList: Record<string, unknown>[]
+    facilityLocationList: FacilityLocationData[]
   }
 }
 
@@ -86,11 +110,23 @@ export interface DeleteFacilityParams {
 }
 
 export interface CreateFacilityLocationParams {
-  facilityLocation: Record<string, unknown>
+  facilityLocation: FacilityLocationData & {
+    id?: number | string
+    facility: {
+      id: number | string
+      member?: { id: number | string }
+    }
+  }
 }
 
 export interface UpdateFacilityLocationParams {
-  facilityLocation: Record<string, unknown>
+  facilityLocation: FacilityLocationData & {
+    id?: number | string
+    facility: {
+      id: number | string
+      member?: { id: number | string }
+    }
+  }
 }
 
 export interface DeleteFacilityLocationParams {
