@@ -151,13 +151,13 @@ export type Plan = {
   subscriptionType: string | null
   discountPercent: string
   stripeCoupanId: string | null
-  interval: any
+  interval: string | null
   plantype: string | null
   numberOfUsers: number | null
   oneUserPrice: number
   isActive: boolean
   appleProductId: string | null
-  planItems: any
+  planItems: unknown[]
 }
 
 export type PurchaseType = {
@@ -232,7 +232,7 @@ export type Member = {
   id: number
   address: Address
   memberType: string | null
-  appuser: any | null
+  appuser: Record<string, unknown> | null
   timezone: Timezone
   isAuthorizedCaregiver: boolean
   isSelfMember: boolean
