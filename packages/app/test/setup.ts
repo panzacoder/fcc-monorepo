@@ -1,22 +1,8 @@
 import { vi, beforeEach } from 'vitest'
-
-// --- expo-secure-store mock ---
-const secureStoreMap = new Map<string, string>()
-
-vi.mock('expo-secure-store', () => ({
-  setItemAsync: vi.fn(async (key: string, value: string) => {
-    secureStoreMap.set(key, value)
-  }),
-  getItemAsync: vi.fn(async (key: string) => {
-    return secureStoreMap.get(key) ?? null
-  }),
-  deleteItemAsync: vi.fn(async (key: string) => {
-    secureStoreMap.delete(key)
-  })
-}))
+import { _clear as clearSecureStore } from 'expo-secure-store'
 
 beforeEach(() => {
-  secureStoreMap.clear()
+  clearSecureStore()
 })
 
 // --- expo-router mock ---

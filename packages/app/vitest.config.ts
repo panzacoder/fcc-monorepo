@@ -11,7 +11,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      app: path.resolve(__dirname, '.')
+      app: path.resolve(__dirname, '.'),
+      'expo-secure-store': path.resolve(
+        __dirname,
+        'test/__mocks__/expo-secure-store.ts'
+      )
     }
   }
 })
