@@ -27,6 +27,7 @@ import type {
   DeleteAppointmentParams,
   AppointmentNoteParams,
   AppointmentReminderParams,
+  AppointmentReminderData,
   UpdateAppointmentStatusParams,
   SendCalendarInviteParams
 } from './types'
@@ -193,7 +194,7 @@ export function useUpdateAppointmentReminder(header: AuthHeader) {
 export function useDeleteAppointmentReminder(header: AuthHeader) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (params: { reminder: Record<string, unknown> }) =>
+    mutationFn: (params: { reminder: AppointmentReminderData }) =>
       deleteAppointmentReminder(header, params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.all })

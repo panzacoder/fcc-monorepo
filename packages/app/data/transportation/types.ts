@@ -1,3 +1,5 @@
+import type { Address, AccompanyType } from '../types.d'
+
 export interface TransportationRequestsParams {
   memberId: number | string
 }
@@ -6,12 +8,24 @@ export interface TransportationMemberListParams {
   memberId: number | string
 }
 
+export interface TransportationData {
+  id?: number | string
+  date: Date | string
+  description?: string
+  accompany?: number | string
+  accompanyType?: Partial<AccompanyType>
+  reminderList?: unknown[]
+  address?: Partial<Address>
+  appointment?: { id: number | string }
+  event?: { id: number | string }
+}
+
 export interface CreateTransportationParams {
-  transportation: Record<string, unknown>
+  transportation: TransportationData
 }
 
 export interface UpdateTransportationParams {
-  transportation: Record<string, unknown>
+  transportation: TransportationData
 }
 
 export interface DeleteTransportationParams {
@@ -19,69 +33,83 @@ export interface DeleteTransportationParams {
 }
 
 export interface CreateTransportationEventParams {
-  transportation: Record<string, unknown>
+  transportation: TransportationData
 }
 
 export interface UpdateTransportationEventParams {
-  transportation: Record<string, unknown>
+  transportation: TransportationData
 }
 
 export interface DeleteTransportationEventParams {
   transportation: { id: number | string }
 }
 
+export interface TransportationVoData {
+  id: number | string
+  reason?: string
+  isApprove?: boolean
+}
+
 export interface ApproveTransportParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: TransportationVoData
 }
 
 export interface RejectTransportParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: TransportationVoData
 }
 
 export interface EventAcceptTransportationRequestParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: TransportationVoData
 }
 
 export interface EventRejectTransportationRequestParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: TransportationVoData
 }
 
 export interface ResendTransportationRequestParams {
-  transportation: Record<string, unknown>
+  transportation: { id: number | string }
 }
 
 export interface ResendTransportationRequestEventParams {
-  transportation: Record<string, unknown>
+  transportation: { id: number | string }
 }
 
 export interface CancelTransportationRequestParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: { id: number | string }
 }
 
 export interface CancelTransportationRequestEventParams {
-  transportationVo: Record<string, unknown>
+  transportationVo: { id: number | string }
+}
+
+export interface TransportationReminderData {
+  id?: number | string
+  content?: string
+  date?: Date | string
+  appointmentTransportation?: { id: number | string }
+  eventTransportation?: { id: number | string }
 }
 
 export interface CreateTransportationReminderParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }
 
 export interface UpdateTransportationReminderParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }
 
 export interface DeleteTransportationReminderParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }
 
 export interface CreateTransportationReminderEventParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }
 
 export interface UpdateTransportationReminderEventParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }
 
 export interface DeleteTransportationReminderEventParams {
-  reminder: Record<string, unknown>
+  reminder: TransportationReminderData
 }

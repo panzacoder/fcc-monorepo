@@ -43,30 +43,78 @@ export interface GetDoctorFacilitiesParams {
   appointmentType: string
 }
 
+export interface AppointmentData {
+  id?: number | string
+  date?: Date | string
+  description?: string
+  appointmentPreNote?: string
+  purpose?: string
+  type?: { type: string }
+  member?: { id: number | string }
+  doctorLocation?: { id?: number | string }
+  facilityLocation?: { id?: number | string }
+  status?: { status: string }
+}
+
 export interface CreateAppointmentParams {
-  appointment: Record<string, unknown>
+  appointment: AppointmentData
 }
 
 export interface UpdateAppointmentParams {
-  appointment: Record<string, unknown>
+  appointment: AppointmentData
 }
 
 export interface DeleteAppointmentParams {
   appointment: { id: number }
 }
 
+export interface AppointmentNoteData {
+  id?: number | string
+  appointment?: { id: number | string }
+  occurance?: { occurance: string }
+  note?: string
+  shortDescription?: string
+}
+
 export interface AppointmentNoteParams {
-  appointmentNote: Record<string, unknown>
+  appointmentNote: AppointmentNoteData
+}
+
+export interface AppointmentReminderData {
+  id?: number | string
+  content?: string
+  date?: Date | string
+  appointment?: { id: number | string }
 }
 
 export interface AppointmentReminderParams {
-  reminder: Record<string, unknown>
+  reminder: AppointmentReminderData
 }
 
 export interface UpdateAppointmentStatusParams {
-  appointment: Record<string, unknown>
+  appointment: {
+    id: number | string
+    status: { status: string }
+    member: { id: number | string }
+  }
 }
 
 export interface SendCalendarInviteParams {
   appointment: { id: number | string }
+}
+
+export interface AppointmentDetailResponse {
+  domainObjectPrivileges: DomainPrivileges
+  appointmentWithPreviousAppointment: {
+    appointment: AppointmentData & {
+      noteList?: unknown[]
+      reminderList?: unknown[]
+      transportationList?: unknown[]
+    }
+  }
+}
+
+export interface DoctorFacilityLocationItem {
+  name: string
+  locationId: number
 }
