@@ -7,6 +7,8 @@ import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { useLogin } from 'app/data/auth'
+import type { LoginResponse } from 'app/data/auth'
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import { ApiError } from 'app/data/base'
 import { getCredentials } from 'app/utils/secure-storage'
 import headerAction from 'app/redux/header/headerAction'
@@ -21,7 +23,7 @@ import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
 export function SplashScreen() {
-  const notificationDataRef = useRef<any>({})
+  const notificationDataRef = useRef<FirebaseMessagingTypes.RemoteMessage>({})
   const dispatch = useAppDispatch()
   const router = useRouter()
   const loginMutation = useLogin({})
@@ -45,13 +47,13 @@ export function SplashScreen() {
     try {
       await messaging()
         .getInitialNotification()
-        .then((notification: any) => {
+        .then((notification) => {
           if (notification) {
             notificationDataRef.current = notification
           }
         })
 
-      await messaging().onNotificationOpenedApp((remoteMessage: any) => {
+      await messaging().onNotificationOpenedApp((remoteMessage) => {
         if (remoteMessage) {
           notificationDataRef.current = remoteMessage
         }
@@ -161,7 +163,7 @@ export function SplashScreen() {
       router.push('/home')
     }
   }
-  function login(email: any, password: any) {
+  function login(email: string, password: string) {
     loginMutation.mutate(
       {
         appuserVo: {
@@ -179,7 +181,7 @@ export function SplashScreen() {
           }
           setIsShowButtons(true)
         },
-        onSuccess: async (data: any) => {
+        onSuccess: async (data: LoginResponse | null) => {
           if (!data) return
           let subscriptionDetailsobject = {
             subscriptionEndDate: data.subscriptionEndDate || '',

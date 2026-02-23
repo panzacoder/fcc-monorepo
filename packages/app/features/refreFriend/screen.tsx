@@ -34,7 +34,7 @@ export function ReferFriendScreen() {
     referFriendMutation.mutate(
       { email: formData.email },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data: unknown) => {
           if (!data) return
           Alert.alert('', 'Thank You For Helping Us GROW')
         }

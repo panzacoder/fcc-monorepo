@@ -2,6 +2,7 @@
 
 import { View, Alert } from 'react-native'
 import { useLogin } from 'app/data/auth'
+import type { LoginResponse } from 'app/data/auth'
 import { ApiError } from 'app/data/base'
 import { storeCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -65,7 +66,7 @@ export function LoginScreen() {
             Alert.alert('', error.message)
           }
         },
-        onSuccess: async (data: any) => {
+        onSuccess: async (data: LoginResponse | null) => {
           if (!data) return
           let subscriptionDetailsobject = {
             subscriptionEndDate: data.subscriptionEndDate || '',

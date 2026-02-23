@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+import type { EventDetailResponse } from 'app/data/events'
 
 const schema = z.object({
   description: z.string(),
@@ -31,7 +32,11 @@ export function AddEditEventScreen() {
   const createEventMutation = useCreateEvent(header)
   const updateEventMutation = useUpdateEvent(header)
   const router = useRouter()
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    memberData?: string
+    eventDetails?: string
+    isFromCreateSimilar?: string
+  }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let eventDetails = item.eventDetails ? JSON.parse(item.eventDetails) : {}
   let isFromCreateSimilar = item.isFromCreateSimilar
@@ -72,7 +77,7 @@ export function AddEditEventScreen() {
       : new Date()
   )
   // console.log('eventDetails', JSON.stringify(eventDetails))
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date | string) => {
     setSelectedDate(date)
     setKey(Math.random())
   }
@@ -117,47 +122,49 @@ export function AddEditEventScreen() {
       )
     }
   }, [])
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const str = value as string
+      const obj = value as Record<string, string>
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddress.nickName = str
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddress.shortDescription = str
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddress.address.line = str
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddress.address.city = str
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddress.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.description = value.description
+        selectedAddress.address.state.country.id = obj.id
+        selectedAddress.address.state.country.name = obj.name
+        selectedAddress.address.state.country.code = obj.code
+        selectedAddress.address.state.country.namecode = obj.namecode
+        selectedAddress.address.state.country.description = obj.description
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        selectedAddress.address.state.id = obj.id
+        selectedAddress.address.state.name = obj.name
+        selectedAddress.address.state.code = obj.code
+        selectedAddress.address.state.namecode = obj.namecode
+        selectedAddress.address.state.snum = obj.snum
+        selectedAddress.address.state.description = obj.description
       }
       if (index === 6) {
-        setSelectedAddress(value)
+        setSelectedAddress(value as typeof selectedAddress)
       }
     }
 
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function addEditEvent(formData: Schema) {
-    let eventData: any = {
+    let eventData: Record<string, unknown> = {
       date: selectedDate,
       title: formData.title,
       description: formData.description,
@@ -168,7 +175,7 @@ export function AddEditEventScreen() {
       contactList: [],
       reminderList: []
     }
-    const onSuccess = (data: any) => {
+    const onSuccess = (data: EventDetailResponse | null) => {
       if (_.isEmpty(eventDetails)) {
         router.dismiss(1)
       } else {

@@ -23,9 +23,16 @@ import { logger } from 'app/utils/logger'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import type { PrivilegeAction } from 'app/data/types'
+import type {
+  Facility,
+  FacilityDetailsResponse,
+  FacilityLocation,
+  AppointmentListItem
+} from 'app/data/facilities'
 export function FacilityDetailsScreen() {
-  const facilityPrivilegesRef = useRef<any>({})
-  const [facilityDetails, setFacilityDetails] = useState<any>({})
+  const facilityPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const [facilityDetails, setFacilityDetails] = useState<Partial<Facility>>({})
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
@@ -35,7 +42,10 @@ export function FacilityDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    memberData?: string
+    facilityDetails?: string
+  }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   const router = useRouter()
   let facilityInfo = item.facilityDetails
@@ -43,8 +53,10 @@ export function FacilityDetailsScreen() {
     : {}
   logger.debug('facilityInfo', JSON.stringify(facilityInfo))
   const [isShareFacility, setIsShareFacility] = useState(false)
-  const [locationList, setLocationList] = useState([])
-  const [appointmentList, setAppointmentList] = useState([])
+  const [locationList, setLocationList] = useState<FacilityLocation[]>([])
+  const [appointmentList, setAppointmentList] = useState<AppointmentListItem[]>(
+    []
+  )
 
   const facilityId = facilityInfo.id ? facilityInfo.id : ''
   const { data: facilityDetailsData, isLoading: isDetailsLoading } =
@@ -55,7 +67,7 @@ export function FacilityDetailsScreen() {
 
   useEffect(() => {
     if (facilityDetailsData) {
-      const data = facilityDetailsData as any
+      const data = facilityDetailsData as FacilityDetailsResponse
       if (data.domainObjectPrivileges) {
         facilityPrivilegesRef.current = data.domainObjectPrivileges.Facility
           ? data.domainObjectPrivileges.Facility
@@ -124,7 +136,7 @@ export function FacilityDetailsScreen() {
   const cancelClicked = () => {
     setIsShareFacility(false)
   }
-  async function shareFacility(email: any) {
+  async function shareFacility(email: string) {
     shareFacilityMutation.mutate(
       {
         doctorSharingInfo: {
@@ -163,7 +175,7 @@ export function FacilityDetailsScreen() {
       </View>
     )
   }
-  async function copyToClipboard(value: any) {
+  async function copyToClipboard(value: string) {
     await Clipboard.setStringAsync(value)
     Alert.alert('', 'Username copied to clipborad')
   }
@@ -326,16 +338,21 @@ export function FacilityDetailsScreen() {
             </View>
             {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
-                {locationList.map((data: any, index: number) => {
-                  data.component = 'Facility'
-                  data.doctorFacilityId = facilityInfo.id
-                  data.memberData = memberData
-                  return (
-                    <View key={index}>
-                      <Location data={data} />
-                    </View>
-                  )
-                })}
+                {locationList.map(
+                  (
+                    data: FacilityLocation & Record<string, unknown>,
+                    index: number
+                  ) => {
+                    data.component = 'Facility'
+                    data.doctorFacilityId = facilityInfo.id
+                    data.memberData = memberData
+                    return (
+                      <View key={index}>
+                        <Location data={data} />
+                      </View>
+                    )
+                  }
+                )}
               </ScrollView>
             ) : (
               <View />
@@ -384,131 +401,133 @@ export function FacilityDetailsScreen() {
             </View>
             {appointmentList.length > 0 && isShowAppointments ? (
               <ScrollView className="h-[60%] flex-1">
-                {appointmentList.map((data: any, index: number) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => {
-                        router.push(
-                          formatUrl('/circles/appointmentDetails', {
-                            appointmentDetails: JSON.stringify(data),
-                            memberData: JSON.stringify(memberData)
-                          })
-                        )
-                      }}
-                      key={index}
-                      className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
-                    >
-                      <View className=" flex-row">
-                        <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
-                          {data.date
-                            ? formatTimeToUserLocalTime(
-                                data.date,
-                                userAddress,
-                                memberAddress
-                              )
-                            : ''}
-                        </Typography>
-                        <View className="">
-                          <Typography className="text-sm font-bold text-black">
-                            {data.status ? data.status : ''}
+                {appointmentList.map(
+                  (data: AppointmentListItem, index: number) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          router.push(
+                            formatUrl('/circles/appointmentDetails', {
+                              appointmentDetails: JSON.stringify(data),
+                              memberData: JSON.stringify(memberData)
+                            })
+                          )
+                        }}
+                        key={index}
+                        className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
+                      >
+                        <View className=" flex-row">
+                          <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
+                            {data.date
+                              ? formatTimeToUserLocalTime(
+                                  data.date,
+                                  userAddress,
+                                  memberAddress
+                                )
+                              : ''}
                           </Typography>
-                        </View>
-                      </View>
-                      <View className="flex-row">
-                        <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
-                          {data.purpose ? data.purpose : ''}
-                        </Typography>
-                        {data.markCompleteCancel ? (
-                          <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
-                            {'Mark Complete/Cancel'}
-                          </Typography>
-                        ) : (
-                          <View />
-                        )}
-                      </View>
-                      <View className="flex-row">
-                        <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
-                          {data.appointment ? data.appointment : ''}
-                        </Typography>
-                        <Typography className="font-400 ml-[10px] text-sm text-black">
-                          {data.type.toLowerCase() === 'doctor appointment'
-                            ? 'Doctor'
-                            : 'Facility'}
-                        </Typography>
-                      </View>
-                      {data.hasNotes ||
-                      data.hasReminders ||
-                      data.hasTransportation ? (
-                        <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
-                      ) : (
-                        <View />
-                      )}
-
-                      <View className="ml-5 flex-row self-center">
-                        <View className="w-[30%]">
-                          {data.hasNotes ? (
-                            <View className="flex-row">
-                              <Feather
-                                className="ml-5 mt-1"
-                                name={'message-circle'}
-                                size={25}
-                                color={'green'}
-                              />
-                              {data.unreadMessageCount > 0 ? (
-                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                  {data.unreadMessageCount}
-                                </Typography>
-                              ) : (
-                                <View />
-                              )}
-                            </View>
-                          ) : (
-                            <View />
-                          )}
-                        </View>
-                        <View className="w-[30%]">
-                          {data.hasReminders ? (
-                            <View className="flex-row">
-                              <Feather
-                                className="ml-5 mt-1"
-                                name={'clock'}
-                                size={25}
-                                color={'red'}
-                              />
-                              {data.activeReminderCount > 0 ? (
-                                <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
-                                  {data.activeReminderCount}
-                                </Typography>
-                              ) : (
-                                <View />
-                              )}
-                            </View>
-                          ) : (
-                            <View />
-                          )}
-                        </View>
-                        {data.hasTransportation ? (
-                          <View className="w-[30%]">
-                            <Feather
-                              className="ml-5 mt-1"
-                              name={'truck'}
-                              size={25}
-                              color={
-                                data.transportationStatus === 'Requested'
-                                  ? '#cf8442'
-                                  : data.transportationStatus === 'Rejected'
-                                    ? 'red'
-                                    : '#4DA529'
-                              }
-                            />
+                          <View className="">
+                            <Typography className="text-sm font-bold text-black">
+                              {data.status ? data.status : ''}
+                            </Typography>
                           </View>
+                        </View>
+                        <View className="flex-row">
+                          <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
+                            {data.purpose ? data.purpose : ''}
+                          </Typography>
+                          {data.markCompleteCancel ? (
+                            <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
+                              {'Mark Complete/Cancel'}
+                            </Typography>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                        <View className="flex-row">
+                          <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
+                            {data.appointment ? data.appointment : ''}
+                          </Typography>
+                          <Typography className="font-400 ml-[10px] text-sm text-black">
+                            {data.type.toLowerCase() === 'doctor appointment'
+                              ? 'Doctor'
+                              : 'Facility'}
+                          </Typography>
+                        </View>
+                        {data.hasNotes ||
+                        data.hasReminders ||
+                        data.hasTransportation ? (
+                          <View className="my-2 h-[1px] w-[95%] self-center bg-[#86939e]" />
                         ) : (
                           <View />
                         )}
-                      </View>
-                    </TouchableOpacity>
-                  )
-                })}
+
+                        <View className="ml-5 flex-row self-center">
+                          <View className="w-[30%]">
+                            {data.hasNotes ? (
+                              <View className="flex-row">
+                                <Feather
+                                  className="ml-5 mt-1"
+                                  name={'message-circle'}
+                                  size={25}
+                                  color={'green'}
+                                />
+                                {data.unreadMessageCount > 0 ? (
+                                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                    {data.unreadMessageCount}
+                                  </Typography>
+                                ) : (
+                                  <View />
+                                )}
+                              </View>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                          <View className="w-[30%]">
+                            {data.hasReminders ? (
+                              <View className="flex-row">
+                                <Feather
+                                  className="ml-5 mt-1"
+                                  name={'clock'}
+                                  size={25}
+                                  color={'red'}
+                                />
+                                {data.activeReminderCount > 0 ? (
+                                  <Typography className="bg-primary ml-[-5px] h-[20px] w-[20px] rounded-[10px] text-center font-bold text-white">
+                                    {data.activeReminderCount}
+                                  </Typography>
+                                ) : (
+                                  <View />
+                                )}
+                              </View>
+                            ) : (
+                              <View />
+                            )}
+                          </View>
+                          {data.hasTransportation ? (
+                            <View className="w-[30%]">
+                              <Feather
+                                className="ml-5 mt-1"
+                                name={'truck'}
+                                size={25}
+                                color={
+                                  data.transportationStatus === 'Requested'
+                                    ? '#cf8442'
+                                    : data.transportationStatus === 'Rejected'
+                                      ? 'red'
+                                      : '#4DA529'
+                                }
+                              />
+                            </View>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                    )
+                  }
+                )}
               </ScrollView>
             ) : (
               <View />

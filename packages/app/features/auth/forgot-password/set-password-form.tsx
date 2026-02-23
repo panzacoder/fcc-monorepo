@@ -64,7 +64,7 @@ export function SetPasswordForm({
     onLoadingChange(resetPasswordMutation.isPending)
   }, [resetPasswordMutation.isPending])
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = (formData: Schema) => {
     resetPasswordMutation.mutate(
       {
         appuserVo: {

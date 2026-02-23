@@ -56,7 +56,7 @@ function EventEntry({ memberData }: { memberData: MemberData }) {
 
 type TodayCardProps = {
   memberData: MemberData
-  userDetails: any
+  userDetails: Record<string, unknown>
 }
 export function TodayCard({ memberData }: TodayCardProps) {
   const now = new Date()

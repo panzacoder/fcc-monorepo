@@ -7,7 +7,7 @@ import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 
 export type CalendarViewProps = {
-  component: any
+  component: string
   calendarPickerProps: CalendarPickerProps
   onCancel: () => void
   onClear: () => void

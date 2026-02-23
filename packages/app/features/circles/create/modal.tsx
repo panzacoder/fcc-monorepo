@@ -73,7 +73,7 @@ export function CreateCircle() {
   ])
   function joinCircle() {
     logger.debug('joinCircle', JSON.stringify(circleExists))
-    let details: any = circleExists
+    let details = circleExists as { id?: number | string } | boolean | undefined
     joinCircleMutation.mutate(
       {
         memberVo: {

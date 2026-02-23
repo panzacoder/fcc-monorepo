@@ -14,6 +14,11 @@ import { formatUrl } from 'app/utils/format-url'
 import { logger } from 'app/utils/logger'
 import { CircleSummaryCard } from './circle-summary-card'
 import { useMemberDetails, useMemberMenus } from 'app/data/circle'
+import type {
+  GetMemberDetailsResponse,
+  GetMemberMenusResponse,
+  MemberMenu
+} from 'app/data/circle'
 import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
 
 export function CircleDetailsScreen() {
@@ -25,7 +30,10 @@ export function CircleDetailsScreen() {
   const [isAppointments, setIsAppointments] = useState(false)
   const [isIncidents, setIsIncidents] = useState(false)
   const [isEvents, setIsEvents] = useState(false)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    memberData?: string
+    component?: string
+  }>()
   const [menuList, setMenuList] = useState(null)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
@@ -38,7 +46,7 @@ export function CircleDetailsScreen() {
   }
   logger.debug('memberData', JSON.stringify(memberData))
   let unreadMessages = 0
-  memberData.unreadMessages.map((data: any) => {
+  memberData.unreadMessages.map((data: { unreadMessageCount: number }) => {
     unreadMessages += data.unreadMessageCount
   })
   let todayAppt = ''
@@ -61,9 +69,9 @@ export function CircleDetailsScreen() {
 
   useEffect(() => {
     if (memberDetailsData) {
-      const data = memberDetailsData as any
+      const data = memberDetailsData as GetMemberDetailsResponse
       if (data.memberList) {
-        data.memberList.map((entry: any) => {
+        data.memberList.map((entry: Record<string, unknown>) => {
           if (memberData.member === entry.member) {
             setMemberData(entry)
             logger.debug('memberData', JSON.stringify(memberData))
@@ -75,13 +83,13 @@ export function CircleDetailsScreen() {
 
   useEffect(() => {
     if (memberMenusData) {
-      const data = memberMenusData as any
+      const data = memberMenusData as GetMemberMenusResponse
       if (data.member && data.member.address) {
         dispatch(
           currentMemberAddressAction.setMemberAddress(data.member.address)
         )
         let list = data.member.menuList ? data.member.menuList : []
-        list.map((entry: any) => {
+        list.map((entry: MemberMenu) => {
           if (entry.menuid === 'MyAppointments') {
             setIsAppointments(true)
           } else if (entry.menuid === 'MyCommunications') {

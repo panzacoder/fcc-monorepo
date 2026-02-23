@@ -12,6 +12,7 @@ import {
   useUpdateProfile,
   useUpdateMemberAuthorizedCaregiver
 } from 'app/data/profile'
+import type { ProfileMember } from 'app/data/profile'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
@@ -43,7 +44,12 @@ export function EditUserProfileScreen() {
   const updateCaregiverMutation = useUpdateMemberAuthorizedCaregiver(header)
   const isLoading =
     updateProfileMutation.isPending || updateCaregiverMutation.isPending
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    component?: string
+    userDetails?: string
+    memberDetails?: string
+    memberData?: string
+  }>()
   const router = useRouter()
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
@@ -93,7 +99,7 @@ export function EditUserProfileScreen() {
     mutation.mutate(
       { memberVo },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data: ProfileMember | null) => {
           logger.debug('datatat ', JSON.stringify(data))
           let fullName = data.firstName ? data.firstName : ''
           fullName += data.lastName ? ' ' + data.lastName : ''

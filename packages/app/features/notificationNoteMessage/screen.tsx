@@ -25,6 +25,12 @@ import {
   useUpdateMessageThread,
   messageKeys
 } from 'app/data/messages'
+import type {
+  GetThreadResponse,
+  MessageThread,
+  Message
+} from 'app/data/messages'
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import { useQueryClient } from '@tanstack/react-query'
 import { logger } from 'app/utils/logger'
 Notifications.setNotificationHandler({
@@ -40,8 +46,8 @@ export function NotificationNoteMessageScreen() {
   const [isRender, setIsRender] = useState(false)
   const [key, setKey] = useState(0)
   const [message, setMessage] = useState('')
-  const [messageList, setMessageList] = useState(null) as any
-  const [threadDetails, setThreadDetails] = useState(null) as any
+  const [messageList, setMessageList] = useState<Message[] | null>(null)
+  const [threadDetails, setThreadDetails] = useState<MessageThread | null>(null)
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
   const userDetails = useAppSelector((state) => state.userProfileState.header)
@@ -51,7 +57,10 @@ export function NotificationNoteMessageScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    noteData?: string
+    memberData?: string
+  }>()
   let noteData =
     item.noteData && item.noteData !== undefined
       ? JSON.parse(item.noteData)
@@ -78,7 +87,7 @@ export function NotificationNoteMessageScreen() {
 
   useEffect(() => {
     if (threadData) {
-      const data = threadData as any
+      const data = threadData as GetThreadResponse
       if (data.messageThread) {
         let messageThread = data.messageThread
         setThreadDetails(messageThread)
@@ -96,10 +105,10 @@ export function NotificationNoteMessageScreen() {
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
-      await messaging().setBackgroundMessageHandler(async (message: any) => {
+      await messaging().setBackgroundMessageHandler(async (message) => {
         updateMessageList(message)
       })
-      await messaging().onMessage((message: any) => {
+      await messaging().onMessage((message) => {
         updateMessageList(message)
       })
     } catch (e: unknown) {}
@@ -107,8 +116,10 @@ export function NotificationNoteMessageScreen() {
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
   )
-  async function updateMessageList(message: any) {
-    let messageList: any = messageListFromStore
+  async function updateMessageList(
+    message: FirebaseMessagingTypes.RemoteMessage
+  ) {
+    let messageList = [...messageListFromStore]
     let messeageContent = message.data ? message.data : {}
     let messageObject = {
       sender: messeageContent.MemberId ? messeageContent.MemberId : '',
@@ -187,7 +198,7 @@ export function NotificationNoteMessageScreen() {
               }
               className="max-h-[90%] "
             >
-              {messageList.map((message: any, index: number) => {
+              {messageList.map((message: Message, index: number) => {
                 if (isValidObject(userDetails) && isValidObject(message)) {
                   if (message.sender !== userDetails.id) {
                     return (

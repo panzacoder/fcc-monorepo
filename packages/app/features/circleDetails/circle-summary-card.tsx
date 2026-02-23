@@ -9,6 +9,7 @@ import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import type { MemberMenu } from 'app/data/circle'
 import { Image } from 'app/ui/image'
 import { googleMapOpenUrl } from 'app/ui/utils'
 
@@ -25,7 +26,7 @@ export function CircleSummaryCard({ menuList, memberData, userDetails }) {
     isPrescription = false,
     isMedicalDevice = false,
     isCalendar = false
-  menuList.map((data: any, index: any) => {
+  menuList.map((data: MemberMenu) => {
     if (data.menuid === 'MyCaregivers') {
       isCaregiver = true
     } else if (data.menuid === 'MyDoctors') {
