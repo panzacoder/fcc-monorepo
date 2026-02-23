@@ -37,7 +37,7 @@ export function SplashScreen() {
       } else {
         setIsShowButtons(true)
       }
-    } catch (e) {
+    } catch (e: unknown) {
       setIsShowButtons(true)
     }
   }, [])
@@ -57,7 +57,7 @@ export function SplashScreen() {
         }
       })
       getUsernamePassword()
-    } catch (e) {
+    } catch (e: unknown) {
       getUsernamePassword()
     }
   }, [])

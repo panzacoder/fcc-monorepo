@@ -187,7 +187,7 @@ export function HomeScreen() {
       } else {
         logger.debug('Failed', 'No Token Recived')
       }
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
   async function updateFcmToken(fcmToken: any) {
     updateFcmTokenMutation.mutate(
@@ -211,7 +211,7 @@ export function HomeScreen() {
       await messaging().onMessage((message: any) => {
         schedulePushNotification(message)
       })
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   const getToken = useCallback(async () => {
     try {
@@ -223,7 +223,7 @@ export function HomeScreen() {
         getFcmToken()
         logger.debug('Authorization status:', authStatus)
       }
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   async function registerForPushNotificationsAsync() {
     let token: any
@@ -262,7 +262,7 @@ export function HomeScreen() {
           })
         ).data
         logger.debug(token)
-      } catch (e) {
+      } catch (e: unknown) {
         token = `${e}`
       }
     } else {

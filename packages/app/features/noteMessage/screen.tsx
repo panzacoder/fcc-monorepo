@@ -232,7 +232,7 @@ export function NoteMessageScreen() {
       await messaging().onMessage((message: any) => {
         updateMessageList(message)
       })
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList

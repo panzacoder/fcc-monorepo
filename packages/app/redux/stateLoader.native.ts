@@ -10,7 +10,7 @@ export class StateLoader {
         return this.initializeState()
       }
       return JSON.parse(serializedState)
-    } catch (err) {
+    } catch (err: unknown) {
       return this.initializeState()
     }
   }
@@ -19,7 +19,7 @@ export class StateLoader {
     try {
       const serializedState = JSON.stringify(state)
       await AsyncStorage.setItem(STORE_NAME, serializedState)
-    } catch (err) {
+    } catch (err: unknown) {
       // Silently fail — AsyncStorage may be unavailable
     }
   }

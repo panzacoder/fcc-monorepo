@@ -6,6 +6,7 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
+    "useUnknownInCatchVariables": true,
     "jsxImportSource": "nativewind",
     "strict": false,
     "jsx": "preserve"

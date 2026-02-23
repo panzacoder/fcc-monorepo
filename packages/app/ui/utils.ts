@@ -33,7 +33,7 @@ export function googleMapOpenUrl(address: string) {
         return Linking.openURL(url)
       }
     })
-    .catch((err) => logger.error('An error occurred', err))
+    .catch((err: unknown) => logger.error('An error occurred', err))
 }
 export const removeAllSpecialCharFromString = (phoneNumber: any) => {
   let newNumber = String(phoneNumber).replace(

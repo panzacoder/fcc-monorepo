@@ -226,7 +226,7 @@ export function PaymentsScreen() {
         () => openPaymentSheet(paymentIntent, sessionId, subscriptionId),
         1000
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.debug(error)
     }
   }
@@ -335,8 +335,10 @@ export function PaymentsScreen() {
         try {
           RNIap.initConnection()
           RNIap.clearTransactionIOS()
-        } catch (err) {
-          logger.warn(err.code, err.message)
+        } catch (err: unknown) {
+          const code = err instanceof Error ? (err as any).code : undefined
+          const message = err instanceof Error ? err.message : String(err)
+          logger.warn(code, message)
         }
 
         let purchaseUpdateSubscription = purchaseUpdatedListener(
@@ -347,7 +349,7 @@ export function PaymentsScreen() {
             if (receipt) {
               try {
                 verifyInAppPurchaseReceipt(receipt)
-              } catch (ackErr) {
+              } catch (ackErr: unknown) {
                 logger.warn('ackErr', ackErr)
               }
             }
@@ -384,9 +386,10 @@ export function PaymentsScreen() {
         identifier = 'com.familycarecircle.yearly'
       }
       RNIap.requestSubscription(identifier)
-    } catch (err) {
-      logger.debug('err', err.message)
-      Alert.alert(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      logger.debug('err', message)
+      Alert.alert(message)
     }
   }
   return (

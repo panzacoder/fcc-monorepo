@@ -362,7 +362,7 @@ export function MedicalDevicesDetailsScreen() {
         setNoteData(noteData)
         setIsMessageThread(true)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setLoading(false)
       logger.debug(error)
     }
