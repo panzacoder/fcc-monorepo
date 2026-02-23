@@ -2,6 +2,10 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
     "jsxImportSource": "nativewind",
     "strict": false,
     "jsx": "preserve"

@@ -23,7 +23,8 @@
       }
     ],
     "strict": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "next-env.d.ts",
