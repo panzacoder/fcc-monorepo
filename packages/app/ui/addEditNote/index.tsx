@@ -9,6 +9,33 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Typography } from '../typography'
 import { logger } from 'app/utils/logger'
+import type { TaskOccurance, PurchaseOccurance } from 'app/data/types.d'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
+
+interface NoteData {
+  id?: number | string
+  shortDescription?: string
+  note?: string
+  occurance?: { occurance: string }
+}
+
+interface StaticData {
+  taskOccuranceList: TaskOccurance[]
+  purchaseOccuranceList: PurchaseOccurance[]
+}
+
+interface AddEditNoteProps {
+  component: string
+  noteData: NoteData
+  cancelClicked: () => void
+  createUpdateNote: (
+    occurance: string,
+    note: string,
+    title: string,
+    noteData: NoteData
+  ) => void
+}
+
 const schema = z.object({
   title: z.string().min(1, { message: 'Note title is required' }),
   note: z.string().min(1, { message: 'Note details is required' }),
@@ -20,29 +47,33 @@ export const AddEditNote = ({
   noteData,
   cancelClicked,
   createUpdateNote
-}) => {
-  const staticData: any = useAppSelector(
+}: AddEditNoteProps) => {
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
-  let occurance: any = ''
+  ) as StaticData
+  let occurance = ''
   // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
     occurance = noteData.occurance.occurance
     // facilityTypeIdex = getTypeIndex(facilityDetails.type)
     if (component === 'Appointment') {
-      staticData.taskOccuranceList.map(async (data: any, index: any) => {
-        if (data.occurance === noteData.occurance.occurance) {
-          occuranceIndex = index + 1
+      staticData.taskOccuranceList.map(
+        async (data: TaskOccurance, index: number) => {
+          if (data.occurance === noteData.occurance.occurance) {
+            occuranceIndex = index + 1
+          }
         }
-      })
+      )
     } else if (component === 'Medical Device') {
-      staticData.purchaseOccuranceList.map(async (data: any, index: any) => {
-        if (data.occurance === noteData.occurance.occurance) {
-          occuranceIndex = index + 1
-          // console.log('occuranceIndex', '' + occuranceIndex)
+      staticData.purchaseOccuranceList.map(
+        async (data: PurchaseOccurance, index: number) => {
+          if (data.occurance === noteData.occurance.occurance) {
+            occuranceIndex = index + 1
+            // console.log('occuranceIndex', '' + occuranceIndex)
+          }
         }
-      })
+      )
     }
   }
   const { control, handleSubmit, reset } = useForm({
@@ -62,7 +93,7 @@ export const AddEditNote = ({
   let occuranceList: Array<{ id: number; title: string }> = []
   if (component === 'Appointment') {
     occuranceList = staticData.taskOccuranceList.map(
-      (data: any, index: any) => {
+      (data: TaskOccurance, index: number) => {
         return {
           title: data.occurance,
           id: index + 1
@@ -72,7 +103,7 @@ export const AddEditNote = ({
   }
   if (component === 'Medical Device') {
     occuranceList = staticData.purchaseOccuranceList.map(
-      (data: any, index: any) => {
+      (data: PurchaseOccurance, index: number) => {
         return {
           title: data.occurance,
           id: index + 1
@@ -88,7 +119,7 @@ export const AddEditNote = ({
         : ''
     createUpdateNote(occurance, formData.note, formData.title, noteData)
   }
-  async function setOccuranceChange(value: any) {
+  async function setOccuranceChange(value: DropdownItem | null) {
     logger.debug('value', JSON.stringify(value))
     if (value === null) {
       reset({

@@ -13,12 +13,44 @@ import testIDs from '../../utils/testIDs'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 
+interface CalendarEventItem {
+  date: string
+  type: string
+  action: string
+  id: number | string
+  location: string
+  status: string
+  description: string
+  title: string
+}
+
+interface ProcessedCalendarItem {
+  title: string
+  data: {
+    hour: string
+    duration: string
+    title: string
+    type: string
+    id: number | string
+    location: string
+    status: string
+    desc: string
+  }[]
+  status?: string
+}
+
+interface ExpandableCalendarViewProps {
+  memberData: Record<string, unknown>
+  calenderEvents: CalendarEventItem[]
+  handleChange: (month: { dateString: string }) => void
+}
+
 const today = new Date().toISOString().split('T')[0]
 export const ExpandableCalendarView = ({
   memberData,
   calenderEvents,
   handleChange
-}) => {
+}: ExpandableCalendarViewProps) => {
   const router = useRouter()
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -32,9 +64,12 @@ export const ExpandableCalendarView = ({
   useEffect(() => {
     getMarkedDates()
   }, [])
-  const onDateChanged = (date: any, updateSource: any) => {}
+  const onDateChanged = (_date: string, _updateSource: string) => {}
 
-  async function onMonthChange(month: any, updateSource: any) {
+  async function onMonthChange(
+    month: { dateString: string },
+    _updateSource: string
+  ) {
     // console.log('onMonthChange: ', '' + month)
     await handleChange(month)
     getMarkedDates()
@@ -42,31 +77,33 @@ export const ExpandableCalendarView = ({
   async function getMarkedDates() {
     let marked = {}
     let data = await processData(calenderEvents)
-    data.forEach((item: any) => {
+    data.forEach((item: ProcessedCalendarItem) => {
       if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {
-        let dotsColor = item.data.map((items: any, index: any) => {
-          let color = ''
-          if (String(items.type).toLowerCase() === 'appointment') {
-            switch (item.status) {
-              case 'Cancelled':
-                color = 'gray-400'
-                break
-              case 'Completed':
-                color = '#d2bd7f'
-                break
-              default:
-                color = '#0c6b25'
+        let dotsColor = item.data.map(
+          (items: ProcessedCalendarItem['data'][number], index: number) => {
+            let color = ''
+            if (String(items.type).toLowerCase() === 'appointment') {
+              switch (item.status) {
+                case 'Cancelled':
+                  color = 'gray-400'
+                  break
+                case 'Completed':
+                  color = '#d2bd7f'
+                  break
+                default:
+                  color = '#0c6b25'
+              }
+              return {
+                key: 'Appointment' + index,
+                color: color
+              }
+            } else if (String(items.type).toLowerCase() === 'event') {
+              return { key: 'Event' + index, color: '#518b9f' }
+            } else {
+              return { key: 'Incident' + index, color: '#c21111' }
             }
-            return {
-              key: 'Appointment' + index,
-              color: color
-            }
-          } else if (String(items.type).toLowerCase() === 'event') {
-            return { key: 'Event' + index, color: '#518b9f' }
-          } else {
-            return { key: 'Incident' + index, color: '#c21111' }
           }
-        })
+        )
         marked[item.title] = { marked: true, dots: dotsColor }
       } else {
         marked[item.title] = { disabled: true }
@@ -75,8 +112,8 @@ export const ExpandableCalendarView = ({
     logger.debug('marked', JSON.stringify(marked))
     setMarkedObject(marked)
   }
-  async function processData(data: any) {
-    let item = data.map((calendarDetails: any) => {
+  async function processData(data: CalendarEventItem[]) {
+    let item = data.map((calendarDetails: CalendarEventItem) => {
       let title = String(
         getFullDateForCalendar(calendarDetails.date, 'YYYY-MM-DD')
       )
@@ -101,7 +138,7 @@ export const ExpandableCalendarView = ({
     let sortedResult = _(item)
       .groupBy('title')
       .map((g) =>
-        _.mergeWith({}, ...g, (obj: any, src: any) =>
+        _.mergeWith({}, ...g, (obj: unknown, src: unknown) =>
           _.isArray(obj) ? obj.concat(src) : undefined
         )
       )
@@ -109,7 +146,7 @@ export const ExpandableCalendarView = ({
     return sortedResult
   }
 
-  function getStatusColor(status: any) {
+  function getStatusColor(status: string) {
     if (String(status).toLowerCase() === 'Cancelled'.toLowerCase()) {
       return 'bg-[#CCCCCC]'
     }
@@ -119,7 +156,7 @@ export const ExpandableCalendarView = ({
       return 'bg-[#D4EFDF]'
     }
   }
-  function itemPressed(data: any) {
+  function itemPressed(data: CalendarEventItem) {
     if (data.action === 'Appointment') {
       router.push(
         formatUrl('/circles/appointmentDetails', {
@@ -143,7 +180,7 @@ export const ExpandableCalendarView = ({
       )
     }
   }
-  function getCard(data: any, index: any) {
+  function getCard(data: CalendarEventItem, index: number) {
     let bgColor =
       data.action === 'Incident'
         ? 'bg-[#FADBD8]'
@@ -234,7 +271,7 @@ export const ExpandableCalendarView = ({
         />
 
         <ScrollView className="my-3 w-full">
-          {calenderEvents.map((data: any, index: number) => {
+          {calenderEvents.map((data: CalendarEventItem, index: number) => {
             return (
               <View key={index} className="">
                 {getCard(data, index)}

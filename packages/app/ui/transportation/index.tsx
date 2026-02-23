@@ -19,16 +19,51 @@ import {
   useUpdateTransportationReminderEvent,
   useDeleteTransportationReminderEvent
 } from 'app/data/transportation'
+import type { ComponentProps } from 'react'
+import type { Feather as FeatherType } from 'app/ui/icons'
+import type { MomentInput } from 'moment-timezone'
+
+interface TransportationDisplayData {
+  id?: number | string
+  createdOn?: MomentInput
+  accompanyName?: string
+  date?: MomentInput
+  description?: string
+  status?: { status?: string }
+  address?: Record<string, unknown>
+  reminderList?: ReminderItem[]
+  showResendButton?: boolean
+  showCancelButton?: boolean
+  createdByName?: string
+}
+
+interface ReminderItem {
+  id?: number | string
+  content?: string
+  date?: string
+}
+
+interface TransportationProps {
+  component: string
+  data: TransportationDisplayData
+  editTransportation: (data: TransportationDisplayData) => void
+  deleteResendCancelTransportation: (
+    count: number,
+    data: TransportationDisplayData
+  ) => void
+}
+
 export const Transportation = ({
   component,
   data,
   editTransportation,
   deleteResendCancelTransportation
-}) => {
+}: TransportationProps) => {
   const [isAddReminder, setIsAddReminder] = useState(false)
 
-  const [remindersData, setReminderData] = useState({})
-  const [transportationData, setTransportationData] = useState(data ? data : {})
+  const [remindersData, setReminderData] = useState<ReminderItem>({})
+  const [transportationData, setTransportationData] =
+    useState<TransportationDisplayData>(data ? data : {})
   const [isRender, setIsRender] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
@@ -37,7 +72,7 @@ export const Transportation = ({
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  let list: object[] = []
+  let list: ReminderItem[] = []
   if (transportationData.reminderList) {
     list = transportationData.reminderList
   }
@@ -88,7 +123,7 @@ export const Transportation = ({
     updateReminderEventMutation.isPending ||
     deleteReminderEventMutation.isPending
 
-  async function callDeleteResendCancelTransportation(count: any) {
+  async function callDeleteResendCancelTransportation(count: number) {
     deleteResendCancelTransportation(count, transportationData)
   }
 
@@ -98,7 +133,7 @@ export const Transportation = ({
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: any
+    iconValue: ComponentProps<typeof FeatherType>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -122,8 +157,24 @@ export const Transportation = ({
   function cancelClicked() {
     setIsAddReminder(false)
   }
-  async function deleteReminder(reminderData: any) {
-    let reminderPayload: any = {
+  function handleReminderSuccess(res: unknown) {
+    const data = res as TransportationDisplayData | undefined
+    setTransportationData(data ? data : {})
+    setRemindersList(data?.reminderList ? data.reminderList : [])
+    setIsRender(!isRender)
+  }
+  function handleReminderCreateUpdateSuccess(res: unknown) {
+    const data = res as TransportationDisplayData | undefined
+    setTransportationData(data ? data : {})
+    setIsAddReminder(false)
+    setRemindersList(data?.reminderList ? data.reminderList : [])
+  }
+  async function deleteReminder(reminderData: ReminderItem) {
+    let reminderPayload: {
+      id: number | string
+      appointmentTransportation?: { id: number | string }
+      eventTransportation?: { id: number | string }
+    } = {
       id: reminderData.id ? reminderData.id : ''
     }
     if (component === 'Appointment') {
@@ -133,11 +184,7 @@ export const Transportation = ({
       deleteReminderMutation.mutate(
         { reminder: reminderPayload },
         {
-          onSuccess: (data: any) => {
-            setTransportationData(data ? data : {})
-            setRemindersList(data?.reminderList ? data.reminderList : [])
-            setIsRender(!isRender)
-          },
+          onSuccess: handleReminderSuccess,
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to delete reminder')
           }
@@ -150,11 +197,7 @@ export const Transportation = ({
       deleteReminderEventMutation.mutate(
         { reminder: reminderPayload },
         {
-          onSuccess: (data: any) => {
-            setTransportationData(data ? data : {})
-            setRemindersList(data?.reminderList ? data.reminderList : [])
-            setIsRender(!isRender)
-          },
+          onSuccess: handleReminderSuccess,
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to delete reminder')
           }
@@ -164,10 +207,16 @@ export const Transportation = ({
   }
   async function createUpdateReminder(
     title: string,
-    date: any,
-    reminderData: any
+    date: Date | string,
+    reminderData: ReminderItem
   ) {
-    let reminderPayload: any = {
+    let reminderPayload: {
+      content: string
+      date: Date | string
+      id?: number | string
+      appointmentTransportation?: { id: number | string }
+      eventTransportation?: { id: number | string }
+    } = {
       content: title,
       date: date
     }
@@ -182,11 +231,7 @@ export const Transportation = ({
         createReminderMutation.mutate(
           { reminder: reminderPayload },
           {
-            onSuccess: (data: any) => {
-              setTransportationData(data ? data : {})
-              setIsAddReminder(false)
-              setRemindersList(data?.reminderList ? data.reminderList : [])
-            },
+            onSuccess: handleReminderCreateUpdateSuccess,
             onError: (error) => {
               Alert.alert('', error.message || 'Failed to create reminder')
             }
@@ -196,11 +241,7 @@ export const Transportation = ({
         updateReminderMutation.mutate(
           { reminder: reminderPayload },
           {
-            onSuccess: (data: any) => {
-              setTransportationData(data ? data : {})
-              setIsAddReminder(false)
-              setRemindersList(data?.reminderList ? data.reminderList : [])
-            },
+            onSuccess: handleReminderCreateUpdateSuccess,
             onError: (error) => {
               Alert.alert('', error.message || 'Failed to update reminder')
             }
@@ -215,11 +256,7 @@ export const Transportation = ({
         createReminderEventMutation.mutate(
           { reminder: reminderPayload },
           {
-            onSuccess: (data: any) => {
-              setTransportationData(data ? data : {})
-              setIsAddReminder(false)
-              setRemindersList(data?.reminderList ? data.reminderList : [])
-            },
+            onSuccess: handleReminderCreateUpdateSuccess,
             onError: (error) => {
               Alert.alert('', error.message || 'Failed to create reminder')
             }
@@ -229,11 +266,7 @@ export const Transportation = ({
         updateReminderEventMutation.mutate(
           { reminder: reminderPayload },
           {
-            onSuccess: (data: any) => {
-              setTransportationData(data ? data : {})
-              setIsAddReminder(false)
-              setRemindersList(data?.reminderList ? data.reminderList : [])
-            },
+            onSuccess: handleReminderCreateUpdateSuccess,
             onError: (error) => {
               Alert.alert('', error.message || 'Failed to update reminder')
             }
@@ -242,7 +275,7 @@ export const Transportation = ({
       }
     }
   }
-  const editReminder = (remiderData: any) => {
+  const editReminder = (remiderData: ReminderItem) => {
     setReminderData(remiderData)
     setIsAddReminder(true)
   }
@@ -324,7 +357,7 @@ export const Transportation = ({
       )}
       {remindersList.length > 0 ? (
         <ScrollView className="w-[95%]">
-          {remindersList.map((data: any, index: number) => {
+          {remindersList.map((data: ReminderItem, index: number) => {
             return (
               <View key={index} className="ml-4">
                 <Reminder

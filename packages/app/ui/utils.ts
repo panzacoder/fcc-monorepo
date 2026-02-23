@@ -15,7 +15,7 @@ export function cn(...inputs: ClassValue[]) {
 export function consoleData(title: string, data: string) {
   logger.debug(title, data)
 }
-export const isNull = (input: any) => {
+export const isNull = (input: unknown) => {
   if (undefined === input || null === input) {
     return true
   }
@@ -35,7 +35,9 @@ export function googleMapOpenUrl(address: string) {
     })
     .catch((err: unknown) => logger.error('An error occurred', err))
 }
-export const removeAllSpecialCharFromString = (phoneNumber: any) => {
+export const removeAllSpecialCharFromString = (
+  phoneNumber: string | number
+) => {
   let newNumber = String(phoneNumber).replace(
     /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,
     ''
@@ -43,7 +45,7 @@ export const removeAllSpecialCharFromString = (phoneNumber: any) => {
   newNumber = newNumber.replace(' ', '')
   return newNumber
 }
-export const convertPhoneNumberToUsaPhoneNumberFormat = (value: any) => {
+export const convertPhoneNumberToUsaPhoneNumberFormat = (value: string) => {
   if (!value) return value
   const currentValue = value.replace(/[^\d]/g, '')
   const cvLength = currentValue.length
@@ -55,8 +57,24 @@ export const convertPhoneNumberToUsaPhoneNumberFormat = (value: any) => {
     return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3, 6)}-${currentValue.slice(6, 10)}`
   }
 }
-export function getAddressFromObject(address: any) {
-  if (isNull(address)) {
+interface StateWithCountry {
+  name?: string
+  countryvo?: { name?: string }
+  country?: { name?: string }
+}
+export interface AddressLike {
+  line?: string
+  city?: string
+  statevo?: StateWithCountry
+  state?: StateWithCountry
+  country?: { name?: string }
+  pin?: string
+  pincode?: number | string
+  zipCode?: string
+  zicode?: string
+}
+export function getAddressFromObject(address: AddressLike | null | undefined) {
+  if (isNull(address) || !address) {
     return ''
   }
   let finalAddress = ''
@@ -111,7 +129,7 @@ export function getAddressFromObject(address: any) {
   let pin = address.pin
   if (pin && pin.length > 0) {
     finalAddress = finalAddress + pin.toString().trim()
-  } else if (address.pincode && address.pincode > 0) {
+  } else if (address.pincode && Number(address.pincode) > 0) {
     finalAddress = finalAddress + address.pincode.toString().trim()
   }
 
@@ -168,19 +186,19 @@ export const getMonthsListOnly = () => {
   ]
   return monthsList
 }
-function getTimezoneName(userAddress: any, memberAddress: any) {
+export interface TimezoneHolder {
+  timezone?: { name?: string } | null
+}
+function getTimezoneName(
+  userAddress: TimezoneHolder | null,
+  memberAddress: TimezoneHolder | null
+) {
   let userData = userAddress
-  let timeZoneName = null
+  let timeZoneName: string | null = null
   let memberData = memberAddress
-  if (memberData?.timezone ? memberData.timezone.name : false) {
+  if (memberData?.timezone?.name) {
     timeZoneName = memberData.timezone.name
-  } else if (
-    userData !== null
-      ? userData.timezone !== null
-        ? userData.timezone.name
-        : false
-      : false
-  ) {
+  } else if (userData?.timezone?.name) {
     timeZoneName = userData.timezone.name
   }
 
@@ -191,10 +209,10 @@ function getTimezoneName(userAddress: any, memberAddress: any) {
   }
 }
 
-export const getFullDate = (date: any) => {
+export const getFullDate = (date: MomentInput) => {
   return moment(date).format(DATE_CONSTANT.FULL_DATE)
 }
-export const getDay = (date: any) => {
+export const getDay = (date: MomentInput) => {
   // console.log('date./.', date)
   var time = moment(date).format('hh:mm A')
   var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -202,9 +220,9 @@ export const getDay = (date: any) => {
   return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
 }
 export const convertUserTimeToUTC = (
-  time: any,
-  userAddress: any,
-  memberAddress: any
+  time: MomentInput,
+  userAddress: TimezoneHolder | null,
+  memberAddress: TimezoneHolder | null
 ) => {
   let timeZoneName = getTimezoneName(userAddress, memberAddress)
   let time1 = moment(time).format(DATE_CONSTANT.FULL_DATE)
@@ -213,16 +231,19 @@ export const convertUserTimeToUTC = (
     .utc()
   return utcDateTime
 }
-export const getOnlyUserTimeZone = (userAddress: any, memberAddress: any) => {
+export const getOnlyUserTimeZone = (
+  userAddress: TimezoneHolder | null,
+  memberAddress: TimezoneHolder | null
+) => {
   let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
     return `(${moment().tz(timeZoneName).format('z')})`
   }
 }
 export const convertTimeToUserLocalTime = (
-  time: any,
-  userAddress: any,
-  memberAddress: any
+  time: MomentInput,
+  userAddress: TimezoneHolder | null,
+  memberAddress: TimezoneHolder | null
 ) => {
   let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
@@ -232,9 +253,9 @@ export const convertTimeToUserLocalTime = (
   }
 }
 export const formatTimeToUserLocalTime = (
-  time: any,
-  userAddress: any,
-  memberAddress: any
+  time: MomentInput,
+  userAddress: TimezoneHolder | null,
+  memberAddress: TimezoneHolder | null
 ) => {
   let timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
@@ -243,7 +264,7 @@ export const formatTimeToUserLocalTime = (
     return getFullDate(moment(time).utc(true))
   }
 }
-export const getColorSet = (index: any) => {
+export const getColorSet = (index: number) => {
   let colorsList = [
     'bg-[#A2416B]',
     'bg-[#000080]',

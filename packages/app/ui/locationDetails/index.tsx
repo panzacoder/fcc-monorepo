@@ -12,6 +12,30 @@ import { useStatesAndTimezones } from 'app/data/locations'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
 import { logger } from 'app/utils/logger'
+import type { Address, Country, State, Timezone } from 'app/data/types.d'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
+
+interface LocationInputData {
+  nickName?: string
+  shortDescription?: string
+  address: Partial<Address> & {
+    state: Partial<State> & {
+      country: Partial<Country>
+    }
+    timezone: Partial<Timezone>
+  }
+}
+
+interface StaticData {
+  countryList: Country[]
+}
+
+interface LocationDetailsProps {
+  component: string
+  data: LocationInputData | Record<string, never>
+  setAddressObject: (value: unknown, index: number) => void
+}
+
 const schema = z.object({
   locationName: z.string(),
   line: z.string(),
@@ -26,19 +50,26 @@ const schema1 = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export type Schema1 = z.infer<typeof schema1>
-export const LocationDetails = ({ component, data, setAddressObject }) => {
+export const LocationDetails = ({
+  component,
+  data,
+  setAddressObject
+}: LocationDetailsProps) => {
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const header = useAppSelector((state) => state.headerState.header)
-  const memberAddress: any = useAppSelector(
+  const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
-  )
-  const statesListFullRef = useRef<any>([])
+  ) as Partial<Address> & {
+    state: Partial<State> & { country: Partial<Country> }
+    timezone: Partial<Timezone>
+  }
+  const statesListFullRef = useRef<State[]>([])
   const statesListRef = useRef<Array<{ id: number; title: string }>>([])
   const timezonesListRef = useRef<Array<{ id: number; title: string }>>([])
-  const timeZoneListFullRef = useRef<any>([])
+  const timeZoneListFullRef = useRef<Timezone[]>([])
   const countryIndexRef = useRef(-1)
   const stateIndexRef = useRef(-1)
   const timeZoneIndexRef = useRef(-1)
@@ -61,7 +92,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
     let countryId = 101
-    staticData.countryList.map((data: any, index: any) => {
+    staticData.countryList.map((data: Country, index: number) => {
       if (data.name === countryName) {
         countryIndexRef.current = index + 1
         countryId = staticData.countryList[index].id
@@ -104,7 +135,7 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       let newTimeZone = moment.tz.guess()
       const countryObject = ct.getCountriesForTimezone(newTimeZone)
       let countryName = countryObject[0]?.name ? countryObject[0].name : ''
-      staticData.countryList.map(async (data: any, index: any) => {
+      staticData.countryList.map(async (data: Country, index: number) => {
         if (data.name === countryName) {
           setAddressObject(staticData.countryList[index], 4)
         }
@@ -118,21 +149,19 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
   useEffect(() => {
     if (!statesQuery.data) return
     let stateList: Array<{ id: number; title: string }> =
-      statesQuery.data.stateList.map(({ name, id }: Response, index: any) => {
+      statesQuery.data.stateList.map(({ name }: State, index: number) => {
         return {
           title: name,
           id: index + 1
         }
       })
     let timeZoneList: Array<{ id: number; title: string }> =
-      statesQuery.data.timeZoneList.map(
-        ({ name, id }: Response, index: any) => {
-          return {
-            title: name,
-            id: index + 1
-          }
+      statesQuery.data.timeZoneList.map(({ name }: Timezone, index: number) => {
+        return {
+          title: name,
+          id: index + 1
         }
-      )
+      })
     statesListRef.current = stateList
     timezonesListRef.current = timeZoneList
     statesListFullRef.current = statesQuery.data.stateList
@@ -143,8 +172,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       : []
     if (component === 'SignUp') {
       let newTimeZone = moment.tz.guess()
-      statesQuery.data.timeZoneList.map((data: any, index: any) => {
-        if (data.name === newTimeZone) {
+      statesQuery.data.timeZoneList.map((tz: Timezone, index: number) => {
+        if (tz.name === newTimeZone) {
           timeZoneIndexRef.current = index + 1
         }
       })
@@ -156,23 +185,23 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       let stateName = locationData.address.state.name
         ? locationData.address.state.name
         : ''
-      statesQuery.data.stateList.map((data: any, index: any) => {
-        if (data.name === stateName) {
+      statesQuery.data.stateList.map((item: State, index: number) => {
+        if (item.name === stateName) {
           stateIndexRef.current = index + 1
         }
       })
       let timeZoneName = locationData.address.timezone.name
         ? locationData.address.timezone.name
         : ''
-      statesQuery.data.timeZoneList.map((data: any, index: any) => {
-        if (data.name === timeZoneName) {
+      statesQuery.data.timeZoneList.map((item: Timezone, index: number) => {
+        if (item.name === timeZoneName) {
           timeZoneIndexRef.current = index + 1
         }
       })
     } else if (!_.isEmpty(memberAddress)) {
       let stateName = memberAddress.state.name ? memberAddress.state.name : ''
-      statesQuery.data.stateList.map((data: any, index: any) => {
-        if (data.name === stateName) {
+      statesQuery.data.stateList.map((item: State, index: number) => {
+        if (item.name === stateName) {
           stateIndexRef.current = index + 1
         }
       })
@@ -180,8 +209,8 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
       let timeZoneName = memberAddress.timezone.name
         ? memberAddress.timezone.name
         : ''
-      statesQuery.data.timeZoneList.map((data: any, index: any) => {
-        if (data.name === timeZoneName) {
+      statesQuery.data.timeZoneList.map((item: Timezone, index: number) => {
+        if (item.name === timeZoneName) {
           timeZoneIndexRef.current = index + 1
         }
       })
@@ -231,36 +260,33 @@ export const LocationDetails = ({ component, data, setAddressObject }) => {
     },
     resolver: zodResolver(schema1)
   })
-  type Response = {
-    id: number
-    name: string
-  }
   const countryList: Array<{ id: number; title: string }> =
-    staticData.countryList.map(({ name, id }: Response, index: any) => {
+    staticData.countryList.map(({ name }: Country, index: number) => {
       return {
         title: name,
         id: index + 1
       }
     })
-  async function setSelectedCountryChange(value: any) {
+  async function setSelectedCountryChange(value: DropdownItem) {
     if (value) {
       if (isDataReceived) {
-        setAddressObject(staticData.countryList[value.id - 1], 4)
-        let countryId = staticData.countryList[value.id - 1].id
-          ? staticData.countryList[value.id - 1].id
+        const idx = Number(value.id) - 1
+        setAddressObject(staticData.countryList[idx], 4)
+        let countryId = staticData.countryList[idx].id
+          ? staticData.countryList[idx].id
           : 101
         setSelectedCountryId(countryId)
       }
     }
   }
-  async function setSelectedStateChange(value: any) {
+  async function setSelectedStateChange(value: DropdownItem) {
     if (value) {
-      setAddressObject(statesListFullRef.current[value.id - 1], 5)
+      setAddressObject(statesListFullRef.current[Number(value.id) - 1], 5)
     }
   }
-  async function setSelectedTimeZoneChange(value: any) {
+  async function setSelectedTimeZoneChange(value: DropdownItem) {
     if (value) {
-      setAddressObject(timeZoneListFullRef.current[value.id - 1], 8)
+      setAddressObject(timeZoneListFullRef.current[Number(value.id) - 1], 8)
     }
   }
 

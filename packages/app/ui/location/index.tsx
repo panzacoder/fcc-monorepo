@@ -12,10 +12,30 @@ import {
   useDeleteDoctorLocation,
   useDeleteFacilityLocation
 } from 'app/data/locations'
-export function Location(data: any) {
+import type { Address } from 'app/data/types.d'
+import type { AddressLike } from 'app/ui/utils'
+
+interface LocationDisplayData {
+  id?: number | string
+  nickName?: string
+  shortDescription?: string
+  address?: AddressLike
+  phone?: string
+  fax?: string
+  website?: string
+  component?: string
+  doctorFacilityId?: number | string
+  memberData?: Record<string, unknown>
+}
+
+interface LocationProps {
+  data: LocationDisplayData
+}
+
+export function Location({ data }: LocationProps) {
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
-  let locationData = data.data ? data.data : {}
+  let locationData = data ? data : ({} as LocationDisplayData)
   let memberData = locationData.memberData ? locationData.memberData : {}
   const deleteDoctorLocationMutation = useDeleteDoctorLocation(header)
   const deleteFacilityLocationMutation = useDeleteFacilityLocation(header)
@@ -26,8 +46,8 @@ export function Location(data: any) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
     return newUrl
   }
-  async function deleteLocation(memberData: any) {
-    const onError = (error: any) => {
+  async function deleteLocation(memberData: Record<string, unknown>) {
+    const onError = (error: Error) => {
       Alert.alert('', error.message || 'Failed to delete location')
     }
 
@@ -44,8 +64,8 @@ export function Location(data: any) {
           }
         },
         {
-          onSuccess: (data: any) => {
-            let details: any = data ? JSON.stringify(data) : {}
+          onSuccess: (data: unknown) => {
+            let details = data ? JSON.stringify(data) : '{}'
             router.replace(
               formatUrl('/circles/doctorDetails', {
                 doctorDetails: details,
@@ -64,8 +84,8 @@ export function Location(data: any) {
           }
         },
         {
-          onSuccess: (data: any) => {
-            let details: any = data ? JSON.stringify(data) : {}
+          onSuccess: (data: unknown) => {
+            let details = data ? JSON.stringify(data) : '{}'
             router.replace(
               formatUrl('/circles/facilityDetails', {
                 facilityDetails: details,

@@ -24,6 +24,39 @@ import {
   useUpdateTransportationEvent
 } from 'app/data/transportation'
 import { useStatesAndTimezones } from 'app/data/locations'
+import type { Address, Country, State, AccompanyType } from 'app/data/types.d'
+import type { TransportationData } from 'app/data/transportation/types'
+import type { ComponentProps } from 'react'
+import type { Feather as FeatherType } from 'app/ui/icons'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
+
+interface TransportDisplayData extends Partial<TransportationData> {
+  accompanyName?: string
+  accompanyType?: Partial<AccompanyType>
+  status?: { status?: string }
+}
+
+interface AddEditTransportProps {
+  component: string
+  address: Partial<Address> & {
+    state?: Partial<State> & { country?: Partial<Country> }
+  }
+  transportData: TransportDisplayData
+  date: Date | string
+  appointmentId: number | string
+  cancelClicked: () => void
+}
+
+interface StaticData {
+  countryList: Country[]
+}
+
+interface MemberListItem {
+  name: string
+  id: number
+  memberId: number | string
+}
+
 const schema = z.object({
   member: z.number().min(0, { message: 'Select Member' }),
   description: z.string(),
@@ -41,22 +74,26 @@ export const AddEditTransport = ({
   date,
   appointmentId,
   cancelClicked
-}) => {
+}: AddEditTransportProps) => {
   logger.debug('address', JSON.stringify(address))
   const header = useAppSelector((state) => state.headerState.header)
   const user = useAppSelector((state) => state.userProfileState.header)
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const [selectedDate, setSelectedDate] = useState(
     !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
   )
   const [key, setKey] = useState(0)
-  const [memberList, setMemberList] = useState([]) as any
-  const [memberListFull, setMemberListFull] = useState([]) as any
-  const memberAddress: any = useAppSelector(
+  const [memberList, setMemberList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [memberListFull, setMemberListFull] = useState<MemberListItem[]>([])
+  const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
-  )
+  ) as Partial<Address> & {
+    state: Partial<State> & { country: Partial<Country> }
+  }
   const countryIndexRef = useRef(-1)
   const stateIndexRef = useRef(-1)
   const [selectedCountryId, setSelectedCountryId] = useState(101)
@@ -72,15 +109,15 @@ export const AddEditTransport = ({
   useEffect(() => {
     if (!memberListQuery.data || !_.isEmpty(transportData)) return
     let list: Array<{ id: number; title: string }> = memberListQuery.data.map(
-      ({ name, id }: Response, index: any) => {
+      (item: MemberListItem, index: number) => {
         return {
-          title: name,
+          title: item.name,
           id: index + 1
         }
       }
     )
     setMemberList(list)
-    setMemberListFull(memberListQuery.data || [])
+    setMemberListFull((memberListQuery.data as MemberListItem[]) || [])
   }, [memberListQuery.data])
 
   useEffect(() => {
@@ -95,7 +132,7 @@ export const AddEditTransport = ({
     }
 
     let statesList: Array<{ id: number; title: string }> = []
-    statesQuery.data.stateList.map(({ name, id }: Response, index: any) => {
+    statesQuery.data.stateList.map(({ name }: State, index: number) => {
       if (name === stateName) {
         stateIndexRef.current = index + 1
         reset({
@@ -126,12 +163,10 @@ export const AddEditTransport = ({
     },
     resolver: zodResolver(schema)
   })
-  const [statesList, setStatesList] = useState([]) as any
-  const [statesListFull, setStatesListFull] = useState([])
-  type Response = {
-    id: number
-    name: string
-  }
+  const [statesList, setStatesList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [statesListFull, setStatesListFull] = useState<State[]>([])
   let countryName = ''
   if (!_.isEmpty(address)) {
     countryName = address.state.country.name ? address.state.country.name : ''
@@ -143,7 +178,7 @@ export const AddEditTransport = ({
     }
   }
   const countryList: Array<{ id: number; title: string }> = []
-  staticData.countryList.map(({ name, id }: Response, index: any) => {
+  staticData.countryList.map(({ name }: Country, index: number) => {
     if (name === countryName) {
       countryIndexRef.current = index + 1
     }
@@ -178,7 +213,7 @@ export const AddEditTransport = ({
         zipCode: formData.postalCode,
         state: stateObject
       }
-      let transportPayload: any = {
+      let transportPayload: TransportationData = {
         date: selectedDate,
         description: formData.description,
         accompany: memberListFull[formData.member - 1].memberId
@@ -187,10 +222,12 @@ export const AddEditTransport = ({
         accompanyType: {
           type: 'Family Member'
         },
-        reminderList: []
+        reminderList: [],
+        address: {
+          ...transportAddress,
+          state: { ...transportAddress.state, country: countryObject }
+        }
       }
-      transportPayload.address = transportAddress
-      transportPayload.address.state.country = countryObject
       if (component === 'Appointment') {
         transportPayload.appointment = { id: appointmentId }
         createTransportationMutation.mutate(
@@ -225,7 +262,7 @@ export const AddEditTransport = ({
         )
       }
     } else {
-      let transportPayload: any = {
+      let transportPayload: TransportationData = {
         id: transportData.id ? transportData.id : '',
         date: selectedDate,
         description: transportData.description ? transportData.description : '',
@@ -275,15 +312,16 @@ export const AddEditTransport = ({
       }
     }
   }
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date) => {
     setSelectedDate(date)
     setKey(Math.random())
   }
 
-  async function setSelectedCountryChange(value: any) {
+  async function setSelectedCountryChange(value: DropdownItem) {
     if (value) {
-      let countryId = staticData.countryList[value.id - 1].id
-        ? staticData.countryList[value.id - 1].id
+      const idx = Number(value.id) - 1
+      let countryId = staticData.countryList[idx].id
+        ? staticData.countryList[idx].id
         : 101
       setSelectedCountryId(countryId)
     }
@@ -294,7 +332,7 @@ export const AddEditTransport = ({
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: any
+    iconValue: ComponentProps<typeof FeatherType>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
