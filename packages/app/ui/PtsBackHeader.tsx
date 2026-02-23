@@ -4,10 +4,16 @@ import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useAppSelector } from 'app/redux/hooks'
-export const PtsBackHeader = ({ title, memberData }) => {
+
+type PtsBackHeaderProps = {
+  title: string
+  memberData: Record<string, unknown>
+}
+
+export const PtsBackHeader = ({ title, memberData }: PtsBackHeaderProps) => {
   const router = useRouter()
   const user = useAppSelector((state) => state.userProfileState.header)
-  async function goToScreen(title: any) {
+  async function goToScreen(title: string) {
     if (title === 'Appointment Details') {
       router.dismiss(2)
       router.push(

@@ -2,12 +2,27 @@ import { View, ScrollView, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
+
+type CircleRequest = {
+  requestraisedby: string
+  caregivername?: string
+  membername?: string
+  role?: string
+}
+
+type NewCirclesListProps = {
+  cancelClicked: () => void
+  newCirclesList: CircleRequest[]
+  acceptRejectClicked: (data: CircleRequest, accepted: boolean) => void
+  roleUid: string
+}
+
 export const NewCirclesList = ({
   cancelClicked,
   newCirclesList,
   acceptRejectClicked,
   roleUid
-}) => {
+}: NewCirclesListProps) => {
   return (
     <View className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda]">
       <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">
@@ -24,7 +39,7 @@ export const NewCirclesList = ({
         </View>
       </View>
       <ScrollView className="">
-        {newCirclesList.map((data: any, index: number) => {
+        {newCirclesList.map((data: CircleRequest, index: number) => {
           let sentence =
             data.requestraisedby === 'FM'
               ? roleUid === 'My Circle'

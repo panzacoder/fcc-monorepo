@@ -13,6 +13,25 @@ const schema = z.object({
   subject: z.string().min(1, { message: 'Subject is required' })
 })
 export type Schema = z.infer<typeof schema>
+
+type Participant = {
+  name?: string
+  isSelected?: boolean
+}
+
+type NoteData = {
+  shortDescription?: string
+}
+
+type AddMessageThreadProps = {
+  participantsList: Participant[]
+  noteData: NoteData
+  cancelClicked: () => void
+  isParticipantSelected: (index: number) => void
+  createMessageThread: (subject: string, noteData: NoteData) => void
+  isUpdateParticipants: boolean
+}
+
 export const AddMessageThread = ({
   participantsList,
   noteData,
@@ -20,7 +39,7 @@ export const AddMessageThread = ({
   isParticipantSelected,
   createMessageThread,
   isUpdateParticipants
-}) => {
+}: AddMessageThreadProps) => {
   logger.debug('noteData', JSON.stringify(noteData))
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -67,7 +86,7 @@ export const AddMessageThread = ({
         )}
 
         <ScrollView className="h-[60%] max-h-[60%]">
-          {participantsList.map((data: any, index: number) => {
+          {participantsList.map((data: Participant, index: number) => {
             return (
               <View className=" w-full items-center" key={index}>
                 <View className="ml-4 flex-row items-center">

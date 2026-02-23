@@ -13,16 +13,24 @@ export type DropdownItem = {
   title: string
 }
 
+export type DropdownListItem = {
+  id?: string | number
+  title?: string
+  name?: string
+  label?: string
+  value?: string
+}
+
 export type PtsDropdownProps = {
   label?: string
   maxHeight?: number
   value?: string
   defaultValue?: string
-  list: any[]
+  list: DropdownListItem[]
   onChangeValue?: (item: DropdownItem) => void
   error?: boolean
   emptyResultText?: string
-  onSubmitEditing?: (e?: any) => void
+  onSubmitEditing?: (e?: unknown) => void
 } & Omit<AutocompleteDropdownProps, 'ref'>
 
 const DropdownInput = React.forwardRef<TextInput>(
@@ -58,8 +66,8 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
   const dataSet = useMemo(() => {
     return list.map((item) => {
       return {
-        title: item.title || item.name || item.label,
-        id: item.id || item.value
+        title: (item.title || item.name || item.label) ?? '',
+        id: String(item.id ?? item.value ?? '')
       }
     })
   }, [list])
