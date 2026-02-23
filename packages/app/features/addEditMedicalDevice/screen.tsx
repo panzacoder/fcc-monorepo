@@ -22,21 +22,33 @@ import { CheckBox } from 'react-native-elements'
 import { useAppSelector } from 'app/redux/hooks'
 
 import { useMemberDoctors } from 'app/data/doctors'
+import type { DoctorListItem } from 'app/data/doctors/types'
 import {
   useCreateMedicalDevice,
   useUpdateMedicalDevice
 } from 'app/data/medical-devices'
+import type { CreateMedicalDeviceParams } from 'app/data/medical-devices/types'
+import type { PurchaseType } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 const schema = z.object({
   prescriberIndex: z.number().min(0, { message: 'Type is required' }),
   description: z.string().min(1, { message: 'Required' })
 })
 export type Schema = z.infer<typeof schema>
+type MemberRouteParams = {
+  member?: number | string
+  firstname?: string
+  lastname?: string
+}
+
 export function AddEditMedicalDeviceScreen() {
   const doctorListRef = useRef<Array<{ id: number; title: string }>>([])
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let memberData =
-    item.memberData !== undefined ? JSON.parse(item.memberData) : {}
+    item.memberData !== undefined
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
   let medicalDeviceDetails =
     item.medicalDeviceDetails !== undefined
       ? JSON.parse(item.medicalDeviceDetails)
@@ -49,7 +61,7 @@ export function AddEditMedicalDeviceScreen() {
   )
   const [key, setKey] = useState(0)
   const [selectedPrescriberIndex, setSelectedPrescriberIndex] = useState(-1)
-  const [doctorListFull, setDoctorListFull] = useState([]) as any
+  const [doctorListFull, setDoctorListFull] = useState<DoctorListItem[]>([])
   const [prescribedBy, setPrescribedBy] = useState('')
   const [selectedType, setSelectedType] = useState(
     medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
@@ -59,9 +71,9 @@ export function AddEditMedicalDeviceScreen() {
       ? medicalDeviceDetails.isPrescribedBy
       : false
   )
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const header = useAppSelector((state) => state.headerState.header)
   const memberId = memberData.member ? memberData.member : ''
   const doctorsQuery = useMemberDoctors(header, { memberId })
@@ -69,28 +81,28 @@ export function AddEditMedicalDeviceScreen() {
   const updateMedicalDeviceMutation = useUpdateMedicalDevice(header)
   useEffect(() => {
     if (doctorsQuery.data) {
-      let list = (doctorsQuery.data as any).list
-        ? (doctorsQuery.data as any).list
-        : []
-      doctorListRef.current = list.map((data: any, index: any) => {
-        if (!_.isEmpty(medicalDeviceDetails)) {
-          if (
-            medicalDeviceDetails.doctor &&
-            data.id === medicalDeviceDetails.doctor.id
-          ) {
-            let prescribedIndex = index + 1
-            setSelectedPrescriberIndex(prescribedIndex)
-            setPrescribedBy(data.doctorName)
-            reset({
-              prescriberIndex: prescribedIndex
-            })
+      let list = doctorsQuery.data.list ? doctorsQuery.data.list : []
+      doctorListRef.current = list.map(
+        (data: DoctorListItem, index: number) => {
+          if (!_.isEmpty(medicalDeviceDetails)) {
+            if (
+              medicalDeviceDetails.doctor &&
+              data.id === medicalDeviceDetails.doctor.id
+            ) {
+              let prescribedIndex = index + 1
+              setSelectedPrescriberIndex(prescribedIndex)
+              setPrescribedBy(data.doctorName)
+              reset({
+                prescriberIndex: prescribedIndex
+              })
+            }
+          }
+          return {
+            title: data.doctorName,
+            id: index + 1
           }
         }
-        return {
-          title: data.doctorName,
-          id: index + 1
-        }
-      })
+      )
       setDoctorListFull(list)
     }
   }, [doctorsQuery.data])
@@ -100,11 +112,13 @@ export function AddEditMedicalDeviceScreen() {
     createMedicalDeviceMutation.isPending ||
     updateMedicalDeviceMutation.isPending
   // console.log('medicalDeviceDetails', JSON.stringify(medicalDeviceDetails))
-  const typesList = staticData.purchaseTypeList.map((data: any, index: any) => {
-    return {
-      label: data.type
+  const typesList = staticData.purchaseTypeList.map(
+    (data: PurchaseType, index: number) => {
+      return {
+        label: data.type
+      }
     }
-  })
+  )
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       prescriberIndex: !isPrescribed ? 1 : selectedPrescriberIndex,
@@ -132,8 +146,14 @@ export function AddEditMedicalDeviceScreen() {
     }
     createUpdateMedicalDevice(object)
   }
-  async function createUpdateMedicalDevice(object: any) {
-    let purchaseData: any = {
+  async function createUpdateMedicalDevice(object: {
+    doctorId: number | string
+    description: string
+    date: string | Date
+    selectedType: string
+    isPrescribed: boolean
+  }) {
+    let purchaseData: CreateMedicalDeviceParams['purchase'] = {
       id:
         !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
           ? medicalDeviceDetails.id
@@ -157,7 +177,7 @@ export function AddEditMedicalDeviceScreen() {
     mutation.mutate(
       { purchase: purchaseData },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data) => {
           let details = data?.purchase ? data.purchase : {}
           if (_.isEmpty(medicalDeviceDetails)) {
             router.dismiss(1)
@@ -177,15 +197,15 @@ export function AddEditMedicalDeviceScreen() {
       }
     )
   }
-  const onSelectionType = (data: any) => {
+  const onSelectionType = (data: string) => {
     setSelectedType(data)
     // console.log('purpose1', purpose)
   }
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date) => {
     setSelectedDate(date)
     setKey(Math.random())
   }
-  async function setPrescriberChange(value: any) {
+  async function setPrescriberChange(value: number | null) {
     if (value === null) {
       reset({
         prescriberIndex: -1

@@ -20,6 +20,11 @@ import {
   useCreatePrescription,
   useUpdatePrescription
 } from 'app/data/prescriptions'
+import type { PrescriptionMedicineInput } from 'app/data/prescriptions/types'
+import type { ActiveDoctorItem } from 'app/data/doctors/types'
+import type { PharmacyListItem } from 'app/data/facilities/types'
+import type { MedicineType } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import {
   CalendarView,
   CalendarViewInput
@@ -34,8 +39,14 @@ const schema = z.object({
   notes: z.string()
 })
 export type Schema = z.infer<typeof schema>
+type MemberRouteParams = {
+  member?: number | string
+  firstname?: string
+  lastname?: string
+}
+
 export function AddEditPrescriptionScreen() {
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
   const createPrescriptionMutation = useCreatePrescription(header)
@@ -47,11 +58,17 @@ export function AddEditPrescriptionScreen() {
       ? JSON.parse(item.prescriptionDetails)
       : {}
   let activeDoctorList =
-    item.activeDoctorList !== undefined ? JSON.parse(item.activeDoctorList) : []
+    item.activeDoctorList !== undefined
+      ? (JSON.parse(item.activeDoctorList) as ActiveDoctorItem[])
+      : ([] as ActiveDoctorItem[])
   let pharmacyList =
-    item.pharmacyList !== undefined ? JSON.parse(item.pharmacyList) : []
+    item.pharmacyList !== undefined
+      ? (JSON.parse(item.pharmacyList) as PharmacyListItem[])
+      : ([] as PharmacyListItem[])
   let memberData =
-    item.memberData !== undefined ? JSON.parse(item.memberData) : {}
+    item.memberData !== undefined
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [calenderClickedCount, setCalenderClickedCount] = useState(0)
   const [prescribedBy, setPrescribedBy] = useState(
@@ -94,19 +111,14 @@ export function AddEditPrescriptionScreen() {
       ? prescriptionDetails.endDate
       : ''
   )
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
-  type TypeResponse = {
-    id: number
-    type: string
-  }
-  //dropdown is not working for 0 as id, so we started id from 1
   let typeIndex = -1
   let typesList: Array<{ id: number; title: string }> =
     staticData.medicineTypeList.map(
-      ({ type, id }: TypeResponse, index: any) => {
+      ({ type, id }: MedicineType, index: number) => {
         if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
           if (prescriptionDetails.type.type === type) {
             typeIndex = index + 1
@@ -141,28 +153,43 @@ export function AddEditPrescriptionScreen() {
     },
     resolver: zodResolver(schema)
   })
-  const doctorList = activeDoctorList.map((data: any, index: any) => {
-    return {
-      label: data.name
+  const doctorList = activeDoctorList.map(
+    (data: ActiveDoctorItem, index: number) => {
+      return {
+        label: data.name
+      }
     }
-  })
-  const pharmaciesList = pharmacyList.map((data: any, index: any) => {
-    return {
-      label: data.name
+  )
+  const pharmaciesList = pharmacyList.map(
+    (data: PharmacyListItem, index: number) => {
+      return {
+        label: data.name
+      }
     }
-  })
-  async function createUpdatePrescription(object: any) {
-    let doctorId = ''
-    let facilityId = ''
+  )
+  async function createUpdatePrescription(object: {
+    type: number | string
+    drugName: string
+    strength: string
+    instructions: string
+    notes: string
+    prescribedBy: string
+    selectedPharmacy: string
+    prescribedDate: string | Date
+    startDate: string | Date
+    endDate: string | Date
+  }) {
+    let doctorId: number | string = ''
+    let facilityId: number | string = ''
     if (object.prescribedBy !== '') {
-      doctorList.map((data: any, index: any) => {
+      activeDoctorList.map((data: ActiveDoctorItem, index: number) => {
         if (data.name === object.prescribedBy) {
           doctorId = data.id
         }
       })
     }
     if (object.selectedPharmacy !== '') {
-      pharmacyList.map((data: any, index: any) => {
+      pharmacyList.map((data: PharmacyListItem, index: number) => {
         if (data.name === object.selectedPharmacy) {
           facilityId = data.id
         }
@@ -194,7 +221,7 @@ export function AddEditPrescriptionScreen() {
     mutation.mutate(
       { medicine },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data) => {
           let details = data?.medicine ? data.medicine : {}
           if (_.isEmpty(prescriptionDetails)) {
             router.dismiss(1)
@@ -232,11 +259,11 @@ export function AddEditPrescriptionScreen() {
     }
     createUpdatePrescription(object)
   }
-  const onSelectionPrescriber = (data: any) => {
+  const onSelectionPrescriber = (data: string) => {
     setPrescribedBy(data)
     // console.log('purpose1', purpose)
   }
-  const onSelectionPharmacy = (data: any) => {
+  const onSelectionPharmacy = (data: string) => {
     setSelectedPharmacy(data)
     // console.log('purpose1', purpose)
   }

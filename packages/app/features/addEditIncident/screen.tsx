@@ -13,6 +13,9 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useCreateIncident, useUpdateIncident } from 'app/data/incidents'
+import type { IncidentData } from 'app/data/incidents/types'
+import type { IncidentType } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { Button } from 'app/ui/button'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -21,22 +24,31 @@ import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+
+type MemberRouteParams = {
+  member?: number | string
+  firstname?: string
+  lastname?: string
+}
+
 const schema = z.object({
   description: z.string(),
   title: z.string().min(1, { message: 'Enter incident title' })
 })
 export type Schema = z.infer<typeof schema>
 export function AddEditIncidentScreen() {
-  const incidentTypeRef = useRef<any>('')
+  const incidentTypeRef = useRef<string>('')
   const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const createIncidentMutation = useCreateIncident(header)
   const updateIncidentMutation = useUpdateIncident(header)
-  const item = useLocalSearchParams<any>()
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  const item = useLocalSearchParams<Record<string, string>>()
+  let memberData = item.memberData
+    ? (JSON.parse(item.memberData) as MemberRouteParams)
+    : ({} as MemberRouteParams)
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
@@ -76,7 +88,7 @@ export function AddEditIncidentScreen() {
   )
   const [key, setKey] = useState(0)
   // console.log('incidentDetails', JSON.stringify(incidentDetails))
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date) => {
     setSelectedDate(date)
     setKey(Math.random())
   }
@@ -84,7 +96,7 @@ export function AddEditIncidentScreen() {
     incidentTypeRef.current = incidentDetails.type ? incidentDetails.type : ''
   }
   const incidentTypeList = staticData.incidentTypeList.map(
-    (data: any, index: any) => {
+    (data: IncidentType, index: number) => {
       return {
         label: data.type
       }
@@ -134,7 +146,7 @@ export function AddEditIncidentScreen() {
     }
   }, [])
 
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
       if (index === 0) {
         selectedAddress.nickName = value
@@ -176,7 +188,7 @@ export function AddEditIncidentScreen() {
     }
   }
   async function addEditIncident(formData: Schema) {
-    let incidentData: any = {
+    let incidentData: IncidentData = {
       date: selectedDate,
       title: formData.title,
       description: formData.description,
@@ -192,7 +204,7 @@ export function AddEditIncidentScreen() {
       createIncidentMutation.mutate(
         { incident: incidentData },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             let details = data?.incident ? data.incident : data
             if (_.isEmpty(incidentDetails)) {
               router.dismiss(1)
@@ -216,7 +228,7 @@ export function AddEditIncidentScreen() {
       updateIncidentMutation.mutate(
         { incident: incidentData },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             let details = data
             if (_.isEmpty(incidentDetails)) {
               router.dismiss(1)
@@ -237,7 +249,7 @@ export function AddEditIncidentScreen() {
       )
     }
   }
-  const onSelectionIncidentType = (data: any) => {
+  const onSelectionIncidentType = (data: string) => {
     incidentTypeRef.current = data
     // console.log('purpose1', purpose)
   }

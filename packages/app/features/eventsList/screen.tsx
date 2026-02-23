@@ -12,6 +12,9 @@ import { Button } from 'app/ui/button'
 import moment from 'moment'
 import _ from 'lodash'
 import { useEvents } from 'app/data/events'
+import type { EventListItem } from 'app/data/events/types'
+import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -31,10 +34,10 @@ const schema = z.object({
   yearIndex: z.number()
 })
 export type Schema = z.infer<typeof schema>
-const monthsList = getMonthsList() as any
+const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 // let currentFilter = 'Upcoming'
 export function EventsListScreen() {
-  const eventsPrivilegesRef = useRef<any>({})
+  const eventsPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const router = useRouter()
@@ -42,8 +45,8 @@ export function EventsListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
-  const [eventsList, setEventsList] = useState([]) as any
-  const [eventsListFull, setEventsListFull] = useState([]) as any
+  const [eventsList, setEventsList] = useState<EventListItem[]>([])
+  const [eventsListFull, setEventsListFull] = useState<EventListItem[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -51,10 +54,10 @@ export function EventsListScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
-  const item = useLocalSearchParams<any>()
+  ) as StaticData
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -66,12 +69,8 @@ export function EventsListScreen() {
     },
     resolver: zodResolver(schema)
   })
-  type Response = {
-    id: number
-    name: string
-  }
   let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
-  staticData.yearList.map(({ name, id }: Response, index: any) => {
+  staticData.yearList.map(({ name, id }: YearList, index: number) => {
     yearList.push({
       id: index + 2,
       title: name
@@ -127,19 +126,19 @@ export function EventsListScreen() {
       )
     }
   }, [])
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(eventsListFull, filter)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
+  async function getFilteredList(list: EventListItem[], filter: string) {
+    let filteredList: EventListItem[] = []
     if (filter === 'Open Items') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
       list = _.orderBy(list, (x) => x.date, 'desc')
     }
-    list.map((data: any, index: any) => {
+    list.map((data: EventListItem, index: number) => {
       if (filter === 'Upcoming') {
         if (
           moment(data.date).utc().isAfter(moment().utc()) &&
@@ -193,14 +192,14 @@ export function EventsListScreen() {
     })
   }
 
-  async function setYearChange(value: any) {
+  async function setYearChange(value: number | null) {
     if (value === null) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: any) {
+  async function setMonthChange(value: number | null) {
     if (value === null) {
       reset({
         monthIndex: -1
@@ -376,7 +375,7 @@ export function EventsListScreen() {
       )}
       {!isLoading && eventsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
-          {eventsList.map((data: any, index: number) => {
+          {eventsList.map((data: EventListItem, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {
