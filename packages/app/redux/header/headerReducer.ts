@@ -1,10 +1,18 @@
 import { GET_HEADER, SET_HEADER } from './headerTypes'
+import type { HeaderAction } from './headerAction'
 
-const initialState = {
+interface HeaderState {
+  header: Record<string, unknown>
+}
+
+const initialState: HeaderState = {
   header: {}
 }
 
-const headerReducer = (state = initialState, action: any) => {
+const headerReducer = (
+  state = initialState,
+  action: HeaderAction
+): HeaderState => {
   switch (action.type) {
     case GET_HEADER:
       return {

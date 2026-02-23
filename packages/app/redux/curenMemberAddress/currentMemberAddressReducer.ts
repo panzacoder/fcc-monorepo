@@ -2,12 +2,20 @@ import {
   GET_CURRENT_MEMBER_ADDRESS,
   SET_CURRENT_MEMBER_ADDRESS
 } from './currentMemberAddressTypes'
+import type { CurrentMemberAddressAction } from './currentMemberAddressAction'
 
-const initalState = {
+interface CurrentMemberAddressState {
+  currentMemberAddress: Record<string, unknown>
+}
+
+const initalState: CurrentMemberAddressState = {
   currentMemberAddress: {}
 }
 
-const currentMemberAddressReducer = (state = initalState, action) => {
+const currentMemberAddressReducer = (
+  state = initalState,
+  action: CurrentMemberAddressAction
+): CurrentMemberAddressState => {
   switch (action.type) {
     case GET_CURRENT_MEMBER_ADDRESS:
       return {
