@@ -77,6 +77,24 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 ---
 
+## Phase 1-5 Audit Findings (2026-02-23)
+
+Full audit of all completed phases against their GH issue acceptance criteria.
+
+**Fixed in this audit:**
+
+- **Phase 3 (3C.1)**: `signUp/screen.tsx` had module-level `let selectedAddress` and function-level `let userPhone` — both refactored to `useRef`. Fixes shared/stale state bugs across remounts.
+
+**Documented — no action needed now:**
+
+- **Phase 1 (1A-3)**: "Investigate if API session token can replace stored credentials" — no documentation of investigation. App still stores email+password (securely via expo-secure-store). This is a research item that may inform the future auth migration (see `.claude/future-exploration.md`). No code fix needed.
+- **Phase 2 (2A-6)**: Storybook CI build commented out — pre-existing `expo-secure-store`/`@unimodules/core` webpack incompatibility. Tracked for Phase 8G (GH #110).
+- **Phase 5**: NativeWind transform config not yet needed (all tests are data-layer). Will be required when UI component tests are added.
+
+**Bookkeeping**: PR #115 referenced `Closes #95` instead of `Closes #98`. Issue #98 was closed manually as COMPLETED — no action needed.
+
+---
+
 ## Notes
 
 - Sensitive long-term exploration tracked separately (see `git stash list` for `.future-exploration.md`).
