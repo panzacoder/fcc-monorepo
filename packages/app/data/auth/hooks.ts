@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import type { AuthHeader, FetchDataOptions } from '../base'
+import type { AuthHeader } from '../base'
 import {
   login,
   logout,
@@ -12,7 +12,6 @@ import {
 } from './api'
 import type {
   LoginParams,
-  LoginResponse,
   LogoutParams,
   CreateAccountParams,
   ForgotPasswordParams,
@@ -29,12 +28,7 @@ export const authKeys = {
 
 export function useLogin(header: AuthHeader) {
   return useMutation({
-    mutationFn: (
-      params: LoginParams & { options?: FetchDataOptions<LoginResponse> }
-    ) => {
-      const { options, ...loginParams } = params
-      return login(header, loginParams, options)
-    }
+    mutationFn: (params: LoginParams) => login(header, params)
   })
 }
 

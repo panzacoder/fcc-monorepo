@@ -167,20 +167,15 @@ export function SplashScreen() {
           emailOrPhone: email,
           credential: password,
           rememberMe: true
-        },
-        options: {
-          onFailure: (res) => {
-            if (res.status === 'FAILURE' && res.errorCode === 'RVF_101') {
-              router.push(formatUrl('/verification', { email: email }))
-            } else if (res.status === 'FAILURE') {
-              Alert.alert('', res.message)
-              setIsShowButtons(true)
-            }
-          }
         }
       },
       {
-        onError: () => {
+        onError: (error: Error) => {
+          if ('errorCode' in error && error.errorCode === 'RVF_101') {
+            router.push(formatUrl('/verification', { email: email }))
+          } else {
+            Alert.alert('', error.message)
+          }
           setIsShowButtons(true)
         },
         onSuccess: async (data: any) => {

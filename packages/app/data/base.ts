@@ -1,30 +1,30 @@
 import { getUserDeviceInformation } from 'app/utils/device'
-import {
-  CallPostService,
-  CallPostServiceResponse
-} from 'app/utils/fetchServerData'
+import { emitSessionExpired } from 'app/utils/auth-events'
 import { BASE_URL } from 'app/utils/urlConstants'
-import { Alert } from 'react-native'
 import { logger } from 'app/utils/logger'
 
 export type AuthHeader = any
 
-export type FetchDataOptions<DataType> = {
-  onFailure?: (response: CallPostServiceResponse<DataType>) => void
+export class ApiError extends Error {
+  errorCode?: string
+  constructor(message: string, errorCode?: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.errorCode = errorCode
+  }
 }
 
-type fetchDataProps<DataType> = {
+type FetchDataProps = {
   header: AuthHeader
   route: string
   data?: any
-} & FetchDataOptions<DataType>
+}
 
-export async function fetchData<DataType>({
+export async function fetchData<T>({
   header,
   route,
-  data = {},
-  onFailure
-}: fetchDataProps<DataType>): Promise<DataType | void> {
+  data = {}
+}: FetchDataProps): Promise<T> {
   const url = new URL(route, BASE_URL)
   logger.debug(`Fetching data from ${url}`)
   const deviceInfo = await getUserDeviceInformation()
@@ -34,16 +34,26 @@ export async function fetchData<DataType>({
     ...data
   }
 
-  const res = CallPostService<DataType>(url, payload)
-    .then((res) => {
-      if (res.status === 'SUCCESS') {
-        return res.data
-      } else {
-        onFailure ? onFailure(res) : Alert.alert('', res.message)
-      }
-    })
-    .catch((error) => {
-      logger.debug(error)
-    })
-  return res
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`)
+  }
+
+  const json = await response.json()
+
+  if (json.errorCode === 'SEP_101') {
+    emitSessionExpired()
+    throw new Error('Session expired')
+  }
+
+  if (json.status === 'SUCCESS') {
+    return json.data as T
+  }
+
+  throw new ApiError(json.message || 'Request failed', json.errorCode)
 }

@@ -54,18 +54,16 @@ export function LoginScreen() {
           emailOrPhone: formData.email,
           credential: formData.password,
           rememberMe: true
-        },
-        options: {
-          onFailure: (res) => {
-            if (res.status === 'FAILURE' && res.errorCode === 'RVF_101') {
-              router.push(formatUrl('/verification', { email: formData.email }))
-            } else if (res.status === 'FAILURE') {
-              Alert.alert('', res.message)
-            }
-          }
         }
       },
       {
+        onError: (error: Error) => {
+          if ('errorCode' in error && error.errorCode === 'RVF_101') {
+            router.push(formatUrl('/verification', { email: formData.email }))
+          } else {
+            Alert.alert('', error.message)
+          }
+        },
         onSuccess: async (data: any) => {
           if (!data) return
           let subscriptionDetailsobject = {
