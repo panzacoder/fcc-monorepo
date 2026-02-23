@@ -43,6 +43,18 @@ jobs:
       - run: yarn install --immutable
       - run: npx prettier --check .
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+      - run: yarn install --immutable
+      - run: yarn turbo run test
+
   build:
     name: Build
     runs-on: ubuntu-latest
