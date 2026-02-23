@@ -22,10 +22,18 @@ import {
   useUpdateIncidentNote,
   useDeleteIncidentNote
 } from 'app/data/incidents'
+import type {
+  IncidentDetailResponse,
+  IncidentDetail,
+  IncidentNote,
+  IncidentNoteData
+} from 'app/data/incidents/types'
 import {
   useThreadParticipants,
   useCreateMessageThread
 } from 'app/data/messages'
+import type { ThreadParticipant } from 'app/data/messages/types'
+import type { PrivilegeAction } from 'app/data/types.d'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -38,19 +46,29 @@ import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
+type MemberRouteParams = {
+  member: number | string
+  firstname?: string
+  lastname?: string
+}
+
 export function IncidentDetailsScreen() {
-  const incidentPrivilegesRef = useRef<any>({})
-  const notePrivilegesRef = useRef<any>({})
+  const incidentPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const notePrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
-  const [participantsList, setParticipantsList] = useState([]) as any
+  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
+    []
+  )
   const [isShowNotes, setIsShowNotes] = useState(false)
-  const [incidentDetails, setIncidentDetails] = useState({}) as any
-  const [noteData, setNoteData] = useState({})
-  const [notesList, setNotesList] = useState([])
+  const [incidentDetails, setIncidentDetails] = useState<
+    Partial<IncidentDetail>
+  >({})
+  const [noteData, setNoteData] = useState<Partial<IncidentNote>>({})
+  const [notesList, setNotesList] = useState<IncidentNote[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -58,11 +76,11 @@ export function IncidentDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
-      ? JSON.parse(item.memberData)
-      : {}
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
   let incidentData =
     item.incidentDetails && item.incidentDetails !== undefined
       ? JSON.parse(item.incidentDetails)
@@ -97,7 +115,7 @@ export function IncidentDetailsScreen() {
 
   useEffect(() => {
     if (incidentDetailsData) {
-      const data = incidentDetailsData as any
+      const data = incidentDetailsData as IncidentDetailResponse
       if (data.domainObjectPrivileges) {
         incidentPrivilegesRef.current = data.domainObjectPrivileges.Incident
           ? data.domainObjectPrivileges.Incident
@@ -174,12 +192,12 @@ export function IncidentDetailsScreen() {
   }
 
   async function createUpdateNote(
-    occurance: any,
-    noteDetails: any,
-    title: any,
-    noteData: any
+    occurance: string,
+    noteDetails: string,
+    title: string,
+    noteData: Partial<IncidentNote>
   ) {
-    const notePayload: Record<string, unknown> = {
+    const notePayload: IncidentNoteData = {
       incident: {
         id: incidentDetails.id ? incidentDetails.id : ''
       },
@@ -220,11 +238,11 @@ export function IncidentDetailsScreen() {
     setIsAddNote(false)
     setIsMessageThread(false)
   }
-  const editNote = (noteData: any) => {
+  const editNote = (noteData: IncidentNote) => {
     setNoteData(noteData)
     setIsAddNote(true)
   }
-  async function deleteNote(noteId: any) {
+  async function deleteNote(noteId: number) {
     deleteNoteMutation.mutate(
       { note: { id: noteId } },
       {
@@ -237,7 +255,7 @@ export function IncidentDetailsScreen() {
       }
     )
   }
-  const messageThreadClicked = (noteData: any) => {
+  const messageThreadClicked = (noteData: IncidentNote) => {
     logger.debug('messageThreadClicked', JSON.stringify(noteData))
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
@@ -252,17 +270,19 @@ export function IncidentDetailsScreen() {
       getThreadParticipants(noteData)
     }
   }
-  async function getThreadParticipants(noteData: any) {
+  async function getThreadParticipants(noteData: IncidentNote) {
     setLoading(true)
     try {
       const result = await refetchParticipants()
       setLoading(false)
       if (result.data) {
-        const list = (result.data as any[]).map((item: any) => {
-          let object = item
-          object.isSelected = false
-          return object
-        })
+        const list = (result.data as ThreadParticipant[]).map(
+          (item: ThreadParticipant) => {
+            let object = item
+            object.isSelected = false
+            return object
+          }
+        )
         setParticipantsList(list)
         setNoteData(noteData)
         setIsMessageThread(true)
@@ -272,10 +292,13 @@ export function IncidentDetailsScreen() {
       logger.debug(error)
     }
   }
-  function createMessageThread(subject: any, noteData: any) {
+  function createMessageThread(
+    subject: string,
+    noteData: Partial<IncidentNote>
+  ) {
     setNoteData(noteData)
     let list: object[] = []
-    participantsList.map((data: any, index: any) => {
+    participantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -319,7 +342,7 @@ export function IncidentDetailsScreen() {
       }
     )
   }
-  function isParticipantSelected(index: any) {
+  function isParticipantSelected(index: number) {
     participantsList[index].isSelected = !participantsList[index].isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
@@ -457,7 +480,7 @@ export function IncidentDetailsScreen() {
 
             {notesList.length > 0 && isShowNotes ? (
               <ScrollView className="">
-                {notesList.map((data: any, index: number) => {
+                {notesList.map((data: IncidentNote, index: number) => {
                   return (
                     <View key={index}>
                       <Note
