@@ -13,6 +13,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
+import type { ComponentProps } from 'react'
 import moment from 'moment'
 import {
   useAppointmentDetails as useAppointmentDetailsQuery,
@@ -55,10 +56,76 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { logger } from 'app/utils/logger'
+import type { AppointmentDetailResponse } from 'app/data/appointments/types'
+import type { PrivilegeAction } from 'app/data/types.d'
+import type { ThreadParticipant } from 'app/data/messages/types'
+
+interface NoteItem {
+  id: number | string
+  shortDescription?: string
+  note?: string
+  occurance?: { occurance: string }
+  hasMsgThread?: boolean
+}
+
+interface ReminderItem {
+  id: number | string
+  content?: string
+  date?: string
+  apointmentId?: number | string
+}
+
+interface TransportItem {
+  id: number | string
+  apointmentId?: number | string
+  [key: string]: unknown
+}
+
+interface AppointmentDetailData {
+  id?: number | string
+  date?: string
+  description?: string
+  purpose?: string
+  type?: { type: string }
+  status?: { status: string }
+  member?: { id: number | string }
+  doctorLocation?: {
+    id?: number | string
+    doctor?: {
+      salutation?: string
+      firstName?: string
+      lastName?: string
+      specialist?: string
+      phone?: string
+      email?: string
+      website?: string
+      websiteuser?: string
+    }
+    address?: Record<string, unknown>
+    [key: string]: unknown
+  }
+  facilityLocation?: {
+    id?: number | string
+    facility?: {
+      name?: string
+      type?: string
+      phone?: string
+      email?: string
+      website?: string
+      websiteuser?: string
+    }
+    address?: Record<string, unknown>
+    [key: string]: unknown
+  }
+  noteList?: NoteItem[]
+  reminderList?: ReminderItem[]
+  transportationList?: TransportItem[]
+}
+
 export function AppointmentDetailsScreen() {
-  const appointmentPrivilegesRef = useRef({})
-  const notePrivilegesRef = useRef({})
-  const transportationPrivilegesRef = useRef({})
+  const appointmentPrivilegesRef = useRef<PrivilegeAction[]>([])
+  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
+  const transportationPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -66,7 +133,7 @@ export function AppointmentDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
@@ -74,25 +141,37 @@ export function AppointmentDetailsScreen() {
   // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
   const [isAddNote, setIsAddNote] = useState(false)
-  const [memberData, setMemberData] = useState(
-    item.memberData ? JSON.parse(item.memberData) : {}
+  const [memberData, setMemberData] = useState<Record<string, unknown>>(
+    item.memberData ? JSON.parse(item.memberData as string) : {}
   )
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [isAddRemider, setIsAddReminder] = useState(false)
   const [isAddTransportation, setIsAddTransportation] = useState(false)
   const [isRender, setIsRender] = useState(false)
-  const [noteData, setNoteData] = useState({})
+  const [noteData, setNoteData] = useState<Partial<NoteItem>>({})
   const [isShowNotes, setIsShowNotes] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
   const [isShowTransportation, setIsShowTransportation] = useState(false)
-  const [reminderData, setReminderData] = useState({})
-  const [transportationData, setTransportationData] = useState({})
+  const [reminderData, setReminderData] = useState<{
+    date?: Date
+    content?: string
+    note?: string
+  }>({})
+  const [transportationData, setTransportationData] = useState<
+    Partial<TransportItem>
+  >({})
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [notesList, setNotesList] = useState([])
-  const [participantsList, setParticipantsList] = useState([]) as any
-  const [remindersList, setRemindersList] = useState([])
-  const [transportationList, setTransportationList] = useState([])
-  const [appointmentDetails, setAppointmentDetails] = useState({}) as any
+  const [notesList, setNotesList] = useState<NoteItem[]>([])
+  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
+    []
+  )
+  const [remindersList, setRemindersList] = useState<ReminderItem[]>([])
+  const [transportationList, setTransportationList] = useState<TransportItem[]>(
+    []
+  )
+  const [appointmentDetails, setAppointmentDetails] = useState<
+    Partial<AppointmentDetailData>
+  >({})
   const appointmentId = appointmentInfo.id ? Number(appointmentInfo.id) : 0
   const {
     data: appointmentDetailsData,
@@ -116,15 +195,19 @@ export function AppointmentDetailsScreen() {
   const { data: allMemberDetailsData } = useAllMemberDetails(header)
 
   const { refetch: refetchParticipants } = useThreadParticipants(header, {
-    member: { id: memberData.member ? memberData.member : '' },
+    member: {
+      id: memberData.member ? (memberData.member as number | string) : ''
+    },
     messageThreadType: { type: 'Appointment' }
   })
 
   useEffect(() => {
     if (allMemberDetailsData) {
-      const memberDetailsResult = allMemberDetailsData as any
+      const memberDetailsResult = allMemberDetailsData as {
+        memberList?: Array<{ member: number | string; [key: string]: unknown }>
+      }
       if (memberDetailsResult.memberList) {
-        memberDetailsResult.memberList.forEach((member: any) => {
+        memberDetailsResult.memberList.forEach((member) => {
           if (memberData.member === member.member) {
             setMemberData(member)
             logger.debug('setMemberData', JSON.stringify(member))
@@ -136,29 +219,30 @@ export function AppointmentDetailsScreen() {
 
   useEffect(() => {
     if (appointmentDetailsData) {
-      const data = appointmentDetailsData as any
+      const data = appointmentDetailsData as AppointmentDetailResponse
       if (data.domainObjectPrivileges) {
         appointmentPrivilegesRef.current = data.domainObjectPrivileges
           .Appointment
           ? data.domainObjectPrivileges.Appointment
-          : {}
+          : []
         notePrivilegesRef.current = data.domainObjectPrivileges.APPOINTMENTNOTE
           ? data.domainObjectPrivileges.APPOINTMENTNOTE
           : data.domainObjectPrivileges.AppointmentNote
             ? data.domainObjectPrivileges.AppointmentNote
-            : {}
+            : []
         transportationPrivilegesRef.current = data.domainObjectPrivileges
           .APPOINTMENTTRANSPORTATION
           ? data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
           : data.domainObjectPrivileges.AppointmentTransportation
             ? data.domainObjectPrivileges.AppointmentTransportation
-            : {}
+            : []
       }
       if (
         data.appointmentWithPreviousAppointment &&
         data.appointmentWithPreviousAppointment.appointment
       ) {
-        const details = data.appointmentWithPreviousAppointment.appointment
+        const details = data.appointmentWithPreviousAppointment
+          .appointment as AppointmentDetailData
         setAppointmentDetails(details)
         if (details.noteList) {
           setNotesList(details.noteList)
@@ -201,7 +285,7 @@ export function AppointmentDetailsScreen() {
     status = '',
     purpose = '',
     description = ''
-  let doctorFacilityAddress = {} as any
+  let doctorFacilityAddress: Record<string, unknown> = {}
   if (!_.isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
       apptDate = formatTimeToUserLocalTime(
@@ -245,9 +329,10 @@ export function AppointmentDetailsScreen() {
         specialist = appointmentDetails.doctorLocation.doctor.specialist
       }
       if (appointmentDetails.doctorLocation.doctor.phone) {
-        phone = convertPhoneNumberToUsaPhoneNumberFormat(
-          appointmentDetails.doctorLocation.doctor.phone
-        )
+        phone =
+          convertPhoneNumberToUsaPhoneNumberFormat(
+            appointmentDetails.doctorLocation.doctor.phone!
+          ) ?? ''
       }
       if (appointmentDetails.doctorLocation.doctor.email) {
         email = appointmentDetails.doctorLocation.doctor.email
@@ -269,9 +354,10 @@ export function AppointmentDetailsScreen() {
         specialist = appointmentDetails.facilityLocation.facility.type
       }
       if (appointmentDetails.facilityLocation.facility.phone) {
-        phone = convertPhoneNumberToUsaPhoneNumberFormat(
-          appointmentDetails.facilityLocation.facility.phone
-        )
+        phone =
+          convertPhoneNumberToUsaPhoneNumberFormat(
+            appointmentDetails.facilityLocation.facility.phone!
+          ) ?? ''
       }
       if (appointmentDetails.facilityLocation.facility.email) {
         email = appointmentDetails.facilityLocation.facility.email
@@ -314,10 +400,10 @@ export function AppointmentDetailsScreen() {
       }
     )
   }
-  function createMessageThread(subject: any, noteData: any) {
+  function createMessageThread(subject: string, noteData: NoteItem) {
     setNoteData(noteData)
-    let list: object[] = []
-    participantsList.map((data: any, index: any) => {
+    let list: { user: { id: number } }[] = []
+    participantsList.map((data, index) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -331,15 +417,14 @@ export function AppointmentDetailsScreen() {
       {
         messageThread: {
           subject: subject,
-          member: memberData.member ? memberData.member : '',
+          member: memberData.member
+            ? (memberData.member as number | string)
+            : '',
           noteId: noteData.id ? noteData.id : '',
           type: {
             type: 'Appointment'
           },
           participantList: list,
-          appointmentNote: {
-            id: noteData.id ? noteData.id : ''
-          },
           messageList: []
         }
       },
@@ -361,15 +446,18 @@ export function AppointmentDetailsScreen() {
       }
     )
   }
-  function isParticipantSelected(index: any) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+  function isParticipantSelected(index: number) {
+    const participant = participantsList[index]
+    if (participant) {
+      participant.isSelected = !participant.isSelected
+    }
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
-  function fetchThreadParticipants(noteData: any) {
+  function fetchThreadParticipants(noteData: NoteItem) {
     refetchParticipants().then(({ data }) => {
       if (data) {
-        const list = (data as any[]).map((item: any) => {
+        const list = (data as ThreadParticipant[]).map((item) => {
           let object = item
           object.isSelected = false
           return object
@@ -383,7 +471,9 @@ export function AppointmentDetailsScreen() {
   async function deleteAppointment() {
     deleteAppointmentMutation.mutate(
       {
-        appointment: { id: appointmentDetails.id ? appointmentDetails.id : 0 }
+        appointment: {
+          id: appointmentDetails.id ? Number(appointmentDetails.id) : 0
+        }
       },
       {
         onSuccess: () => {
@@ -400,9 +490,9 @@ export function AppointmentDetailsScreen() {
       }
     )
   }
-  async function deleteNote(noteId: any) {
+  async function deleteNote(noteId: number | string) {
     deleteNoteMutation.mutate(
-      { appointmentNote: { id: noteId } },
+      { appointmentNote: { id: Number(noteId) } },
       {
         onSuccess: () => {
           refetchDetails()
@@ -414,14 +504,21 @@ export function AppointmentDetailsScreen() {
     )
   }
   async function createUpdateNote(
-    occurance: any,
-    noteDetails: any,
-    title: any,
-    noteData: any
+    occurance: string,
+    noteDetails: string,
+    title: string,
+    noteData: {
+      id?: number | string
+      shortDescription?: string
+      note?: string
+      occurance?: { occurance: string }
+    }
   ) {
-    const appointmentNotePayload: Record<string, unknown> = {
+    const appointmentNotePayload = {
       appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : ''
+        id: appointmentDetails.id
+          ? appointmentDetails.id
+          : ('' as number | string)
       },
       occurance: {
         occurance: occurance
@@ -444,9 +541,12 @@ export function AppointmentDetailsScreen() {
         }
       )
     } else {
-      appointmentNotePayload.id = noteData.id ? noteData.id : ''
+      const updatePayload = {
+        ...appointmentNotePayload,
+        id: noteData.id ? noteData.id : ('' as number | string)
+      }
       updateNoteMutation.mutate(
-        { appointmentNote: appointmentNotePayload },
+        { appointmentNote: updatePayload },
         {
           onSuccess: () => {
             setIsAddNote(false)
@@ -461,14 +561,21 @@ export function AppointmentDetailsScreen() {
   }
   async function createUpdateReminder(
     title: string,
-    date: any,
-    reminderData: any
+    date: Date,
+    reminderData: {
+      id?: number | string
+      date?: Date
+      content?: string
+      note?: string
+    }
   ) {
-    const reminderPayload: Record<string, unknown> = {
+    const reminderPayload = {
       content: title,
-      date: date,
+      date: date as Date | string,
       appointment: {
-        id: appointmentDetails.id ? appointmentDetails.id : ''
+        id: appointmentDetails.id
+          ? appointmentDetails.id
+          : ('' as number | string)
       }
     }
 
@@ -476,9 +583,10 @@ export function AppointmentDetailsScreen() {
       createReminderMutation.mutate(
         { reminder: reminderPayload },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
-            setRemindersList(data?.reminderList ? data.reminderList : [])
+            const result = data as { reminderList?: ReminderItem[] }
+            setRemindersList(result?.reminderList ? result.reminderList : [])
           },
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to create reminder')
@@ -486,13 +594,14 @@ export function AppointmentDetailsScreen() {
         }
       )
     } else {
-      reminderPayload.id = reminderData.id
+      const updatePayload = { ...reminderPayload, id: reminderData.id }
       updateReminderMutation.mutate(
-        { reminder: reminderPayload },
+        { reminder: updatePayload },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
-            setRemindersList(data?.reminderList ? data.reminderList : [])
+            const result = data as { reminderList?: ReminderItem[] }
+            setRemindersList(result?.reminderList ? result.reminderList : [])
           },
           onError: (error) => {
             Alert.alert('', error.message || 'Failed to update reminder')
@@ -501,7 +610,7 @@ export function AppointmentDetailsScreen() {
       )
     }
   }
-  async function updateStatus(status: any) {
+  async function updateStatus(status: string) {
     updateStatusMutation.mutate(
       {
         appointment: {
@@ -510,7 +619,7 @@ export function AppointmentDetailsScreen() {
             status: status
           },
           member: {
-            id: memberData.member ? memberData.member : ''
+            id: memberData.member ? (memberData.member as number | string) : ''
           }
         }
       },
@@ -524,7 +633,7 @@ export function AppointmentDetailsScreen() {
       }
     )
   }
-  async function deleteReminder(reminderData: any) {
+  async function deleteReminder(reminderData: ReminderItem) {
     deleteReminderMutation.mutate(
       {
         reminder: {
@@ -535,8 +644,9 @@ export function AppointmentDetailsScreen() {
         }
       },
       {
-        onSuccess: (data: any) => {
-          setRemindersList(data?.reminderList ? data.reminderList : [])
+        onSuccess: (data) => {
+          const result = data as { reminderList?: ReminderItem[] }
+          setRemindersList(result?.reminderList ? result.reminderList : [])
         },
         onError: (error) => {
           Alert.alert('', error.message || 'Failed to delete reminder')
@@ -544,11 +654,11 @@ export function AppointmentDetailsScreen() {
       }
     )
   }
-  const editNote = (noteData: any) => {
+  const editNote = (noteData: NoteItem) => {
     setNoteData(noteData)
     setIsAddNote(true)
   }
-  const messageThreadClicked = (noteData: any) => {
+  const messageThreadClicked = (noteData: NoteItem) => {
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
       router.push(
@@ -562,13 +672,15 @@ export function AppointmentDetailsScreen() {
       fetchThreadParticipants(noteData)
     }
   }
-  const editReminder = (remiderData: any) => {
-    setReminderData(remiderData)
+  const editReminder = (remiderData: ReminderItem) => {
+    setReminderData(
+      remiderData as unknown as { date?: Date; content?: string; note?: string }
+    )
     setIsAddReminder(true)
   }
   async function deleteResendCancelTransportation(
-    count: any,
-    transportData: any
+    count: number,
+    transportData: TransportItem
   ) {
     const transportId = transportData.id ? transportData.id : ''
     if (count === 0) {
@@ -616,7 +728,7 @@ export function AppointmentDetailsScreen() {
       )
     }
   }
-  const editTransportation = (transportationData: any) => {
+  const editTransportation = (transportationData: TransportItem) => {
     // console.log('remiderData', JSON.stringify(transportationData))
     setTransportationData(transportationData)
     setIsAddTransportation(true)
@@ -628,8 +740,8 @@ export function AppointmentDetailsScreen() {
   function getDetailsView(
     title: string,
     value: string,
-    isIcon: boolean,
-    iconValue: any
+    isIcon?: boolean,
+    iconValue?: ComponentProps<typeof Feather>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -637,7 +749,7 @@ export function AppointmentDetailsScreen() {
           <Typography className={titleStyle}>{title}</Typography>
           <Typography className={valueStyle}>{value}</Typography>
         </View>
-        {isIcon ? (
+        {isIcon && iconValue ? (
           <Feather
             onPress={() => {
               if (title === 'Phone' && value !== '') {
@@ -697,7 +809,7 @@ export function AppointmentDetailsScreen() {
                           appointmentDetails:
                             JSON.stringify(appointmentDetails),
                           component:
-                            appointmentDetails.type.type ===
+                            appointmentDetails.type?.type ===
                             'Doctor Appointment'
                               ? 'Doctor'
                               : 'Facility',
@@ -758,7 +870,7 @@ export function AppointmentDetailsScreen() {
                 <View />
               )}
               {websiteUser !== '' ? (
-                getDetailsView('Username', websiteUser, false, 'copy')
+                getDetailsView('Username', websiteUser)
               ) : (
                 <View />
               )}
@@ -770,10 +882,10 @@ export function AppointmentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getDetailsView('Date', apptDate, false, '')}
-              {getDetailsView('Purpose', purpose, false, '')}
-              {getDetailsView('Status', status, false, '')}
-              {getDetailsView('Description', description, false, '')}
+              {getDetailsView('Date', apptDate)}
+              {getDetailsView('Purpose', purpose)}
+              {getDetailsView('Status', status)}
+              {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
               (getUserPermission(appointmentPrivilegesRef.current)
                 .createPermission ||
@@ -876,7 +988,7 @@ export function AppointmentDetailsScreen() {
 
               {notesList.length > 0 && isShowNotes ? (
                 <ScrollView className="">
-                  {notesList.map((data: any, index: number) => {
+                  {notesList.map((data, index) => {
                     return (
                       <View key={index}>
                         <Note
@@ -941,7 +1053,7 @@ export function AppointmentDetailsScreen() {
 
               {remindersList.length > 0 && isShowReminder ? (
                 <ScrollView className="">
-                  {remindersList.map((data: any, index: number) => {
+                  {remindersList.map((data, index) => {
                     data.apointmentId = appointmentDetails.id
                     return (
                       <View key={index}>
@@ -1007,7 +1119,7 @@ export function AppointmentDetailsScreen() {
               </View>
               {transportationList.length > 0 && isShowTransportation ? (
                 <ScrollView className="">
-                  {transportationList.map((data: any, index: number) => {
+                  {transportationList.map((data, index) => {
                     data.apointmentId = appointmentDetails.id
                     return (
                       <View key={index}>
@@ -1102,7 +1214,7 @@ export function AppointmentDetailsScreen() {
             date={
               appointmentDetails.date ? appointmentDetails.date : new Date()
             }
-            appointmentId={appointmentDetails.id}
+            appointmentId={appointmentDetails.id ?? ''}
             cancelClicked={cancelClicked}
           />
         </View>

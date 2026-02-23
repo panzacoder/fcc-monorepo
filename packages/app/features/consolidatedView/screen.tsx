@@ -15,6 +15,7 @@ import {
   useConsolidatedDetails,
   useFilterConsolidatedDetails
 } from 'app/data/dashboard'
+import type { MemberActivity } from 'app/data/dashboard/types'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatUrl } from 'app/utils/format-url'
@@ -31,26 +32,26 @@ export function ConsolidatedViewScreen() {
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
   const [selectedType, setSelectedType] = useState('All')
-  const [fromDate, setFromDate] = useState(
-    getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+  const [fromDate, setFromDate] = useState<string>(
+    getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
   )
-  const [toDate, setToDate] = useState(
-    getFullDateForCalendar(new Date(), 'YYYY-MM-DD') as any
+  const [toDate, setToDate] = useState<string>(
+    getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
   )
-  const [currentDate, setCurrentDate] = useState(
-    getFullDateForCalendar(new Date(), 'DD MMM YYYY') as any
+  const [currentDate, setCurrentDate] = useState<string>(
+    getFullDateForCalendar(new Date(), 'DD MMM YYYY')
   )
-  const weekFirstLastDaysRef = useRef<any>([])
-  const weekDayListDatesRef = useRef<any>([])
-  const weekDayUtcDatesRef = useRef<any>([])
-  const weekDayListRef = useRef<any>([])
-  const listDayOneRef = useRef<any>([])
-  const listDayTwoRef = useRef<any>([])
-  const listDayThreeRef = useRef<any>([])
-  const listDayFourRef = useRef<any>([])
-  const listDayFiveRef = useRef<any>([])
-  const listDaySixRef = useRef<any>([])
-  const listDaySevenRef = useRef<any>([])
+  const weekFirstLastDaysRef = useRef<string[]>([])
+  const weekDayListDatesRef = useRef<string[]>([])
+  const weekDayUtcDatesRef = useRef<Date[]>([])
+  const weekDayListRef = useRef<string[]>([])
+  const listDayOneRef = useRef<MemberActivity[]>([])
+  const listDayTwoRef = useRef<MemberActivity[]>([])
+  const listDayThreeRef = useRef<MemberActivity[]>([])
+  const listDayFourRef = useRef<MemberActivity[]>([])
+  const listDayFiveRef = useRef<MemberActivity[]>([])
+  const listDaySixRef = useRef<MemberActivity[]>([])
+  const listDaySevenRef = useRef<MemberActivity[]>([])
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -61,12 +62,16 @@ export function ConsolidatedViewScreen() {
   let memberData = {
     member: userDetails.memberId ? userDetails.memberId : ''
   }
-  const [memberActivityList, setMemberActivityList] = useState([]) as any
+  const [memberActivityList, setMemberActivityList] = useState<
+    MemberActivity[]
+  >([])
 
   const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const [isShowCalender, setIsShowCalender] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [typesList, setTypesList] = useState([]) as any
+  const [typesList, setTypesList] = useState<{ id: number; title: string }[]>(
+    []
+  )
   const [selectedDate, setSelectedDate] = useState(
     getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
   )
@@ -75,7 +80,7 @@ export function ConsolidatedViewScreen() {
   const [currentDateForDayView, setCurrentDateForDayView] = useState(
     getFullDateForCalendar(new Date(), 'DD MMM YYYY')
   )
-  const [selectedDateUtc, setSelectedDateUtc] = useState(new Date()) as any
+  const [selectedDateUtc, setSelectedDateUtc] = useState<Date>(new Date())
   const currentYear = currentDate.split(' ')[2]
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDayView, setIsDayView] = useState(false)
@@ -123,7 +128,7 @@ export function ConsolidatedViewScreen() {
     listDaySixRef.current = []
     listDaySevenRef.current = []
   }
-  async function getWeekCurrentLastDays(currentDateParam: any) {
+  async function getWeekCurrentLastDays(currentDateParam: Date | string) {
     logger.debug('currentDate', currentDateParam)
     weekFirstLastDaysRef.current = []
     weekDayListDatesRef.current = []
@@ -161,9 +166,9 @@ export function ConsolidatedViewScreen() {
       }
     }
   }
-  async function setMemberActivityWithDays(list: any) {
+  async function setMemberActivityWithDays(list: MemberActivity[]) {
     clearLists()
-    list.forEach((data: any) => {
+    list.forEach((data) => {
       const fullDate = getFullDateForCalendar(data.date, 'YYYY-MM-DD')
 
       switch (fullDate) {
@@ -193,14 +198,14 @@ export function ConsolidatedViewScreen() {
   }
   useEffect(() => {
     getWeekCurrentLastDays(new Date())
-    setQueryFromDate(weekFirstLastDaysRef.current[0])
-    setQueryToDate(weekFirstLastDaysRef.current[6])
+    setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+    setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
   }, [])
 
   useEffect(() => {
     if (filterOptionsData) {
-      let list: object[] = [{ id: 1, title: 'All' }]
-      filterOptionsData.filterOptionTypes.map((data: any, index: any) => {
+      let list: { id: number; title: string }[] = [{ id: 1, title: 'All' }]
+      filterOptionsData.filterOptionTypes.map((data, index) => {
         let object = {
           title: data,
           id: index + 2
@@ -213,9 +218,9 @@ export function ConsolidatedViewScreen() {
 
   useEffect(() => {
     if (!isFilterActive && detailsData) {
-      let list: object[] = []
+      let list: MemberActivity[] = []
       if (isDayView) {
-        detailsData.memberActivityList.map(async (option: any) => {
+        detailsData.memberActivityList.map(async (option) => {
           if (
             currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
           ) {
@@ -237,8 +242,8 @@ export function ConsolidatedViewScreen() {
 
   useEffect(() => {
     if (isFilterActive && filteredDetailsData) {
-      let list: object[] = []
-      filteredDetailsData.memberActivityList.map((option: any) => {
+      let list: MemberActivity[] = []
+      filteredDetailsData.memberActivityList.map((option) => {
         if (isDayView) {
           if (
             currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
@@ -273,11 +278,11 @@ export function ConsolidatedViewScreen() {
     setIsShowCalender(false)
   }
   async function getPreviousWeek() {
-    getWeekCurrentLastDays(weekDayUtcDatesRef.current[0])
+    getWeekCurrentLastDays(weekDayUtcDatesRef.current[0]!)
     setIsFilterActive(false)
     setIsDataReceived(false)
-    setQueryFromDate(weekFirstLastDaysRef.current[0])
-    setQueryToDate(weekFirstLastDaysRef.current[6])
+    setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+    setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
   }
   async function getPreviousDate() {
     setDayCount((prev) => prev - 1)
@@ -294,11 +299,11 @@ export function ConsolidatedViewScreen() {
     setQueryToDate(newDate)
   }
   async function getNextWeek() {
-    getWeekCurrentLastDays(weekDayUtcDatesRef.current[6])
+    getWeekCurrentLastDays(weekDayUtcDatesRef.current[6]!)
     setIsFilterActive(false)
     setIsDataReceived(false)
-    setQueryFromDate(weekFirstLastDaysRef.current[0])
-    setQueryToDate(weekFirstLastDaysRef.current[6])
+    setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+    setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
   }
   async function getNextDate() {
     setDayCount((prev) => prev + 1)
@@ -314,7 +319,7 @@ export function ConsolidatedViewScreen() {
     setQueryFromDate(newDate)
     setQueryToDate(newDate)
   }
-  function getActivityName(type: any) {
+  function getActivityName(type: string) {
     let activityName = ''
     if (type === 'Doctor Appointment') {
       activityName = 'Doctor'
@@ -327,7 +332,7 @@ export function ConsolidatedViewScreen() {
     }
     return activityName
   }
-  function getColor(type: any) {
+  function getColor(type: string) {
     let colorStr = ''
     if (type === 'Doctor Appointment') {
       colorStr = 'bg-[#ebe4d1]'
@@ -340,7 +345,7 @@ export function ConsolidatedViewScreen() {
     }
     return colorStr
   }
-  function getCard(data: any, index: any) {
+  function getCard(data: MemberActivity, index: number) {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -478,21 +483,21 @@ export function ConsolidatedViewScreen() {
       </TouchableOpacity>
     )
   }
-  async function setSelectedTypeChange(value: any) {
+  async function setSelectedTypeChange(value: { title: string; id: string }) {
     setSelectedType(value && value.title !== null ? value.title : 'All')
   }
 
-  const dayTimesView = memberActivityList.map((data: any, index: any) => {
+  const dayTimesView = memberActivityList.map((data, index) => {
     return getCard(data, index)
   })
-  const weekView = weekDayListRef.current.map((data: any, index: any) => {
+  const weekView = weekDayListRef.current.map((data, index) => {
     return (
       <View key={index} className="">
         <View className="my-4 flex-row ">
           {index === 0 ? (
             <ScrollView className="w-full ">
               <Typography className=" font-bold">{data}</Typography>
-              {listDayOneRef.current.map((data: any, index: number) => {
+              {listDayOneRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -508,7 +513,7 @@ export function ConsolidatedViewScreen() {
             <ScrollView className="w-full flex-1">
               <Typography className="font-bold">{data}</Typography>
 
-              {listDayTwoRef.current.map((data: any, index: number) => {
+              {listDayTwoRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -523,7 +528,7 @@ export function ConsolidatedViewScreen() {
           {index === 2 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDayThreeRef.current.map((data: any, index: number) => {
+              {listDayThreeRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -538,7 +543,7 @@ export function ConsolidatedViewScreen() {
           {index === 3 ? (
             <ScrollView className="w-full">
               <Typography className=" font-bold">{data}</Typography>
-              {listDayFourRef.current.map((data: any, index: number) => {
+              {listDayFourRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -553,7 +558,7 @@ export function ConsolidatedViewScreen() {
           {index === 4 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDayFiveRef.current.map((data: any, index: number) => {
+              {listDayFiveRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -568,7 +573,7 @@ export function ConsolidatedViewScreen() {
           {index === 5 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDaySixRef.current.map((data: any, index: number) => {
+              {listDaySixRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -583,7 +588,7 @@ export function ConsolidatedViewScreen() {
           {index === 6 ? (
             <ScrollView className="w-full">
               <Typography className="font-bold">{data}</Typography>
-              {listDaySevenRef.current.map((data: any, index: number) => {
+              {listDaySevenRef.current.map((data, index) => {
                 return (
                   <View key={index} className="">
                     {getCard(data, index)}
@@ -629,8 +634,8 @@ export function ConsolidatedViewScreen() {
             setIsDayView(false)
             setIsFilterActive(false)
             setIsDataReceived(false)
-            setQueryFromDate(weekFirstLastDaysRef.current[0])
-            setQueryToDate(weekFirstLastDaysRef.current[6])
+            setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+            setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
           }}
           className={`w-[40%] items-center justify-center ${isWeekView ? 'bg-[#c2cad1]' : 'bg-white'} py-2`}
         >
@@ -686,8 +691,8 @@ export function ConsolidatedViewScreen() {
                       setQueryToDate(toDate)
                     } else {
                       getWeekCurrentLastDays(selectedDateUtc)
-                      setQueryFromDate(weekFirstLastDaysRef.current[0])
-                      setQueryToDate(weekFirstLastDaysRef.current[6])
+                      setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+                      setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
                     }
                   }}
                 />
@@ -717,8 +722,8 @@ export function ConsolidatedViewScreen() {
                       setQueryToDate(resetDate)
                     } else {
                       getWeekCurrentLastDays(new Date())
-                      setQueryFromDate(weekFirstLastDaysRef.current[0])
-                      setQueryToDate(weekFirstLastDaysRef.current[6])
+                      setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+                      setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
                     }
                   }}
                 />

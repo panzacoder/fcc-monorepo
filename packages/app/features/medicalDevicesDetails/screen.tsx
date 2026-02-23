@@ -24,6 +24,14 @@ import {
   useThreadParticipants,
   useCreateMessageThread
 } from 'app/data/messages'
+import type { ThreadParticipant } from 'app/data/messages/types'
+import type {
+  MedicalDeviceDetails,
+  MedicalDeviceNote,
+  MedicalDeviceReminder,
+  MedicalDeviceDetailsResponse
+} from 'app/data/medical-devices/types'
+import type { PrivilegeAction } from 'app/data/types.d'
 import { useLocalSearchParams } from 'expo-router'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -38,22 +46,32 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
 export function MedicalDevicesDetailsScreen() {
-  const medicalDevicePrivilegesRef = useRef<any>({})
-  const notePrivilegesRef = useRef<any>({})
+  const medicalDevicePrivilegesRef = useRef<PrivilegeAction[]>([])
+  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [isShowReminder, setIsShowReminder] = useState(false)
-  const [reminderData, setReminderData] = useState({})
-  const [remindersList, setRemindersList] = useState([])
+  const [reminderData, setReminderData] = useState<{
+    date?: Date
+    content?: string
+    note?: string
+  }>({})
+  const [remindersList, setRemindersList] = useState<MedicalDeviceReminder[]>(
+    []
+  )
   const [isAddRemider, setIsAddReminder] = useState(false)
-  const [participantsList, setParticipantsList] = useState([]) as any
+  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
+    []
+  )
   const [isShowNotes, setIsShowNotes] = useState(false)
-  const [medicalDevicesDetails, setMedicalDevicesDetails] = useState({}) as any
-  const [noteData, setNoteData] = useState({})
-  const [notesList, setNotesList] = useState([])
+  const [medicalDevicesDetails, setMedicalDevicesDetails] = useState<
+    Partial<MedicalDeviceDetails>
+  >({})
+  const [noteData, setNoteData] = useState<Partial<MedicalDeviceNote>>({})
+  const [notesList, setNotesList] = useState<MedicalDeviceNote[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -61,7 +79,7 @@ export function MedicalDevicesDetailsScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -103,21 +121,23 @@ export function MedicalDevicesDetailsScreen() {
     refetch: refetchParticipants
   } = useThreadParticipants(header, threadParticipantsParams)
 
-  const navigateAfterThreadRef = useRef<{ noteData: any } | null>(null)
+  const navigateAfterThreadRef = useRef<{ noteData: MedicalDeviceNote } | null>(
+    null
+  )
 
   useEffect(() => {
     if (medicalDeviceDetailsData) {
-      const data = medicalDeviceDetailsData as any
+      const data = medicalDeviceDetailsData as MedicalDeviceDetailsResponse
       if (data.domainObjectPrivileges) {
         medicalDevicePrivilegesRef.current = data.domainObjectPrivileges
           .Purchase
           ? data.domainObjectPrivileges.Purchase
-          : {}
+          : []
         notePrivilegesRef.current = data.domainObjectPrivileges.PURCHASENOTE
           ? data.domainObjectPrivileges.PURCHASENOTE
           : data.domainObjectPrivileges.PurchaseNote
             ? data.domainObjectPrivileges.PurchaseNote
-            : {}
+            : []
       }
 
       setMedicalDevicesDetails(data.purchase ? data.purchase : {})
@@ -216,14 +236,16 @@ export function MedicalDevicesDetailsScreen() {
   }
   async function createUpdateReminder(
     title: string,
-    date: any,
-    reminderData: any
+    date: Date,
+    reminderData: { id?: number; date?: Date; content?: string; note?: string }
   ) {
-    const reminderPayload: Record<string, unknown> = {
+    const reminderPayload = {
       content: title,
-      date: date,
+      date: String(date),
       purchase: {
-        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
+        id: medicalDevicesDetails.id
+          ? medicalDevicesDetails.id
+          : ('' as number | string)
       }
     }
 
@@ -231,7 +253,7 @@ export function MedicalDevicesDetailsScreen() {
       createReminderMutation.mutate(
         { reminder: reminderPayload },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
             if (data.purchase && data.purchase.reminderList) {
               setRemindersList(data.purchase.reminderList)
@@ -245,11 +267,11 @@ export function MedicalDevicesDetailsScreen() {
         }
       )
     } else {
-      reminderPayload.id = reminderData.id
+      const updatePayload = { ...reminderPayload, id: reminderData.id }
       updateReminderMutation.mutate(
-        { reminder: reminderPayload },
+        { reminder: updatePayload },
         {
-          onSuccess: (data: any) => {
+          onSuccess: (data) => {
             setIsAddReminder(false)
             if (data.purchase && data.purchase.reminderList) {
               setRemindersList(data.purchase.reminderList)
@@ -265,14 +287,21 @@ export function MedicalDevicesDetailsScreen() {
     }
   }
   async function createUpdateNote(
-    occurance: any,
-    noteDetails: any,
-    title: any,
-    noteData: any
+    occurance: string,
+    noteDetails: string,
+    title: string,
+    noteData: {
+      id?: number | string
+      shortDescription?: string
+      note?: string
+      occurance?: { occurance: string }
+    }
   ) {
-    const notePayload: Record<string, unknown> = {
+    const notePayload = {
       purchase: {
-        id: medicalDevicesDetails.id ? medicalDevicesDetails.id : ''
+        id: medicalDevicesDetails.id
+          ? medicalDevicesDetails.id
+          : ('' as number | string)
       },
       occurance: {
         occurance: occurance
@@ -295,9 +324,12 @@ export function MedicalDevicesDetailsScreen() {
         }
       )
     } else {
-      notePayload.id = noteData.id ? noteData.id : ''
+      const updateNotePayload = {
+        ...notePayload,
+        id: noteData.id ? noteData.id : ('' as number | string)
+      }
       updateNoteMutation.mutate(
-        { note: notePayload },
+        { note: updateNotePayload },
         {
           onSuccess: () => {
             setIsAddNote(false)
@@ -316,11 +348,11 @@ export function MedicalDevicesDetailsScreen() {
     setIsMessageThread(false)
   }
 
-  const editNote = (noteData: any) => {
+  const editNote = (noteData: MedicalDeviceNote) => {
     setNoteData(noteData)
     setIsAddNote(true)
   }
-  async function deleteNote(noteId: any) {
+  async function deleteNote(noteId: number) {
     deleteNoteMutation.mutate(
       { note: { id: noteId } },
       {
@@ -333,7 +365,7 @@ export function MedicalDevicesDetailsScreen() {
       }
     )
   }
-  const messageThreadClicked = (noteData: any) => {
+  const messageThreadClicked = (noteData: MedicalDeviceNote) => {
     setNoteData(noteData)
     if (noteData.hasMsgThread) {
       router.push(
@@ -347,13 +379,13 @@ export function MedicalDevicesDetailsScreen() {
       getThreadParticipants(noteData)
     }
   }
-  async function getThreadParticipants(noteData: any) {
+  async function getThreadParticipants(noteData: MedicalDeviceNote) {
     setLoading(true)
     try {
       const result = await refetchParticipants()
       setLoading(false)
       if (result.data) {
-        const list = (result.data as any[]).map((item: any) => {
+        const list = (result.data as ThreadParticipant[]).map((item) => {
           let object = item
           object.isSelected = false
           return object
@@ -367,10 +399,10 @@ export function MedicalDevicesDetailsScreen() {
       logger.debug(error)
     }
   }
-  function createMessageThread(subject: any, noteData: any) {
+  function createMessageThread(subject: string, noteData: MedicalDeviceNote) {
     setNoteData(noteData)
-    let list: object[] = []
-    participantsList.map((data: any, index: any) => {
+    let list: { user: { id: number } }[] = []
+    participantsList.map((data, index) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -390,9 +422,6 @@ export function MedicalDevicesDetailsScreen() {
             type: 'Purchase'
           },
           participantList: list,
-          medicalDeviceNote: {
-            id: noteData.id ? noteData.id : ''
-          },
           messageList: []
         }
       },
@@ -408,8 +437,11 @@ export function MedicalDevicesDetailsScreen() {
       }
     )
   }
-  function isParticipantSelected(index: any) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+  function isParticipantSelected(index: number) {
+    const participant = participantsList[index]
+    if (participant) {
+      participant.isSelected = !participant.isSelected
+    }
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
@@ -435,22 +467,24 @@ export function MedicalDevicesDetailsScreen() {
       }
     )
   }
-  const editReminder = (remiderData: any) => {
-    setReminderData(remiderData)
+  const editReminder = (remiderData: MedicalDeviceReminder) => {
+    setReminderData(
+      remiderData as unknown as { date?: Date; content?: string; note?: string }
+    )
     setIsAddReminder(true)
   }
-  async function deleteReminder(reminderData: any) {
+  async function deleteReminder(reminderData: MedicalDeviceReminder) {
     deleteReminderMutation.mutate(
       {
         reminder: {
-          id: reminderData.id ? reminderData.id : '',
+          id: reminderData.id ? reminderData.id : 0,
           purchase: {
-            id: reminderData.id ? reminderData.id : ''
+            id: reminderData.id ? reminderData.id : 0
           }
         }
       },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data) => {
           if (data.purchase && data.purchase.reminderList) {
             setRemindersList(data.purchase.reminderList)
           } else {
@@ -578,7 +612,7 @@ export function MedicalDevicesDetailsScreen() {
 
             {notesList.length > 0 && isShowNotes ? (
               <ScrollView className="">
-                {notesList.map((data: any, index: number) => {
+                {notesList.map((data, index) => {
                   return (
                     <View key={index}>
                       <Note
@@ -644,7 +678,7 @@ export function MedicalDevicesDetailsScreen() {
 
             {remindersList.length > 0 && isShowReminder ? (
               <ScrollView className="">
-                {remindersList.map((data: any, index: number) => {
+                {remindersList.map((data, index) => {
                   return (
                     <View key={index}>
                       <Reminder
