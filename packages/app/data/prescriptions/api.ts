@@ -51,7 +51,7 @@ export async function createPrescription(
   header: AuthHeader,
   params: CreatePrescriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<PrescriptionDetailResponse>({
     header,
     route: CREATE_PRESCRIPTION,
     data: params
@@ -62,7 +62,7 @@ export async function updatePrescription(
   header: AuthHeader,
   params: UpdatePrescriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<PrescriptionDetailResponse>({
     header,
     route: UPDATE_PRESCRIPTION,
     data: params
@@ -73,7 +73,7 @@ export async function deletePrescription(
   header: AuthHeader,
   params: DeletePrescriptionParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_PRESCRIPTION,
     data: {
