@@ -1,8 +1,8 @@
 import { vi, beforeEach } from 'vitest'
-import { _clear as clearSecureStore } from 'expo-secure-store'
 
-beforeEach(() => {
-  clearSecureStore()
+beforeEach(async () => {
+  const { _clear } = (await import('expo-secure-store')) as any
+  _clear()
 })
 
 // --- expo-router mock ---
