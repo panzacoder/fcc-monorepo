@@ -1,4 +1,6 @@
-export function getUserPermission(previliges: any) {
+type Permission = '*' | 'Create' | 'Read' | 'Update' | 'Delete'
+
+export function getUserPermission(previliges: Permission[] | null | undefined) {
   if (!previliges) {
     return {
       readPermission: false,

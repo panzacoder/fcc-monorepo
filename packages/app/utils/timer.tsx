@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react'
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import moment from 'moment'
-export const Timer = ({ startDate }) => {
-  //   let date = startDate ? startDate : ''
+
+interface TimerProps {
+  startDate: string
+}
+
+export const Timer = ({ startDate }: TimerProps) => {
   const [expired, setExpired] = useState(false)
   const [days, setDays] = useState(-1)
   const [hours, setHours] = useState(-1)
@@ -13,14 +17,14 @@ export const Timer = ({ startDate }) => {
     setInterval(timerInit, 1000)
   }, [])
   function timerInit() {
-    const now: any = moment()
+    const now = moment()
     if (!startDate) {
       setExpired(true)
       return
     }
 
-    const countDownStartDate: any = moment(startDate)
-    const distance: any = countDownStartDate - now
+    const countDownStartDate = moment(startDate)
+    const distance = countDownStartDate.valueOf() - now.valueOf()
     const days = Math.floor(distance / (1000 * 60 * 60 * 24))
     const hours = Math.floor(
       (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
@@ -28,7 +32,7 @@ export const Timer = ({ startDate }) => {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
     const seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
-    if (distance < 0 || isNaN(parseFloat(distance))) {
+    if (distance < 0 || isNaN(distance)) {
       clearInterval(this.countDownId)
       setDays(0)
       setHours(0)
