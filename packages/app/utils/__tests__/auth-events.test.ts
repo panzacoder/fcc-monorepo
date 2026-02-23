@@ -1,7 +1,15 @@
-import { describe, it, expect, vi } from 'vitest'
-import { onSessionExpired, emitSessionExpired } from '../auth-events'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import {
+  onSessionExpired,
+  emitSessionExpired,
+  _clearListeners
+} from '../auth-events'
 
 describe('auth-events', () => {
+  beforeEach(() => {
+    _clearListeners()
+  })
+
   it('calls subscriber on emit', () => {
     const handler = vi.fn()
     const unsubscribe = onSessionExpired(handler)

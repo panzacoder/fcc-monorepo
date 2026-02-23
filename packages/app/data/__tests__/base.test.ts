@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fetchData, ApiError } from '../base'
 
 const mockFetch = vi.fn()
-globalThis.fetch = mockFetch
+vi.stubGlobal('fetch', mockFetch)
 
 vi.mock('app/utils/device', () => ({
   getUserDeviceInformation: vi.fn().mockResolvedValue({
@@ -86,11 +86,11 @@ describe('fetchData', () => {
     expect(body.foo).toBe('bar')
   })
 
-  it('throws on HTTP error', async () => {
-    mockFetch.mockReturnValue(Promise.resolve({ ok: false, status: 500 }))
+  it.each([400, 401, 403, 500])('throws on HTTP %i', async (status) => {
+    mockFetch.mockReturnValue(Promise.resolve({ ok: false, status }))
 
     await expect(fetchData({ header, route: 'test' })).rejects.toThrow(
-      'Request failed with status 500'
+      `Request failed with status ${status}`
     )
   })
 

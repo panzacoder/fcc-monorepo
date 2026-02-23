@@ -2,6 +2,7 @@
 
 import { View, Alert } from 'react-native'
 import { useLogin } from 'app/data/auth'
+import { ApiError } from 'app/data/base'
 import { storeCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
@@ -58,7 +59,7 @@ export function LoginScreen() {
       },
       {
         onError: (error: Error) => {
-          if ('errorCode' in error && error.errorCode === 'RVF_101') {
+          if (error instanceof ApiError && error.errorCode === 'RVF_101') {
             router.push(formatUrl('/verification', { email: formData.email }))
           } else {
             Alert.alert('', error.message)
