@@ -62,9 +62,7 @@ export function PrescriptionsListScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
-  const prescriptionPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>(
-    {}
-  )
+  const prescriptionPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedType, setSelectedType] = useState('All')
   const [selectedPrescriber, setSelectedPrescriber] = useState('All')
   const [selectedPharmacy, setSelectedPharmacy] = useState('All')
@@ -129,7 +127,7 @@ export function PrescriptionsListScreen() {
         prescriptionPrivilegesRef.current = prescriptionData
           .domainObjectPrivileges.Medicine
           ? prescriptionData.domainObjectPrivileges.Medicine
-          : {}
+          : []
       }
       let list = prescriptionData.medicineList
         ? prescriptionData.medicineList

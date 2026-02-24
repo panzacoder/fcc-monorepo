@@ -37,7 +37,7 @@ export type Schema = z.infer<typeof schema>
 const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 // let currentFilter = 'Upcoming'
 export function EventsListScreen() {
-  const eventsPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const eventsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const router = useRouter()
@@ -88,7 +88,7 @@ export function EventsListScreen() {
       if (eventsData.domainObjectPrivileges) {
         eventsPrivilegesRef.current = eventsData.domainObjectPrivileges.Event
           ? eventsData.domainObjectPrivileges.Event
-          : {}
+          : []
       }
       let list = eventsData.eventList ? eventsData.eventList : []
       setEventsList(list)

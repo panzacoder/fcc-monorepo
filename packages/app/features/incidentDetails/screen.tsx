@@ -59,8 +59,8 @@ type MemberRouteParams = {
 }
 
 export function IncidentDetailsScreen() {
-  const incidentPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
-  const notePrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const incidentPrivilegesRef = useRef<PrivilegeAction[]>([])
+  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -125,12 +125,12 @@ export function IncidentDetailsScreen() {
       if (data.domainObjectPrivileges) {
         incidentPrivilegesRef.current = data.domainObjectPrivileges.Incident
           ? data.domainObjectPrivileges.Incident
-          : {}
+          : []
         notePrivilegesRef.current = data.domainObjectPrivileges.INCIDENTNOTE
           ? data.domainObjectPrivileges.INCIDENTNOTE
           : data.domainObjectPrivileges.IncidentNote
             ? data.domainObjectPrivileges.IncidentNote
-            : {}
+            : []
       }
 
       setIncidentDetails(data.incident ? data.incident : {})

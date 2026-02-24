@@ -47,7 +47,7 @@ export function MessagesScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
   const router = useRouter()
-  const messagePrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const messagePrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -101,7 +101,7 @@ export function MessagesScreen() {
           ? threadsData.domainObjectPrivileges.MESSAGETHREAD
           : threadsData.domainObjectPrivileges.MessageThread
             ? threadsData.domainObjectPrivileges.MessageThread
-            : {}
+            : []
       }
       let threadList = threadsData.threadList ? threadsData.threadList : []
       setMessagesList(threadList)

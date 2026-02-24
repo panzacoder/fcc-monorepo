@@ -31,7 +31,7 @@ import type {
   AppointmentListItem
 } from 'app/data/facilities'
 export function FacilityDetailsScreen() {
-  const facilityPrivilegesRef = useRef<Record<string, PrivilegeAction[]>>({})
+  const facilityPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [facilityDetails, setFacilityDetails] = useState<Partial<Facility>>({})
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
@@ -71,7 +71,7 @@ export function FacilityDetailsScreen() {
       if (data.domainObjectPrivileges) {
         facilityPrivilegesRef.current = data.domainObjectPrivileges.Facility
           ? data.domainObjectPrivileges.Facility
-          : {}
+          : []
       }
       setFacilityDetails(
         data.facilityWithAppointment
