@@ -227,19 +227,27 @@ export function AddEditAppointmentScreen() {
       return
     }
     const mutationCallbacks = {
-      onSuccess: (data) => {
+      onSuccess: (data: unknown) => {
+        const response = data as {
+          appointmentWithPreviousAppointment?: {
+            appointment?: Record<string, unknown>
+          }
+          appointment?: Record<string, unknown>
+        }
         let apptDetails = {}
         if (_.isEmpty(appointmentDetails)) {
-          apptDetails = data?.appointmentWithPreviousAppointment?.appointment
-            ? data.appointmentWithPreviousAppointment.appointment
+          apptDetails = response?.appointmentWithPreviousAppointment
+            ?.appointment
+            ? response.appointmentWithPreviousAppointment.appointment
             : {}
         } else {
           if (isFromCreateSimilar === 'true') {
-            apptDetails = data?.appointmentWithPreviousAppointment?.appointment
-              ? data.appointmentWithPreviousAppointment.appointment
+            apptDetails = response?.appointmentWithPreviousAppointment
+              ?.appointment
+              ? response.appointmentWithPreviousAppointment.appointment
               : {}
           } else {
-            apptDetails = data?.appointment ? data.appointment : {}
+            apptDetails = response?.appointment ? response.appointment : {}
           }
         }
         if (_.isEmpty(appointmentDetails)) {

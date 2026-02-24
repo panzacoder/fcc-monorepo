@@ -6,7 +6,7 @@ const getSubscription = () => {
   }
 }
 
-const setSubscription = (data) => {
+const setSubscription = (data: unknown) => {
   return {
     type: SET_SUBSCRIPTION,
     payload: data

@@ -19,7 +19,7 @@ type MemberData = {
   upcomingEvent?: Event
 }
 
-function CalendarEntry({ date, title }) {
+function CalendarEntry({ date, title }: { date: string; title: string }) {
   const now = new Date()
 
   return isEqual(date, now) ? (

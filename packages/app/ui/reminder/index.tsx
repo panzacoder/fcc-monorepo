@@ -5,7 +5,17 @@ import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import { Timer } from 'app/utils/timer'
 import { useAppSelector } from 'app/redux/hooks'
 
-export const Reminder = ({ data, editReminder, deleteReminder }) => {
+interface ReminderProps {
+  data: Record<string, any>
+  editReminder: (...args: any[]) => void
+  deleteReminder: (...args: any[]) => void
+}
+
+export const Reminder = ({
+  data,
+  editReminder,
+  deleteReminder
+}: ReminderProps) => {
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )

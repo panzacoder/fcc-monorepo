@@ -3,13 +3,22 @@ import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
 import { Button } from 'app/ui/button'
+
+interface PrivacyPolicyProps {
+  address: Record<string, any>
+  cancelClicked: (...args: any[]) => void
+  acceptClicked: (...args: any[]) => void
+  data: Record<string, any>
+  component: string
+}
+
 export const PrivacyPolicy = ({
   address,
   cancelClicked,
   acceptClicked,
   data,
   component
-}) => {
+}: PrivacyPolicyProps) => {
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
   let valueStyle = 'font-400 ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {

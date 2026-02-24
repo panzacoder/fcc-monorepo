@@ -1,10 +1,11 @@
 import { GET_SUBSCRIPTION, SET_SUBSCRIPTION } from './subscriptionTypes'
+import type { AnyAction } from 'redux'
 
 const initialState = {
   subscription: {}
 }
 
-const subscriptionReducer = (state = initialState, action) => {
+const subscriptionReducer = (state = initialState, action: AnyAction) => {
   switch (action.type) {
     case GET_SUBSCRIPTION:
       return {

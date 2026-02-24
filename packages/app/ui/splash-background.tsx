@@ -2,7 +2,7 @@
 import { ImageBackground, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-export function SplashBackground({ children }) {
+export function SplashBackground({ children }: { children: React.ReactNode }) {
   return (
     <ImageBackground
       source={require('app/assets/splash.png')}

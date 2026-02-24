@@ -8,7 +8,7 @@ const tabIconMap = {
   home: 'home',
   circles: 'circle',
   planner: 'calendar'
-}
+} as const
 
 const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
   state,
@@ -39,7 +39,7 @@ const MyTabBar: ComponentProps<typeof Tabs>['tabBar'] = ({
             })
           }
 
-          const icon = tabIconMap[route.name]
+          const icon = tabIconMap[route.name as keyof typeof tabIconMap]
           return (
             icon && (
               <Pressable

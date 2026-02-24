@@ -6,7 +6,7 @@ const getPaidAd = () => {
   }
 }
 
-const setPaidAd = (data) => {
+const setPaidAd = (data: unknown) => {
   return {
     type: SET_PAID_AD,
     payload: data

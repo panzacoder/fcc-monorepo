@@ -9,7 +9,7 @@ const getSubscriptionDetails = () => {
   }
 }
 
-const setSubscriptionDetails = (data) => {
+const setSubscriptionDetails = (data: unknown) => {
   return {
     type: SET_SUBSCRIPTION_DETAILS,
     payload: data

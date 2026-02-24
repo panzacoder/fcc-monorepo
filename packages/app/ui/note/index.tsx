@@ -4,6 +4,16 @@ import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
+
+interface NoteProps {
+  component: string
+  data: Record<string, any>
+  editNote: (...args: any[]) => void
+  deleteNote: (...args: any[]) => void
+  messageThreadClicked: (...args: any[]) => void
+  notePrivileges: any
+}
+
 export const Note = ({
   component,
   data,
@@ -11,7 +21,7 @@ export const Note = ({
   deleteNote,
   messageThreadClicked,
   notePrivileges
-}) => {
+}: NoteProps) => {
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )

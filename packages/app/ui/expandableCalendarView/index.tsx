@@ -75,7 +75,10 @@ export const ExpandableCalendarView = ({
     getMarkedDates()
   }
   async function getMarkedDates() {
-    let marked = {}
+    let marked: Record<
+      string,
+      { marked?: boolean; dots?: unknown[]; disabled?: boolean }
+    > = {}
     let data = await processData(calenderEvents)
     data.forEach((item: ProcessedCalendarItem) => {
       if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {

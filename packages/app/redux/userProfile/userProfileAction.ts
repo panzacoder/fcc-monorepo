@@ -6,7 +6,7 @@ const getUserProfile = () => {
   }
 }
 
-const setUserProfile = (data) => {
+const setUserProfile = (data: unknown) => {
   return {
     type: SET_USER_PROFILE,
     payload: data

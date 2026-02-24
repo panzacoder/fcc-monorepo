@@ -8,6 +8,7 @@
     "alwaysStrict": true,
     "strictFunctionTypes": true,
     "useUnknownInCatchVariables": true,
+    "noImplicitAny": true,
     "jsxImportSource": "nativewind",
     "strict": false,
     "jsx": "preserve"

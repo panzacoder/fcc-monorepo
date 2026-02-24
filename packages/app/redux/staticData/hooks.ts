@@ -1,4 +1,5 @@
 import { Country } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { useAppSelector } from '../hooks'
 
 export function useStaticData() {
@@ -6,5 +7,5 @@ export function useStaticData() {
 }
 
 export function useCountries(): Country[] {
-  return useStaticData()['countryList'] || []
+  return (useStaticData() as Partial<StaticData>).countryList || []
 }
