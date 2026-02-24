@@ -1,4 +1,4 @@
-import type { DomainPrivileges } from '../types.d'
+import type { Address, DomainPrivileges } from '../types.d'
 
 export interface IncidentListItem {
   id: number
@@ -24,7 +24,7 @@ export interface GetIncidentsParams {
 export interface IncidentLocation {
   shortDescription: string
   nickName: string
-  address: Record<string, unknown>
+  address: Partial<Address> & { id?: number | string }
 }
 
 export interface IncidentNote {
@@ -49,20 +49,38 @@ export interface IncidentDetailResponse {
   incident: IncidentDetail
 }
 
+export interface IncidentData {
+  date: string | Date
+  title: string
+  description?: string
+  type: string
+  member: { id: number | string }
+  location: IncidentLocation
+  contactList?: unknown[]
+  id?: number | string
+}
+
 export interface CreateIncidentParams {
-  incident: Record<string, unknown>
+  incident: IncidentData
 }
 
 export interface UpdateIncidentParams {
-  incident: Record<string, unknown>
+  incident: IncidentData
 }
 
 export interface DeleteIncidentParams {
   incident: { id: number }
 }
 
+export interface IncidentNoteData {
+  incident: { id: number | string }
+  note: string
+  shortDescription: string
+  id?: number | string
+}
+
 export interface IncidentNoteParams {
-  note: Record<string, unknown>
+  note: IncidentNoteData
 }
 
 export interface DeleteIncidentNoteParams {
@@ -71,4 +89,11 @@ export interface DeleteIncidentNoteParams {
 
 export interface GetIncidentNoteParams {
   note: { id: number }
+}
+
+export interface IncidentNoteResponse {
+  messageThread?: {
+    id: number
+    [key: string]: unknown
+  }
 }

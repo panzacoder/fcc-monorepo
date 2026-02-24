@@ -52,12 +52,24 @@ export interface GetCaregiverDetailsParams {
   memberId: number | string
 }
 
+export interface CaregiverFamilyMemberInput {
+  id?: number | string
+  memberId: number | string
+  familyMemberId?: number | string
+  email?: string
+  phone?: string
+  firstName?: string
+  lastName?: string
+  familyMemberMemberStatus?: { status: string }
+  relationRole: RelationRole
+}
+
 export interface CreateCaregiverParams {
-  familyMember: Record<string, unknown>
+  familyMember: CaregiverFamilyMemberInput
 }
 
 export interface UpdateCaregiverParams {
-  familyMember: Record<string, unknown>
+  familyMember: CaregiverFamilyMemberInput
 }
 
 export interface DeleteCaregiverParams {
@@ -66,6 +78,14 @@ export interface DeleteCaregiverParams {
 }
 
 export interface FindCaregiverByEmailPhoneParams {
+  email: string
+}
+
+export interface FindCaregiverResult {
+  id: number
+  firstName: string
+  middleName: string | null
+  lastName: string
   email: string
 }
 

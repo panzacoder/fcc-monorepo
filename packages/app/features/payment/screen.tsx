@@ -40,6 +40,14 @@ import sponsororAction from 'app/redux/sponsor/sponsorAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import { logger } from 'app/utils/logger'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import type {
+  CheckOutSessionResponse,
+  PaymentSuccessResponse,
+  IosReceiptVerificationResponse,
+  IosReceiptInfo,
+  PlanDetail
+} from 'app/data/payment/types'
+// Platform-conditional import, types unavailable at this point
 let StripeProvider: any
 let useStripe: any
 
@@ -62,7 +70,7 @@ const itemSubs = Platform.select({
     'com.familycarecircle.halfyearly',
     'com.familycarecircle.yearly'
   ]
-}) as any
+}) as string[] | undefined
 
 export function PaymentsScreen() {
   const dispatch = useAppDispatch()
@@ -74,9 +82,11 @@ export function PaymentsScreen() {
   const [email, setEmail] = useState('')
   const header = useAppSelector((state) => state.headerState.header)
   const userDetails = useAppSelector((state) => state.userProfileState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
-  let planDetails = item.planDetails ? JSON.parse(item.planDetails) : {}
+  let planDetails: PlanDetail = item.planDetails
+    ? JSON.parse(item.planDetails)
+    : {}
 
   const paymentConfigQuery = usePaymentConfig(header)
   const checkOutSessionMutation = useCheckOutSession(header)
@@ -96,7 +106,7 @@ export function PaymentsScreen() {
     appleSuccessPaymentMutation.isPending ||
     iosReceiptVerificationMutation.isPending
 
-  const verifyInAppPurchaseReceipt = (receipt: any) => {
+  const verifyInAppPurchaseReceipt = (receipt: string) => {
     iosReceiptVerificationMutation.mutate(
       {
         'receipt-data': receipt,
@@ -104,7 +114,7 @@ export function PaymentsScreen() {
         'exclude-old-transactions': true
       },
       {
-        onSuccess: (response: any) => {
+        onSuccess: (response: IosReceiptVerificationResponse) => {
           if (response) {
             let latestRecipt = response.latest_receipt_info
             if (latestRecipt) {
@@ -121,7 +131,7 @@ export function PaymentsScreen() {
       }
     )
   }
-  const completeIOSTransactionOnOurServer = (data: any) => {
+  const completeIOSTransactionOnOurServer = (data: IosReceiptInfo) => {
     appleSuccessPaymentMutation.mutate(
       {
         notificationType: 'PTS_PURCHASED',
@@ -155,7 +165,7 @@ export function PaymentsScreen() {
         }
       },
       {
-        onSuccess: (response: any) => {
+        onSuccess: (response) => {
           logger.debug('our server response', response)
           router.back()
         },
@@ -168,28 +178,29 @@ export function PaymentsScreen() {
   async function initializePaymentSheet() {
     logger.debug('in createSessionCheckout')
     try {
-      const data: any = await checkOutSessionMutation.mutateAsync({
-        user: { email: userDetails.email },
-        order: {
-          id: null,
-          description: null,
-          email: userDetails.email,
-          price: planDetails.price ? '' + planDetails.price : '',
-          currency: null,
-          status: null,
-          date: null,
-          orderid: null,
-          orderItems: [
-            {
-              id: null,
-              description: planDetails.description
-                ? planDetails.description
-                : '',
-              plan: { id: planDetails.id ? planDetails.id : '' }
-            }
-          ]
-        }
-      })
+      const data: CheckOutSessionResponse =
+        await checkOutSessionMutation.mutateAsync({
+          user: { email: userDetails.email },
+          order: {
+            id: null,
+            description: null,
+            email: userDetails.email,
+            price: planDetails.price ? '' + planDetails.price : '',
+            currency: null,
+            status: null,
+            date: null,
+            orderid: null,
+            orderItems: [
+              {
+                id: null,
+                description: planDetails.description
+                  ? planDetails.description
+                  : '',
+                plan: { id: planDetails.id ? planDetails.id : '' }
+              }
+            ]
+          }
+        })
 
       if (!data) {
         return
@@ -226,19 +237,22 @@ export function PaymentsScreen() {
         () => openPaymentSheet(paymentIntent, sessionId, subscriptionId),
         1000
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.debug(error)
     }
   }
 
-  async function handlePaymentSuccess(sessionId: any, subscriptionId: any) {
+  async function handlePaymentSuccess(
+    sessionId: string,
+    subscriptionId: string
+  ) {
     paymentSuccessMutation.mutate(
       {
         sessionId: sessionId,
         subscriptionId: subscriptionId
       },
       {
-        onSuccess: async (data: any) => {
+        onSuccess: async (data: PaymentSuccessResponse) => {
           logger.debug('payment response', data)
           if (data) {
             let userSubscription =
@@ -292,7 +306,11 @@ export function PaymentsScreen() {
     )
   }
 
-  async function failPayment(reason: any, sessionId: any, subscriptionId: any) {
+  async function failPayment(
+    reason: string,
+    sessionId: string,
+    subscriptionId: string
+  ) {
     paymentFailMutation.mutate(
       {
         sessionId: sessionId,
@@ -300,7 +318,7 @@ export function PaymentsScreen() {
         subscriptionId: subscriptionId
       },
       {
-        onSuccess: (response: any) => {
+        onSuccess: (response) => {
           logger.debug(JSON.stringify(response))
         },
         onError: (error) => {
@@ -311,9 +329,9 @@ export function PaymentsScreen() {
   }
 
   const openPaymentSheet = async (
-    paymentIntent: any,
-    sessionId: any,
-    subscriptionId: any
+    paymentIntent: string,
+    sessionId: string,
+    subscriptionId: string
   ) => {
     let { error } = await presentPaymentSheet({ clientSecret: paymentIntent })
 
@@ -335,8 +353,10 @@ export function PaymentsScreen() {
         try {
           RNIap.initConnection()
           RNIap.clearTransactionIOS()
-        } catch (err) {
-          logger.warn(err.code, err.message)
+        } catch (err: unknown) {
+          const code = err instanceof Error ? (err as any).code : undefined
+          const message = err instanceof Error ? err.message : String(err)
+          logger.warn(code, message)
         }
 
         let purchaseUpdateSubscription = purchaseUpdatedListener(
@@ -347,7 +367,7 @@ export function PaymentsScreen() {
             if (receipt) {
               try {
                 verifyInAppPurchaseReceipt(receipt)
-              } catch (ackErr) {
+              } catch (ackErr: unknown) {
                 logger.warn('ackErr', ackErr)
               }
             }
@@ -372,7 +392,7 @@ export function PaymentsScreen() {
   )
   async function requestSubscription() {
     try {
-      let identifier: any = ''
+      let identifier: string = ''
       let price = planDetails.price ? '' + planDetails.price : ''
       if (price === '1.99') {
         identifier = 'com.familycarecircle.monthly'
@@ -384,9 +404,10 @@ export function PaymentsScreen() {
         identifier = 'com.familycarecircle.yearly'
       }
       RNIap.requestSubscription(identifier)
-    } catch (err) {
-      logger.debug('err', err.message)
-      Alert.alert(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      logger.debug('err', message)
+      Alert.alert(message)
     }
   }
   return (

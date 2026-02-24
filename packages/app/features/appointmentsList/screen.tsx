@@ -11,7 +11,12 @@ import { COLORS } from 'app/utils/colors'
 import _ from 'lodash'
 import moment from 'moment'
 import { useAppointments, useDoctorFacilities } from 'app/data/appointments'
-import type { GetAppointmentsParams } from 'app/data/appointments'
+import type {
+  GetAppointmentsParams,
+  AppointmentListItem,
+  DoctorFacilityItem
+} from 'app/data/appointments'
+import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -37,7 +42,12 @@ const typesList: Array<{ id: number; title: string }> = [
   { id: 3, title: 'Facility' }
 ]
 
-const monthsList = getMonthsList() as any
+const monthsList = getMonthsList() as Array<{ id: number; title: string }>
+type MemberRouteParams = {
+  member: number | string
+  firstname?: string
+  lastname?: string
+}
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
   const appointmentPrivilegesRef = useRef({})
@@ -51,12 +61,18 @@ export function AppointmentsListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
-  const [appointmentsList, setAppointmentsList] = useState([]) as any
-  const [doctorFacilityList, setDoctorFacilityList] = useState([]) as any
-  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState(
-    []
-  ) as any
-  const [appointmentsListFull, setAppointmentsListFull] = useState([]) as any
+  const [appointmentsList, setAppointmentsList] = useState<
+    AppointmentListItem[]
+  >([])
+  const [doctorFacilityList, setDoctorFacilityList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState<
+    DoctorFacilityItem[]
+  >([])
+  const [appointmentsListFull, setAppointmentsListFull] = useState<
+    AppointmentListItem[]
+  >([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -64,10 +80,10 @@ export function AppointmentsListScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
-  const staticData: any = useAppSelector(
+  const item = useLocalSearchParams<Record<string, string>>()
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       monthIndex: 1,
@@ -79,15 +95,15 @@ export function AppointmentsListScreen() {
   })
   let memberData =
     item.memberData && item.memberData !== undefined
-      ? JSON.parse(item.memberData)
-      : {}
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
 
   type Response = {
     id: number
     name: string
   }
   let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
-  staticData.yearList.map(({ name, id }: Response, index: any) => {
+  staticData.yearList.map(({ name, id }: Response, index: number) => {
     yearList.push({
       id: index + 2,
       title: name
@@ -139,7 +155,7 @@ export function AppointmentsListScreen() {
       const list: Array<{ id: number; title: string }> = [
         { title: 'All', id: 1 }
       ]
-      doctorFacilityData.map((data: any, index: any) => {
+      doctorFacilityData.map((data: DoctorFacilityItem, index: number) => {
         list.push({ title: data.name, id: index + 2 })
       })
       setDoctorFacilityList(list)
@@ -175,14 +191,14 @@ export function AppointmentsListScreen() {
     }
   }, [])
 
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
+  async function getFilteredList(list: AppointmentListItem[], filter: string) {
+    let filteredList: AppointmentListItem[] = []
     if (filter === 'Open Items' || filter === 'Upcoming') {
       list = _.orderBy(list, (x) => x.date, 'asc')
     } else {
       list = _.orderBy(list, (x) => x.date, 'desc')
     }
-    list.map((data: any, index: any) => {
+    list.map((data: AppointmentListItem, index: number) => {
       if (filter === 'Upcoming') {
         if (
           moment(data.date).utc().isAfter(moment().utc()) &&
@@ -217,7 +233,7 @@ export function AppointmentsListScreen() {
     })
     setAppointmentsList(filteredList)
   }
-  async function setFilteredList(filter: any) {
+  async function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(appointmentsListFull, filter)
@@ -255,28 +271,28 @@ export function AppointmentsListScreen() {
       typeIndex: 1
     })
   }
-  async function setDoctorFacilityChange(value: any) {
+  async function setDoctorFacilityChange(value: number | null) {
     if (value === null) {
       reset({
         doctorFacilityIndex: -1
       })
     }
   }
-  async function setYearChange(value: any) {
+  async function setYearChange(value: number | null) {
     if (value === null) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: any) {
+  async function setMonthChange(value: number | null) {
     if (value === null) {
       reset({
         monthIndex: -1
       })
     }
   }
-  async function setSelectedTypeChange(value: any) {
+  async function setSelectedTypeChange(value: { id: number } | null) {
     if (value) {
       let id = value.id - 1
       logger.debug('value', JSON.stringify(value))
@@ -508,7 +524,7 @@ export function AppointmentsListScreen() {
       )}
       {isDataReceived && appointmentsList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
-          {appointmentsList.map((data: any, index: number) => {
+          {appointmentsList.map((data: AppointmentListItem, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {

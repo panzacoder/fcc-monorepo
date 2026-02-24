@@ -37,7 +37,7 @@ export function ForgotPasswordForm({
     onLoadingChange(forgotPasswordMutation.isPending)
   }, [forgotPasswordMutation.isPending])
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = (formData: { email: string }) => {
     forgotPasswordMutation.mutate(
       {
         appuserVo: {

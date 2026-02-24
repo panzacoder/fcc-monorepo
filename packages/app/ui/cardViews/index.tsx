@@ -9,9 +9,20 @@ import {
 import { useAppSelector } from 'app/redux/hooks'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-export const CardView = ({ data, trasportationClicked }) => {
+
+type TransportationRequest = {
+  type: string
+  count: number
+}
+
+type CardViewProps = {
+  data: string
+  trasportationClicked: (memberData: Record<string, unknown>) => void
+}
+
+export const CardView = ({ data, trasportationClicked }: CardViewProps) => {
   const router = useRouter()
-  const memberNamesList: any = useAppSelector(
+  const memberNamesList = useAppSelector(
     (state) => state.memberNames.memberNamesList
   )
   let memberData = data ? JSON.parse(data) : {}
@@ -35,7 +46,7 @@ export const CardView = ({ data, trasportationClicked }) => {
   let eventTransporationCount = 0,
     appointmentTransportationCount = 0,
     totalTransportationCount = 0
-  memberData.transportationRequests.map((data: any) => {
+  memberData.transportationRequests.map((data: TransportationRequest) => {
     if (data.type === 'Appointment') {
       appointmentTransportationCount = data.count
     } else {
@@ -99,7 +110,9 @@ export const CardView = ({ data, trasportationClicked }) => {
       eventText += memberData.upcomingEvent.location
     }
   }
-  let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
+  let backgroundColor = getColorSet(
+    (memberNamesList ?? []).indexOf(fullName) % 26
+  )
   return (
     <View className="flex-1">
       {memberData.upcomingAppointment ||

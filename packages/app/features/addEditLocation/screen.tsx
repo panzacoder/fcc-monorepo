@@ -14,6 +14,14 @@ import {
   useUpdateDoctorLocation,
   useUpdateFacilityLocation
 } from 'app/data/locations'
+import type {
+  DoctorLocationData,
+  FacilityLocationData,
+  CreateDoctorLocationResponse,
+  CreateFacilityLocationResponse
+} from 'app/data/locations/types'
+import type { StaticData } from 'app/data/static'
+import type { Country, State as StateType } from 'app/data/types.d'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -31,6 +39,13 @@ import {
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
+
+type MemberRouteParams = {
+  member: number | string
+  firstname?: string
+  lastname?: string
+}
+
 const schema = z.object({
   locationName: z.string().min(1, { message: 'Location name is required' }),
   address: z.string(),
@@ -50,13 +65,15 @@ export function AddEditLocationScreen() {
   const stateIndexRef = useRef(-1)
   const countryIndexRef = useRef(-1)
   let locationPhone = ''
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  let memberData = item.memberData
+    ? (JSON.parse(item.memberData) as MemberRouteParams)
+    : ({} as MemberRouteParams)
   let locationDetails = item.locationDetails
     ? JSON.parse(item.locationDetails)
     : {}
@@ -65,14 +82,16 @@ export function AddEditLocationScreen() {
   let details = item.details ? JSON.parse(item.details) : {}
   logger.debug('details', JSON.stringify(details))
   const [selectedCountryId, setSelectedCountryId] = useState<number>(0)
-  const [statesList, setStatesList] = useState([]) as any
+  const [statesList, setStatesList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
   const [statesListFull, setStatesListFull] = useState([])
   type Response = {
     id: number
     name: string
   }
   const countryList: Array<{ id: number; title: string }> =
-    staticData.countryList.map(({ name, id }: Response, index: any) => {
+    staticData.countryList.map(({ name, id }: Response, index: number) => {
       return {
         title: name,
         id: index + 1
@@ -90,19 +109,21 @@ export function AddEditLocationScreen() {
   useEffect(() => {
     if (statesQuery.data) {
       let mappedStates: Array<{ id: number; title: string }> =
-        statesQuery.data.stateList.map(({ name, id }: Response, index: any) => {
-          return {
-            title: name,
-            id: index + 1
+        statesQuery.data.stateList.map(
+          ({ name, id }: Response, index: number) => {
+            return {
+              title: name,
+              id: index + 1
+            }
           }
-        })
+        )
       setStatesList(mappedStates)
       setStatesListFull(statesQuery.data.stateList || [])
       if (!_.isEmpty(locationDetails)) {
         let stateName = locationDetails.address.state.name
           ? locationDetails.address.state.name
           : ''
-        statesQuery.data.stateList.map((data: any, index: any) => {
+        statesQuery.data.stateList.map((data: StateType, index: number) => {
           if (data.name === stateName) {
             stateIndexRef.current = index + 1
             reset({
@@ -145,7 +166,7 @@ export function AddEditLocationScreen() {
       countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
     consoleData('countryName', countryName)
-    staticData.countryList.map(async (data: any, index: any) => {
+    staticData.countryList.map(async (data: Country, index: number) => {
       if (data.name === countryName) {
         countryIndexRef.current = index + 1
         consoleData('countryName index', '' + countryIndexRef.current)
@@ -197,7 +218,7 @@ export function AddEditLocationScreen() {
     },
     resolver: zodResolver(phoneSchema)
   })
-  function setSelectedCountryChange(value: any) {
+  function setSelectedCountryChange(value: { id: number } | null) {
     if (value) {
       let countryId = staticData.countryList[value.id - 1]?.id
         ? staticData.countryList[value.id - 1].id
@@ -232,8 +253,8 @@ export function AddEditLocationScreen() {
       }
     }
 
-    const onDoctorSuccess = (data: any) => {
-      let details: any = data?.doctor ? JSON.stringify(data.doctor) : {}
+    const onDoctorSuccess = (data: CreateDoctorLocationResponse) => {
+      let details = data?.doctor ? JSON.stringify(data.doctor) : '{}'
       router.dismiss(1)
       router.replace(
         formatUrl('/circles/doctorDetails', {
@@ -243,8 +264,8 @@ export function AddEditLocationScreen() {
       )
     }
 
-    const onFacilitySuccess = (data: any) => {
-      let details: any = data?.facility ? JSON.stringify(data.facility) : {}
+    const onFacilitySuccess = (data: CreateFacilityLocationResponse) => {
+      let details = data?.facility ? JSON.stringify(data.facility) : '{}'
       router.dismiss(1)
       router.replace(
         formatUrl('/circles/facilityDetails', {
@@ -254,12 +275,15 @@ export function AddEditLocationScreen() {
       )
     }
 
-    const onError = (error: any) => {
+    const onError = (error: Error) => {
       Alert.alert('', error.message || 'Failed to save location')
     }
 
     if (item.component === 'Doctor') {
-      let doctorLocation: any = { ...addressObject }
+      let doctorLocation: DoctorLocationData = {
+        ...addressObject,
+        doctor: { id: '' }
+      }
       if (_.isEmpty(locationDetails)) {
         doctorLocation.doctor = {
           id: details.id ? details.id : '',
@@ -291,7 +315,10 @@ export function AddEditLocationScreen() {
         )
       }
     } else {
-      let facilityLocation: any = { ...addressObject }
+      let facilityLocation: FacilityLocationData = {
+        ...addressObject,
+        facility: { id: '' }
+      }
       if (_.isEmpty(locationDetails)) {
         facilityLocation.facility = {
           id: details.id ? details.id : '',

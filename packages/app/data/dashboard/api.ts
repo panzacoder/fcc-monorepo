@@ -29,7 +29,7 @@ export async function updateFcmToken(
   header: AuthHeader,
   params: UpdateFcmTokenParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_FCM_TOKEN,
     data: params

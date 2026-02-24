@@ -12,12 +12,30 @@ const schema = z.object({
   title: z.string().min(1, { message: 'Reminder title is required' })
 })
 export type Schema = z.infer<typeof schema>
+
+type ReminderData = {
+  date?: Date
+  content?: string
+  note?: string
+}
+
+type AddEditReminderProps = {
+  component: string
+  reminderData: ReminderData
+  cancelClicked: () => void
+  createUpdateReminder: (
+    title: string,
+    date: Date,
+    reminderData: ReminderData
+  ) => void
+}
+
 export const AddEditReminder = ({
   component,
   reminderData,
   cancelClicked,
   createUpdateReminder
-}) => {
+}: AddEditReminderProps) => {
   const [selectedDate, setSelectedDate] = useState(
     reminderData.date ? reminderData.date : new Date()
   )
@@ -34,7 +52,7 @@ export const AddEditReminder = ({
     resolver: zodResolver(schema)
   })
 
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date) => {
     setSelectedDate(date)
     setKey(Math.random())
   }

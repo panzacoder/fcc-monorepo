@@ -37,6 +37,13 @@ import {
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAppSelector } from 'app/redux/hooks'
+import type {
+  ProfileAppUser,
+  ProfileMember,
+  ProfileOrder,
+  ProfileUserSubscription,
+  UserProfileResponse
+} from 'app/data/profile'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
@@ -57,10 +64,14 @@ export function ProfileScreen() {
   const [isAutoSubscription, setIsAutoSubscription] = useState(false)
   const [isSubscribedUser, setISubscribedUser] = useState(false)
   const [isShowAlerts, setIsShowAlerts] = useState(false)
-  const [appuserDetails, setAppuserDetails] = useState({}) as any
-  const [userSubscription, setUserSubscription] = useState({}) as any
-  const [memberDetails, setMemberDetails] = useState({}) as any
-  const [orderList, setOrderList] = useState([])
+  const [appuserDetails, setAppuserDetails] = useState<Partial<ProfileAppUser>>(
+    {}
+  )
+  const [userSubscription, setUserSubscription] = useState<
+    Partial<ProfileUserSubscription>
+  >({})
+  const [memberDetails, setMemberDetails] = useState<Partial<ProfileMember>>({})
+  const [orderList, setOrderList] = useState<ProfileOrder[]>([])
 
   const { handleSubmit: handleSubmit1, control: control1 } = useForm({
     defaultValues: {
@@ -93,7 +104,7 @@ export function ProfileScreen() {
 
   useEffect(() => {
     if (!profileData) return
-    const data = profileData as any
+    const data = profileData as UserProfileResponse
     let appUser = data.appuser ? data.appuser : {}
     setAppuserDetails(appUser)
     let member = data.member ? data.member : {}
@@ -274,7 +285,7 @@ export function ProfileScreen() {
       }
     )
   }
-  function deleteAccount(password: any) {
+  function deleteAccount(password: string) {
     deleteAccountMutation.mutate(
       {
         appuserVo: {
@@ -319,7 +330,7 @@ export function ProfileScreen() {
     }
   }
   function getOrderItemsView() {
-    let orderView = orderList.map((data: any, index: any) => {
+    let orderView = orderList.map((data: ProfileOrder, index: number) => {
       let planName = data.orderItems
         ? data.orderItems[0].description.replace('Basic ', '')
         : ''

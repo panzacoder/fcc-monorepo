@@ -4,7 +4,13 @@ import { Feather } from 'app/ui/icons'
 import { getFullDateForCalendar, getNameInitials } from 'app/ui/utils'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-export function CardView(data: any) {
+
+type TransportationRequest = {
+  type: string
+  count: number
+}
+
+export function CardView(data: { data: string }) {
   const router = useRouter()
   let memberData = data.data
   let textStyle =
@@ -27,7 +33,7 @@ export function CardView(data: any) {
   let eventTransporationCount = 0,
     appointmentTransportationCount = 0,
     totalTransportationCount = 0
-  memberData.transportationRequests.map((data: any) => {
+  memberData.transportationRequests.map((data: TransportationRequest) => {
     if (data.type === 'Appointment') {
       appointmentTransportationCount = data.count
     } else {

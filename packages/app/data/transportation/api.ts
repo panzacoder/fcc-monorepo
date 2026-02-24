@@ -78,7 +78,7 @@ export async function createTransportation(
   header: AuthHeader,
   params: CreateTransportationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_TRANSPORTATION,
     data: params
@@ -89,7 +89,7 @@ export async function updateTransportation(
   header: AuthHeader,
   params: UpdateTransportationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_TRANSPORTATION,
     data: params
@@ -100,7 +100,7 @@ export async function deleteTransportation(
   header: AuthHeader,
   params: DeleteTransportationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_TRANSPORTATION,
     data: params
@@ -111,7 +111,7 @@ export async function createTransportationEvent(
   header: AuthHeader,
   params: CreateTransportationEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_TRANSPORTATION_EVENT,
     data: params
@@ -122,7 +122,7 @@ export async function updateTransportationEvent(
   header: AuthHeader,
   params: UpdateTransportationEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_TRANSPORTATION_EVENT,
     data: params
@@ -133,7 +133,7 @@ export async function deleteTransportationEvent(
   header: AuthHeader,
   params: DeleteTransportationEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_TRANSPORTATION_EVENT,
     data: params
@@ -144,7 +144,7 @@ export async function approveTransport(
   header: AuthHeader,
   params: ApproveTransportParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: APPROVE_TRANSPORT,
     data: params
@@ -155,7 +155,7 @@ export async function rejectTransport(
   header: AuthHeader,
   params: RejectTransportParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: REJECT_TRANSPORT,
     data: params
@@ -166,7 +166,7 @@ export async function eventAcceptTransportationRequest(
   header: AuthHeader,
   params: EventAcceptTransportationRequestParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: EVENT_ACCEPT_TRANSPORTATION_REQUEST,
     data: params
@@ -177,7 +177,7 @@ export async function eventRejectTransportationRequest(
   header: AuthHeader,
   params: EventRejectTransportationRequestParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: EVENT_REJECT_TRANSPORTATION_REQUEST,
     data: params
@@ -188,7 +188,7 @@ export async function resendTransportationRequest(
   header: AuthHeader,
   params: ResendTransportationRequestParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: RESEND_TRANSPORTATION_REQUEST,
     data: params
@@ -199,7 +199,7 @@ export async function resendTransportationRequestEvent(
   header: AuthHeader,
   params: ResendTransportationRequestEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: RESEND_TRANSPORTATION_REQUEST_EVENT,
     data: params
@@ -210,7 +210,7 @@ export async function cancelTransportationRequest(
   header: AuthHeader,
   params: CancelTransportationRequestParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CANCEL_TRANSPORTATION_REQUEST,
     data: params
@@ -221,7 +221,7 @@ export async function cancelTransportationRequestEvent(
   header: AuthHeader,
   params: CancelTransportationRequestEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CANCEL_TRANSPORTATION_REQUEST_EVENT,
     data: params
@@ -232,7 +232,7 @@ export async function createTransportationReminder(
   header: AuthHeader,
   params: CreateTransportationReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_TRANSPORTATION_REMINDER,
     data: params
@@ -243,7 +243,7 @@ export async function updateTransportationReminder(
   header: AuthHeader,
   params: UpdateTransportationReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_TRANSPORTATION_REMINDER,
     data: params
@@ -254,7 +254,7 @@ export async function deleteTransportationReminder(
   header: AuthHeader,
   params: DeleteTransportationReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_TRANSPORTATION_REMINDER,
     data: params
@@ -265,7 +265,7 @@ export async function createTransportationReminderEvent(
   header: AuthHeader,
   params: CreateTransportationReminderEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_TRANSPORTATION_REMINDER_EVENT,
     data: params
@@ -276,7 +276,7 @@ export async function updateTransportationReminderEvent(
   header: AuthHeader,
   params: UpdateTransportationReminderEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_TRANSPORTATION_REMINDER_EVENT,
     data: params
@@ -287,7 +287,7 @@ export async function deleteTransportationReminderEvent(
   header: AuthHeader,
   params: DeleteTransportationReminderEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_TRANSPORTATION_REMINDER_EVENT,
     data: params

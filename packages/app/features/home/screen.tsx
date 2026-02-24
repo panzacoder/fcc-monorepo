@@ -43,6 +43,16 @@ import {
   useEventAcceptTransportationRequest,
   useEventRejectTransportationRequest
 } from 'app/data/transportation'
+import type { WeekDetailsMember } from 'app/data/dashboard/types'
+
+interface TransportRequestItem {
+  id: number | string
+  type: string
+  createdbyname: string
+  name: string
+  location: string
+  date: string
+}
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -62,11 +72,11 @@ export function HomeScreen() {
     []
   )
   const dispatch = useAppDispatch()
-  const memberNamesList: any = useAppSelector((state) =>
+  const memberNamesList = useAppSelector((state) =>
     state.memberNames.memberNamesList !== undefined
       ? state.memberNames.memberNamesList
       : []
-  )
+  ) as string[]
   const router = useRouter()
   const header = useAppSelector((state) => state.headerState.header)
   const user = useAppSelector((state) => state.userProfileState.header)
@@ -83,7 +93,8 @@ export function HomeScreen() {
   }
   dispatch(memberNamesAction.setMemberNames(memberNamesList))
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
-  const [transportRequestData, setTransportRequestData] = useState({}) as any
+  const [transportRequestData, setTransportRequestData] =
+    useState<TransportRequestItem | null>(null)
   const [isRejectTransportRequest, setIsRejectTransportRequest] =
     useState(false)
   const [transportMemberName, setTransportMemberName] = useState('')
@@ -92,8 +103,10 @@ export function HomeScreen() {
     useState(false)
   const [upcomingSentence, setUpcomingSentence] = useState('')
   const [isDataReceived, setDataReceived] = useState(false)
-  const [memberList, setMemberList] = useState([])
-  const [transportationList, setTransportationList] = useState([])
+  const [memberList, setMemberList] = useState<WeekDetailsMember[]>([])
+  const [transportationList, setTransportationList] = useState<
+    TransportRequestItem[]
+  >([])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       rejectReason: ''
@@ -137,7 +150,7 @@ export function HomeScreen() {
         : []
       setMemberList(memberList)
       logger.debug('memberList', JSON.stringify(memberList))
-      memberList.map((data: any) => {
+      memberList.map((data) => {
         if (
           data.upcomingAppointment ||
           data.recentIncident ||
@@ -187,9 +200,9 @@ export function HomeScreen() {
       } else {
         logger.debug('Failed', 'No Token Recived')
       }
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
-  async function updateFcmToken(fcmToken: any) {
+  async function updateFcmToken(fcmToken: string) {
     updateFcmTokenMutation.mutate(
       {
         appuserVo: {
@@ -205,13 +218,13 @@ export function HomeScreen() {
   }
   const handleFcmMessage = useCallback(async () => {
     try {
-      await messaging().setBackgroundMessageHandler(async (message: any) => {
-        schedulePushNotification(message)
+      await messaging().setBackgroundMessageHandler(async (message) => {
+        schedulePushNotification(message as unknown as Record<string, unknown>)
       })
-      await messaging().onMessage((message: any) => {
-        schedulePushNotification(message)
+      await messaging().onMessage((message) => {
+        schedulePushNotification(message as unknown as Record<string, unknown>)
       })
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   const getToken = useCallback(async () => {
     try {
@@ -223,10 +236,10 @@ export function HomeScreen() {
         getFcmToken()
         logger.debug('Authorization status:', authStatus)
       }
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   async function registerForPushNotificationsAsync() {
-    let token: any
+    let token: string | undefined
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
@@ -262,7 +275,7 @@ export function HomeScreen() {
           })
         ).data
         logger.debug(token)
-      } catch (e) {
+      } catch (e: unknown) {
         token = `${e}`
       }
     } else {
@@ -271,14 +284,20 @@ export function HomeScreen() {
 
     return token
   }
-  async function schedulePushNotification(message: any) {
+  async function schedulePushNotification(message: Record<string, unknown>) {
+    const notification = message.notification as
+      | { title?: string; body?: string }
+      | undefined
+    const data = message.data as
+      | { MessageType?: string; [key: string]: string | undefined }
+      | undefined
     Notifications.dismissAllNotificationsAsync()
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: message.notification.title,
-        body: message.notification.body,
+        title: notification?.title,
+        body: notification?.body,
         data: {
-          MessageType: message.data.MessageType,
+          MessageType: data?.MessageType ?? '',
           notificationData: message
         }
       },
@@ -298,17 +317,20 @@ export function HomeScreen() {
         setChannels(value ?? [])
       )
     }
-    async function redirect(notification: any) {
-      notification = notification.request.content
+    async function redirect(notification: Notifications.Notification) {
+      const content = notification.request
+        .content as Notifications.NotificationContent & {
+        data: Record<string, any>
+      }
       if (
-        !_.isEmpty(notification.data.notificationData) &&
-        notification.data.notificationData !== undefined
+        !_.isEmpty(content.data.notificationData) &&
+        content.data.notificationData !== undefined
       ) {
-        let notificationType = notification.data.MessageType
-          ? notification.data.MessageType
+        let notificationType = content.data.MessageType
+          ? content.data.MessageType
           : ''
-        let notificationData = notification.data.notificationData
-          ? notification.data.notificationData
+        let notificationData = content.data.notificationData
+          ? content.data.notificationData
           : {}
         let memberData = {
           member:
@@ -397,7 +419,7 @@ export function HomeScreen() {
       }
     }
     const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response: any) => {
+      (response) => {
         redirect(response.notification)
       }
     )
@@ -411,7 +433,7 @@ export function HomeScreen() {
     }
   }, [])
 
-  async function trasportationClicked(memberData: any) {
+  async function trasportationClicked(memberData: WeekDetailsMember) {
     let fullName = ''
     if (memberData.firstname) {
       fullName += memberData.firstname.trim() + ' '
@@ -420,9 +442,11 @@ export function HomeScreen() {
       fullName += memberData.lastname.trim()
     }
     setTransportMemberName(fullName)
-    setTransportMemberId(memberData.member ? memberData.member : '')
+    setTransportMemberId(memberData.member ? String(memberData.member) : '')
   }
-  async function approveRejectTrasportRequest(transportData: any) {
+  async function approveRejectTrasportRequest(
+    transportData: TransportRequestItem
+  ) {
     const params = {
       transport: {
         id: transportData.id ? transportData.id : '',
@@ -436,13 +460,13 @@ export function HomeScreen() {
         queryKey: dashboardKeys.weekDetails()
       })
     }
-    const onError = (error: any) => {
+    const onError = (error: Error) => {
       logger.debug(error)
     }
     if (transportData.type === 'Event') {
-      eventAcceptMutation.mutate(params, { onSuccess, onError })
+      eventAcceptMutation.mutate(params as any, { onSuccess, onError })
     } else {
-      approveTransportMutation.mutate(params, { onSuccess, onError })
+      approveTransportMutation.mutate(params as any, { onSuccess, onError })
     }
   }
   const showRequestModal = () => {
@@ -462,7 +486,7 @@ export function HomeScreen() {
           </View>
         </View>
         <ScrollView className="">
-          {transportationList.map((data: any, index: number) => {
+          {transportationList.map((data, index) => {
             return (
               <View className="p-2" key={index}>
                 <Typography className="font-400 ml-2">
@@ -515,7 +539,7 @@ export function HomeScreen() {
   async function rejectRequest(formData: Schema) {
     const params = {
       transport: {
-        id: transportRequestData.id ? transportRequestData.id : '',
+        id: transportRequestData?.id ? transportRequestData.id : '',
         reason: formData.rejectReason,
         isApprove: false
       }
@@ -526,13 +550,13 @@ export function HomeScreen() {
         queryKey: dashboardKeys.weekDetails()
       })
     }
-    const onError = (error: any) => {
+    const onError = (error: Error) => {
       logger.debug(error)
     }
-    if (transportRequestData.type === 'Event') {
-      eventRejectMutation.mutate(params, { onSuccess, onError })
+    if (transportRequestData?.type === 'Event') {
+      eventRejectMutation.mutate(params as any, { onSuccess, onError })
     } else {
-      rejectTransportMutation.mutate(params, { onSuccess, onError })
+      rejectTransportMutation.mutate(params as any, { onSuccess, onError })
     }
   }
   const shwoRejectModal = () => {
@@ -620,12 +644,16 @@ export function HomeScreen() {
             </View>
             {memberList.length > 0 && isWeekDataAvailable ? (
               <ScrollView persistentScrollbar={true} className="m-2 flex-1">
-                {memberList.map((data: any, index: number) => {
+                {memberList.map((data, index) => {
                   return (
                     <View key={index}>
                       <CardView
                         data={JSON.stringify(data)}
-                        trasportationClicked={trasportationClicked}
+                        trasportationClicked={
+                          trasportationClicked as unknown as (
+                            memberData: Record<string, unknown>
+                          ) => void
+                        }
                       ></CardView>
                     </View>
                   )

@@ -3,12 +3,24 @@ import { TextInput, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
+
+type ComboBoxItem = {
+  label: string
+}
+
+type PtsComboBoxProps = {
+  currentData: string
+  listData: ComboBoxItem[]
+  onSelection: (value: string) => void
+  placeholderValue: string
+}
+
 export const PtsComboBox = ({
   currentData,
   listData,
   onSelection,
   placeholderValue
-}) => {
+}: PtsComboBoxProps) => {
   const [isShowDropdown, setIsShowDropdown] = useState(false)
   const [purpose, setPurpose] = useState(currentData)
 
@@ -38,7 +50,7 @@ export const PtsComboBox = ({
       {isShowDropdown ? (
         <View className="w-[95%] self-center ">
           <ScrollView className="">
-            {listData.map((data: any, index: number) => {
+            {listData.map((data: ComboBoxItem, index: number) => {
               return (
                 <TouchableOpacity
                   onPress={() => {

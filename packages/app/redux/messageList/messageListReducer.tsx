@@ -1,10 +1,18 @@
 import { GET_MESSAGE_LIST, SET_MESSAGE_LIST } from './messageListTypes'
+import type { MessageListAction } from './messageListAction'
 
-const initialState = {
+interface MessageListState {
+  messageList: Record<string, unknown>[]
+}
+
+const initialState: MessageListState = {
   messageList: []
 }
 
-const messageListReducer = (state = initialState, action: any) => {
+const messageListReducer = (
+  state = initialState,
+  action: MessageListAction
+): MessageListState => {
   switch (action.type) {
     case GET_MESSAGE_LIST:
       return {

@@ -9,8 +9,13 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { usePrescriptionList } from 'app/data/prescriptions'
+import type { PrescriptionListItem } from 'app/data/prescriptions/types'
 import { usePharmacyList } from 'app/data/facilities'
+import type { PharmacyListItem } from 'app/data/facilities/types'
 import { useActiveDoctors } from 'app/data/doctors'
+import type { ActiveDoctorItem } from 'app/data/doctors/types'
+import type { PrivilegeAction, MedicineType } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -30,46 +35,62 @@ const schema = z.object({
   drugName: z.string()
 })
 export type Schema = z.infer<typeof schema>
+type MemberRouteParams = {
+  member?: number | string
+  firstname?: string
+  lastname?: string
+}
+
 export function PrescriptionsListScreen() {
-  const [prescriptionList, setPrescriptionList] = useState([]) as any
-  const [pharmacyList, setPharmacyList] = useState([]) as any
-  const [pharmacyListFull, setPharmacyListFull] = useState([]) as any
-  const [doctorList, setDoctorList] = useState([]) as any
-  const [doctorListFull, setDoctorListFull] = useState([]) as any
+  const [prescriptionList, setPrescriptionList] = useState<
+    PrescriptionListItem[]
+  >([])
+  const [pharmacyList, setPharmacyList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [pharmacyListFull, setPharmacyListFull] = useState<PharmacyListItem[]>(
+    []
+  )
+  const [doctorList, setDoctorList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [doctorListFull, setDoctorListFull] = useState<ActiveDoctorItem[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [prescriptionListFull, setPrescriptionListFull] = useState([]) as any
+  const [prescriptionListFull, setPrescriptionListFull] = useState<
+    PrescriptionListItem[]
+  >([])
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
-  const prescriptionPrivilegesRef = useRef<any>({})
+  const prescriptionPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedType, setSelectedType] = useState('All')
   const [selectedPrescriber, setSelectedPrescriber] = useState('All')
   const [selectedPharmacy, setSelectedPharmacy] = useState('All')
   const [drugName, setDrugName] = useState('')
   const [isFilterApplied, setIsFilterApplied] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
 
   let memberData =
-    item.memberData !== undefined ? JSON.parse(item.memberData) : {}
-  const staticData: any = useAppSelector(
+    item.memberData !== undefined
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
 
-  type TypeResponse = {
-    id: number
-    type: string
-  }
   let typesList: Array<{ id: number; title: string }> = [
     { id: 1, title: 'All' }
   ]
-  staticData.medicineTypeList.map(({ type, id }: TypeResponse, index: any) => {
-    typesList.push({
-      id: index + 2,
-      title: type
-    })
-  })
+  staticData.medicineTypeList.map(
+    ({ type, id }: MedicineType, index: number) => {
+      typesList.push({
+        id: index + 2,
+        title: type
+      })
+    }
+  )
 
   const memberId = memberData.member ? memberData.member : ''
 
@@ -106,7 +127,7 @@ export function PrescriptionsListScreen() {
         prescriptionPrivilegesRef.current = prescriptionData
           .domainObjectPrivileges.Medicine
           ? prescriptionData.domainObjectPrivileges.Medicine
-          : {}
+          : []
       }
       let list = prescriptionData.medicineList
         ? prescriptionData.medicineList
@@ -124,7 +145,7 @@ export function PrescriptionsListScreen() {
       let pharmacyDropdown: Array<{ id: number; title: string }> = [
         { id: 1, title: 'All' }
       ]
-      list.map((data: any, index: any) => {
+      list.map((data: PharmacyListItem, index: number) => {
         let object = {
           title: data.name,
           id: index + 2
@@ -142,7 +163,7 @@ export function PrescriptionsListScreen() {
       let doctorDropdown: Array<{ id: number; title: string }> = [
         { id: 1, title: 'All' }
       ]
-      list.map((data: any, index: any) => {
+      list.map((data: ActiveDoctorItem, index: number) => {
         let object = {
           title: data.name,
           id: index + 2
@@ -154,14 +175,14 @@ export function PrescriptionsListScreen() {
     }
   }, [doctorsData])
 
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(prescriptionListFull, filter)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
-    list.map((data: any, index: any) => {
+  async function getFilteredList(list: PrescriptionListItem[], filter: string) {
+    let filteredList: PrescriptionListItem[] = []
+    list.map((data: PrescriptionListItem, index: number) => {
       let type = data.type && data.type.type ? data.type.type : ''
       if (filter === 'All') {
         filteredList = list
@@ -185,7 +206,7 @@ export function PrescriptionsListScreen() {
     let newDrugName = formData.drugName
     let newType = 'All'
     let newPharmacy = 'All'
-    let newPrescriber: any = 'All'
+    let newPrescriber: string | ActiveDoctorItem = 'All'
 
     if (formData.typeIndex !== 1) {
       newType = staticData.medicineTypeList[formData.typeIndex - 2].type
@@ -397,7 +418,7 @@ export function PrescriptionsListScreen() {
         <View />
       )}
       <ScrollView className="m-2 mx-2 w-full self-center">
-        {prescriptionList.map((data: any, index: number) => {
+        {prescriptionList.map((data: PrescriptionListItem, index: number) => {
           return (
             <TouchableOpacity
               onPress={() => {

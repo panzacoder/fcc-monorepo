@@ -3,7 +3,7 @@ import { emitSessionExpired } from 'app/utils/auth-events'
 import { BASE_URL } from 'app/utils/urlConstants'
 import { logger } from 'app/utils/logger'
 
-export type AuthHeader = any
+export type AuthHeader = Record<string, unknown>
 
 export class ApiError extends Error {
   errorCode?: string
@@ -17,7 +17,7 @@ export class ApiError extends Error {
 type FetchDataProps = {
   header: AuthHeader
   route: string
-  data?: any
+  data?: object
 }
 
 export async function fetchData<T>({

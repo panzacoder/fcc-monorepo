@@ -1,11 +1,6 @@
 {
   "compilerOptions": {
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
-    "jsxImportSource": "nativewind",
-    "strict": false,
     "noEmit": true,
-    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "app/*": ["./*"]

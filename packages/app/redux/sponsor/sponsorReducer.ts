@@ -1,10 +1,11 @@
 import { GET_SPONSOR, SET_SPONSOR } from './sponsorTypes'
+import type { AnyAction } from 'redux'
 
 const initialState = {
   header: {}
 }
 
-const sponsorReducer = (state = initialState, action) => {
+const sponsorReducer = (state = initialState, action: AnyAction) => {
   switch (action.type) {
     case GET_SPONSOR:
       return {

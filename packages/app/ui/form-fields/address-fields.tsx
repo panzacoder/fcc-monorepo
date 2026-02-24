@@ -5,7 +5,7 @@ import { getStateAndTimezoneData } from 'app/data/states'
 import { State, Timezone } from 'app/data/types'
 import { useCountries } from 'app/redux/staticData/hooks'
 import { cn } from '../utils'
-import { useFormContext } from 'react-hook-form'
+import { Control, FieldValues, useFormContext } from 'react-hook-form'
 import { useAppSelector } from 'app/redux/hooks'
 import { DropdownItem } from '../PtsDropdown'
 import { ControlledTextField } from './controlled-field'
@@ -34,7 +34,7 @@ export const addressSchema = z.object({
   // stateId: z.string()
 })
 export type AddressFieldsProps = {
-  control?: any
+  control?: Control<FieldValues>
   className?: string
   onSubmitEditing?: () => void
 }

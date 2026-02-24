@@ -2,7 +2,13 @@ import { View, ScrollView, TouchableOpacity, Linking } from 'react-native'
 import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
-export const TermsAndConditions = ({ address, cancelClicked }) => {
+export const TermsAndConditions = ({
+  address,
+  cancelClicked
+}: {
+  address: Record<string, unknown>
+  cancelClicked: (address: Record<string, unknown>) => void
+}) => {
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
   let valueStyle = 'font-400 ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {

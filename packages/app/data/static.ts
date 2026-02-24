@@ -1,4 +1,5 @@
 import { fetchData } from './base'
+import type { AuthHeader } from './base'
 import { GET_STATIC_DATA } from 'app/utils/urlConstants'
 import type { AppDispatch } from 'app/redux/hooks'
 import staticDataAction from 'app/redux/staticData/staticAction'
@@ -53,7 +54,10 @@ export interface StaticData {
   purchaseOccuranceList: PurchaseOccurance[]
   countryList: Country[]
 }
-export async function fetchStaticData(header: any, dispatch: AppDispatch) {
+export async function fetchStaticData(
+  header: AuthHeader,
+  dispatch: AppDispatch
+) {
   const staticData = await fetchData<StaticData>({
     header,
     route: GET_STATIC_DATA

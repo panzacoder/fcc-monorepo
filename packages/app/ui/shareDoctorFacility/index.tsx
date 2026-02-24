@@ -10,7 +10,13 @@ const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })
 export type Schema = z.infer<typeof schema>
-export const ShareDoctorFacility = ({ cancelClicked, shareDoctorFacility }) => {
+export const ShareDoctorFacility = ({
+  cancelClicked,
+  shareDoctorFacility
+}: {
+  cancelClicked: () => void
+  shareDoctorFacility: (email: string) => void
+}) => {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       email: ''

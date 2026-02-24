@@ -4,7 +4,15 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { cn } from 'app/ui/utils'
 
-export function AccentButton({ title, onPress, className = '' }) {
+export function AccentButton({
+  title,
+  onPress,
+  className = ''
+}: {
+  title: string
+  onPress: () => void
+  className?: string
+}) {
   const defaultClassName = 'flex flex-row items-center text-white gap-1 group'
   return (
     <TouchableOpacity

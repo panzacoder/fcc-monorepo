@@ -1,6 +1,7 @@
 import { GET_STATES_AND_TIMEZONES } from 'app/utils/urlConstants'
 import { Country, State, Timezone } from './types'
 import { fetchData } from './base'
+import type { AuthHeader } from './base'
 import { logger } from 'app/utils/logger'
 
 export type StateAndTimezoneData = {
@@ -14,7 +15,7 @@ export type StateAndTimezoneProps = {
 }
 
 export async function getStateAndTimezoneData(
-  header: any,
+  header: AuthHeader,
   { id }: StateAndTimezoneProps
 ) {
   if (!id) {

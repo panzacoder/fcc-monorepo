@@ -53,7 +53,7 @@ export async function createDoctor(
   header: AuthHeader,
   params: CreateDoctorParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<DoctorDetailsResponse>({
     header,
     route: CREATE_DOCTOR,
     data: params
@@ -64,7 +64,7 @@ export async function updateDoctor(
   header: AuthHeader,
   params: UpdateDoctorParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<DoctorDetailsResponse>({
     header,
     route: UPDATE_DOCTOR,
     data: params
@@ -75,7 +75,7 @@ export async function deleteDoctor(
   header: AuthHeader,
   params: DeleteDoctorParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_DOCTOR,
     data: params
@@ -86,7 +86,7 @@ export async function createDoctorLocation(
   header: AuthHeader,
   params: CreateDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<DoctorDetailsResponse>({
     header,
     route: CREATE_DOCTOR_LOCATION,
     data: params
@@ -97,7 +97,7 @@ export async function updateDoctorLocation(
   header: AuthHeader,
   params: UpdateDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<DoctorDetailsResponse>({
     header,
     route: UPDATE_DOCTOR_LOCATION,
     data: params
@@ -108,7 +108,7 @@ export async function deleteDoctorLocation(
   header: AuthHeader,
   params: DeleteDoctorLocationParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_DOCTOR_LOCATION,
     data: params
@@ -130,7 +130,7 @@ export async function shareDoctor(
   header: AuthHeader,
   params: ShareDoctorParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: SHARE_CONTACT_INFO,
     data: params

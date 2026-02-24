@@ -18,6 +18,36 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as Contacts from 'expo-contacts'
+import type { Member } from 'app/data/types'
+import type { JoinCircleParams } from 'app/data/circle'
+
+type AddressFormData = {
+  shortDescription: string
+  nickName: string
+  address: {
+    id: string
+    line: string
+    city: string
+    zipCode: string
+    state: {
+      name: string
+      code: string
+      namecode: string
+      description: string
+      snum: string
+      id: string
+      country: {
+        name: string
+        code: string
+        namecode: string
+        isoCode: string
+        description: string
+        id: string
+      }
+    }
+  }
+}
+
 const schema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
@@ -31,7 +61,7 @@ export function CreateCircleScreen() {
   const emailRef = useRef('')
   const fullNameRef = useRef('')
   const timeZoneIdRef = useRef('')
-  const selectedAddressRef = useRef<any>({
+  const selectedAddressRef = useRef<AddressFormData>({
     shortDescription: '',
     nickName: '',
     address: {
@@ -65,7 +95,7 @@ export function CreateCircleScreen() {
     isShowCaregiverModalWithoutEmail,
     setIsShowCaregiverModalWithoutEmail
   ] = useState(false)
-  const [circleDetails, setCircleDetails] = useState({}) as any
+  const [circleDetails, setCircleDetails] = useState<Partial<Member>>({})
   const [isYesNoClicked, setIsYesNoClicked] = useState(true)
   const [isFirstTime, setIsFirstTime] = useState(true)
   const [findEmail, setFindEmail] = useState('')
@@ -86,7 +116,7 @@ export function CreateCircleScreen() {
       setIsCircleExists(findCircleData !== null)
       setCircleDetails(findCircleData !== null ? findCircleData : {})
       if (findCircleData !== null) {
-        const found = findCircleData as any
+        const found = findCircleData as Member
         reset({
           firstName: found.firstName ? found.firstName : '',
           lastName: found.lastName ? found.lastName : ''
@@ -114,51 +144,52 @@ export function CreateCircleScreen() {
     },
     resolver: zodResolver(emailSchema)
   })
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const str = value as string
+      const obj = value as Record<string, string>
       if (index === 0) {
-        selectedAddressRef.current.nickName = value
+        selectedAddressRef.current.nickName = str
       }
       if (index === 7) {
-        selectedAddressRef.current.shortDescription = value
+        selectedAddressRef.current.shortDescription = str
       }
       if (index === 1) {
-        selectedAddressRef.current.address.line = value
+        selectedAddressRef.current.address.line = str
       }
       if (index === 2) {
-        selectedAddressRef.current.address.city = value
+        selectedAddressRef.current.address.city = str
       }
       if (index === 3) {
-        selectedAddressRef.current.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddressRef.current.address.state.country.id = value.id
-        selectedAddressRef.current.address.state.country.name = value.name
-        selectedAddressRef.current.address.state.country.code = value.code
-        selectedAddressRef.current.address.state.country.namecode =
-          value.namecode
-        selectedAddressRef.current.address.state.country.snum = value.snum
+        selectedAddressRef.current.address.state.country.id = obj.id
+        selectedAddressRef.current.address.state.country.name = obj.name
+        selectedAddressRef.current.address.state.country.code = obj.code
+        selectedAddressRef.current.address.state.country.namecode = obj.namecode
+        selectedAddressRef.current.address.state.country.snum = obj.snum
         selectedAddressRef.current.address.state.country.description =
-          value.description
+          obj.description
       }
       if (index === 5) {
-        selectedAddressRef.current.address.state.id = value.id
-        selectedAddressRef.current.address.state.name = value.name
-        selectedAddressRef.current.address.state.code = value.code
-        selectedAddressRef.current.address.state.namecode = value.namecode
-        selectedAddressRef.current.address.state.snum = value.snum
-        selectedAddressRef.current.address.state.description = value.description
+        selectedAddressRef.current.address.state.id = obj.id
+        selectedAddressRef.current.address.state.name = obj.name
+        selectedAddressRef.current.address.state.code = obj.code
+        selectedAddressRef.current.address.state.namecode = obj.namecode
+        selectedAddressRef.current.address.state.snum = obj.snum
+        selectedAddressRef.current.address.state.description = obj.description
       }
       if (index === 6) {
-        selectedAddressRef.current = value
+        selectedAddressRef.current = value as AddressFormData
       }
       if (index === 8) {
-        timeZoneIdRef.current = value.id
+        timeZoneIdRef.current = obj.id
       }
     }
   }
   function sendRequest(formData: Schema) {
-    let memberVo: any
+    let memberVo: JoinCircleParams['memberVo']
     if (isCircleExists) {
       memberVo = {
         id: circleDetails.id ? circleDetails.id : ''

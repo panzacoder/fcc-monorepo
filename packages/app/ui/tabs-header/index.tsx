@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { ComponentProps, FC, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { useAppSelector } from 'app/redux/hooks'
 import PtsNameInitials from '../PtsNameInitials'
@@ -10,9 +10,9 @@ import { clearCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 
 export type TabsHeaderProps = {
-  navigation: any
-  route: any
-  options: any
+  navigation: unknown
+  route: unknown
+  options: Record<string, unknown>
   back?: {
     title: string
     onPress: () => void
@@ -21,7 +21,7 @@ export type TabsHeaderProps = {
 
 const MenuButton: FC<{
   text: string
-  icon: any
+  icon: ComponentProps<typeof Feather>['name']
   onPress: () => void
 }> = ({ text, icon, onPress }) => {
   return (
@@ -51,7 +51,7 @@ export const TabsHeader = ({}) => {
     logoutMutation.mutate(
       { header: header },
       {
-        onSuccess: async (data: any) => {
+        onSuccess: async (data: unknown) => {
           if (!data) return
           await clearCredentials()
           router.dismissAll()

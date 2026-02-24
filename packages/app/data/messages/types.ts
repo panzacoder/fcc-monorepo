@@ -63,8 +63,7 @@ export interface CreateMessageThreadParams {
       type: string
     }
     participantList: { user: { id: number } }[]
-    messageList: Record<string, unknown>[]
-    [key: string]: unknown
+    messageList: { body: string; operation: string }[]
   }
 }
 

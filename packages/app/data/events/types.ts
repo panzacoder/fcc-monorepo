@@ -1,4 +1,4 @@
-import type { DomainPrivileges } from '../types.d'
+import type { Address, DomainPrivileges } from '../types.d'
 
 export interface EventListItem {
   id: number
@@ -20,16 +20,44 @@ export interface EventListResponse {
   eventList: EventListItem[]
 }
 
+export interface EventLocation {
+  shortDescription: string
+  nickName: string
+  address: Address
+}
+
+export interface EventNote {
+  id: number
+  shortDescription: string
+  note: string
+  occurance: { occurance: string }
+  hasMsgThread: boolean
+}
+
+export interface EventReminder {
+  id: number
+  content: string
+  date: string
+}
+
+export interface EventTransportation {
+  id: number
+  status: string
+  date: string
+  pickupLocation: string
+  dropoffLocation: string
+}
+
 export interface EventDetail {
   id: number
   date: string
   title: string
   description: string
   status: { id: number; status: string; description: string | null }
-  location: Record<string, unknown>
-  noteList: Record<string, unknown>[]
-  reminderList: Record<string, unknown>[]
-  transportationList: Record<string, unknown>[]
+  location: EventLocation
+  noteList: EventNote[]
+  reminderList: EventReminder[]
+  transportationList: EventTransportation[]
 }
 
 export interface EventDetailResponse {
@@ -49,11 +77,28 @@ export interface GetEventDetailsParams {
 }
 
 export interface CreateEventParams {
-  event: Record<string, unknown>
+  event: {
+    date: string | Date
+    title: string
+    description: string
+    member: { id: number | string }
+    location: EventLocation
+    contactList: unknown[]
+    reminderList: unknown[]
+  }
 }
 
 export interface UpdateEventParams {
-  event: Record<string, unknown>
+  event: {
+    id: number
+    date: string | Date
+    title: string
+    description: string
+    member: { id: number | string }
+    location: EventLocation
+    contactList: unknown[]
+    reminderList: unknown[]
+  }
 }
 
 export interface DeleteEventParams {
@@ -61,7 +106,12 @@ export interface DeleteEventParams {
 }
 
 export interface EventNoteParams {
-  note: Record<string, unknown>
+  note: {
+    id?: number | string
+    event: { id: number | string }
+    note: string
+    shortDescription: string
+  }
 }
 
 export interface GetEventNoteParams {
@@ -69,7 +119,12 @@ export interface GetEventNoteParams {
 }
 
 export interface EventReminderParams {
-  reminder: Record<string, unknown>
+  reminder: {
+    id?: number
+    content: string
+    date: string
+    event: { id: number | string }
+  }
 }
 
 export interface DeleteEventReminderParams {

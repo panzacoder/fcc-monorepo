@@ -9,13 +9,35 @@ import { TodayCard } from './today-card'
 import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
+import type { MemberMenu } from 'app/data/circle'
 import { Image } from 'app/ui/image'
 import { googleMapOpenUrl } from 'app/ui/utils'
 
 cssInterop(LinearGradient, {
   className: { target: 'style' }
 })
-export function CircleSummaryCard({ menuList, memberData, userDetails }) {
+
+interface MemberRouteData {
+  firstname: string
+  lastname: string
+  member?: number | string
+  address?: string
+  upcomingAppointment?: { date: string; purpose: string; location: string }
+  upcomingEvent?: { date: string; title: string }
+  [key: string]: unknown
+}
+
+interface CircleSummaryCardProps {
+  menuList: MemberMenu[]
+  memberData: MemberRouteData
+  userDetails: Record<string, unknown>
+}
+
+export function CircleSummaryCard({
+  menuList,
+  memberData,
+  userDetails
+}: CircleSummaryCardProps) {
   const router = useRouter()
   const [isSeeMore, setSeeMore] = useState(true)
   // const [isCaregiver, setIsCaregiver] = useState(false)
@@ -25,7 +47,7 @@ export function CircleSummaryCard({ menuList, memberData, userDetails }) {
     isPrescription = false,
     isMedicalDevice = false,
     isCalendar = false
-  menuList.map((data: any, index: any) => {
+  menuList.map((data: MemberMenu) => {
     if (data.menuid === 'MyCaregivers') {
       isCaregiver = true
     } else if (data.menuid === 'MyDoctors') {
@@ -61,7 +83,7 @@ export function CircleSummaryCard({ menuList, memberData, userDetails }) {
         <View className="flex-row gap-5">
           <TouchableOpacity
             onPress={() => {
-              googleMapOpenUrl(memberData.address)
+              if (memberData.address) googleMapOpenUrl(memberData.address)
             }}
             className=""
           >

@@ -8,7 +8,14 @@ export interface FindCircleParams {
 export type FindCircleResponse = Member | null
 
 export interface JoinCircleParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    id: number | string
+    firstName?: string
+    lastName?: string
+    phone?: string
+    email?: string
+    address?: Address
+  }
 }
 
 export interface JoinCircleResponse {
@@ -60,34 +67,55 @@ export interface GetMemberDetailsParams {
   member: { id: number | string }
 }
 
-export type GetMemberDetailsResponse = Record<string, any>
+export interface GetMemberDetailsResponse {
+  memberList: unknown[]
+}
 
 export interface GetMemberMenusParams {
   member: { id: number | string }
 }
 
-export type GetMemberMenusResponse = Record<string, any>
+export interface MemberMenu {
+  menuid: string
+}
+
+export interface GetMemberMenusResponse {
+  member: {
+    address: Address
+    menuList: MemberMenu[]
+  }
+}
 
 export interface AcceptSharedInfoParams {
-  doctorSharingInfo: Record<string, unknown>
+  doctorSharingInfo: {
+    id: number | string
+  }
 }
 
-export type AcceptSharedInfoResponse = Record<string, any>
+export type AcceptSharedInfoResponse = unknown
 
 export interface RejectSharedInfoParams {
-  doctorSharingInfo: Record<string, unknown>
+  doctorSharingInfo: {
+    id: number | string
+  }
 }
 
-export type RejectSharedInfoResponse = Record<string, any>
+export type RejectSharedInfoResponse = unknown
 
 export interface AcceptMemberRequestParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    familyMemberMemberId: number | string
+    isActive: boolean
+  }
 }
 
-export type AcceptMemberRequestResponse = Record<string, any>
+export type AcceptMemberRequestResponse = unknown
 
 export interface RejectMemberRequestParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    familyMemberMemberId: number | string
+    isActive: boolean
+  }
 }
 
-export type RejectMemberRequestResponse = Record<string, any>
+export type RejectMemberRequestResponse = unknown

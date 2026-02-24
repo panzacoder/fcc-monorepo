@@ -9,9 +9,45 @@ import { formatUrl } from 'app/utils/format-url'
 
 import { useAppSelector } from 'app/redux/hooks'
 
-export const CircleCard = ({ data, index, hideCirclesView }) => {
+type TransportationRequest = {
+  type: string
+  count: number
+}
+
+type UnreadMessage = {
+  unreadMessageCount: number
+}
+
+type CircleCardData = {
+  firstname?: string
+  lastname?: string
+  role?: string
+  roleuid?: string
+  sharingInfoRequests?: unknown[]
+  requestsForMember?: unknown[]
+  transportationRequests: TransportationRequest[]
+  unreadMessages: UnreadMessage[]
+  address?: unknown
+}
+
+type CircleCardProps = {
+  data: CircleCardData
+  index: number
+  hideCirclesView: (
+    show: boolean,
+    index: number,
+    isShared: boolean,
+    isTransport: boolean
+  ) => void
+}
+
+export const CircleCard = ({
+  data,
+  index,
+  hideCirclesView
+}: CircleCardProps) => {
   const router = useRouter()
-  const memberNamesList: any = useAppSelector(
+  const memberNamesList = useAppSelector(
     (state) => state.memberNames.memberNamesList
   )
   const [isLoading, setLoading] = useState(false)
@@ -32,7 +68,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   let eventTransporationCount = 0,
     appointmentTransportationCount = 0,
     totalTransportationCount = 0
-  memberData.transportationRequests.map((data: any) => {
+  memberData.transportationRequests.map((data: TransportationRequest) => {
     if (data.type === 'Appointment') {
       appointmentTransportationCount = data.count
     } else {
@@ -42,7 +78,7 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   totalTransportationCount =
     appointmentTransportationCount + eventTransporationCount
   let unreadMessages = 0
-  memberData.unreadMessages.map((data: any) => {
+  memberData.unreadMessages.map((data: UnreadMessage) => {
     unreadMessages += data.unreadMessageCount
   })
   if (memberData.requestsForMember) {
@@ -51,7 +87,9 @@ export const CircleCard = ({ data, index, hideCirclesView }) => {
   let iconStyle = 'mt-1 w-[25%] items-center'
   let textStyle =
     'ml-[-5px] h-[20px] w-[20px] rounded-[10px] bg-[#5ACC6C] text-center font-bold text-white'
-  let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
+  let backgroundColor = getColorSet(
+    (memberNamesList ?? []).indexOf(fullName) % 26
+  )
   return (
     <View className="flex-1">
       <PtsLoader loading={isLoading} />

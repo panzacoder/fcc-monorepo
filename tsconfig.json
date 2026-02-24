@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "strictNullChecks": true,
+    "strict": true,
     "noUncheckedIndexedAccess": true,
     "jsxImportSource": "nativewind",
-    "strict": false,
     "jsx": "preserve"
   },
   "extends": "expo/tsconfig.base"

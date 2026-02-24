@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { combineReducers, type AnyAction } from 'redux'
 import headerReducer from './header/headerReducer'
 import staticDataReducer from './staticData/staticReducer'
 import sponsorReducer from './sponsor/sponsorReducer'
@@ -23,7 +23,12 @@ const appReducer = combineReducers({
   messageList: messageListReducer
 })
 
-const rootReducer = (state: any, action: any) => {
+type AppState = ReturnType<typeof appReducer>
+
+const rootReducer = (
+  state: AppState | undefined,
+  action: AnyAction
+): AppState => {
   if (action.type === 'RESET_ACTION' || action.type === 'USER_LOGOUT') {
     state = undefined
   }
@@ -34,4 +39,4 @@ const rootReducer = (state: any, action: any) => {
 
   return appReducer(state, action)
 }
-export default rootReducer
+export default rootReducer as typeof appReducer

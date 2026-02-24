@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, type ComponentProps } from 'react'
 import { View, Alert } from 'react-native'
 import { useCreateAccount } from 'app/data/auth'
 import { Button } from 'app/ui/button'
@@ -25,7 +25,34 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
 
-const initialAddress: any = {
+type AddressFormData = {
+  shortDescription: string
+  nickName: string
+  address: {
+    id: string
+    line: string
+    city: string
+    zipCode: string
+    state: {
+      name: string
+      code: string
+      namecode: string
+      description: string
+      snum: string
+      id: string
+      country: {
+        name: string
+        code: string
+        namecode: string
+        isoCode: string
+        description: string
+        id: string
+      }
+    }
+  }
+}
+
+const initialAddress: AddressFormData = {
   shortDescription: '',
   nickName: '',
   address: {
@@ -83,7 +110,9 @@ const phoneSchema = z.object({
 type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
-  const selectedAddress = useRef<any>(structuredClone(initialAddress))
+  const selectedAddress = useRef<AddressFormData>(
+    structuredClone(initialAddress)
+  )
   const userPhone = useRef('')
   const createAccountMutation = useCreateAccount({})
   const [timeZone, setTimeZone] = useState('')
@@ -139,7 +168,7 @@ export function SignUpScreen() {
         }
       },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data: unknown) => {
           if (data) {
             router.push(formatUrl('/verification', { email: formData.email }))
           }
@@ -150,45 +179,47 @@ export function SignUpScreen() {
       }
     )
   }
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const str = value as string
+      const obj = value as Record<string, string>
       if (index === 0) {
-        selectedAddress.current.nickName = value
+        selectedAddress.current.nickName = str
       }
       if (index === 7) {
-        selectedAddress.current.shortDescription = value
+        selectedAddress.current.shortDescription = str
       }
       if (index === 1) {
-        selectedAddress.current.address.line = value
+        selectedAddress.current.address.line = str
       }
       if (index === 2) {
-        selectedAddress.current.address.city = value
+        selectedAddress.current.address.city = str
       }
       if (index === 3) {
-        selectedAddress.current.address.zipCode = value
+        selectedAddress.current.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddress.current.address.state.country.id = value.id
-        selectedAddress.current.address.state.country.name = value.name
-        selectedAddress.current.address.state.country.code = value.code
-        selectedAddress.current.address.state.country.namecode = value.namecode
-        selectedAddress.current.address.state.country.snum = value.snum
+        selectedAddress.current.address.state.country.id = obj.id
+        selectedAddress.current.address.state.country.name = obj.name
+        selectedAddress.current.address.state.country.code = obj.code
+        selectedAddress.current.address.state.country.namecode = obj.namecode
+        selectedAddress.current.address.state.country.snum = obj.snum
         selectedAddress.current.address.state.country.description =
-          value.description
+          obj.description
       }
       if (index === 5) {
-        selectedAddress.current.address.state.id = value.id
-        selectedAddress.current.address.state.name = value.name
-        selectedAddress.current.address.state.code = value.code
-        selectedAddress.current.address.state.namecode = value.namecode
-        selectedAddress.current.address.state.snum = value.snum
-        selectedAddress.current.address.state.description = value.description
+        selectedAddress.current.address.state.id = obj.id
+        selectedAddress.current.address.state.name = obj.name
+        selectedAddress.current.address.state.code = obj.code
+        selectedAddress.current.address.state.namecode = obj.namecode
+        selectedAddress.current.address.state.snum = obj.snum
+        selectedAddress.current.address.state.description = obj.description
       }
       if (index === 6) {
-        selectedAddress.current = value
+        selectedAddress.current = value as AddressFormData
       }
       if (index === 8) {
-        let tz = value.name ? value.name : ''
+        let tz = obj.name ? obj.name : ''
         setTimeZone(tz)
         logger.debug('timeZone', tz)
       }
@@ -196,8 +227,8 @@ export function SignUpScreen() {
     setAddress(selectedAddress.current)
     // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  async function acceptNewRequest(data: any) {}
-  const cancelClicked = (address: any) => {
+  async function acceptNewRequest(_data: unknown) {}
+  const cancelClicked = (address: Record<string, unknown>) => {
     setAddress(address)
     setIsShowPrivacyPolicy(false)
     setIsShowTerms(false)
@@ -349,8 +380,16 @@ export function SignUpScreen() {
         <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
           <PrivacyPolicy
             address={address}
-            cancelClicked={cancelClicked}
-            acceptClicked={acceptNewRequest}
+            cancelClicked={
+              cancelClicked as ComponentProps<
+                typeof PrivacyPolicy
+              >['cancelClicked']
+            }
+            acceptClicked={
+              acceptNewRequest as ComponentProps<
+                typeof PrivacyPolicy
+              >['acceptClicked']
+            }
             data={{}}
             component={'SignUp'}
           />
@@ -360,7 +399,14 @@ export function SignUpScreen() {
       )}
       {isShowTerms ? (
         <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
-          <TermsAndConditions address={address} cancelClicked={cancelClicked} />
+          <TermsAndConditions
+            address={address}
+            cancelClicked={
+              cancelClicked as ComponentProps<
+                typeof TermsAndConditions
+              >['cancelClicked']
+            }
+          />
         </View>
       ) : (
         <View />

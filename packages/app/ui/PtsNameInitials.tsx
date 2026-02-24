@@ -8,10 +8,12 @@ export type Props = {
   className?: string
 }
 const PtsNameInitials = ({ fullName, className }: Props) => {
-  const memberNamesList: any = useAppSelector(
+  const memberNamesList = useAppSelector(
     (state) => state.memberNames.memberNamesList
   )
-  let backgroundColor = getColorSet(memberNamesList.indexOf(fullName) % 26)
+  let backgroundColor = getColorSet(
+    (memberNamesList ?? []).indexOf(fullName) % 26
+  )
   return (
     <View
       className={`h-[36px] w-[36px] items-center justify-center rounded-full ${backgroundColor}`}

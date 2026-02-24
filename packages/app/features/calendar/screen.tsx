@@ -16,8 +16,9 @@ import { getUserPermission } from 'app/utils/getUserPemissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
 import { useAppSelector } from 'app/redux/hooks'
+import type { AllowedDomainObjects } from 'app/data/dashboard'
 export function CalendarScreen() {
-  const calendarPrivilegesRef = useRef<any>({})
+  const calendarPrivilegesRef = useRef<AllowedDomainObjects>({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowAddModal, setIsShowAddModal] = useState(false)
   const [calenderEvents, setCalenderEvents] = useState([])
@@ -28,7 +29,7 @@ export function CalendarScreen() {
     String(moment().format('YYYY')).toUpperCase()
   )
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
 
@@ -52,7 +53,7 @@ export function CalendarScreen() {
     }
   }, [calendarData])
 
-  function handleCurrentMonthChange(currentMonth: any) {
+  function handleCurrentMonthChange(currentMonth: { dateString: string }) {
     let changedMonth = moment(currentMonth.dateString).format('MMM')
     let changedYear = moment(currentMonth.dateString).format('YYYY')
     setCurrentMonth(changedMonth)

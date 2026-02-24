@@ -17,6 +17,7 @@ import {
 import type {
   EventListResponse,
   EventDetailResponse,
+  EventReminder,
   GetEventsParams,
   GetEventDetailsParams,
   CreateEventParams,
@@ -61,7 +62,7 @@ export async function createEvent(
   header: AuthHeader,
   params: CreateEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<EventDetailResponse>({
     header,
     route: CREATE_EVENT,
     data: params
@@ -72,7 +73,7 @@ export async function updateEvent(
   header: AuthHeader,
   params: UpdateEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<EventDetailResponse>({
     header,
     route: UPDATE_EVENT,
     data: params
@@ -83,7 +84,7 @@ export async function deleteEvent(
   header: AuthHeader,
   params: DeleteEventParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_EVENT,
     data: params
@@ -94,7 +95,7 @@ export async function createEventNote(
   header: AuthHeader,
   params: EventNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: CREATE_EVENT_NOTE,
     data: params
@@ -105,7 +106,7 @@ export async function updateEventNote(
   header: AuthHeader,
   params: EventNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_EVENT_NOTE,
     data: params
@@ -116,7 +117,7 @@ export async function deleteEventNote(
   header: AuthHeader,
   params: { note: { id: number } }
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_EVENT_NOTE,
     data: params
@@ -127,7 +128,7 @@ export async function getEventNote(
   header: AuthHeader,
   params: GetEventNoteParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: GET_EVENT_NOTE,
     data: params
@@ -138,7 +139,7 @@ export async function createEventReminder(
   header: AuthHeader,
   params: EventReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<EventReminder[]>({
     header,
     route: CREATE_EVENT_REMINDER,
     data: params
@@ -149,7 +150,7 @@ export async function updateEventReminder(
   header: AuthHeader,
   params: EventReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<EventReminder[]>({
     header,
     route: UPDATE_EVENT_REMINDER,
     data: params
@@ -160,7 +161,7 @@ export async function deleteEventReminder(
   header: AuthHeader,
   params: DeleteEventReminderParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<EventReminder[]>({
     header,
     route: DELETE_EVENT_REMINDER,
     data: params
@@ -171,7 +172,7 @@ export async function updateEventStatus(
   header: AuthHeader,
   params: UpdateEventStatusParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: UPDATE_EVENT_STATUS,
     data: params

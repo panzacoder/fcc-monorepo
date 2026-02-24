@@ -1,5 +1,16 @@
+import type { DomainPrivileges, PrivilegeAction } from '../types.d'
+
+export interface WeekDetailsMember {
+  firstname: string
+  lastname: string
+  member: number | string
+  upcomingAppointment: unknown
+  recentIncident: unknown
+  upcomingEvent: unknown
+}
+
 export interface GetWeekDetailsResponse {
-  memberList: any[]
+  memberList: WeekDetailsMember[]
   upcomingAppointmentCount: number
   upcomingEventCount: number
 }
@@ -16,10 +27,12 @@ export interface GetCalendarItemsParams {
   year: string
 }
 
+export type AllowedDomainObjects = Record<string, PrivilegeAction[]>
+
 export interface GetCalendarItemsResponse {
-  domainObjectPrivileges: any
-  allowedDomainObjects: any
-  calenderItemList: any[]
+  domainObjectPrivileges: DomainPrivileges
+  allowedDomainObjects: AllowedDomainObjects
+  calenderItemList: unknown[]
 }
 
 export interface GetConsolidatedFilterOptionsResponse {
@@ -31,8 +44,23 @@ export interface GetConsolidatedDetailsParams {
   todate: string
 }
 
+export interface MemberActivity {
+  date: string
+  type: string
+  membername: string
+  status: string
+  address: string
+  purpose: string
+  hasNotes: boolean
+  hasReminders: boolean
+  hasTransportation: boolean
+  unreadMessageCount: number
+  activeReminderCount: number
+  transportationStatus: string
+}
+
 export interface GetConsolidatedDetailsResponse {
-  memberActivityList: any[]
+  memberActivityList: MemberActivity[]
 }
 
 export interface GetFilterConsolidatedDetailsParams {

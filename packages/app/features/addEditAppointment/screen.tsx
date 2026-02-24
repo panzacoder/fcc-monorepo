@@ -27,6 +27,12 @@ import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { Typography } from 'app/ui/typography'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+import type { StaticData } from 'app/data/static'
+import type {
+  AppointmentData,
+  DoctorFacilityLocationItem
+} from 'app/data/appointments/types'
+import type { AppointmentPurpose } from 'app/data/types.d'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
@@ -40,10 +46,10 @@ type TypeResponse = {
 }
 export function AddEditAppointmentScreen() {
   const router = useRouter()
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
-  const item = useLocalSearchParams<any>()
+  ) as StaticData
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorFacilityDetails = item.doctorFacilityDetails
     ? JSON.parse(item.doctorFacilityDetails)
@@ -72,13 +78,15 @@ export function AddEditAppointmentScreen() {
       ? appointmentDetails.purpose
       : ''
   )
-  const [selectedDoctorFacility, setSelectedDoctorFacility] = useState(
-    null
-  ) as any
-  const [doctorFacilityList, setDoctorFacilityList] = useState([]) as any
-  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState(
-    []
-  ) as any
+  const [selectedDoctorFacility, setSelectedDoctorFacility] = useState<
+    number | null
+  >(null)
+  const [doctorFacilityList, setDoctorFacilityList] = useState<
+    Array<{ id: number; title: string }>
+  >([])
+  const [doctorFacilityListFull, setDoctorFacilityListFull] = useState<
+    DoctorFacilityLocationItem[]
+  >([])
   const [isShowDoctorFacilityDropdown, setIsShowDoctorFacilityDropdown] =
     useState(false)
   const [fetchDoctors, setFetchDoctors] = useState(false)
@@ -109,7 +117,7 @@ export function AddEditAppointmentScreen() {
         title: isDoctorType ? 'Add New Doctor' : 'Add New Facility'
       }
     ]
-    rawData.map(({ name }: any, index: any) => {
+    rawData.map(({ name }: DoctorFacilityLocationItem, index: number) => {
       let object = {
         id: index + 2,
         title: name
@@ -153,7 +161,7 @@ export function AddEditAppointmentScreen() {
       facilityDoctorLocationId = appointmentDetails.facilityLocation.id
     }
 
-    list.map(async (data: any, index: any) => {
+    list.map(async (data: DoctorFacilityLocationItem, index: number) => {
       if (data.locationId === facilityDoctorLocationId) {
         setFacilityDoctorIndex(index + 2)
         logger.debug('doctoFacilityIndex', String(index + 2))
@@ -163,7 +171,7 @@ export function AddEditAppointmentScreen() {
       }
     })
   }, [doctorsQuery.data, facilitiesQuery.data, fetchDoctors, fetchFacilities])
-  let typeIndex: any = -1
+  let typeIndex: number = -1
   if (!_.isEmpty(appointmentDetails) && !isLoading) {
     if (
       appointmentDetails.type &&
@@ -184,7 +192,7 @@ export function AddEditAppointmentScreen() {
   }
 
   async function addEditAppointment(formData: Schema) {
-    let appointmentData: any = {
+    let appointmentData: AppointmentData = {
       date: selectedDate,
       description: formData.description,
       appointmentPreNote: '',
@@ -219,19 +227,27 @@ export function AddEditAppointmentScreen() {
       return
     }
     const mutationCallbacks = {
-      onSuccess: (data: any) => {
+      onSuccess: (data: unknown) => {
+        const response = data as {
+          appointmentWithPreviousAppointment?: {
+            appointment?: Record<string, unknown>
+          }
+          appointment?: Record<string, unknown>
+        }
         let apptDetails = {}
         if (_.isEmpty(appointmentDetails)) {
-          apptDetails = data?.appointmentWithPreviousAppointment?.appointment
-            ? data.appointmentWithPreviousAppointment.appointment
+          apptDetails = response?.appointmentWithPreviousAppointment
+            ?.appointment
+            ? response.appointmentWithPreviousAppointment.appointment
             : {}
         } else {
           if (isFromCreateSimilar === 'true') {
-            apptDetails = data?.appointmentWithPreviousAppointment?.appointment
-              ? data.appointmentWithPreviousAppointment.appointment
+            apptDetails = response?.appointmentWithPreviousAppointment
+              ?.appointment
+              ? response.appointmentWithPreviousAppointment.appointment
               : {}
           } else {
-            apptDetails = data?.appointment ? data.appointment : {}
+            apptDetails = response?.appointment ? response.appointment : {}
           }
         }
         if (_.isEmpty(appointmentDetails)) {
@@ -247,7 +263,7 @@ export function AddEditAppointmentScreen() {
           })
         )
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         Alert.alert('', error.message || 'Failed to save appointment')
       }
     }
@@ -276,7 +292,7 @@ export function AddEditAppointmentScreen() {
     resolver: zodResolver(schema)
   })
   const purposeList = staticData.appointmentPurposeList.map(
-    (data: any, index: any) => {
+    (data: AppointmentPurpose, index: number) => {
       return {
         label: data.purpose
       }
@@ -284,24 +300,24 @@ export function AddEditAppointmentScreen() {
   )
   let typesList: Array<{ id: number; title: string }> =
     staticData.appointmentTypeList.map(
-      ({ type, id }: TypeResponse, index: any) => {
+      ({ type, id }: TypeResponse, index: number) => {
         return {
           id: index + 1,
           title: type
         }
       }
     )
-  const onSelection = (date: any) => {
+  const onSelection = (date: Date) => {
     // console.log('onSelection', '' + date)
     setSelectedDate(date)
     setKey(Math.random())
   }
-  const onSelectionPurpose = (data: any) => {
+  const onSelectionPurpose = (data: string) => {
     // purpose = data
     setPurpose(data)
     logger.debug('purpose1', purpose)
   }
-  async function setSelectedTypeChange(value: any) {
+  async function setSelectedTypeChange(value: { id: number } | null) {
     if (value) {
       setIsShowDoctorFacilityDropdown(true)
       setSelectedDoctorFacility(value.id)
@@ -317,7 +333,9 @@ export function AddEditAppointmentScreen() {
       }
     }
   }
-  async function selectedDoctorFacilityChange(value: any) {
+  async function selectedDoctorFacilityChange(
+    value: { id: number; title: string } | null
+  ) {
     if (value && !isLoading) {
       // console.log('value', JSON.stringify(value))
       if (value.title === 'Add New Doctor') {

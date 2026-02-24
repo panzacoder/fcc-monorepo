@@ -59,12 +59,29 @@ export interface GetPrescriptionParams {
   memberId: number | string
 }
 
+export interface PrescriptionMedicineInput {
+  id: number | string | null
+  name: string
+  prescribedDate: string
+  startDate: string
+  endDate: string
+  instructions: string
+  notes: string
+  strength: string
+  pharmacy: string
+  doctorName: string
+  facilityid: number | string
+  doctorid: number | string
+  member: { id: number | string }
+  type: { id: number | string }
+}
+
 export interface CreatePrescriptionParams {
-  medicine: Record<string, unknown>
+  medicine: PrescriptionMedicineInput
 }
 
 export interface UpdatePrescriptionParams {
-  medicine: Record<string, unknown>
+  medicine: PrescriptionMedicineInput
 }
 
 export interface DeletePrescriptionParams {

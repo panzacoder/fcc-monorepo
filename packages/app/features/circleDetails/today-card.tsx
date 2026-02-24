@@ -19,7 +19,7 @@ type MemberData = {
   upcomingEvent?: Event
 }
 
-function CalendarEntry({ date, title }) {
+function CalendarEntry({ date, title }: { date: string; title: string }) {
   const now = new Date()
 
   return isEqual(date, now) ? (
@@ -56,7 +56,7 @@ function EventEntry({ memberData }: { memberData: MemberData }) {
 
 type TodayCardProps = {
   memberData: MemberData
-  userDetails: any
+  userDetails: Record<string, unknown>
 }
 export function TodayCard({ memberData }: TodayCardProps) {
   const now = new Date()

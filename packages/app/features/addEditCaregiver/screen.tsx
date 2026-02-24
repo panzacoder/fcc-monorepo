@@ -24,6 +24,12 @@ import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+import type { StaticData } from 'app/data/static'
+import type {
+  FindCaregiverResult,
+  CaregiverDetailResponse,
+  CaregiverFamilyMemberInput
+} from 'app/data/caregivers'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
@@ -44,14 +50,17 @@ export function AddEditCaregiverScreen() {
   const emailRef = useRef('')
   let caregiverPhone = ''
   const router = useRouter()
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{
+    caregiverDetails?: string
+    memberData?: string
+  }>()
   let caregiverDetails = item.caregiverDetails
     ? JSON.parse(item.caregiverDetails)
     : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   const header = useAppSelector((state) => state.headerState.header)
   const [memberId, setMemberId] = useState('')
   const [memberEmail, setMemberEmail] = useState('')
@@ -82,17 +91,19 @@ export function AddEditCaregiverScreen() {
     name: string
   }
   const profileList: Array<{ id: number; title: string }> =
-    staticData.profileList.map(({ name, id }: ProfileResponse, index: any) => {
-      if (!_.isEmpty(caregiverDetails)) {
-        if (profileRef.current === name) {
-          profileIndexRef.current = index + 1
+    staticData.profileList.map(
+      ({ name, id }: ProfileResponse, index: number) => {
+        if (!_.isEmpty(caregiverDetails)) {
+          if (profileRef.current === name) {
+            profileIndexRef.current = index + 1
+          }
+        }
+        return {
+          id: index + 1,
+          title: name
         }
       }
-      return {
-        id: index + 1,
-        title: name
-      }
-    })
+    )
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       profileIndex: profileIndexRef.current,
@@ -133,17 +144,14 @@ export function AddEditCaregiverScreen() {
 
     if (searchData) {
       setIsMemberFound(true)
+      const found = searchData as FindCaregiverResult
       let name = ''
-      name += (searchData as any).firstName ? (searchData as any).firstName : ''
-      name += (searchData as any).middleName
-        ? '' + (searchData as any).middleName
-        : ''
-      name += (searchData as any).lastName
-        ? ' ' + (searchData as any).lastName
-        : ''
+      name += found.firstName ? found.firstName : ''
+      name += found.middleName ? '' + found.middleName : ''
+      name += found.lastName ? ' ' + found.lastName : ''
       setMemberName(name)
-      setMemberId((searchData as any).id ? (searchData as any).id : '')
-      setMemberEmail((searchData as any).email ? (searchData as any).email : '')
+      setMemberId(found.id ? String(found.id) : '')
+      setMemberEmail(found.email ? found.email : '')
       reset({
         email: 'default',
         firstName: 'default',
@@ -165,7 +173,7 @@ export function AddEditCaregiverScreen() {
       setSearchEmail(emailRef.current)
     }
   }
-  async function createUpdateCaregiver(object: any) {
+  async function createUpdateCaregiver(object: CaregiverFamilyMemberInput) {
     const mutation = _.isEmpty(caregiverDetails)
       ? createCaregiverMutation
       : updateCaregiverMutation
@@ -173,7 +181,7 @@ export function AddEditCaregiverScreen() {
     mutation.mutate(
       { familyMember: object },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data: CaregiverDetailResponse | null) => {
           let details = data && data.familyMember ? data.familyMember : {}
           if (_.isEmpty(caregiverDetails)) {
             router.dismiss(1)

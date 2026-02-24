@@ -30,6 +30,13 @@ import {
   useUpdateMessageThread,
   messageKeys
 } from 'app/data/messages'
+import type {
+  MessageThread,
+  Message,
+  Participant,
+  GetThreadResponse,
+  ThreadParticipant
+} from 'app/data/messages/types'
 import { useAppointmentNote, appointmentKeys } from 'app/data/appointments'
 import { useEventNote, eventKeys } from 'app/data/events'
 import { useIncidentNote, incidentKeys } from 'app/data/incidents'
@@ -53,13 +60,15 @@ export function NoteMessageScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [message, setMessage] = useState('')
   const [isMessageThread, setIsMessageThread] = useState(false)
-  const [participantsList, setParticipantsList] = useState(null) as any
-  const [messageList, setMessageList] = useState(null) as any
+  const [participantsList, setParticipantsList] = useState<
+    Participant[] | null
+  >(null)
+  const [messageList, setMessageList] = useState<Message[] | null>(null)
   const [key, setKey] = useState(0)
-  const [threadParticipantsList, setThreadParticipantsList] = useState(
-    []
-  ) as any
-  const [threadDetails, setThreadDetails] = useState(null) as any
+  const [threadParticipantsList, setThreadParticipantsList] = useState<
+    ThreadParticipant[]
+  >([])
+  const [threadDetails, setThreadDetails] = useState<MessageThread | null>(null)
   const [fetchParticipants, setFetchParticipants] = useState(false)
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
@@ -70,7 +79,7 @@ export function NoteMessageScreen() {
   const memberAddress = useAppSelector(
     (state) => state.currentMemberAddress.currentMemberAddress
   )
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let noteData =
     item.noteData && item.noteData !== undefined
       ? JSON.parse(item.noteData)
@@ -157,7 +166,7 @@ export function NoteMessageScreen() {
     }
   }
 
-  function processMessageThread(messageThread: any) {
+  function processMessageThread(messageThread: MessageThread) {
     setThreadDetails(messageThread)
     let msgList =
       messageThread.messageList !== undefined &&
@@ -171,8 +180,8 @@ export function NoteMessageScreen() {
       messageThread.participantList !== null
         ? messageThread.participantList
         : []
-    let list: any[] = []
-    participantList.map((data: any) => {
+    let list: Participant[] = []
+    participantList.map((data: Participant) => {
       if (data.participantName) {
         let object = {
           participantName: data.participantName
@@ -185,7 +194,7 @@ export function NoteMessageScreen() {
 
   useEffect(() => {
     if (isGeneral && threadData) {
-      const data = threadData as any
+      const data = threadData as GetThreadResponse
       if (data.messageThread) {
         processMessageThread(data.messageThread)
       }
@@ -195,7 +204,10 @@ export function NoteMessageScreen() {
 
   useEffect(() => {
     if (isGeneral) return
-    let noteResult: any = null
+    let noteResult: {
+      messageThread?: MessageThread
+      purchaseNote?: { messageThread?: MessageThread }
+    } | null = null
     if (isAppointment) noteResult = appointmentNoteData
     else if (isIncident) noteResult = incidentNoteData
     else if (isMedicalDevice) noteResult = medicalDeviceNoteData
@@ -232,13 +244,13 @@ export function NoteMessageScreen() {
       await messaging().onMessage((message: any) => {
         updateMessageList(message)
       })
-    } catch (e) {}
+    } catch (e: unknown) {}
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
   )
   async function updateMessageList(message: any) {
-    let messageList: any = messageListFromStore
+    let messageList: Message[] = messageListFromStore
     let messeageContent = message.data ? message.data : {}
     let messageObject = {
       sender: messeageContent.MemberId ? messeageContent.MemberId : '',
@@ -259,11 +271,11 @@ export function NoteMessageScreen() {
 
   useEffect(() => {
     if (fetchParticipants && threadParticipantsData) {
-      const data = threadParticipantsData as any
-      const list = data.map((data: any, index: any) => {
+      const data = threadParticipantsData as ThreadParticipant[]
+      const list = data.map((data: ThreadParticipant, index: number) => {
         let object = data
         let isParticipant = false
-        participantsList.map((participant: any, index: any) => {
+        participantsList!.map((participant: Participant, index: number) => {
           if (participant.participantName === data.name) {
             isParticipant = true
           }
@@ -284,7 +296,7 @@ export function NoteMessageScreen() {
     })
   }
 
-  function isParticipantSelected(index: any) {
+  function isParticipantSelected(index: number) {
     threadParticipantsList[index].isSelected =
       !threadParticipantsList[index].isSelected
     setIsRender(!isRender)
@@ -296,7 +308,7 @@ export function NoteMessageScreen() {
   async function updateMessageThreadParticipants() {
     setLoading(true)
     let list: object[] = []
-    threadParticipantsList.map((data: any, index: any) => {
+    threadParticipantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -421,27 +433,29 @@ export function NoteMessageScreen() {
               horizontal={true}
               className="w-[85%] max-w-[85%] flex-row"
             >
-              {participantsList.map((participant: any, index: number) => {
-                return (
-                  <View key={index} className="ml-2">
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (participant.participantName) {
-                          Alert.alert('', participant.participantName)
-                        }
-                      }}
-                    >
-                      <PtsNameInitials
-                        fullName={
-                          participant.participantName
-                            ? participant.participantName
-                            : ''
-                        }
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )
-              })}
+              {participantsList.map(
+                (participant: Participant, index: number) => {
+                  return (
+                    <View key={index} className="ml-2">
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (participant.participantName) {
+                            Alert.alert('', participant.participantName)
+                          }
+                        }}
+                      >
+                        <PtsNameInitials
+                          fullName={
+                            participant.participantName
+                              ? participant.participantName
+                              : ''
+                          }
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                }
+              )}
             </ScrollView>
           ) : (
             <View />
@@ -475,7 +489,7 @@ export function NoteMessageScreen() {
               }
               className="max-h-[90%] "
             >
-              {messageList.map((message: any, index: number) => {
+              {messageList.map((message: Message, index: number) => {
                 if (isValidObject(userDetails) && isValidObject(message)) {
                   if (message.sender !== userDetails.id) {
                     return (

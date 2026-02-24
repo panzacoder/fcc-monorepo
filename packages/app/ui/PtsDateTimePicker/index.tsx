@@ -12,7 +12,13 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'react-native-elements'
-export const PtsDateTimePicker = ({ currentData, onSelection }) => {
+export const PtsDateTimePicker = ({
+  currentData,
+  onSelection
+}: {
+  currentData: string | Date
+  onSelection: (date: Date) => void
+}) => {
   const selectedTimeRef = useRef<any>(new Date())
   const selectedDateRef = useRef<any>(new Date())
   // console.log('defaultValue', JSON.stringify(defaultValue))
@@ -65,14 +71,14 @@ export const PtsDateTimePicker = ({ currentData, onSelection }) => {
                 if (event.type === 'set') {
                   selectedTimeRef.current = moment(date).format('hh:mm A')
                   selectedDateRef.current = moment(date).format('DD MMM YYYY')
-                  currentData = date
+                  currentData = date as Date
                   setDateSelected(selectedDateRef.current)
                   setTimeSelected(selectedTimeRef.current)
                   cancelClicked()
                   // console.log('date', date)
                   // console.log('selectedTime', selectedTime)
                   // console.log('selectedDate', selectedDate)
-                  onSelection(date)
+                  onSelection(date as Date)
                 } else {
                   cancelClicked()
                 }

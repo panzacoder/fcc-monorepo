@@ -17,6 +17,7 @@ import type {
   UpdateCaregiverParams,
   DeleteCaregiverParams,
   FindCaregiverByEmailPhoneParams,
+  FindCaregiverResult,
   ResendCaregiverRequestParams
 } from './types'
 
@@ -55,7 +56,7 @@ export async function createCaregiver(
   header: AuthHeader,
   params: CreateCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CaregiverDetailResponse>({
     header,
     route: CREATE_CAREGIVER,
     data: params
@@ -66,7 +67,7 @@ export async function updateCaregiver(
   header: AuthHeader,
   params: UpdateCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<CaregiverDetailResponse>({
     header,
     route: UPDATE_CAREGIVER,
     data: params
@@ -77,7 +78,7 @@ export async function deleteCaregiver(
   header: AuthHeader,
   params: DeleteCaregiverParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: DELETE_CAREGIVER,
     data: {
@@ -93,7 +94,7 @@ export async function findCaregiverByEmailPhone(
   header: AuthHeader,
   params: FindCaregiverByEmailPhoneParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<FindCaregiverResult>({
     header,
     route: FIND_CAREGIVER_BY_EMAIL_PHONE,
     data: {
@@ -108,7 +109,7 @@ export async function resendCaregiverRequest(
   header: AuthHeader,
   params: ResendCaregiverRequestParams
 ) {
-  return fetchData<Record<string, unknown>>({
+  return fetchData<unknown>({
     header,
     route: RESEND_CAREGIVER_REQEST,
     data: {

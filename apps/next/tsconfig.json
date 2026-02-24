@@ -22,8 +22,8 @@
         "name": "next"
       }
     ],
-    "strict": false,
-    "strictNullChecks": true
+    "strict": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "next-env.d.ts",

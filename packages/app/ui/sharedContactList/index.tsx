@@ -2,11 +2,24 @@ import { View, ScrollView, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
+
+type SharedContact = {
+  doctorName?: string
+  facilityName?: string
+  frommemberName?: string
+}
+
+type SharedContactListProps = {
+  cancelClicked: () => void
+  sharedContactsList: SharedContact[]
+  acceptRejectClicked: (data: SharedContact, accepted: boolean) => void
+}
+
 export const SharedContactList = ({
   cancelClicked,
   sharedContactsList,
   acceptRejectClicked
-}) => {
+}: SharedContactListProps) => {
   // console.log('sharedContactsList', JSON.stringify(sharedContactsList))
   return (
     <View className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda]">
@@ -24,7 +37,7 @@ export const SharedContactList = ({
         </View>
       </View>
       <ScrollView className="">
-        {sharedContactsList.map((data: any, index: number) => {
+        {sharedContactsList.map((data: SharedContact, index: number) => {
           let doctorFacilityName = ''
           if (data.doctorName) {
             doctorFacilityName = data.doctorName

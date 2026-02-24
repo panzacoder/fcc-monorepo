@@ -2,7 +2,11 @@ import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-export const CaregiverProfileInfo = ({ cancelClicked }) => {
+export const CaregiverProfileInfo = ({
+  cancelClicked
+}: {
+  cancelClicked: () => void
+}) => {
   let titleStyle = 'font-400 w-full text-[15px] text-[#066f72] font-bold'
   let valueStyle = 'font-400 w-[95%] text-[15px] text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {

@@ -1,13 +1,64 @@
-export interface GetUserProfileParams {
-  [key: string]: any
+import type { Address } from '../types.d'
+
+export type GetUserProfileParams = object
+
+export interface ProfileAppUser {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  isFreeUser: boolean
+}
+
+export interface ProfileMember {
+  id: number
+  memberId: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: Address
+}
+
+export interface ProfileOrder {
+  date: string
+  price: number
+  status: string
+  orderItems: { description: string }[]
+}
+
+export interface ProfileUserSubscription {
+  status: string
+  plan: {
+    id: number
+    description: string
+    price: number
+    plantype: string
+  }
+  source: string
+  startDate: string
+  endDate: string
 }
 
 export interface UserProfileResponse {
-  [key: string]: any
+  appuser: ProfileAppUser
+  member: ProfileMember
+  orderList: ProfileOrder[]
+  userSubscription: ProfileUserSubscription
+  expiringSubscription: boolean
+  expiredSubscription: boolean
+  subscriptionEndDate: string
 }
 
 export interface UpdateProfileParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    id: number | string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    isMemberUpdate: boolean
+  }
 }
 
 export interface GetMemberProfileParams {
@@ -15,23 +66,29 @@ export interface GetMemberProfileParams {
 }
 
 export interface MemberProfileResponse {
-  [key: string]: any
+  id: number
+  memberId: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: Address
 }
 
 export interface AutoSubscriptionParams {
-  [key: string]: any
+  email: string
 }
 
 export interface ManualSubscriptionParams {
-  [key: string]: any
+  email: string
 }
 
 export interface CancelSubscriptionParams {
-  [key: string]: any
+  email: string
 }
 
 export interface DeleteAccountParams {
-  [key: string]: any
+  appuserVo: { email: string; credential: string }
 }
 
 export interface CheckValidCredentialParams {
@@ -43,15 +100,30 @@ export interface UpdateSponsorCodeParams {
 }
 
 export interface UpdateMemberAuthorizedCaregiverParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    id: number | string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    isMemberUpdate: boolean
+  }
 }
 
 export interface UpdateMemberAddressParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    id: number | string
+    isMemberUpdate: boolean
+    address: Address
+  }
 }
 
 export interface UpdateMemberAuthorizedCaregiverAddressParams {
-  memberVo: Record<string, unknown>
+  memberVo: {
+    id: number | string
+    isMemberUpdate: boolean
+    address: Address
+  }
 }
 
 export interface DeleteAuthorizedCaregiverParams {
@@ -67,5 +139,5 @@ export interface DeleteMemberParams {
 }
 
 export interface ReferFriendParams {
-  [key: string]: any
+  email: string
 }

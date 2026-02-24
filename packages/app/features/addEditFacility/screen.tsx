@@ -15,6 +15,9 @@ import {
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { useCreateFacility, useUpdateFacility } from 'app/data/facilities'
+import type { FacilityLocationData } from 'app/data/facilities/types'
+import type { FacilityType } from 'app/data/types'
+import type { StaticData } from 'app/data/static'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import { useForm } from 'react-hook-form'
@@ -35,9 +38,15 @@ const phoneSchema = z.object({
   locationPhone: z.string()
 })
 export type Schema = z.infer<typeof schema>
+type MemberRouteParams = {
+  member?: number | string
+  firstname?: string
+  lastname?: string
+}
+
 export function AddEditFacilityScreen() {
   const selectedTypeRef = useRef('')
-  const selectedAddressRef = useRef<any>({
+  const selectedAddressRef = useRef<FacilityLocationData>({
     shortDescription: '',
     nickName: '',
     address: {
@@ -67,17 +76,19 @@ export function AddEditFacilityScreen() {
   const isFacilityActiveRef = useRef(true)
   const locationPhoneRef = useRef('')
   const router = useRouter()
-  const staticData: any = useAppSelector(
+  const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
-  )
+  ) as StaticData
   // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const createFacilityMutation = useCreateFacility(header)
   const updateFacilityMutation = useUpdateFacility(header)
   const isLoading =
     createFacilityMutation.isPending || updateFacilityMutation.isPending
-  const item = useLocalSearchParams<any>()
-  let memberData = item.memberData ? JSON.parse(item.memberData) : {}
+  const item = useLocalSearchParams<Record<string, string>>()
+  let memberData = item.memberData
+    ? (JSON.parse(item.memberData) as MemberRouteParams)
+    : ({} as MemberRouteParams)
   let facilityDetails = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
@@ -96,11 +107,13 @@ export function AddEditFacilityScreen() {
     isFacilityActiveRef.current ? true : false
   )
   const [isPharmacy, setIsPharmacy] = useState(false)
-  const typesList = staticData.facilityTypeList.map((data: any, index: any) => {
-    return {
-      label: data.type
+  const typesList = staticData.facilityTypeList.map(
+    (data: FacilityType, index: number) => {
+      return {
+        label: data.type
+      }
     }
-  })
+  )
 
   // console.log('facilityTypeIndex', '' + facilityTypeIndex)
 
@@ -135,7 +148,7 @@ export function AddEditFacilityScreen() {
       Alert.alert('', 'Select Type')
       return
     }
-    const data: any = await updateFacilityMutation.mutateAsync({
+    const data = await updateFacilityMutation.mutateAsync({
       facility: {
         id: facilityDetails.id ? facilityDetails.id : '',
         member: {
@@ -177,7 +190,7 @@ export function AddEditFacilityScreen() {
     )
     selectedAddressRef.current.address.id = ''
     locationList.push(selectedAddressRef.current)
-    const data: any = await createFacilityMutation.mutateAsync({
+    const data = await createFacilityMutation.mutateAsync({
       facility: {
         member: {
           id: memberData.member
@@ -213,11 +226,11 @@ export function AddEditFacilityScreen() {
       }
     }
   }
-  const onSelectionType = (data: any) => {
+  const onSelectionType = (data: string) => {
     selectedTypeRef.current = data
     // console.log('purpose1', purpose)
   }
-  async function setAddressObject(value: any, index: any) {
+  async function setAddressObject(value: unknown, index: number) {
     if (value) {
       if (index === 0) {
         selectedAddressRef.current.nickName = value

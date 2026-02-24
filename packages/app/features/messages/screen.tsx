@@ -16,16 +16,28 @@ import {
   useThreadParticipants,
   useCreateMessageThread
 } from 'app/data/messages'
+import type {
+  MessageThread,
+  ThreadParticipant,
+  ParticipantDetail
+} from 'app/data/messages/types'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
+import type { PrivilegeAction } from 'app/data/types.d'
+
+type MemberRouteParams = {
+  member: number | string
+  firstname?: string
+  lastname?: string
+}
 export function MessagesScreen() {
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
-  const memberNamesList: any = useAppSelector(
+  const memberNamesList: string[] = useAppSelector(
     (state) => state.memberNames.memberNamesList
   )
   const userAddress = useAppSelector(
@@ -35,21 +47,23 @@ export function MessagesScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
   const router = useRouter()
-  const messagePrivilegesRef = useRef<any>({})
+  const messagePrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
-  const [participantsList, setParticipantsList] = useState([]) as any
+  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
+    []
+  )
   const [isShowFilter, setIsShowFilter] = useState(false)
-  const [messagesList, setMessagesList] = useState([]) as any
-  const [messagesListFull, setMessagesListFull] = useState([]) as any
+  const [messagesList, setMessagesList] = useState<MessageThread[]>([])
+  const [messagesListFull, setMessagesListFull] = useState<MessageThread[]>([])
   const [fetchParticipants, setFetchParticipants] = useState(false)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
-      ? JSON.parse(item.memberData)
-      : {}
+      ? (JSON.parse(item.memberData) as MemberRouteParams)
+      : ({} as MemberRouteParams)
 
   const threadParams = {
     member: {
@@ -87,7 +101,7 @@ export function MessagesScreen() {
           ? threadsData.domainObjectPrivileges.MESSAGETHREAD
           : threadsData.domainObjectPrivileges.MessageThread
             ? threadsData.domainObjectPrivileges.MessageThread
-            : {}
+            : []
       }
       let threadList = threadsData.threadList ? threadsData.threadList : []
       setMessagesList(threadList)
@@ -102,20 +116,25 @@ export function MessagesScreen() {
 
   useEffect(() => {
     if (fetchParticipants && participantsData) {
-      const list = participantsData.map((data: any, index: any) => {
-        let object = data
-        object.isSelected = false
-        return object
-      })
+      const list = participantsData.map(
+        (data: ThreadParticipant, index: number) => {
+          let object = data
+          object.isSelected = false
+          return object
+        }
+      )
       setParticipantsList(list)
       setIsMessageThread(true)
       setFetchParticipants(false)
     }
   }, [fetchParticipants, participantsData])
 
-  function createMessageThread(subject: any, noteData: any) {
+  function createMessageThread(
+    subject: string,
+    noteData: Record<string, unknown>
+  ) {
     let list: object[] = []
-    participantsList.map((data: any, index: any) => {
+    participantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
           user: {
@@ -138,7 +157,7 @@ export function MessagesScreen() {
         }
       },
       {
-        onSuccess: (data: any) => {
+        onSuccess: (data) => {
           setIsMessageThread(false)
           let messageData = data?.messageThread ? data.messageThread : {}
           router.push(
@@ -155,9 +174,9 @@ export function MessagesScreen() {
   function getThreadParticipants() {
     setFetchParticipants(true)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
-    list.map((data: any, index: any) => {
+  async function getFilteredList(list: MessageThread[], filter: string) {
+    let filteredList: MessageThread[] = []
+    list.map((data: MessageThread, index: number) => {
       let type = data.type && data.type.type ? data.type.type : ''
       if (filter === 'All') {
         filteredList = list
@@ -167,7 +186,7 @@ export function MessagesScreen() {
     })
     setMessagesList(filteredList)
   }
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(messagesListFull, filter)
@@ -175,7 +194,7 @@ export function MessagesScreen() {
   const cancelClicked = () => {
     setIsMessageThread(false)
   }
-  function isParticipantSelected(index: any) {
+  function isParticipantSelected(index: number) {
     participantsList[index].isSelected = !participantsList[index].isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
@@ -285,7 +304,7 @@ export function MessagesScreen() {
       )}
       {messagesList.length > 0 ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
-          {messagesList.map((data: any, index: number) => {
+          {messagesList.map((data: MessageThread, index: number) => {
             return (
               <Pressable
                 onPress={() => {
@@ -346,7 +365,7 @@ export function MessagesScreen() {
                       className="w-[95%] max-w-[95%] flex-row"
                     >
                       {data.participantDetailsList.map(
-                        (data: any, index: number) => {
+                        (data: ParticipantDetail, index: number) => {
                           let fullName = data.name ? data.name : ''
                           if (memberNamesList.includes(fullName) === false) {
                             memberNamesList.push(fullName)

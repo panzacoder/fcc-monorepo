@@ -3,7 +3,13 @@ import { Typography } from '../typography'
 import { Divider } from '../divider'
 import { ScrollView } from '../scroll-view'
 
-export function ModalScreen({ children, title }) {
+export function ModalScreen({
+  children,
+  title
+}: {
+  children: React.ReactNode
+  title: string
+}) {
   return (
     <View className="flex h-full items-center">
       <Typography

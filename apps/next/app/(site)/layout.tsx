@@ -3,7 +3,11 @@
 import { SplashBackground } from 'app/ui/splash-background'
 import { AppBar } from './app-bar'
 
-export default function SplashLayout({ children }) {
+export default function SplashLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return (
     <SplashBackground>
       <div className="grid h-full w-full max-w-screen-xl grid-cols-1 grid-rows-[min-content_1fr]">

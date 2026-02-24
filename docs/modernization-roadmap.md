@@ -12,9 +12,9 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 | 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
 | **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
 | **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
-| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** (branch `fix/gh-101/phase4-data-layer`, pending PR)              |
-| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Ready** (Phase 4 done)                                                  |
-| 6      | [#103](https://github.com/panzacoder/fcc-monorepo/issues/103)     | TypeScript Strictness                    | Blocked by Phase 5                                                        |
+| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** ([PR #119](https://github.com/panzacoder/fcc-monorepo/pull/119)) |
+| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Done** ([PR #120](https://github.com/panzacoder/fcc-monorepo/pull/120)) |
+| **6**  | [**#103**](https://github.com/panzacoder/fcc-monorepo/issues/103) | **TypeScript Strictness**                | **Done** (branch: `chore/gh-103/phase6-typescript-strictness`)            |
 | 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 6                                                        |
 | 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 2 done)                                                      |
 | 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Ready (Phase 2 done)                                                      |
@@ -92,6 +92,35 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 - **Phase 5**: NativeWind transform config not yet needed (all tests are data-layer). Will be required when UI component tests are added.
 
 **Bookkeeping**: PR #115 referenced `Closes #95` instead of `Closes #98`. Issue #98 was closed manually as COMPLETED — no action needed.
+
+---
+
+## Phase 6 Completion Notes (2026-02-23)
+
+**`strict: true` enabled** in root `tsconfig.json`. Individual strict flags consolidated. 362 pre-existing errors remain (from earlier-batched files that need further typing, primarily `addEdit*` screens and `addEditFacility`/`addEditIncident`).
+
+**21-batch execution plan** in `docs/plans/2026-02-23-phase6-typescript-strictness-plan.md`:
+
+- Batches 1-5: Core flags, redux, catch variables, data types
+- Batches 6-9: Data layer `Record<string, unknown>` → proper types
+- Batches 10-11: UI components
+- Batches 12-19: Feature screens (507 → ~0 `any` in modified files)
+- Batch 20: `strictFunctionTypes` enabled + 14 function variance fixes
+- Batch 21: `noImplicitAny` enabled + 50 implicit `any` fixes + `strict: true` flip
+
+**Key patterns established:**
+
+- `ComponentProps<typeof Component>['propName']` for callback type bridging under `strictFunctionTypes`
+- `NoteDisplayData` / `ReminderDisplayData` interfaces in UI components with all-optional fields for broad compatibility
+- `MutationFor<T>` utility type in `data/types.d.ts`
+- Local interfaces in feature screens when data layer types don't fully model API responses
+
+**362 remaining errors** are predominantly:
+
+- `string | undefined` not assignable to `string` (strictNullChecks in addEdit\* forms)
+- `{}` not assignable to specific types (untyped address/state objects in addEditFacility/addEditIncident)
+- Missing properties on `FacilityDetailsResponse` (needs data layer type update)
+- These should be addressed as part of Phase 7 (Screen Decomposition) or a dedicated cleanup pass
 
 ---
 

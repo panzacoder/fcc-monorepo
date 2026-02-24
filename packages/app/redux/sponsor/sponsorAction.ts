@@ -6,7 +6,7 @@ const getSponsor = () => {
   }
 }
 
-const setSponsor = (data) => {
+const setSponsor = (data: unknown) => {
   return {
     type: SET_SPONSOR,
     payload: data

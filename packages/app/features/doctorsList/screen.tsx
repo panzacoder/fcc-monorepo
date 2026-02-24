@@ -9,20 +9,22 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMemberDoctors } from 'app/data/doctors'
+import type { DoctorListItem } from 'app/data/doctors/types'
+import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function DoctorsListScreen() {
-  const doctorPrivilegesRef = useRef<any>({})
+  const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
-  const [doctorList, setDoctorList] = useState([]) as any
-  const [doctorListFull, setDoctorListFull] = useState([]) as any
+  const [doctorList, setDoctorList] = useState<DoctorListItem[]>([])
+  const [doctorListFull, setDoctorListFull] = useState<DoctorListItem[]>([])
   const [currentFilter, setCurrentFilter] = useState('Active')
   const [isShowFilter, setIsShowFilter] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
   let memberData = JSON.parse(item.memberData)
 
@@ -35,7 +37,7 @@ export function DoctorsListScreen() {
       if (doctorsData.domainObjectPrivileges) {
         doctorPrivilegesRef.current = doctorsData.domainObjectPrivileges.Doctor
           ? doctorsData.domainObjectPrivileges.Doctor
-          : {}
+          : []
       }
       let list = doctorsData.list ? doctorsData.list : []
       setDoctorList(list)
@@ -44,14 +46,14 @@ export function DoctorsListScreen() {
       setIsDataReceived(true)
     }
   }, [doctorsData])
-  function setFilteredList(filter: any) {
+  function setFilteredList(filter: string) {
     setIsShowFilter(false)
     setCurrentFilter(filter)
     getFilteredList(doctorListFull, filter)
   }
-  async function getFilteredList(list: any, filter: any) {
-    let filteredList: any[] = []
-    list.map((data: any, index: any) => {
+  async function getFilteredList(list: DoctorListItem[], filter: string) {
+    let filteredList: DoctorListItem[] = []
+    list.map((data: DoctorListItem, index: number) => {
       let type = data.type && data.type.type ? data.type.type : ''
       if (filter === 'All') {
         filteredList = list
@@ -148,7 +150,7 @@ export function DoctorsListScreen() {
       )}
       {isDataReceived ? (
         <ScrollView className="m-2 mx-5 w-full self-center">
-          {doctorList.map((data: any, index: number) => {
+          {doctorList.map((data: DoctorListItem, index: number) => {
             return (
               <TouchableOpacity
                 onPress={() => {
