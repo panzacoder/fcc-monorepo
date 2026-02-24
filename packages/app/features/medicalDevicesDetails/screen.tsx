@@ -624,9 +624,19 @@ export function MedicalDevicesDetailsScreen() {
                       <Note
                         component={'Medical Device'}
                         data={data}
-                        editNote={editNote}
-                        deleteNote={deleteNote}
-                        messageThreadClicked={messageThreadClicked}
+                        editNote={
+                          editNote as ComponentProps<typeof Note>['editNote']
+                        }
+                        deleteNote={
+                          deleteNote as ComponentProps<
+                            typeof Note
+                          >['deleteNote']
+                        }
+                        messageThreadClicked={
+                          messageThreadClicked as ComponentProps<
+                            typeof Note
+                          >['messageThreadClicked']
+                        }
                         notePrivileges={notePrivilegesRef.current}
                       />
                     </View>
@@ -689,8 +699,16 @@ export function MedicalDevicesDetailsScreen() {
                     <View key={index}>
                       <Reminder
                         data={data}
-                        editReminder={editReminder}
-                        deleteReminder={deleteReminder}
+                        editReminder={
+                          editReminder as ComponentProps<
+                            typeof Reminder
+                          >['editReminder']
+                        }
+                        deleteReminder={
+                          deleteReminder as ComponentProps<
+                            typeof Reminder
+                          >['deleteReminder']
+                        }
                       />
                     </View>
                   )

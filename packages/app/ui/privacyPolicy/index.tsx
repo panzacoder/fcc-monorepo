@@ -5,10 +5,10 @@ import { Typography } from '../typography'
 import { Button } from 'app/ui/button'
 
 interface PrivacyPolicyProps {
-  address: Record<string, any>
-  cancelClicked: (...args: any[]) => void
-  acceptClicked: (...args: any[]) => void
-  data: Record<string, any>
+  address: Record<string, unknown>
+  cancelClicked: (address?: Record<string, unknown>) => void | Promise<void>
+  acceptClicked: (data: Record<string, unknown>) => void | Promise<void>
+  data: Record<string, unknown>
   component: string
 }
 

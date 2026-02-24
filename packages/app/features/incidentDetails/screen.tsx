@@ -492,10 +492,24 @@ export function IncidentDetailsScreen() {
                       <Note
                         component={'Incident'}
                         data={data}
-                        editNote={editNote}
-                        deleteNote={deleteNote}
-                        messageThreadClicked={messageThreadClicked}
-                        notePrivileges={notePrivilegesRef.current}
+                        editNote={
+                          editNote as ComponentProps<typeof Note>['editNote']
+                        }
+                        deleteNote={
+                          deleteNote as ComponentProps<
+                            typeof Note
+                          >['deleteNote']
+                        }
+                        messageThreadClicked={
+                          messageThreadClicked as ComponentProps<
+                            typeof Note
+                          >['messageThreadClicked']
+                        }
+                        notePrivileges={
+                          notePrivilegesRef.current as unknown as ComponentProps<
+                            typeof Note
+                          >['notePrivileges']
+                        }
                       />
                     </View>
                   )

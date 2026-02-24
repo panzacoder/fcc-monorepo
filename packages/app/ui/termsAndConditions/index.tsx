@@ -6,8 +6,8 @@ export const TermsAndConditions = ({
   address,
   cancelClicked
 }: {
-  address: Record<string, any>
-  cancelClicked: (...args: any[]) => void
+  address: Record<string, unknown>
+  cancelClicked: (address: Record<string, unknown>) => void
 }) => {
   let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
   let valueStyle = 'font-400 ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'

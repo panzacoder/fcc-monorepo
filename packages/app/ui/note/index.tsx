@@ -5,13 +5,25 @@ import { convertTimeToUserLocalTime } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPemissions'
 import { useAppSelector } from 'app/redux/hooks'
 
+type Permission = '*' | 'Create' | 'Read' | 'Update' | 'Delete'
+
+interface NoteDisplayData {
+  id?: number | string
+  shortDescription?: string
+  note?: string
+  createdOn?: string
+  createdByName?: string
+  hasMsgThread?: boolean
+  occurance?: { occurance?: string }
+}
+
 interface NoteProps {
   component: string
-  data: Record<string, any>
-  editNote: (...args: any[]) => void
-  deleteNote: (...args: any[]) => void
-  messageThreadClicked: (...args: any[]) => void
-  notePrivileges: any
+  data: NoteDisplayData
+  editNote: (noteData: NoteDisplayData) => void | Promise<void>
+  deleteNote: (noteId: NoteDisplayData['id']) => void | Promise<void>
+  messageThreadClicked: (noteData: NoteDisplayData) => void | Promise<void>
+  notePrivileges: Permission[] | null | undefined
 }
 
 export const Note = ({

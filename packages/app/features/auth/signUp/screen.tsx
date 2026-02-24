@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, type ComponentProps } from 'react'
 import { View, Alert } from 'react-native'
 import { useCreateAccount } from 'app/data/auth'
 import { Button } from 'app/ui/button'
@@ -380,8 +380,16 @@ export function SignUpScreen() {
         <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
           <PrivacyPolicy
             address={address}
-            cancelClicked={cancelClicked}
-            acceptClicked={acceptNewRequest}
+            cancelClicked={
+              cancelClicked as ComponentProps<
+                typeof PrivacyPolicy
+              >['cancelClicked']
+            }
+            acceptClicked={
+              acceptNewRequest as ComponentProps<
+                typeof PrivacyPolicy
+              >['acceptClicked']
+            }
             data={{}}
             component={'SignUp'}
           />
@@ -391,7 +399,14 @@ export function SignUpScreen() {
       )}
       {isShowTerms ? (
         <View className="mt-[20px] h-[90%] w-full rounded-[15px] border-[1px] border-[#e0deda] bg-white">
-          <TermsAndConditions address={address} cancelClicked={cancelClicked} />
+          <TermsAndConditions
+            address={address}
+            cancelClicked={
+              cancelClicked as ComponentProps<
+                typeof TermsAndConditions
+              >['cancelClicked']
+            }
+          />
         </View>
       ) : (
         <View />

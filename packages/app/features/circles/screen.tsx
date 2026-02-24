@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ComponentProps } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -515,8 +515,16 @@ export function CirclesListScreen() {
         <View className="h-[85%] w-full">
           <PrivacyPolicy
             address={{}}
-            cancelClicked={cancelClicked}
-            acceptClicked={acceptNewRequest}
+            cancelClicked={
+              cancelClicked as ComponentProps<
+                typeof PrivacyPolicy
+              >['cancelClicked']
+            }
+            acceptClicked={
+              acceptNewRequest as ComponentProps<
+                typeof PrivacyPolicy
+              >['acceptClicked']
+            }
             data={requestData}
             component={'Circles'}
           />

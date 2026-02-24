@@ -1,16 +1,8 @@
 {
   "compilerOptions": {
-    "strictNullChecks": true,
+    "strict": true,
     "noUncheckedIndexedAccess": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictFunctionTypes": true,
-    "useUnknownInCatchVariables": true,
-    "noImplicitAny": true,
     "jsxImportSource": "nativewind",
-    "strict": false,
     "jsx": "preserve"
   },
   "extends": "expo/tsconfig.base"
