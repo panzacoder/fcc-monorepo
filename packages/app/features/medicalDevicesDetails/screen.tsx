@@ -1,6 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ComponentProps
+} from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -752,7 +758,11 @@ export function MedicalDevicesDetailsScreen() {
             noteData={noteData}
             cancelClicked={cancelClicked}
             isParticipantSelected={isParticipantSelected}
-            createMessageThread={createMessageThread}
+            createMessageThread={
+              createMessageThread as ComponentProps<
+                typeof AddMessageThread
+              >['createMessageThread']
+            }
             isUpdateParticipants={false}
           />
         </View>

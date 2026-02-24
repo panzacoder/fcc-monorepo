@@ -71,9 +71,10 @@ export function CircleDetailsScreen() {
     if (memberDetailsData) {
       const data = memberDetailsData as GetMemberDetailsResponse
       if (data.memberList) {
-        data.memberList.map((entry: Record<string, unknown>) => {
-          if (memberData.member === entry.member) {
-            setMemberData(entry)
+        data.memberList.map((entry) => {
+          const entryRecord = entry as Record<string, unknown>
+          if (memberData.member === entryRecord.member) {
+            setMemberData(entryRecord)
             logger.debug('memberData', JSON.stringify(memberData))
           }
         })

@@ -1,6 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ComponentProps
+} from 'react'
 import {
   View,
   Alert,
@@ -532,7 +538,11 @@ export function IncidentDetailsScreen() {
             component={'Incident'}
             noteData={noteData}
             cancelClicked={cancelClicked}
-            createUpdateNote={createUpdateNote}
+            createUpdateNote={
+              createUpdateNote as ComponentProps<
+                typeof AddEditNote
+              >['createUpdateNote']
+            }
           />
         </View>
       ) : (

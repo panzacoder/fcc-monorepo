@@ -27,7 +27,10 @@ import {
   useCreateMedicalDevice,
   useUpdateMedicalDevice
 } from 'app/data/medical-devices'
-import type { CreateMedicalDeviceParams } from 'app/data/medical-devices/types'
+import type {
+  CreateMedicalDeviceParams,
+  MedicalDeviceDetailsResponse
+} from 'app/data/medical-devices/types'
 import type { PurchaseType } from 'app/data/types'
 import type { StaticData } from 'app/data/static'
 const schema = z.object({
@@ -171,31 +174,41 @@ export function AddEditMedicalDeviceScreen() {
     }
     const isCreate =
       _.isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
-    const mutation = isCreate
-      ? createMedicalDeviceMutation
-      : updateMedicalDeviceMutation
-    mutation.mutate(
-      { purchase: purchaseData },
-      {
-        onSuccess: (data) => {
-          let details = data?.purchase ? data.purchase : {}
-          if (_.isEmpty(medicalDeviceDetails)) {
-            router.dismiss(1)
-          } else {
-            router.dismiss(2)
-          }
-          router.push(
-            formatUrl('/circles/medicalDeviceDetails', {
-              medicalDevicesDetails: JSON.stringify(details),
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to save medical device')
+    const mutationCallbacks = {
+      onSuccess: (data: MedicalDeviceDetailsResponse) => {
+        let details = data?.purchase ? data.purchase : {}
+        if (_.isEmpty(medicalDeviceDetails)) {
+          router.dismiss(1)
+        } else {
+          router.dismiss(2)
         }
+        router.push(
+          formatUrl('/circles/medicalDeviceDetails', {
+            medicalDevicesDetails: JSON.stringify(details),
+            memberData: JSON.stringify(memberData)
+          })
+        )
+      },
+      onError: (error: Error) => {
+        Alert.alert('', error.message || 'Failed to save medical device')
       }
-    )
+    }
+    if (isCreate) {
+      createMedicalDeviceMutation.mutate(
+        { purchase: purchaseData },
+        mutationCallbacks
+      )
+    } else {
+      updateMedicalDeviceMutation.mutate(
+        {
+          purchase: {
+            ...purchaseData,
+            id: purchaseData.id!
+          }
+        },
+        mutationCallbacks
+      )
+    }
   }
   const onSelectionType = (data: string) => {
     setSelectedType(data)

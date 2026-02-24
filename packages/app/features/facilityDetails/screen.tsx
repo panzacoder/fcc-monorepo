@@ -338,21 +338,18 @@ export function FacilityDetailsScreen() {
             </View>
             {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
-                {locationList.map(
-                  (
-                    data: FacilityLocation & Record<string, unknown>,
-                    index: number
-                  ) => {
-                    data.component = 'Facility'
-                    data.doctorFacilityId = facilityInfo.id
-                    data.memberData = memberData
-                    return (
-                      <View key={index}>
-                        <Location data={data} />
-                      </View>
-                    )
-                  }
-                )}
+                {locationList.map((data, index: number) => {
+                  const extendedData = data as FacilityLocation &
+                    Record<string, unknown>
+                  extendedData.component = 'Facility'
+                  extendedData.doctorFacilityId = facilityInfo.id
+                  extendedData.memberData = memberData
+                  return (
+                    <View key={index}>
+                      <Location data={extendedData} />
+                    </View>
+                  )
+                })}
               </ScrollView>
             ) : (
               <View />

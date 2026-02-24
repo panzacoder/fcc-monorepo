@@ -900,7 +900,11 @@ export function EventDetailsScreen() {
             component={'Event'}
             noteData={noteData}
             cancelClicked={cancelClicked}
-            createUpdateNote={createUpdateNote}
+            createUpdateNote={
+              createUpdateNote as ComponentProps<
+                typeof AddEditNote
+              >['createUpdateNote']
+            }
           />
         </View>
       ) : (
@@ -943,7 +947,11 @@ export function EventDetailsScreen() {
             noteData={noteData}
             cancelClicked={cancelClicked}
             isParticipantSelected={isParticipantSelected}
-            createMessageThread={createMessageThread}
+            createMessageThread={
+              createMessageThread as ComponentProps<
+                typeof AddMessageThread
+              >['createMessageThread']
+            }
             isUpdateParticipants={false}
           />
         </View>

@@ -39,4 +39,4 @@ const rootReducer = (
 
   return appReducer(state, action)
 }
-export default rootReducer
+export default rootReducer as typeof appReducer

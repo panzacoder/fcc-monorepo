@@ -1126,9 +1126,15 @@ export function AppointmentDetailsScreen() {
                         <Transportation
                           component={'Appointment'}
                           data={data}
-                          editTransportation={editTransportation}
+                          editTransportation={
+                            editTransportation as ComponentProps<
+                              typeof Transportation
+                            >['editTransportation']
+                          }
                           deleteResendCancelTransportation={
-                            deleteResendCancelTransportation
+                            deleteResendCancelTransportation as unknown as ComponentProps<
+                              typeof Transportation
+                            >['deleteResendCancelTransportation']
                           }
                         />
                       </View>
@@ -1228,7 +1234,11 @@ export function AppointmentDetailsScreen() {
             noteData={noteData}
             cancelClicked={cancelClicked}
             isParticipantSelected={isParticipantSelected}
-            createMessageThread={createMessageThread}
+            createMessageThread={
+              createMessageThread as ComponentProps<
+                typeof AddMessageThread
+              >['createMessageThread']
+            }
             isUpdateParticipants={false}
           />
         </View>

@@ -103,9 +103,11 @@ const PtsDropdown = React.forwardRef(function PtsDropdown(
           closeOnSubmit
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onSelectItem={(item: DropdownItem) => {
+          onSelectItem={(item) => {
             logger.debug('item', item)
-            onChangeValue?.(item)
+            if (item) {
+              onChangeValue?.(item as DropdownItem)
+            }
             item && onSubmitEditing?.()
           }}
           dataSet={dataSet}

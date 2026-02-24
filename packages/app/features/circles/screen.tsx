@@ -468,7 +468,7 @@ export function CirclesListScreen() {
               }[]
             }
             acceptRejectClicked={
-              acceptRejectClicked as (
+              acceptRejectClicked as unknown as (
                 data: {
                   doctorName?: string
                   facilityName?: string
