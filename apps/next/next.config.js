@@ -52,9 +52,6 @@ const nextConfig = {
     'react-native-web',
     'solito'
   ],
-  experimental: {
-    forceSwcTransforms: true
-  },
   async headers() {
     return [
       {

@@ -7,20 +7,20 @@ const IOSUrl =
 const APKUrl =
   'https://play.google.com/store/apps/details?id=com.familycarecircle.fccmobileapp&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { ua } = userAgent(req)
 
   if (/iP(hone|ad|od)/.test(ua)) {
     await track(
       'iOS App Store Redirect',
-      { destination: IOSUrl, location: 'middleware' },
+      { destination: IOSUrl, location: 'proxy' },
       { request: req }
     )
     return NextResponse.redirect(IOSUrl)
   } else if (/Android/.test(ua)) {
     await track(
       'Android Play Store Redirect',
-      { destination: APKUrl, location: 'middleware' },
+      { destination: APKUrl, location: 'proxy' },
       { request: req }
     )
     return NextResponse.redirect(APKUrl)
