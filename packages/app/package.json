@@ -30,14 +30,13 @@
     "react-native-safe-area-context": "4.8.2",
     "react-native-vector-icons": "^10.0.3",
     "react-native-webview": "13.6.4",
-    "react-redux": "^9.1.0",
-    "redux": "^5.0.1",
     "solito": "4.2.2",
     "tailwind-merge": "^2.2.2",
     "tailwind-variants": "^0.2.1",
     "tailwindcss": "^3.4.1",
     "toggle-switch-react-native": "^3.3.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zustand": "^5.0.11"
   },
   "scripts": {
     "lint": "eslint .",
