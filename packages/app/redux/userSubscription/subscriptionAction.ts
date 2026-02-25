@@ -13,6 +13,6 @@ const setSubscription = (data: unknown) => {
   }
 }
 
-const subcriptionAction = { getSubscription, setSubscription }
+const subscriptionAction = { getSubscription, setSubscription }
 
-export default subcriptionAction
+export default subscriptionAction

@@ -34,7 +34,7 @@ import RNIap, {
   purchaseUpdatedListener
 } from 'react-native-iap'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
+import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import sponsororAction from 'app/redux/sponsor/sponsorAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
