@@ -14,7 +14,7 @@ export type ControlledTextFieldProps<T extends FieldValues> =
   PtsTextInputProps &
     Omit<ControllerProps<T>, 'render'> & {
       inputClassName?: string
-      InputComponent?: React.ComponentType<any>
+      InputComponent?: React.ComponentType<PtsTextInputProps>
     }
 
 export function ControlledTextField<T extends FieldValues>({

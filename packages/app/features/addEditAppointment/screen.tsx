@@ -39,7 +39,6 @@ const schema = z.object({
   doctoFacilityIndex: z.number().min(0, { message: 'Select Doctor/Facility' })
 })
 export type Schema = z.infer<typeof schema>
-// let selectedDate: any = new Date()
 type TypeResponse = {
   id: number
   type: string

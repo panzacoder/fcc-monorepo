@@ -381,8 +381,7 @@ export function IncidentDetailsScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(incidentPrivileges)
-                .createPermission ? (
+              {getUserPermission(incidentPrivileges).createPermission ? (
                 <Button
                   className="w-[50%]"
                   title="Create Similar"
@@ -400,8 +399,7 @@ export function IncidentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(incidentPrivileges)
-                .updatePermission ? (
+              {getUserPermission(incidentPrivileges).updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
                   title="Edit"

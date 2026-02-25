@@ -521,8 +521,7 @@ export function MedicalDevicesDetailsScreen() {
         <ScrollView className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(medicalDevicePrivileges)
-                .createPermission ? (
+              {getUserPermission(medicalDevicePrivileges).createPermission ? (
                 <Button
                   className="w-[50%]"
                   title="Create Similar"
@@ -542,8 +541,7 @@ export function MedicalDevicesDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(medicalDevicePrivileges)
-                .updatePermission ? (
+              {getUserPermission(medicalDevicePrivileges).updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
                   title="Edit"
@@ -717,8 +715,7 @@ export function MedicalDevicesDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(medicalDevicePrivileges)
-            .deletePermission ? (
+          {getUserPermission(medicalDevicePrivileges).deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""

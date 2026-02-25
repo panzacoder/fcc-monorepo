@@ -47,21 +47,34 @@ import type {
   IosReceiptInfo,
   PlanDetail
 } from 'app/data/payment/types'
-// Platform-conditional import, types unavailable at this point
-let StripeProvider: any
-let useStripe: any
+import type { ReactNode } from 'react'
+
+interface StripeHookResult {
+  initPaymentSheet: (
+    params: Record<string, string>
+  ) => Promise<{ error?: string }>
+  presentPaymentSheet: (
+    params?: Record<string, string>
+  ) => Promise<{ error?: { code: string; message: string } }>
+  confirmPaymentSheetPayment: () => Promise<void>
+}
+
+let StripeProvider: React.ComponentType<{
+  publishableKey: string
+  setUrlSchemeOnAndroid?: boolean
+  children?: ReactNode
+}>
+let useStripe: () => StripeHookResult
 
 if (Platform.OS === 'android') {
   StripeProvider = require('@stripe/stripe-react-native').StripeProvider
   useStripe = require('@stripe/stripe-react-native').useStripe
 } else {
-  useStripe = () => {
-    return {
-      initPaymentSheet: () => {},
-      presentPaymentSheet: () => {},
-      confirmPaymentSheetPayment: () => {}
-    }
-  }
+  useStripe = () => ({
+    initPaymentSheet: async () => ({}),
+    presentPaymentSheet: async () => ({}),
+    confirmPaymentSheetPayment: async () => {}
+  })
 }
 const itemSubs = Platform.select({
   ios: [
@@ -354,7 +367,10 @@ export function PaymentsScreen() {
           RNIap.initConnection()
           RNIap.clearTransactionIOS()
         } catch (err: unknown) {
-          const code = err instanceof Error ? (err as any).code : undefined
+          const code =
+            err instanceof Error
+              ? (err as Error & { code?: string }).code
+              : undefined
           const message = err instanceof Error ? err.message : String(err)
           logger.warn(code, message)
         }

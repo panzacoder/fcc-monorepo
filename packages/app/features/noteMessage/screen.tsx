@@ -13,6 +13,7 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
@@ -238,18 +239,24 @@ export function NoteMessageScreen() {
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
-      await messaging().setBackgroundMessageHandler(async (message: any) => {
-        updateMessageList(message)
-      })
-      await messaging().onMessage((message: any) => {
-        updateMessageList(message)
-      })
+      await messaging().setBackgroundMessageHandler(
+        async (message: FirebaseMessagingTypes.RemoteMessage) => {
+          updateMessageList(message)
+        }
+      )
+      await messaging().onMessage(
+        (message: FirebaseMessagingTypes.RemoteMessage) => {
+          updateMessageList(message)
+        }
+      )
     } catch (e: unknown) {}
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
   )
-  async function updateMessageList(message: any) {
+  async function updateMessageList(
+    message: FirebaseMessagingTypes.RemoteMessage
+  ) {
     let messageList: Message[] = messageListFromStore
     let messeageContent = message.data ? message.data : {}
     let messageObject = {

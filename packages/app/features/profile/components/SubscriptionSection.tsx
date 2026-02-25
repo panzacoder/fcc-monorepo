@@ -38,7 +38,13 @@ interface SubscriptionSectionProps {
   userSubscription: Partial<ProfileUserSubscription>
   orderList: ProfileOrder[]
   isSubscribedUser: boolean
-  userProfile: { premiumFeatureTrialinfo: any }
+  userProfile: {
+    premiumFeatureTrialinfo: {
+      startDate: string
+      endDate: string
+      status: { status: string }
+    } | null
+  }
   autoSubscription: ProfileDataReturn['autoSubscription']
   manualSubscription: ProfileDataReturn['manualSubscription']
   cancelSubscription: ProfileDataReturn['cancelSubscription']

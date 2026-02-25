@@ -19,8 +19,8 @@ export const PtsDateTimePicker = ({
   currentData: string | Date
   onSelection: (date: Date) => void
 }) => {
-  const selectedTimeRef = useRef<any>(new Date())
-  const selectedDateRef = useRef<any>(new Date())
+  const selectedTimeRef = useRef<string>('')
+  const selectedDateRef = useRef<string>('')
   // console.log('defaultValue', JSON.stringify(defaultValue))
   // console.log('currentData', JSON.stringify(currentData))
   // console.log('onSelection', JSON.stringify(onSelection))
