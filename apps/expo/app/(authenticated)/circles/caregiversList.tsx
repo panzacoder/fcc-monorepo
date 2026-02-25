@@ -1,4 +1,4 @@
-import { CaregiversListScreen } from 'app/features/caregiersList/screen'
+import { CaregiversListScreen } from 'app/features/caregiversList/screen'
 import { Stack } from 'expo-router'
 export default function Caregivers() {
   return (
