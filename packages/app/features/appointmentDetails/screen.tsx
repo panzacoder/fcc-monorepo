@@ -1,13 +1,7 @@
 'use client'
 import _ from 'lodash'
 import { useState, useEffect } from 'react'
-import {
-  View,
-  Alert,
-  TouchableOpacity,
-  Linking,
-  BackHandler
-} from 'react-native'
+import { View, Alert, Linking, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
@@ -15,50 +9,21 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import type { ComponentProps } from 'react'
 import moment from 'moment'
-import {
-  useAppointmentDetails as useAppointmentDetailsQuery,
-  useDeleteAppointment,
-  useCreateAppointmentNote,
-  useUpdateAppointmentNote,
-  useDeleteAppointmentNote,
-  useCreateAppointmentReminder,
-  useUpdateAppointmentReminder,
-  useDeleteAppointmentReminder,
-  useUpdateAppointmentStatus,
-  useSendCalendarInvite
-} from 'app/data/appointments'
-import { useAllMemberDetails } from 'app/data/circle'
-import {
-  useCreateMessageThread,
-  useThreadParticipants
-} from 'app/data/messages'
-import {
-  useDeleteTransportation,
-  useResendTransportationRequest,
-  useCancelTransportationRequest
-} from 'app/data/transportation'
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import {
   formatTimeToUserLocalTime,
   convertPhoneNumberToUsaPhoneNumberFormat
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
-import { useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
-import { Note } from 'app/ui/note'
-import { Reminder } from 'app/ui/reminder'
-import { Transportation } from 'app/ui/transportation'
-import { AddEditNote } from 'app/ui/addEditNote'
-import { AddEditReminder } from 'app/ui/addEditReminder'
-import { AddEditTransport } from 'app/ui/addEditTransport'
-import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { logger } from 'app/utils/logger'
-import { usePermissions } from 'app/utils/usePermissions'
-import type { AppointmentDetailResponse } from 'app/data/appointments/types'
-import type { ThreadParticipant } from 'app/data/messages/types'
+import { useAppointmentDetailsData } from './hooks/useAppointmentDetailsData'
+import { AppointmentNotesSection } from './components/AppointmentNotesSection'
+import { AppointmentRemindersSection } from './components/AppointmentRemindersSection'
+import { AppointmentTransportationSection } from './components/AppointmentTransportationSection'
 
 interface NoteItem {
   id: number | string
@@ -135,33 +100,11 @@ export function AppointmentDetailsScreen() {
   let appointmentInfo = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
-  // let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  // console.log('appointmentInfo', '' + JSON.stringify(appointmentInfo))
-  const [isAddNote, setIsAddNote] = useState(false)
   const [memberData, setMemberData] = useState<Record<string, unknown>>(
     item.memberData ? JSON.parse(item.memberData as string) : {}
   )
-  const [isMessageThread, setIsMessageThread] = useState(false)
-  const [isAddRemider, setIsAddReminder] = useState(false)
-  const [isAddTransportation, setIsAddTransportation] = useState(false)
-  const [isRender, setIsRender] = useState(false)
-  const [noteData, setNoteData] = useState<Partial<NoteItem>>({})
-  const [isShowNotes, setIsShowNotes] = useState(false)
-  const [isShowReminder, setIsShowReminder] = useState(false)
-  const [isShowTransportation, setIsShowTransportation] = useState(false)
-  const [reminderData, setReminderData] = useState<{
-    date?: Date
-    content?: string
-    note?: string
-  }>({})
-  const [transportationData, setTransportationData] = useState<
-    Partial<TransportItem>
-  >({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [notesList, setNotesList] = useState<NoteItem[]>([])
-  const [participantsList, setParticipantsList] = useState<ThreadParticipant[]>(
-    []
-  )
   const [remindersList, setRemindersList] = useState<ReminderItem[]>([])
   const [transportationList, setTransportationList] = useState<TransportItem[]>(
     []
@@ -170,59 +113,33 @@ export function AppointmentDetailsScreen() {
     Partial<AppointmentDetailData>
   >({})
   const appointmentId = appointmentInfo.id ? Number(appointmentInfo.id) : 0
-  const {
-    data: appointmentDetailsData,
-    isLoading: isDetailsLoading,
-    refetch: refetchDetails
-  } = useAppointmentDetailsQuery(header, appointmentId)
 
-  const deleteAppointmentMutation = useDeleteAppointment(header)
-  const createNoteMutation = useCreateAppointmentNote(header)
-  const updateNoteMutation = useUpdateAppointmentNote(header)
-  const deleteNoteMutation = useDeleteAppointmentNote(header)
-  const createReminderMutation = useCreateAppointmentReminder(header)
-  const updateReminderMutation = useUpdateAppointmentReminder(header)
-  const deleteReminderMutation = useDeleteAppointmentReminder(header)
-  const updateStatusMutation = useUpdateAppointmentStatus(header)
-  const sendCalendarInviteMutation = useSendCalendarInvite(header)
-  const createMessageThreadMutation = useCreateMessageThread(header)
-  const deleteTransportationMutation = useDeleteTransportation(header)
-  const resendTransportationMutation = useResendTransportationRequest(header)
-  const cancelTransportationMutation = useCancelTransportationRequest(header)
-  const { data: allMemberDetailsData } = useAllMemberDetails(header)
-
-  const apptData_ = appointmentDetailsData as
-    | AppointmentDetailResponse
-    | undefined
-  const appointmentPrivileges = usePermissions(
-    apptData_?.domainObjectPrivileges,
-    'Appointment'
-  )
-  const notePrivileges = usePermissions(
-    apptData_?.domainObjectPrivileges,
-    'APPOINTMENTNOTE',
-    'AppointmentNote'
-  )
-  const transportationPrivileges = usePermissions(
-    apptData_?.domainObjectPrivileges,
-    'APPOINTMENTTRANSPORTATION',
-    'AppointmentTransportation'
-  )
-
-  const { refetch: refetchParticipants } = useThreadParticipants(header, {
+  const hookData = useAppointmentDetailsData(header, appointmentId, {
     member: {
       id: memberData.member ? (memberData.member as number | string) : ''
     },
     messageThreadType: { type: 'Appointment' }
   })
 
+  const {
+    data,
+    isLoading,
+    refetch,
+    appointmentPrivileges,
+    notePrivileges,
+    transportationPrivileges
+  } = hookData
+
   useEffect(() => {
-    if (allMemberDetailsData) {
-      const memberDetailsResult = allMemberDetailsData as {
-        memberList?: Array<{ member: number | string; [key: string]: unknown }>
+    if (hookData.allMemberDetailsData) {
+      const result = hookData.allMemberDetailsData as {
+        memberList?: Array<{
+          member: number | string
+          [key: string]: unknown
+        }>
       }
-      if (memberDetailsResult.memberList) {
-        memberDetailsResult.memberList.forEach((member) => {
+      if (result.memberList) {
+        result.memberList.forEach((member) => {
           if (memberData.member === member.member) {
             setMemberData(member)
             logger.debug('setMemberData', JSON.stringify(member))
@@ -230,31 +147,22 @@ export function AppointmentDetailsScreen() {
         })
       }
     }
-  }, [allMemberDetailsData])
+  }, [hookData.allMemberDetailsData])
 
   useEffect(() => {
-    if (appointmentDetailsData) {
-      const data = appointmentDetailsData as AppointmentDetailResponse
-      if (
-        data.appointmentWithPreviousAppointment &&
-        data.appointmentWithPreviousAppointment.appointment
-      ) {
+    if (data) {
+      if (data.appointmentWithPreviousAppointment?.appointment) {
         const details = data.appointmentWithPreviousAppointment
           .appointment as AppointmentDetailData
         setAppointmentDetails(details)
-        if (details.noteList) {
-          setNotesList(details.noteList)
-        }
-        if (details.reminderList) {
-          setRemindersList(details.reminderList)
-        }
-        if (details.transportationList) {
-          setTransportationList(details.transportationList)
-        }
+        setNotesList(details.noteList ?? [])
+        setRemindersList(details.reminderList ?? [])
+        setTransportationList(details.transportationList ?? [])
       }
       setIsDataReceived(true)
     }
-  }, [appointmentDetailsData])
+  }, [data])
+
   function handleBackButtonClick() {
     router.dismiss(2)
     router.push(
@@ -264,6 +172,7 @@ export function AppointmentDetailsScreen() {
     )
     return true
   }
+
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
@@ -273,6 +182,7 @@ export function AppointmentDetailsScreen() {
       )
     }
   }, [])
+
   let doctorFacilityName = '',
     specialist = '',
     phone = '',
@@ -284,6 +194,7 @@ export function AppointmentDetailsScreen() {
     purpose = '',
     description = ''
   let doctorFacilityAddress: Record<string, unknown> = {}
+
   if (!_.isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
       apptDate = formatTimeToUserLocalTime(
@@ -292,15 +203,10 @@ export function AppointmentDetailsScreen() {
         memberAddress
       )
     }
-    if (appointmentDetails.status && appointmentDetails.status.status) {
-      status = appointmentDetails.status.status
-    }
-    if (appointmentDetails.purpose) {
-      purpose = appointmentDetails.purpose
-    }
-    if (appointmentDetails.description) {
-      description = appointmentDetails.description
-    }
+    status = appointmentDetails.status?.status ?? ''
+    purpose = appointmentDetails.purpose ?? ''
+    description = appointmentDetails.description ?? ''
+
     if (appointmentDetails.doctorLocation) {
       doctorFacilityAddress = appointmentDetails.doctorLocation
       doctorFacilityAddress.component = 'Appointment'
@@ -308,433 +214,35 @@ export function AppointmentDetailsScreen() {
       doctorFacilityAddress = appointmentDetails.facilityLocation
       doctorFacilityAddress.component = 'Appointment'
     }
-    if (
-      appointmentDetails.doctorLocation &&
-      appointmentDetails.doctorLocation.doctor
-    ) {
-      if (appointmentDetails.doctorLocation.doctor.salutation) {
-        doctorFacilityName +=
-          appointmentDetails.doctorLocation.doctor.salutation + '. '
-      }
-      if (appointmentDetails.doctorLocation.doctor.firstName) {
-        doctorFacilityName += appointmentDetails.doctorLocation.doctor.firstName
-      }
-      if (appointmentDetails.doctorLocation.doctor.lastName) {
-        doctorFacilityName +=
-          ' ' + appointmentDetails.doctorLocation.doctor.lastName
-      }
-      if (appointmentDetails.doctorLocation.doctor.specialist) {
-        specialist = appointmentDetails.doctorLocation.doctor.specialist
-      }
-      if (appointmentDetails.doctorLocation.doctor.phone) {
-        phone =
-          convertPhoneNumberToUsaPhoneNumberFormat(
-            appointmentDetails.doctorLocation.doctor.phone!
-          ) ?? ''
-      }
-      if (appointmentDetails.doctorLocation.doctor.email) {
-        email = appointmentDetails.doctorLocation.doctor.email
-      }
-      if (appointmentDetails.doctorLocation.doctor.website) {
-        website = appointmentDetails.doctorLocation.doctor.website
-      }
-      if (appointmentDetails.doctorLocation.doctor.websiteuser) {
-        websiteUser = appointmentDetails.doctorLocation.doctor.websiteuser
-      }
-    } else if (
-      appointmentDetails.facilityLocation &&
-      appointmentDetails.facilityLocation.facility
-    ) {
-      if (appointmentDetails.facilityLocation.facility.name) {
-        doctorFacilityName += appointmentDetails.facilityLocation.facility.name
-      }
-      if (appointmentDetails.facilityLocation.facility.type) {
-        specialist = appointmentDetails.facilityLocation.facility.type
-      }
-      if (appointmentDetails.facilityLocation.facility.phone) {
-        phone =
-          convertPhoneNumberToUsaPhoneNumberFormat(
-            appointmentDetails.facilityLocation.facility.phone!
-          ) ?? ''
-      }
-      if (appointmentDetails.facilityLocation.facility.email) {
-        email = appointmentDetails.facilityLocation.facility.email
-      }
-      if (appointmentDetails.facilityLocation.facility.website) {
-        website = appointmentDetails.facilityLocation.facility.website
-      }
-      if (appointmentDetails.facilityLocation.facility.websiteuser) {
-        websiteUser = appointmentDetails.facilityLocation.facility.websiteuser
-      }
+
+    const doc = appointmentDetails.doctorLocation?.doctor
+    const fac = appointmentDetails.facilityLocation?.facility
+    if (doc) {
+      if (doc.salutation) doctorFacilityName += doc.salutation + '. '
+      if (doc.firstName) doctorFacilityName += doc.firstName
+      if (doc.lastName) doctorFacilityName += ' ' + doc.lastName
+      specialist = doc.specialist ?? ''
+      phone = doc.phone
+        ? convertPhoneNumberToUsaPhoneNumberFormat(doc.phone) ?? ''
+        : ''
+      email = doc.email ?? ''
+      website = doc.website ?? ''
+      websiteUser = doc.websiteuser ?? ''
+    } else if (fac) {
+      doctorFacilityName = fac.name ?? ''
+      specialist = fac.type ?? ''
+      phone = fac.phone
+        ? convertPhoneNumberToUsaPhoneNumberFormat(fac.phone) ?? ''
+        : ''
+      email = fac.email ?? ''
+      website = fac.website ?? ''
+      websiteUser = fac.websiteuser ?? ''
     }
   }
+
   let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
-  const cancelClicked = () => {
-    setIsAddNote(false)
-    setIsAddReminder(false)
-    setIsAddTransportation(false)
-    setIsMessageThread(false)
-  }
-  async function sendInvite() {
-    sendCalendarInviteMutation.mutate(
-      {
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : ''
-        }
-      },
-      {
-        onSuccess: () => {
-          Alert.alert(
-            '',
-            `Send to\n${
-              memberData.email ? memberData.email : ''
-            } . \n\nCheck your email for the appointment invite. `
-          )
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to send calendar invite')
-        }
-      }
-    )
-  }
-  function createMessageThread(subject: string, noteData: NoteItem) {
-    setNoteData(noteData)
-    let list: { user: { id: number } }[] = []
-    participantsList.map((data, index) => {
-      if (data.isSelected === true) {
-        let object = {
-          user: {
-            id: data.id
-          }
-        }
-        list.push(object)
-      }
-    })
-    createMessageThreadMutation.mutate(
-      {
-        messageThread: {
-          subject: subject,
-          member: memberData.member
-            ? (memberData.member as number | string)
-            : '',
-          noteId: noteData.id ? noteData.id : '',
-          type: {
-            type: 'Appointment'
-          },
-          participantList: list,
-          messageList: []
-        }
-      },
-      {
-        onSuccess: () => {
-          setIsMessageThread(false)
-          refetchDetails()
-          router.push(
-            formatUrl('/circles/noteMessage', {
-              component: 'Appointment',
-              memberData: JSON.stringify(memberData),
-              noteData: JSON.stringify(noteData)
-            })
-          )
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to create message thread')
-        }
-      }
-    )
-  }
-  function isParticipantSelected(index: number) {
-    const participant = participantsList[index]
-    if (participant) {
-      participant.isSelected = !participant.isSelected
-    }
-    setIsRender(!isRender)
-    setParticipantsList(participantsList)
-  }
-  function fetchThreadParticipants(noteData: NoteItem) {
-    refetchParticipants().then(({ data }) => {
-      if (data) {
-        const list = (data as ThreadParticipant[]).map((item) => {
-          let object = item
-          object.isSelected = false
-          return object
-        })
-        setParticipantsList(list)
-        setNoteData(noteData)
-        setIsMessageThread(true)
-      }
-    })
-  }
-  async function deleteAppointment() {
-    deleteAppointmentMutation.mutate(
-      {
-        appointment: {
-          id: appointmentDetails.id ? Number(appointmentDetails.id) : 0
-        }
-      },
-      {
-        onSuccess: () => {
-          router.dismiss(2)
-          router.push(
-            formatUrl('/circles/appointmentsList', {
-              memberData: JSON.stringify(memberData)
-            })
-          )
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to delete appointment')
-        }
-      }
-    )
-  }
-  async function deleteNote(noteId: number | string) {
-    deleteNoteMutation.mutate(
-      { appointmentNote: { id: Number(noteId) } },
-      {
-        onSuccess: () => {
-          refetchDetails()
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to delete note')
-        }
-      }
-    )
-  }
-  async function createUpdateNote(
-    occurance: string,
-    noteDetails: string,
-    title: string,
-    noteData: {
-      id?: number | string
-      shortDescription?: string
-      note?: string
-      occurance?: { occurance: string }
-    }
-  ) {
-    const appointmentNotePayload = {
-      appointment: {
-        id: appointmentDetails.id
-          ? appointmentDetails.id
-          : ('' as number | string)
-      },
-      occurance: {
-        occurance: occurance
-      },
-      note: noteDetails,
-      shortDescription: title
-    }
 
-    if (_.isEmpty(noteData)) {
-      createNoteMutation.mutate(
-        { appointmentNote: appointmentNotePayload },
-        {
-          onSuccess: () => {
-            setIsAddNote(false)
-            refetchDetails()
-          },
-          onError: (error) => {
-            Alert.alert('', error.message || 'Failed to create note')
-          }
-        }
-      )
-    } else {
-      const updatePayload = {
-        ...appointmentNotePayload,
-        id: noteData.id ? noteData.id : ('' as number | string)
-      }
-      updateNoteMutation.mutate(
-        { appointmentNote: updatePayload },
-        {
-          onSuccess: () => {
-            setIsAddNote(false)
-            refetchDetails()
-          },
-          onError: (error) => {
-            Alert.alert('', error.message || 'Failed to update note')
-          }
-        }
-      )
-    }
-  }
-  async function createUpdateReminder(
-    title: string,
-    date: Date,
-    reminderData: {
-      id?: number | string
-      date?: Date
-      content?: string
-      note?: string
-    }
-  ) {
-    const reminderPayload = {
-      content: title,
-      date: date as Date | string,
-      appointment: {
-        id: appointmentDetails.id
-          ? appointmentDetails.id
-          : ('' as number | string)
-      }
-    }
-
-    if (_.isEmpty(reminderData)) {
-      createReminderMutation.mutate(
-        { reminder: reminderPayload },
-        {
-          onSuccess: (data) => {
-            setIsAddReminder(false)
-            const result = data as { reminderList?: ReminderItem[] }
-            setRemindersList(result?.reminderList ? result.reminderList : [])
-          },
-          onError: (error) => {
-            Alert.alert('', error.message || 'Failed to create reminder')
-          }
-        }
-      )
-    } else {
-      const updatePayload = { ...reminderPayload, id: reminderData.id }
-      updateReminderMutation.mutate(
-        { reminder: updatePayload },
-        {
-          onSuccess: (data) => {
-            setIsAddReminder(false)
-            const result = data as { reminderList?: ReminderItem[] }
-            setRemindersList(result?.reminderList ? result.reminderList : [])
-          },
-          onError: (error) => {
-            Alert.alert('', error.message || 'Failed to update reminder')
-          }
-        }
-      )
-    }
-  }
-  async function updateStatus(status: string) {
-    updateStatusMutation.mutate(
-      {
-        appointment: {
-          id: appointmentDetails.id ? appointmentDetails.id : '',
-          status: {
-            status: status
-          },
-          member: {
-            id: memberData.member ? (memberData.member as number | string) : ''
-          }
-        }
-      },
-      {
-        onSuccess: () => {
-          refetchDetails()
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to update status')
-        }
-      }
-    )
-  }
-  async function deleteReminder(reminderData: ReminderItem) {
-    deleteReminderMutation.mutate(
-      {
-        reminder: {
-          id: reminderData.id ? reminderData.id : '',
-          appointment: {
-            id: reminderData.apointmentId ? reminderData.apointmentId : ''
-          }
-        }
-      },
-      {
-        onSuccess: (data) => {
-          const result = data as { reminderList?: ReminderItem[] }
-          setRemindersList(result?.reminderList ? result.reminderList : [])
-        },
-        onError: (error) => {
-          Alert.alert('', error.message || 'Failed to delete reminder')
-        }
-      }
-    )
-  }
-  const editNote = (noteData: NoteItem) => {
-    setNoteData(noteData)
-    setIsAddNote(true)
-  }
-  const messageThreadClicked = (noteData: NoteItem) => {
-    setNoteData(noteData)
-    if (noteData.hasMsgThread) {
-      router.push(
-        formatUrl('/circles/noteMessage', {
-          component: 'Appointment',
-          memberData: JSON.stringify(memberData),
-          noteData: JSON.stringify(noteData)
-        })
-      )
-    } else {
-      fetchThreadParticipants(noteData)
-    }
-  }
-  const editReminder = (remiderData: ReminderItem) => {
-    setReminderData(
-      remiderData as unknown as { date?: Date; content?: string; note?: string }
-    )
-    setIsAddReminder(true)
-  }
-  async function deleteResendCancelTransportation(
-    count: number,
-    transportData: TransportItem
-  ) {
-    const transportId = transportData.id ? transportData.id : ''
-    if (count === 0) {
-      deleteTransportationMutation.mutate(
-        { transportation: { id: transportId } },
-        {
-          onSuccess: () => {
-            refetchDetails()
-          },
-          onError: (error) => {
-            Alert.alert('', error.message || 'Failed to delete transportation')
-          }
-        }
-      )
-    } else if (count === 1) {
-      resendTransportationMutation.mutate(
-        { transportation: { id: transportId } },
-        {
-          onSuccess: () => {
-            refetchDetails()
-          },
-          onError: (error) => {
-            Alert.alert(
-              '',
-              error.message || 'Failed to resend transportation request'
-            )
-          }
-        }
-      )
-    } else {
-      setTransportationList([])
-      cancelTransportationMutation.mutate(
-        { transportationVo: { id: transportId } },
-        {
-          onSuccess: () => {
-            refetchDetails()
-          },
-          onError: (error) => {
-            Alert.alert(
-              '',
-              error.message || 'Failed to cancel transportation request'
-            )
-          }
-        }
-      )
-    }
-  }
-  const editTransportation = (transportationData: TransportItem) => {
-    // console.log('remiderData', JSON.stringify(transportationData))
-    setTransportationData(transportationData)
-    setIsAddTransportation(true)
-  }
-  function getWebsite(url: string) {
-    let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')
-    return newUrl
-  }
   function getDetailsView(
     title: string,
     value: string,
@@ -755,7 +263,9 @@ export function AppointmentDetailsScreen() {
               } else if (title === 'Email' && value !== '') {
                 Linking.openURL(`mailto:${value}`)
               } else if (title === 'Website' && value !== '') {
-                Linking.openURL(`http://${getWebsite(value)}`)
+                Linking.openURL(
+                  `http://${String(value).replace(/(^\w+:|^)\/\//, '')}`
+                )
               }
             }}
             className="ml-[-10px]"
@@ -770,32 +280,99 @@ export function AppointmentDetailsScreen() {
     )
   }
 
+  async function sendInvite() {
+    hookData.sendCalendarInvite.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : ''
+        }
+      },
+      {
+        onSuccess: () => {
+          Alert.alert(
+            '',
+            `Send to\n${
+              memberData.email ? memberData.email : ''
+            } . \n\nCheck your email for the appointment invite. `
+          )
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to send calendar invite')
+        }
+      }
+    )
+  }
+
+  async function deleteAppointment() {
+    hookData.deleteAppointment.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? Number(appointmentDetails.id) : 0
+        }
+      },
+      {
+        onSuccess: () => {
+          router.dismiss(2)
+          router.push(
+            formatUrl('/circles/appointmentsList', {
+              memberData: JSON.stringify(memberData)
+            })
+          )
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to delete appointment')
+        }
+      }
+    )
+  }
+
+  async function updateStatus(statusValue: string) {
+    hookData.updateStatus.mutate(
+      {
+        appointment: {
+          id: appointmentDetails.id ? appointmentDetails.id : '',
+          status: { status: statusValue },
+          member: {
+            id: memberData.member ? (memberData.member as number | string) : ''
+          }
+        }
+      },
+      {
+        onSuccess: () => {
+          refetch()
+        },
+        onError: (error) => {
+          Alert.alert('', error.message || 'Failed to update status')
+        }
+      }
+    )
+  }
+
   const isMutating =
-    deleteAppointmentMutation.isPending ||
-    createNoteMutation.isPending ||
-    updateNoteMutation.isPending ||
-    deleteNoteMutation.isPending ||
-    createReminderMutation.isPending ||
-    updateReminderMutation.isPending ||
-    deleteReminderMutation.isPending ||
-    updateStatusMutation.isPending ||
-    sendCalendarInviteMutation.isPending ||
-    createMessageThreadMutation.isPending ||
-    deleteTransportationMutation.isPending ||
-    resendTransportationMutation.isPending ||
-    cancelTransportationMutation.isPending
+    hookData.deleteAppointment.isPending ||
+    hookData.createNote.isPending ||
+    hookData.updateNote.isPending ||
+    hookData.deleteNote.isPending ||
+    hookData.createReminder.isPending ||
+    hookData.updateReminder.isPending ||
+    hookData.deleteReminder.isPending ||
+    hookData.updateStatus.isPending ||
+    hookData.sendCalendarInvite.isPending ||
+    hookData.createMessageThread.isPending ||
+    hookData.deleteTransportation.isPending ||
+    hookData.resendTransportation.isPending ||
+    hookData.cancelTransportation.isPending
 
   return (
     <View className="flex-1 ">
-      <PtsLoader loading={isDetailsLoading || isMutating} />
+      <PtsLoader loading={isLoading || isMutating} />
       <PtsBackHeader title="Appointment Details" memberData={memberData} />
       {isDataReceived ? (
         <View className=" h-full w-full flex-1 py-2">
           <ScrollView persistentScrollbar={true} className="flex-1">
             <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-                {getUserPermission(appointmentPrivileges)
-                  .createPermission ? (
+                {getUserPermission(appointmentPrivileges).createPermission ? (
                   <Button
                     className="w-[50%]"
                     title="Create Similar"
@@ -819,8 +396,7 @@ export function AppointmentDetailsScreen() {
                 ) : (
                   <View />
                 )}
-                {getUserPermission(appointmentPrivileges)
-                  .updatePermission ? (
+                {getUserPermission(appointmentPrivileges).updatePermission ? (
                   <Button
                     className="ml-[5px] w-[30%]"
                     title="Edit"
@@ -856,7 +432,6 @@ export function AppointmentDetailsScreen() {
               ) : (
                 <View />
               )}
-
               {email !== '' ? (
                 getDetailsView('Email', email, true, 'mail')
               ) : (
@@ -885,16 +460,11 @@ export function AppointmentDetailsScreen() {
               {getDetailsView('Status', status)}
               {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
-              (getUserPermission(appointmentPrivileges)
-                .createPermission ||
-                getUserPermission(appointmentPrivileges)
-                  .updatePermission ||
-                getUserPermission(appointmentPrivileges)
-                  .deletePermission) ? (
+              (getUserPermission(appointmentPrivileges).createPermission ||
+                getUserPermission(appointmentPrivileges).updatePermission ||
+                getUserPermission(appointmentPrivileges).deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
-                  {moment(
-                    appointmentDetails.date ? appointmentDetails.date : ''
-                  )
+                  {moment(appointmentDetails.date ?? '')
                     .utc()
                     .isBefore(moment().utc()) ? (
                     <Button
@@ -908,7 +478,6 @@ export function AppointmentDetailsScreen() {
                   ) : (
                     <View />
                   )}
-
                   <Button
                     className="ml-3 w-[50%] bg-[#ef6603]"
                     title="Mark Cancelled"
@@ -944,226 +513,46 @@ export function AppointmentDetailsScreen() {
               </View>
             </View>
 
-            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-              <View className=" w-full flex-row items-center">
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsShowNotes(!isShowNotes)
-                  }}
-                  className="w-[60%] flex-row"
-                >
-                  <Typography className="font-400 text-[14px] font-bold text-black">
-                    {'Notes'}
-                    {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
-                  </Typography>
-                  {notesList.length > 0 ? (
-                    <Feather
-                      className=""
-                      name={!isShowNotes ? 'chevron-down' : 'chevron-up'}
-                      size={20}
-                      color={'black'}
-                    />
-                  ) : (
-                    <View />
-                  )}
-                </TouchableOpacity>
-                {getUserPermission(notePrivileges)
-                  .createPermission ? (
-                  <Button
-                    className=""
-                    title="Add Note"
-                    leadingIcon="plus"
-                    variant="border"
-                    onPress={() => {
-                      setNoteData({})
-                      setIsAddNote(true)
-                    }}
-                  />
-                ) : (
-                  <View />
-                )}
-              </View>
+            <AppointmentNotesSection
+              appointmentId={appointmentId}
+              notesList={notesList}
+              notePrivileges={notePrivileges}
+              memberData={memberData}
+              createNoteMutation={hookData.createNote}
+              updateNoteMutation={hookData.updateNote}
+              deleteNoteMutation={hookData.deleteNote}
+              createMessageThreadMutation={hookData.createMessageThread}
+              refetchParticipants={hookData.refetchParticipants}
+              onRefetch={refetch}
+            />
 
-              {notesList.length > 0 && isShowNotes ? (
-                <ScrollView className="">
-                  {notesList.map((data, index) => {
-                    return (
-                      <View key={index}>
-                        <Note
-                          component={'Appointment'}
-                          data={data}
-                          editNote={
-                            editNote as ComponentProps<typeof Note>['editNote']
-                          }
-                          deleteNote={
-                            deleteNote as ComponentProps<
-                              typeof Note
-                            >['deleteNote']
-                          }
-                          messageThreadClicked={
-                            messageThreadClicked as ComponentProps<
-                              typeof Note
-                            >['messageThreadClicked']
-                          }
-                          notePrivileges={notePrivileges}
-                        />
-                      </View>
-                    )
-                  })}
-                </ScrollView>
-              ) : (
-                <View />
-              )}
-            </View>
+            <AppointmentRemindersSection
+              appointmentId={appointmentId}
+              appointmentDate={appointmentDetails.date ?? ''}
+              remindersList={remindersList}
+              createReminderMutation={hookData.createReminder}
+              updateReminderMutation={hookData.updateReminder}
+              deleteReminderMutation={hookData.deleteReminder}
+              onRefetch={refetch}
+            />
 
-            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-              <View className=" w-full flex-row items-center">
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsShowReminder(!isShowReminder)
-                  }}
-                  className="w-[50%] flex-row"
-                >
-                  <Typography className="font-400 text-[14px] font-bold text-black">
-                    {'Reminders'}
-                    {remindersList.length > 0
-                      ? ' (' + remindersList.length + ') '
-                      : ''}
-                  </Typography>
-                  {remindersList.length > 0 ? (
-                    <Feather
-                      className=""
-                      name={!isShowReminder ? 'chevron-down' : 'chevron-up'}
-                      size={20}
-                      color={'black'}
-                    />
-                  ) : (
-                    <View />
-                  )}
-                </TouchableOpacity>
-                {moment(appointmentDetails.date ? appointmentDetails.date : '')
-                  .utc()
-                  .isAfter(moment().utc()) ? (
-                  <Button
-                    className=""
-                    title="Add Reminder"
-                    leadingIcon="plus"
-                    variant="border"
-                    onPress={() => {
-                      setReminderData({})
-                      setIsAddReminder(true)
-                    }}
-                  />
-                ) : (
-                  <View />
-                )}
-              </View>
+            <AppointmentTransportationSection
+              appointmentId={appointmentDetails.id ?? ''}
+              appointmentDate={appointmentDetails.date ?? ''}
+              transportationList={transportationList}
+              transportationPrivileges={transportationPrivileges}
+              address={
+                doctorFacilityAddress.address
+                  ? doctorFacilityAddress.address
+                  : {}
+              }
+              deleteTransportationMutation={hookData.deleteTransportation}
+              resendTransportationMutation={hookData.resendTransportation}
+              cancelTransportationMutation={hookData.cancelTransportation}
+              onRefetch={refetch}
+            />
 
-              {remindersList.length > 0 && isShowReminder ? (
-                <ScrollView className="">
-                  {remindersList.map((data, index) => {
-                    data.apointmentId = appointmentDetails.id
-                    return (
-                      <View key={index}>
-                        <Reminder
-                          data={data}
-                          editReminder={
-                            editReminder as ComponentProps<
-                              typeof Reminder
-                            >['editReminder']
-                          }
-                          deleteReminder={
-                            deleteReminder as ComponentProps<
-                              typeof Reminder
-                            >['deleteReminder']
-                          }
-                        />
-                      </View>
-                    )
-                  })}
-                </ScrollView>
-              ) : (
-                <View />
-              )}
-            </View>
-
-            <View className="border-primary mt-[10] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
-              <View className=" w-full flex-row items-center">
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsShowTransportation(!isShowTransportation)
-                  }}
-                  className="w-[50%] flex-row"
-                >
-                  <Typography className="font-400 text-[14px] font-bold text-black">
-                    {'Transportation'}
-                    {transportationList.length > 0
-                      ? ' (' + transportationList.length + ') '
-                      : ''}
-                  </Typography>
-                  {transportationList.length > 0 ? (
-                    <Feather
-                      className=""
-                      name={
-                        !isShowTransportation ? 'chevron-down' : 'chevron-up'
-                      }
-                      size={20}
-                      color={'black'}
-                    />
-                  ) : (
-                    <View />
-                  )}
-                </TouchableOpacity>
-                {moment(appointmentDetails.date ? appointmentDetails.date : '')
-                  .utc()
-                  .isAfter(moment().utc()) &&
-                getUserPermission(transportationPrivileges)
-                  .createPermission ? (
-                  <Button
-                    className=""
-                    title="Transportation"
-                    leadingIcon="plus"
-                    variant="border"
-                    onPress={() => {
-                      setTransportationData({})
-                      setIsAddTransportation(true)
-                    }}
-                  />
-                ) : (
-                  <View />
-                )}
-              </View>
-              {transportationList.length > 0 && isShowTransportation ? (
-                <ScrollView className="">
-                  {transportationList.map((data, index) => {
-                    data.apointmentId = appointmentDetails.id
-                    return (
-                      <View key={index}>
-                        <Transportation
-                          component={'Appointment'}
-                          data={data}
-                          editTransportation={
-                            editTransportation as ComponentProps<
-                              typeof Transportation
-                            >['editTransportation']
-                          }
-                          deleteResendCancelTransportation={
-                            deleteResendCancelTransportation as unknown as ComponentProps<
-                              typeof Transportation
-                            >['deleteResendCancelTransportation']
-                          }
-                        />
-                      </View>
-                    )
-                  })}
-                </ScrollView>
-              ) : (
-                <View />
-              )}
-            </View>
-
-            {getUserPermission(appointmentPrivileges)
-              .deletePermission ? (
+            {getUserPermission(appointmentPrivileges).deletePermission ? (
               <View className="mx-5 my-5 flex-row self-center">
                 <Button
                   className="w-[50%]"
@@ -1197,66 +586,6 @@ export function AppointmentDetailsScreen() {
               <View />
             )}
           </ScrollView>
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddNote ? (
-        <View className="mt-[20] h-full w-full">
-          <AddEditNote
-            component={'Appointment'}
-            noteData={noteData}
-            cancelClicked={cancelClicked}
-            createUpdateNote={createUpdateNote}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddRemider ? (
-        <View className="mt-[20] h-full w-full">
-          <AddEditReminder
-            component={'Appointment'}
-            reminderData={reminderData}
-            cancelClicked={cancelClicked}
-            createUpdateReminder={createUpdateReminder}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
-      {isAddTransportation ? (
-        <View className="h-[95%] w-full">
-          <AddEditTransport
-            component={'Appointment'}
-            address={
-              doctorFacilityAddress.address ? doctorFacilityAddress.address : {}
-            }
-            transportData={transportationData}
-            date={
-              appointmentDetails.date ? appointmentDetails.date : new Date()
-            }
-            appointmentId={appointmentDetails.id ?? ''}
-            cancelClicked={cancelClicked}
-          />
-        </View>
-      ) : (
-        <View />
-      )}
-      {isMessageThread ? (
-        <View className="h-full w-full">
-          <AddMessageThread
-            participantsList={participantsList}
-            noteData={noteData}
-            cancelClicked={cancelClicked}
-            isParticipantSelected={isParticipantSelected}
-            createMessageThread={
-              createMessageThread as ComponentProps<
-                typeof AddMessageThread
-              >['createMessageThread']
-            }
-            isUpdateParticipants={false}
-          />
         </View>
       ) : (
         <View />
