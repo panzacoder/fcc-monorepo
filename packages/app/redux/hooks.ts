@@ -1,7 +1,12 @@
-import { useDispatch, useSelector, useStore } from 'react-redux'
-import type { AppDispatch, RootState } from './store'
-export type { AppDispatch, RootState }
+import { useStore, type AppState } from 'app/store'
+import type { StoreApi, UseBoundStore } from 'zustand'
 
-// Use throughout your app instead of plain `useDispatch` and `useSelector`
-export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
-export const useAppSelector = useSelector.withTypes<RootState>()
+export type RootState = AppState
+
+export function useAppSelector<T>(selector: (state: AppState) => T): T {
+  return useStore(selector)
+}
+
+export type AppDispatch = StoreApi<
+  AppState & ReturnType<UseBoundStore<StoreApi<AppState>>['getState']>
+>['setState']
