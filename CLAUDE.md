@@ -18,6 +18,7 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 - **Redux feature-based reducers** in `packages/app/redux/`
 - **React Hook Form + Zod** for forms
 - **No comments** unless explicitly requested
+- **Format before commit**: Run `npx prettier --write <files>` on changed files before committing
 
 ### Branch Naming
 
