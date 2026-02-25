@@ -1,0 +1,11 @@
+# Smoke test: verify app launches successfully
+# Run: maestro test flows/smoke/app-launches.yaml
+
+appId: app.familycarecircle.fcc
+---
+- launchApp:
+    clearState: true
+
+- assertVisible:
+    text: "Email Address"
+    timeout: 15000

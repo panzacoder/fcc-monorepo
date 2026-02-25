@@ -5,44 +5,48 @@ End-to-end tests for the Family Care Circle mobile app using [Maestro](https://m
 ## Prerequisites
 
 - Maestro CLI: `curl -Ls "https://get.maestro.mobile.dev" | bash`
-- Java 17+: `brew install openjdk@17`
 - iOS Simulator or Android Emulator running
-- App built and installed on simulator/emulator
+- Expo development build installed on simulator/emulator
 
 ## Running Tests
 
 ```bash
-# Single flow
-maestro test flows/auth/login.yaml
+# Smoke test: verify app launches
+maestro test flows/smoke/app-launches.yaml
 
-# All auth tests
-maestro test flows/auth/
+# Login flow (requires test credentials)
+maestro test -e TEST_PASSWORD=<password> flows/auth/login.yaml
+
+# All smoke tests
+maestro test -e TEST_PASSWORD=<password> flows/smoke/
 
 # All tests
-maestro test flows/
+maestro test -e TEST_PASSWORD=<password> flows/
 
-# With recording
-maestro record flows/auth/login.yaml
+# Record a test run (saves video)
+maestro record -e TEST_PASSWORD=<password> flows/auth/login.yaml
 ```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `TEST_EMAIL` | `test@example.com` | Set in `config.yaml`, override with `-e` |
+| `TEST_PASSWORD` | _(none)_ | **Required** — pass via CLI `-e TEST_PASSWORD=xxx` |
 
 ## Test Structure
 
 ```
 maestro/
-├── config.yaml           # Global configuration
+├── config.yaml               # Global config (appId, env defaults)
 ├── flows/
-│   ├── auth/             # Authentication flows
-│   │   ├── login.yaml
-│   │   ├── signup.yaml
-│   │   └── logout.yaml
-│   ├── appointments/     # Appointment flows
-│   │   ├── view-list.yaml
-│   │   └── create.yaml
-│   └── smoke/            # Quick smoke tests
-│       └── happy-path.yaml
-└── shared/               # Reusable sub-flows
-    ├── login.yaml
-    └── logout.yaml
+│   ├── auth/
+│   │   └── login.yaml         # Login with test credentials
+│   └── smoke/
+│       ├── app-launches.yaml  # Verify app boots to login screen
+│       └── happy-path.yaml    # Login → Home → Appointments → Back
+└── shared/
+    └── login.yaml             # Reusable login sub-flow
 ```
 
 ## Writing Tests
@@ -51,15 +55,12 @@ See [Maestro docs](https://maestro.mobile.dev/cli/write-your-first-flow) for flo
 
 Key selectors for FCC:
 
-- Text: `tapOn: "Sign In"` (exact text)
-- Accessibility: `tapOn: { id: "login-button" }` (requires testID on component)
-- Index: `tapOn: { index: 0 }` (nth element)
+- Text: `tapOn: "Sign In"` (exact text match)
+- Accessibility: `tapOn: { id: "login-button" }` (requires `testID` on component)
+- Index: `tapOn: { index: 0 }` (nth matching element)
 
-## CI Integration
-
-Add to GitHub Actions:
+Reuse the shared login sub-flow to avoid duplication:
 
 ```yaml
-- name: Run E2E tests
-  run: maestro test maestro/flows/smoke/
+- runFlow: ../shared/login.yaml
 ```
