@@ -29,10 +29,10 @@ maestro record -e TEST_PASSWORD=<password> flows/auth/login.yaml
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `TEST_EMAIL` | `test@example.com` | Set in `config.yaml`, override with `-e` |
-| `TEST_PASSWORD` | _(none)_ | **Required** — pass via CLI `-e TEST_PASSWORD=xxx` |
+| Variable        | Default            | Description                                        |
+| --------------- | ------------------ | -------------------------------------------------- |
+| `TEST_EMAIL`    | `test@example.com` | Set in `config.yaml`, override with `-e`           |
+| `TEST_PASSWORD` | _(none)_           | **Required** — pass via CLI `-e TEST_PASSWORD=xxx` |
 
 ## Test Structure
 

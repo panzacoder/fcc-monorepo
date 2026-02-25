@@ -7,5 +7,5 @@ appId: app.familycarecircle.fcc
     clearState: true
 
 - assertVisible:
-    text: "Email Address"
+    text: 'Email Address'
     timeout: 15000
