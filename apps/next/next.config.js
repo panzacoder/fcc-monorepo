@@ -52,9 +52,6 @@ const nextConfig = {
     'react-native-web',
     'solito'
   ],
-  experimental: {
-    forceSwcTransforms: true
-  },
   async headers() {
     return [
       {
@@ -69,6 +66,7 @@ const nextConfig = {
     ]
   },
   rewrites() {
+    if (!process.env.BASE_URL) return []
     return [
       {
         source: '/fccApi/2.0/:path*',

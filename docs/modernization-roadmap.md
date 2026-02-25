@@ -17,7 +17,7 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 | **6**  | [**#103**](https://github.com/panzacoder/fcc-monorepo/issues/103) | **TypeScript Strictness**                | **Done** (branch: `chore/gh-103/phase6-typescript-strictness`)            |
 | 7      | [#104](https://github.com/panzacoder/fcc-monorepo/issues/104)     | Screen Decomposition & Cleanup           | Blocked by Phase 6                                                        |
 | 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 2 done)                                                      |
-| 8B     | [#106](https://github.com/panzacoder/fcc-monorepo/issues/106)     | Next.js 14 → 16                          | Ready (Phase 2 done)                                                      |
+| **8B** | [**#106**](https://github.com/panzacoder/fcc-monorepo/issues/106) | **Next.js 14 → 16**                      | **Done** (branch: `chore/gh-106/nextjs-upgrade`)                          |
 | 8C     | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)     | Redux → Zustand                          | Ready (Phase 3 done)                                                      |
 | 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Ready (Phase 4 done)                                                      |
 | 8E-F   | [#109](https://github.com/panzacoder/fcc-monorepo/issues/109)     | Replace moment-timezone & lodash         | Ready (Phase 2 done)                                                      |
@@ -92,6 +92,29 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 - **Phase 5**: NativeWind transform config not yet needed (all tests are data-layer). Will be required when UI component tests are added.
 
 **Bookkeeping**: PR #115 referenced `Closes #95` instead of `Closes #98`. Issue #98 was closed manually as COMPLETED — no action needed.
+
+---
+
+## Phase 8B Completion Notes (2026-02-25)
+
+**Next.js upgraded 14.1.3 → 16.1.6** in two incremental steps (14→15, 15→16). React 18 retained — Next.js 16 peer deps accept `^18.2.0`, avoiding conflict with Expo SDK 50.
+
+**Breaking changes addressed:**
+
+- `middleware.ts` → `proxy.ts`, export `middleware` → `proxy` (v16 deprecation)
+- `next lint` removed in v16 — lint script changed to `eslint .` (ESLint already available via root devDeps)
+- `experimental.forceSwcTransforms` removed (no longer needed)
+- Turbopack is default bundler in v16 — `--webpack` flag added to dev/build scripts (custom webpack config for react-native-web alias and font loading)
+- `rewrites()` guard added for undefined `BASE_URL` (v15 validates destinations strictly)
+- `tsconfig.json`: `jsx` changed from `preserve` to `react-jsx` (mandated by v16)
+
+**No code changes needed in app routes or components** — the app doesn't use async request APIs (`cookies`, `headers`, `params`, `searchParams`), `next/font`, `legacyBehavior` on links, or any other deprecated patterns.
+
+**Future considerations:**
+
+- Turbopack migration: currently using `--webpack` flag. When `@expo/next-adapter` is updated or replaced, migrate webpack config to `turbopack.resolveAlias` and remove `--webpack` flag
+- React 19: coordinate with Phase 8A (Expo SDK upgrade). `react-native-web` warns about deprecated `unmountComponentAtNode` and `render` imports from `react-dom` — will break on React 19
+- `@expo/next-adapter` v6.0.0 is unchanged since 2022 — evaluate whether it's still needed or can be replaced with manual config
 
 ---
 
