@@ -55,11 +55,9 @@ export function Location({ data }: LocationProps) {
       deleteDoctorLocationMutation.mutate(
         {
           doctorLocation: {
-            id: locationData.id ? locationData.id : '',
+            id: Number(locationData.id) || 0,
             doctor: {
-              id: locationData.doctorFacilityId
-                ? locationData.doctorFacilityId
-                : ''
+              id: Number(locationData.doctorFacilityId) || 0
             }
           }
         },
@@ -171,7 +169,7 @@ export function Location({ data }: LocationProps) {
       )}
 
       <View className="w-full flex-row">
-        {locationData.address && locationData.address !== '' ? (
+        {locationData.address ? (
           <View className="w-[85%] flex-row items-center">
             <Typography className="font-400 text-[16px] text-[#1A1A1A]">
               {getAddressFromObject(locationData.address)}
@@ -242,7 +240,7 @@ export function Location({ data }: LocationProps) {
       {locationData.website && locationData.website !== '' ? (
         <TouchableOpacity
           onPress={() => {
-            Linking.openURL(`http://${getWebsite(locationData.website)}`)
+            Linking.openURL(`http://${getWebsite(locationData.website ?? '')}`)
           }}
           className="mt-2 w-[95%] flex-row items-center"
         >

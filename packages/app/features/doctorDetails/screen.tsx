@@ -17,6 +17,7 @@ import {
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { Feather } from 'app/ui/icons'
+import type { ComponentProps } from 'react'
 import {
   useDoctorDetails,
   useDeleteDoctor,
@@ -138,7 +139,7 @@ export function DoctorDetailsScreen() {
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: string
+    iconValue?: ComponentProps<typeof Feather>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -170,7 +171,7 @@ export function DoctorDetailsScreen() {
               iconPressed(title, value)
             }}
           >
-            <Feather className="" name={iconValue} size={20} color={'black'} />
+            <Feather className="" name={iconValue!} size={20} color={'black'} />
           </TouchableOpacity>
         ) : (
           <View />
@@ -180,7 +181,7 @@ export function DoctorDetailsScreen() {
   }
   async function deleteDoctor() {
     deleteDoctorMutation.mutate(
-      { doctor: { id: doctorDetails.id } },
+      { doctor: { id: doctorDetails.id ?? 0 } },
       {
         onSuccess: () => {
           router.dismiss(2)
@@ -265,7 +266,9 @@ export function DoctorDetailsScreen() {
               {doctorDetails.phone && doctorDetails.phone !== '' ? (
                 getDetailsView(
                   'Phone',
-                  convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone),
+                  convertPhoneNumberToUsaPhoneNumberFormat(
+                    doctorDetails.phone ?? ''
+                  ) ?? '',
                   true,
                   'phone'
                 )
@@ -307,8 +310,7 @@ export function DoctorDetailsScreen() {
                 doctorDetails.status && doctorDetails.status.status
                   ? doctorDetails.status.status
                   : '',
-                false,
-                ''
+                false
               )}
             </View>
           </View>

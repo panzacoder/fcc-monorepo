@@ -144,7 +144,7 @@ export const Transportation = ({
         {isIcon ? (
           <Feather
             className="ml-[-10px]"
-            name={iconValue}
+            name={iconValue ?? 'info'}
             size={20}
             color={'black'}
           />
@@ -207,8 +207,8 @@ export const Transportation = ({
   }
   async function createUpdateReminder(
     title: string,
-    date: Date | string,
-    reminderData: ReminderItem
+    date: Date,
+    reminderData: { date?: Date; content?: string; note?: string }
   ) {
     let reminderPayload: {
       content: string
@@ -221,7 +221,7 @@ export const Transportation = ({
       date: date
     }
     if (!_.isEmpty(reminderData)) {
-      reminderPayload.id = reminderData.id
+      reminderPayload.id = remindersData.id
     }
     if (component === 'Appointment') {
       reminderPayload.appointmentTransportation = {

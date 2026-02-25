@@ -43,6 +43,7 @@ import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import type {
   CheckOutSessionResponse,
   PaymentSuccessResponse,
+  PaymentUserSubscription,
   IosReceiptVerificationResponse,
   IosReceiptInfo,
   PlanDetail
@@ -157,7 +158,7 @@ export function PaymentsScreen() {
         notificationType: 'PTS_PURCHASED',
         notificationUUID: '',
         subtype: '',
-        email: userDetails.email,
+        email: userDetails.email ?? '',
         version: '',
         renewableInfo: {
           expirationIntent: '1',
@@ -200,11 +201,11 @@ export function PaymentsScreen() {
     try {
       const data: CheckOutSessionResponse =
         await checkOutSessionMutation.mutateAsync({
-          user: { email: userDetails.email },
+          user: { email: userDetails.email ?? '' },
           order: {
             id: null,
             description: null,
-            email: userDetails.email,
+            email: userDetails.email ?? '',
             price: planDetails.price ? '' + planDetails.price : '',
             currency: null,
             status: null,
@@ -275,7 +276,7 @@ export function PaymentsScreen() {
         onSuccess: async (data: PaymentSuccessResponse) => {
           logger.debug('payment response', data)
           if (data) {
-            let userSubscription =
+            let userSubscription: Partial<PaymentUserSubscription> =
               data.userDetails && data.userDetails.userSubscription
                 ? data.userDetails.userSubscription
                 : {}
@@ -386,7 +387,7 @@ export function PaymentsScreen() {
           async (purchase: InAppPurchase | SubscriptionPurchase) => {
             const receipt = purchase.transactionReceipt
               ? purchase.transactionReceipt
-              : purchase.originalJson
+              : (purchase as unknown as Record<string, string>).originalJson
             if (receipt) {
               try {
                 verifyInAppPurchaseReceipt(receipt)

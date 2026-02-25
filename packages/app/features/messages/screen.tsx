@@ -37,9 +37,8 @@ type MemberRouteParams = {
 export function MessagesScreen() {
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
-  const memberNamesList: string[] = useAppSelector(
-    (state) => state.memberNames.memberNamesList
-  )
+  const memberNamesList: string[] =
+    useAppSelector((state) => state.memberNames.memberNamesList) ?? []
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -130,7 +129,7 @@ export function MessagesScreen() {
     subject: string,
     noteData: Record<string, unknown>
   ) {
-    let list: object[] = []
+    let list: { user: { id: number } }[] = []
     participantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
@@ -192,7 +191,9 @@ export function MessagesScreen() {
     setIsMessageThread(false)
   }
   function isParticipantSelected(index: number) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+    const participant = participantsList[index]
+    if (!participant) return
+    participant.isSelected = !participant.isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }

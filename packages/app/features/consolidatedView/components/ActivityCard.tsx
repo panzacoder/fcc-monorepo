@@ -5,6 +5,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import type { MemberActivity } from 'app/data/dashboard/types'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import type { TimezoneHolder } from 'app/ui/utils'
 
 const ACTIVITY_NAMES: Record<string, string> = {
   'Doctor Appointment': 'Doctor',
@@ -22,8 +23,8 @@ const ACTIVITY_COLORS: Record<string, string> = {
 
 interface ActivityCardProps {
   data: MemberActivity
-  userAddress: string
-  memberAddress: string
+  userAddress: TimezoneHolder
+  memberAddress: TimezoneHolder
   onPress: (data: MemberActivity) => void
 }
 

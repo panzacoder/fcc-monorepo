@@ -134,7 +134,9 @@ export function EventNotesSection({
       {
         messageThread: {
           subject: subject,
-          member: memberData.member ? memberData.member : '',
+          member: memberData.member
+            ? (memberData.member as number | string)
+            : '',
           noteId: currentNoteData.id ? currentNoteData.id : '',
           type: {
             type: 'Event'

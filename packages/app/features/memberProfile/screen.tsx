@@ -272,7 +272,7 @@ export function MemberProfileScreen() {
                   className="font-400 text-primary ml-2 w-[70%] text-[15px] font-bold"
                 >
                   {convertPhoneNumberToUsaPhoneNumberFormat(
-                    memberDetails.phone
+                    memberDetails.phone ?? ''
                   )}
                 </Typography>
               </View>

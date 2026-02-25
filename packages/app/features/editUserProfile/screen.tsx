@@ -100,8 +100,8 @@ export function EditUserProfileScreen() {
       {
         onSuccess: (data: ProfileMember | null) => {
           logger.debug('datatat ', JSON.stringify(data))
-          let fullName = data.firstName ? data.firstName : ''
-          fullName += data.lastName ? ' ' + data.lastName : ''
+          let fullName = data?.firstName ? data.firstName : ''
+          fullName += data?.lastName ? ' ' + data.lastName : ''
           user.memberName = fullName
           dispatch(userProfileAction.setUserProfile(user))
           router.dismiss(2)
@@ -149,7 +149,7 @@ export function EditUserProfileScreen() {
             className="w-[95%] self-center"
             keyboard="number-pad"
             onChangeText={(value) => {
-              userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value)
+              userPhone = convertPhoneNumberToUsaPhoneNumberFormat(value) ?? ''
               reset2({
                 phone: userPhone
               })

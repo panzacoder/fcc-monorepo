@@ -49,7 +49,7 @@ export function PrescriptionDetailsScreen() {
       if (data.domainObjectPrivileges) {
         prescriptionPrivilegesRef.current = data.domainObjectPrivileges.Medicine
           ? data.domainObjectPrivileges.Medicine
-          : {}
+          : []
       }
       setPrescriptionDetails(data.medicine ? data.medicine : {})
     }

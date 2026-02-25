@@ -18,6 +18,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
@@ -90,10 +91,12 @@ export function MedicalDevicesListScreen() {
   function filterDevice(formData: Schema) {
     const month =
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     const year =
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     setFilterMonth(month)
     setFilterYear(year)
   }
@@ -106,15 +109,15 @@ export function MedicalDevicesListScreen() {
     })
   }
 
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  function setYearChange(item: DropdownItem) {
+    if (!item) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  function setMonthChange(item: DropdownItem) {
+    if (!item) {
       reset({
         monthIndex: -1
       })

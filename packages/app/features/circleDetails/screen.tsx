@@ -34,7 +34,7 @@ export function CircleDetailsScreen() {
     memberData?: string
     component?: string
   }>()
-  const [menuList, setMenuList] = useState(null)
+  const [menuList, setMenuList] = useState<MemberMenu[] | null>(null)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
   )

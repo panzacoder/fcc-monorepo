@@ -95,9 +95,7 @@ export const LocationDetails = ({
     staticData.countryList.map((data: Country, index: number) => {
       if (data.name === countryName) {
         countryIndexRef.current = index + 1
-        countryId = staticData.countryList[index].id
-          ? staticData.countryList[index].id
-          : 101
+        countryId = staticData.countryList[index]?.id ?? 101
       }
     })
     return countryId
@@ -124,7 +122,7 @@ export const LocationDetails = ({
       memberAddress.line = ''
       memberAddress.city = ''
       memberAddress.zipCode = ''
-      memberAddress.id = ''
+      memberAddress.id = undefined
       let addressObject = {
         nickName: '',
         shortDescription: '',
@@ -272,9 +270,7 @@ export const LocationDetails = ({
       if (isDataReceived) {
         const idx = Number(value.id) - 1
         setAddressObject(staticData.countryList[idx], 4)
-        let countryId = staticData.countryList[idx].id
-          ? staticData.countryList[idx].id
-          : 101
+        let countryId = staticData.countryList[idx]?.id ?? 101
         setSelectedCountryId(countryId)
       }
     }

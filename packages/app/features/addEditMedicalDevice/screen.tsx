@@ -133,7 +133,7 @@ export function AddEditMedicalDeviceScreen() {
   })
   async function callCreateUpdateDevice(formData: Schema) {
     let doctorId = isPrescribed
-      ? doctorListFull[formData.prescriberIndex - 1].id
+      ? doctorListFull[formData.prescriberIndex - 1]?.id ?? ''
       : ''
     if (selectedType === '') {
       Alert.alert('', 'Select Type')
@@ -160,7 +160,7 @@ export function AddEditMedicalDeviceScreen() {
         !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
           ? medicalDeviceDetails.id
           : null,
-      date: object.date ? object.date : '',
+      date: object.date ? String(object.date) : '',
       description: object.description ? object.description : '',
       type: object.selectedType ? object.selectedType : '',
       isPrescribedBy: object.isPrescribed ? object.isPrescribed : false,

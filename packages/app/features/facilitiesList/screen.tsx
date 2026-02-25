@@ -27,7 +27,7 @@ export function FacilitiesListScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = JSON.parse(item.memberData ?? '{}')
 
   const { data: facilitiesData, isLoading: isFacilitiesLoading } =
     useMemberFacilities(header, {
@@ -57,7 +57,7 @@ export function FacilitiesListScreen() {
   async function getFilteredList(list: FacilityListItem[], filter: string) {
     let filteredList: FacilityListItem[] = []
     list.map((data: FacilityListItem, index: number) => {
-      let type = data.type && data.type.type ? data.type.type : ''
+      let type = data.type ?? ''
       if (filter === 'All') {
         filteredList = list
       } else if (filter === data.status) {

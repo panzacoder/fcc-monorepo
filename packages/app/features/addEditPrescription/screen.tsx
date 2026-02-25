@@ -197,9 +197,11 @@ export function AddEditPrescriptionScreen() {
     let medicine = {
       id: !_.isEmpty(prescriptionDetails) ? prescriptionDetails.id : null,
       name: object.drugName ? object.drugName : '',
-      prescribedDate: object.prescribedDate ? object.prescribedDate : '',
-      startDate: object.startDate ? object.startDate : '',
-      endDate: object.endDate ? object.endDate : '',
+      prescribedDate: object.prescribedDate
+        ? String(object.prescribedDate)
+        : '',
+      startDate: object.startDate ? String(object.startDate) : '',
+      endDate: object.endDate ? String(object.endDate) : '',
       instructions: object.instructions ? object.instructions : '',
       notes: object.notes ? object.notes : '',
       strength: object.strength ? object.strength : '',
@@ -241,7 +243,7 @@ export function AddEditPrescriptionScreen() {
     )
   }
   async function callCreateUpdatePrescription(formData: Schema) {
-    let type = staticData.medicineTypeList[formData.typeIndex - 1].id
+    let type = staticData.medicineTypeList[formData.typeIndex - 1]?.id ?? ''
     let object = {
       type: type,
       drugName: formData.drugName,

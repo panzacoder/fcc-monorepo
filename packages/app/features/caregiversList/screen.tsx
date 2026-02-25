@@ -31,7 +31,7 @@ export function CaregiversListScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = JSON.parse(item.memberData ?? '{}')
 
   const { data: caregiversData, isLoading: isCaregiversLoading } =
     useMemberCaregivers(header, { memberId: memberData.member })

@@ -379,7 +379,9 @@ export function AddEditFacilityScreen() {
                       keyboard="number-pad"
                       onChangeText={(value) => {
                         locationPhoneRef.current =
-                          convertPhoneNumberToUsaPhoneNumberFormat(value)
+                          convertPhoneNumberToUsaPhoneNumberFormat(
+                            value ?? ''
+                          ) ?? ''
                         reset1({
                           locationPhone: locationPhoneRef.current
                         })

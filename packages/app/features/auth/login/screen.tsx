@@ -75,7 +75,11 @@ export function LoginScreen() {
             expiringSubscription: data.expiringSubscription
           }
           data.header.timezone = moment.tz.guess()
-          dispatch(headerAction.setHeader(data.header))
+          dispatch(
+            headerAction.setHeader(
+              data.header as unknown as Record<string, unknown>
+            )
+          )
           dispatch(userProfileAction.setUserProfile(data.appuserVo))
           dispatch(subscriptionAction.setSubscription(data.userSubscription))
           dispatch(

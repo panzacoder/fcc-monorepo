@@ -14,6 +14,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
+import type { CalendarEventItem } from 'app/ui/expandableCalendarView'
 import moment from 'moment'
 import { useAppSelector } from 'app/redux/hooks'
 import type { AllowedDomainObjects } from 'app/data/dashboard'
@@ -21,7 +22,7 @@ export function CalendarScreen() {
   const calendarPrivilegesRef = useRef<AllowedDomainObjects>({})
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isShowAddModal, setIsShowAddModal] = useState(false)
-  const [calenderEvents, setCalenderEvents] = useState([])
+  const [calenderEvents, setCalenderEvents] = useState<CalendarEventItem[]>([])
   const [currentMonth, setCurrentMonth] = useState(
     String(moment().format('MMM')).toUpperCase()
   )
@@ -31,7 +32,7 @@ export function CalendarScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = JSON.parse(item.memberData ?? '{}')
 
   const { data: calendarData, isLoading } = useCalendarItems(header, {
     memberId: memberData.member ? memberData.member : '',
@@ -47,7 +48,9 @@ export function CalendarScreen() {
           : {}
       }
       setCalenderEvents(
-        calendarData.calenderItemList ? calendarData.calenderItemList : []
+        calendarData.calenderItemList
+          ? (calendarData.calenderItemList as CalendarEventItem[])
+          : []
       )
       setIsDataReceived(true)
     }

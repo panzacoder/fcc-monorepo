@@ -194,7 +194,12 @@ export function AppointmentRemindersSection({
         <View className="mt-[20] h-full w-full">
           <AddEditReminder
             component={'Appointment'}
-            reminderData={reminderModal.data ?? {}}
+            reminderData={{
+              ...reminderModal.data,
+              date: reminderModal.data?.date
+                ? new Date(reminderModal.data.date)
+                : undefined
+            }}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}
           />

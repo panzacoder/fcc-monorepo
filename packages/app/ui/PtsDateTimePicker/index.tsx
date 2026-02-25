@@ -104,7 +104,7 @@ export const PtsDateTimePicker = ({
             }}
           >
             <DateTimePicker
-              value={selectedDateRef.current}
+              value={new Date(selectedDateRef.current)}
               testID="dateAndTimePicker"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               mode={

@@ -33,6 +33,7 @@ import type {
   DoctorFacilityLocationItem
 } from 'app/data/appointments/types'
 import type { AppointmentPurpose } from 'app/data/types.d'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
@@ -184,7 +185,6 @@ export function AddEditAppointmentScreen() {
   }
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
-
   }
 
   async function addEditAppointment(formData: Schema) {
@@ -212,11 +212,15 @@ export function AddEditAppointmentScreen() {
     }
     if (formData.doctoFacilityIndex !== 1) {
       if (selectedDoctorFacility === 1) {
-        appointmentData.doctorLocation.id =
-          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+        if (appointmentData.doctorLocation) {
+          appointmentData.doctorLocation.id =
+            doctorFacilityListFull[formData.doctoFacilityIndex - 2]?.locationId
+        }
       } else {
-        appointmentData.facilityLocation.id =
-          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+        if (appointmentData.facilityLocation) {
+          appointmentData.facilityLocation.id =
+            doctorFacilityListFull[formData.doctoFacilityIndex - 2]?.locationId
+        }
       }
     } else {
       Alert.alert('', 'Please Select Doctor/Facility')
@@ -312,12 +316,13 @@ export function AddEditAppointmentScreen() {
     setPurpose(data)
     logger.debug('purpose1', purpose)
   }
-  async function setSelectedTypeChange(value: { id: number } | null) {
+  async function setSelectedTypeChange(value: DropdownItem) {
     if (value) {
+      const numId = Number(value.id)
       setIsShowDoctorFacilityDropdown(true)
-      setSelectedDoctorFacility(value.id)
+      setSelectedDoctorFacility(numId)
       setIsDataReceived(false)
-      if (value.id - 1 === 0) {
+      if (numId - 1 === 0) {
         setFetchDoctors(true)
         setFetchFacilities(false)
         doctorsQuery.refetch()
@@ -328,9 +333,7 @@ export function AddEditAppointmentScreen() {
       }
     }
   }
-  async function selectedDoctorFacilityChange(
-    value: { id: number; title: string } | null
-  ) {
+  async function selectedDoctorFacilityChange(value: DropdownItem) {
     if (value && !isLoading) {
       if (value.title === 'Add New Doctor') {
         router.push(

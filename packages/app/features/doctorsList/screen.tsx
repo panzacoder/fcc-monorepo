@@ -25,7 +25,7 @@ export function DoctorsListScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = JSON.parse(item.memberData ?? '{}')
 
   const { data: doctorsData, isLoading } = useMemberDoctors(header, {
     memberId: memberData.member ? memberData.member : ''

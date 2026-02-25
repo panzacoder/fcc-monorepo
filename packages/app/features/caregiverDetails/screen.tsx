@@ -59,7 +59,7 @@ export function CaregiverDetailsScreen() {
       if (data.domainObjectPrivileges) {
         caregiverPrivilegesRef.current = data.domainObjectPrivileges.Caregiver
           ? data.domainObjectPrivileges.Caregiver
-          : {}
+          : []
       }
       if (data.familyMember) {
         let details = data.familyMember

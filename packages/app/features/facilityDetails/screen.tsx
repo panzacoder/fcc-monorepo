@@ -259,7 +259,7 @@ export function FacilityDetailsScreen() {
                   <TouchableOpacity
                     className=""
                     onPress={() => {
-                      copyToClipboard(facilityDetails.websiteuser)
+                      copyToClipboard(facilityDetails.websiteuser ?? '')
                     }}
                   >
                     <Feather
@@ -341,11 +341,15 @@ export function FacilityDetailsScreen() {
             {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
                 {locationList.map((data, index: number) => {
-                  const extendedData = data as FacilityLocation &
-                    Record<string, unknown>
-                  extendedData.component = 'Facility'
-                  extendedData.doctorFacilityId = facilityInfo.id
-                  extendedData.memberData = memberData
+                  const extendedData = {
+                    ...data,
+                    phone: data.phone ?? undefined,
+                    fax: data.fax ?? undefined,
+                    website: data.website ?? undefined,
+                    component: 'Facility' as const,
+                    doctorFacilityId: facilityInfo.id,
+                    memberData
+                  }
                   return (
                     <View key={index}>
                       <Location data={extendedData} />

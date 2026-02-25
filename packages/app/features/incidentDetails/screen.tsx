@@ -297,7 +297,7 @@ export function IncidentDetailsScreen() {
     noteData: Partial<IncidentNote>
   ) {
     setNoteData(noteData)
-    let list: object[] = []
+    let list: { user: { id: number } }[] = []
     participantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
@@ -318,9 +318,6 @@ export function IncidentDetailsScreen() {
             type: 'Incident'
           },
           participantList: list,
-          incidentNote: {
-            id: noteData.id ? noteData.id : ''
-          },
           messageList: []
         }
       },
@@ -343,7 +340,9 @@ export function IncidentDetailsScreen() {
     )
   }
   function isParticipantSelected(index: number) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+    const participant = participantsList[index]
+    if (!participant) return
+    participant.isSelected = !participant.isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }

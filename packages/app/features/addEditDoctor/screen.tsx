@@ -48,7 +48,6 @@ export function AddEditDoctorScreen() {
     shortDescription: '',
     nickName: '',
     address: {
-      id: '',
       line: '',
       city: '',
       zipCode: '',
@@ -226,7 +225,7 @@ export function AddEditDoctorScreen() {
   }
   async function createDoctor(formData: Schema) {
     let locationList: DoctorLocationData[] = []
-    selectedAddressRef.current.address.id = ''
+    selectedAddressRef.current.address.id = undefined
     locationList.push(selectedAddressRef.current)
     createDoctorMutation.mutate(
       {
@@ -241,7 +240,7 @@ export function AddEditDoctorScreen() {
           phone: removeAllSpecialCharFromString(doctorPhone),
           website: formData.website,
           websiteuser: formData.username,
-          specialist: findSpecializationFromId(formData.specialization),
+          specialist: findSpecializationFromId(formData.specialization) ?? '',
           isSelf: true,
           doctorLocationList: locationList
         }
@@ -360,7 +359,8 @@ export function AddEditDoctorScreen() {
                     keyboard="number-pad"
                     onChangeText={(value) => {
                       doctorPhone =
-                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+                        convertPhoneNumberToUsaPhoneNumberFormat(value ?? '') ??
+                        ''
 
                       reset1({
                         phone: doctorPhone

@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
@@ -116,11 +117,13 @@ export function IncidentsListScreen() {
   function filterEvents(formData: Schema) {
     setSelectedMonth(
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     )
     setSelectedYear(
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     )
   }
   function resetFilter() {
@@ -131,15 +134,15 @@ export function IncidentsListScreen() {
       yearIndex: 1
     })
   }
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  function setYearChange(item: DropdownItem) {
+    if (!item) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  function setMonthChange(item: DropdownItem) {
+    if (!item) {
       reset({
         monthIndex: -1
       })

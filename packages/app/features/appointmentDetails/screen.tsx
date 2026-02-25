@@ -542,9 +542,7 @@ export function AppointmentDetailsScreen() {
               transportationList={transportationList}
               transportationPrivileges={transportationPrivileges}
               address={
-                doctorFacilityAddress.address
-                  ? doctorFacilityAddress.address
-                  : {}
+                (doctorFacilityAddress.address ?? {}) as Record<string, unknown>
               }
               deleteTransportationMutation={hookData.deleteTransportation}
               resendTransportationMutation={hookData.resendTransportation}

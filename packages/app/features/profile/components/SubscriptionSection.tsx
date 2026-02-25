@@ -207,7 +207,7 @@ export function SubscriptionSection({
   function getOrderItemsView() {
     let orderView = orderList.map((data: ProfileOrder, index: number) => {
       let planName = data.orderItems
-        ? data.orderItems[0].description.replace('Basic ', '')
+        ? data.orderItems[0]?.description.replace('Basic ', '') ?? ''
         : ''
       return (
         <View
@@ -286,7 +286,7 @@ export function SubscriptionSection({
                 'End Date',
                 getFullDateForCalendar(userSubscription.endDate, 'DD-MMM-YYYY')
               )}
-              {getDetailsView('Status', userSubscription.status)}
+              {getDetailsView('Status', userSubscription.status ?? '')}
             </View>
           ) : (
             <View />

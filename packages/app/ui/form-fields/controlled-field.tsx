@@ -15,6 +15,7 @@ export type ControlledTextFieldProps<T extends FieldValues> =
     Omit<ControllerProps<T>, 'render'> & {
       inputClassName?: string
       InputComponent?: React.ComponentType<PtsTextInputProps>
+      disabled?: boolean
     }
 
 export function ControlledTextField<T extends FieldValues>({
@@ -49,7 +50,7 @@ export function ControlledTextField<T extends FieldValues>({
               onChangeText={handleChange}
               {...fieldProps}
               {...rest}
-              disabled={disabled || isSubmitting}
+              editable={!(disabled || isSubmitting)}
             />
             {fieldState?.invalid && (
               <Typography className="text-destructive">

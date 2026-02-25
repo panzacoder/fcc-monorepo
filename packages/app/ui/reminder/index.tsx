@@ -97,7 +97,7 @@ export const Reminder = ({
               reminderData.date,
               userAddress,
               memberAddress
-            )}
+            ).toISOString()}
           />
         </View>
       </View>
