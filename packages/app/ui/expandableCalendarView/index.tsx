@@ -4,9 +4,7 @@ import { Typography } from 'app/ui/typography'
 import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import _ from 'lodash'
 import { ExpandableCalendar, CalendarProvider } from 'react-native-calendars'
-import moment from 'moment'
 import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 
 import testIDs from '../../utils/testIDs'
@@ -79,7 +77,12 @@ export const ExpandableCalendarView = ({
     > = {}
     let data = await processData(calenderEvents)
     data.forEach((item: ProcessedCalendarItem) => {
-      if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {
+      if (
+        item.data &&
+        item.data.length > 0 &&
+        item.data[0] &&
+        Object.keys(item.data[0]).length > 0
+      ) {
         let dotsColor = item.data.map(
           (items: ProcessedCalendarItem['data'][number], index: number) => {
             let color = ''
@@ -116,13 +119,13 @@ export const ExpandableCalendarView = ({
   async function processData(data: CalendarEventItem[]) {
     let item = data.map((calendarDetails: CalendarEventItem) => {
       let title = String(
-        getFullDateForCalendar(calendarDetails.date, 'YYYY-MM-DD')
+        getFullDateForCalendar(calendarDetails.date, 'yyyy-MM-dd')
       )
       let object = {
         title: title,
         data: [
           {
-            hour: getFullDateForCalendar(calendarDetails.date, 'hh:mm A'),
+            hour: getFullDateForCalendar(calendarDetails.date, 'hh:mm a'),
             duration: '1h',
             title: calendarDetails.type,
             type: calendarDetails.action,
@@ -136,15 +139,19 @@ export const ExpandableCalendarView = ({
       return object
     })
 
-    let sortedResult = _(item)
-      .groupBy('title')
-      .map((g) =>
-        _.mergeWith({}, ...g, (obj: unknown, src: unknown) =>
-          _.isArray(obj) ? obj.concat(src) : undefined
-        )
-      )
-      .value()
-    return sortedResult
+    const grouped = new Map<string, typeof item>()
+    for (const obj of item) {
+      const existing = grouped.get(obj.title)
+      if (existing) {
+        existing.push(obj)
+      } else {
+        grouped.set(obj.title, [obj])
+      }
+    }
+    return Array.from(grouped.values()).map((group) => ({
+      ...group[0]!,
+      data: group.flatMap((g) => g.data)
+    }))
   }
 
   function getStatusColor(status: string) {
@@ -200,7 +207,7 @@ export const ExpandableCalendarView = ({
     return (
       <View className="flex-1">
         <Typography className="ml-1 w-[95%] p-2 font-bold text-gray-400">
-          {`${days[moment(data.date).day()]}, ${getFullDateForCalendar(data.date, 'MMM DD')}`}
+          {`${days[new Date(data.date).getDay()]}, ${getFullDateForCalendar(data.date, 'MMM dd')}`}
         </Typography>
         <TouchableOpacity
           onPress={() => {
@@ -214,7 +221,7 @@ export const ExpandableCalendarView = ({
             </Typography>
             <Typography className="">
               {data.date
-                ? `${getFullDateForCalendar(data.date, 'hh:mm A')} ${getOnlyUserTimeZone(userAddress, memberAddress)}`
+                ? `${getFullDateForCalendar(data.date, 'hh:mm a')} ${getOnlyUserTimeZone(userAddress, memberAddress)}`
                 : ''}
             </Typography>
           </View>

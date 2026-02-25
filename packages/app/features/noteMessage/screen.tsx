@@ -10,7 +10,6 @@ import {
   ScrollView
 } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
 import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'

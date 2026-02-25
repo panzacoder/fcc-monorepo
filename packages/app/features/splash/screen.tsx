@@ -2,7 +2,7 @@
 
 import { AccentButton } from 'app/ui/accent-button'
 import { View, Text, Alert } from 'react-native'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState, useRef } from 'react'
@@ -17,7 +17,6 @@ import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
-import moment from 'moment-timezone'
 import { useAppDispatch } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -71,7 +70,7 @@ export function SplashScreen() {
   async function navigateToNotification() {
     if (
       notificationDataRef.current &&
-      !_.isEmpty(notificationDataRef.current.data) &&
+      !isEmpty(notificationDataRef.current.data) &&
       notificationDataRef.current.data !== undefined
     ) {
       let notificationType = notificationDataRef.current.data.MessageType
@@ -191,7 +190,8 @@ export function SplashScreen() {
             expiredSubscription: data.expiredSubscription,
             expiringSubscription: data.expiringSubscription
           }
-          data.header.timezone = moment.tz.guess()
+          data.header.timezone =
+            Intl.DateTimeFormat().resolvedOptions().timeZone
           dispatch(
             headerAction.setHeader(
               data.header as unknown as Record<string, unknown>

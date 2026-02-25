@@ -9256,11 +9256,11 @@ __metadata:
     clsx: "npm:^2.1.0"
     countries-and-timezones: "npm:^3.6.0"
     date-fns: "npm:^3.3.1"
+    date-fns-tz: "npm:^3.2.0"
     expo-checkbox: "npm:^2.7.0"
     expo-linear-gradient: "npm:~12.7.2"
     expo-router: "npm:~3.4.8"
     jsdom: "npm:^28.1.0"
-    moment-timezone: "npm:^0.5.45"
     moti: "npm:^0.28.1"
     nativewind: "npm:^4.0.36"
     react: "npm:18.2.0"
@@ -11777,6 +11777,15 @@ __metadata:
     es-errors: "npm:^1.3.0"
     is-data-view: "npm:^1.0.1"
   checksum: 10/fa3bdfa0968bea6711ee50375094b39f561bce3f15f9e558df59de9c25f0bdd4cddc002d9c1d70ac7772ebd36854a7e22d1761e7302a934e6f1c2263bcf44aa2
+  languageName: node
+  linkType: hard
+
+"date-fns-tz@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "date-fns-tz@npm:3.2.0"
+  peerDependencies:
+    date-fns: ^3.0.0 || ^4.0.0
+  checksum: 10/8ab4745f00b40381220f0a7a2ec16e217cb629d4018a19047264d289dd260322baa23e19b3ed63c7e553f9ad34bea9dea105391132930a3e141e9a0a53e54af2
   languageName: node
   linkType: hard
 
@@ -18785,15 +18794,6 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: 10/d71b8dcd4b5af2fe13ecf3bd24070263489404fe216488c5ba7e38ece1f54daf219e72a833a3a2dc404331e870e9f44963a33399589490956bff003a3404d3b2
-  languageName: node
-  linkType: hard
-
-"moment-timezone@npm:^0.5.45":
-  version: 0.5.45
-  resolution: "moment-timezone@npm:0.5.45"
-  dependencies:
-    moment: "npm:^2.29.4"
-  checksum: 10/45e3793d44bea8e826c934a335ebf0b92c6d6dae562fdb59d8c45a16d5c11de4d6692b5fa7eebca969881f06b81b55f8535883bfbc727b597d601709fa5a2bb2
   languageName: node
   linkType: hard
 

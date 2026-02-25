@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { useState } from 'react'
 import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -8,7 +8,7 @@ import { Reminder } from 'app/ui/reminder'
 import { AddEditReminder } from 'app/ui/addEditReminder'
 import { Button } from 'app/ui/button'
 import { useModal } from 'app/utils/useModal'
-import moment from 'moment'
+import { isAfter } from 'date-fns'
 import type { ComponentProps } from 'react'
 import type { AppointmentDetailsHookReturn } from '../hooks/useAppointmentDetailsData'
 
@@ -63,7 +63,7 @@ export function AppointmentRemindersSection({
       }
     }
 
-    if (_.isEmpty(reminderData)) {
+    if (isEmpty(reminderData)) {
       createReminderMutation.mutate(
         { reminder: reminderPayload },
         {
@@ -145,9 +145,10 @@ export function AppointmentRemindersSection({
               <View />
             )}
           </TouchableOpacity>
-          {moment(appointmentDate ? appointmentDate : '')
-            .utc()
-            .isAfter(moment().utc()) ? (
+          {isAfter(
+            new Date(appointmentDate ? appointmentDate : ''),
+            new Date()
+          ) ? (
             <Button
               className=""
               title="Add Reminder"

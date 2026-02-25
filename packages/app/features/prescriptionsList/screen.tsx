@@ -463,14 +463,14 @@ export function PrescriptionsListScreen() {
                         {data.startDate
                           ? getFullDateForCalendar(
                               data.startDate,
-                              'MMM DD, YYYY'
+                              'MMM dd, yyyy'
                             )
                           : ''}
                       </Typography>
                       <Typography className="text-[#ef6603]">
                         {data.endDate
                           ? ' - ' +
-                            getFullDateForCalendar(data.endDate, 'MMM DD, YYYY')
+                            getFullDateForCalendar(data.endDate, 'MMM dd, yyyy')
                           : ''}
                       </Typography>
                     </View>

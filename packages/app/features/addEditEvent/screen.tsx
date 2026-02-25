@@ -6,7 +6,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -76,9 +76,7 @@ export function AddEditEventScreen() {
   })
   const [key, setKey] = useState(0)
   const [selectedDate, setSelectedDate] = useState(
-    !_.isEmpty(eventDetails) && eventDetails.date
-      ? eventDetails.date
-      : new Date()
+    !isEmpty(eventDetails) && eventDetails.date ? eventDetails.date : new Date()
   )
   const onSelection = (date: Date | string) => {
     setSelectedDate(date)
@@ -87,18 +85,18 @@ export function AddEditEventScreen() {
   const { control, handleSubmit } = useForm({
     defaultValues: {
       description:
-        !_.isEmpty(eventDetails) && eventDetails.description
+        !isEmpty(eventDetails) && eventDetails.description
           ? eventDetails.description
           : '',
       title:
-        !_.isEmpty(eventDetails) && eventDetails.title ? eventDetails.title : ''
+        !isEmpty(eventDetails) && eventDetails.title ? eventDetails.title : ''
     },
     resolver: zodResolver(schema)
   })
   function handleBackButtonClick() {
     logger.debug('handleBackButtonClick')
     router.dismiss(1)
-    if (_.isEmpty(eventDetails)) {
+    if (isEmpty(eventDetails)) {
       router.push(
         formatUrl('/circles/eventsList', {
           memberData: JSON.stringify(memberData)
@@ -178,7 +176,7 @@ export function AddEditEventScreen() {
       reminderList: []
     }
     const onSuccess = (data: EventDetailResponse | null) => {
-      if (_.isEmpty(eventDetails)) {
+      if (isEmpty(eventDetails)) {
         router.dismiss(1)
       } else {
         router.dismiss(2)
@@ -191,7 +189,7 @@ export function AddEditEventScreen() {
         })
       )
     }
-    if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
+    if (isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
       ;(eventData.location as typeof selectedAddress).address.id = ''
       createEventMutation.mutate({ event: eventData } as CreateEventParams, {
         onSuccess
@@ -208,7 +206,7 @@ export function AddEditEventScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+          isEmpty(eventDetails) || isFromCreateSimilar === 'true'
             ? 'Add Event'
             : 'Edit Event Details'
         }
@@ -243,7 +241,7 @@ export function AddEditEventScreen() {
           <LocationDetails
             component={'AddEditEvent'}
             data={
-              !_.isEmpty(eventDetails) && eventDetails.location
+              !isEmpty(eventDetails) && eventDetails.location
                 ? eventDetails.location
                 : {}
             }
@@ -262,7 +260,7 @@ export function AddEditEventScreen() {
             <Button
               className="ml-5 bg-[#287CFA]"
               title={
-                _.isEmpty(eventDetails) || isFromCreateSimilar === 'true'
+                isEmpty(eventDetails) || isFromCreateSimilar === 'true'
                   ? 'Create'
                   : 'Save'
               }

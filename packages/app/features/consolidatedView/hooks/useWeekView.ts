@@ -21,20 +21,20 @@ export function useWeekView() {
   const listDaySevenRef = useRef<MemberActivity[]>([])
 
   const [fromDate, setFromDate] = useState<string>(
-    getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
+    getFullDateForCalendar(new Date(), 'yyyy-MM-dd')
   )
   const [toDate, setToDate] = useState<string>(
-    getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
+    getFullDateForCalendar(new Date(), 'yyyy-MM-dd')
   )
   const [currentDate, setCurrentDate] = useState<string>(
-    getFullDateForCalendar(new Date(), 'DD MMM YYYY')
+    getFullDateForCalendar(new Date(), 'dd MMM yyyy')
   )
   const [selectedDate, setSelectedDate] = useState(
-    getFullDateForCalendar(new Date(), 'MMM DD, YYYY')
+    getFullDateForCalendar(new Date(), 'MMM dd, yyyy')
   )
   const [selectedDateUtc, setSelectedDateUtc] = useState<Date>(new Date())
   const [currentDateForDayView, setCurrentDateForDayView] = useState(
-    getFullDateForCalendar(new Date(), 'DD MMM YYYY')
+    getFullDateForCalendar(new Date(), 'dd MMM yyyy')
   )
   const currentDateUtc = new Date()
   const [dayCount, setDayCount] = useState(0)
@@ -72,21 +72,21 @@ export function useWeekView() {
     let previouDayUtc = new Date(firstday.getTime() - 60 * 60 * 24 * 1 * 1000)
     weekDayUtcDatesRef.current.push(previouDayUtc)
     weekDayUtcDatesRef.current.push(firstday)
-    let fullDate = getFullDateForCalendar(firstday, 'DD MMM')
+    let fullDate = getFullDateForCalendar(firstday, 'dd MMM')
     let firstDate = '   ' + weekDaysShort[0] + ' ' + fullDate
     weekDayListRef.current.push(firstDate)
     weekDayListDatesRef.current.push(fullDate)
-    let weekFirstDate = getFullDateForCalendar(firstday, 'YYYY-MM-DD')
+    let weekFirstDate = getFullDateForCalendar(firstday, 'yyyy-MM-dd')
     weekFirstLastDaysRef.current.push(weekFirstDate)
     for (let i = 1; i <= 6; i++) {
       let nextDay = new Date(firstday.getTime() + 60 * 60 * 24 * i * 1000)
 
-      let fullDate = getFullDateForCalendar(nextDay, 'DD MMM')
+      let fullDate = getFullDateForCalendar(nextDay, 'dd MMM')
       let firstDate = '   ' + weekDaysShort[i] + ' ' + fullDate
       weekDayListRef.current.push(firstDate)
       weekDayListDatesRef.current.push(fullDate)
 
-      let weekDate = getFullDateForCalendar(nextDay, 'YYYY-MM-DD')
+      let weekDate = getFullDateForCalendar(nextDay, 'yyyy-MM-dd')
       weekFirstLastDaysRef.current.push(weekDate)
 
       let nextDayUtc = new Date(firstday.getTime() + 60 * 60 * 24 * 7 * 1000)
@@ -101,7 +101,7 @@ export function useWeekView() {
   function setMemberActivityWithDays(list: MemberActivity[]) {
     clearLists()
     list.forEach((data) => {
-      const fullDate = getFullDateForCalendar(data.date, 'YYYY-MM-DD')
+      const fullDate = getFullDateForCalendar(data.date, 'yyyy-MM-dd')
       switch (fullDate) {
         case weekFirstLastDaysRef.current[0]:
           listDayOneRef.current.push(data)
@@ -139,7 +139,7 @@ export function useWeekView() {
     if (isDayView) {
       list.forEach((option) => {
         if (
-          currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
+          currentDate === getFullDateForCalendar(option.date, 'dd MMM yyyy')
         ) {
           filtered.push(option)
         }
@@ -170,9 +170,9 @@ export function useWeekView() {
     setDayCount((prev) => prev - 1)
     let yesterday = new Date(currentDateUtc)
     yesterday.setUTCDate(yesterday.getDate() + dayCount)
-    setCurrentDateForDayView(getFullDateForCalendar(yesterday, 'DD MMM YYYY'))
-    setCurrentDate(getFullDateForCalendar(yesterday, 'DD MMM YYYY'))
-    const newDate = getFullDateForCalendar(yesterday, 'YYYY-MM-DD')
+    setCurrentDateForDayView(getFullDateForCalendar(yesterday, 'dd MMM yyyy'))
+    setCurrentDate(getFullDateForCalendar(yesterday, 'dd MMM yyyy'))
+    const newDate = getFullDateForCalendar(yesterday, 'yyyy-MM-dd')
     setToDate(newDate)
     setFromDate(newDate)
     setIsDataReceived(false)
@@ -184,9 +184,9 @@ export function useWeekView() {
     setDayCount((prev) => prev + 1)
     let tomorrow = new Date(currentDateUtc)
     tomorrow.setUTCDate(tomorrow.getDate() + dayCount)
-    setCurrentDateForDayView(getFullDateForCalendar(tomorrow, 'DD MMM YYYY'))
-    setCurrentDate(getFullDateForCalendar(tomorrow, 'DD MMM YYYY'))
-    const newDate = getFullDateForCalendar(tomorrow, 'YYYY-MM-DD')
+    setCurrentDateForDayView(getFullDateForCalendar(tomorrow, 'dd MMM yyyy'))
+    setCurrentDate(getFullDateForCalendar(tomorrow, 'dd MMM yyyy'))
+    const newDate = getFullDateForCalendar(tomorrow, 'yyyy-MM-dd')
     setToDate(newDate)
     setFromDate(newDate)
     setIsDataReceived(false)
@@ -195,10 +195,10 @@ export function useWeekView() {
   }, [dayCount])
 
   const handleDateChange = useCallback((date: Date) => {
-    setFromDate(getFullDateForCalendar(date, 'YYYY-MM-DD'))
-    setToDate(getFullDateForCalendar(date, 'YYYY-MM-DD'))
-    setCurrentDate(getFullDateForCalendar(date, 'DD MMM YYYY'))
-    setSelectedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
+    setFromDate(getFullDateForCalendar(date, 'yyyy-MM-dd'))
+    setToDate(getFullDateForCalendar(date, 'yyyy-MM-dd'))
+    setCurrentDate(getFullDateForCalendar(date, 'dd MMM yyyy'))
+    setSelectedDate(getFullDateForCalendar(date, 'MMM dd, yyyy'))
     setSelectedDateUtc(date)
   }, [])
 
@@ -250,12 +250,12 @@ export function useWeekView() {
   }, [isDayView, fromDate, toDate, selectedDateUtc])
 
   const resetView = useCallback(() => {
-    setSelectedDate(getFullDateForCalendar(new Date(), 'MMM DD, YYYY'))
+    setSelectedDate(getFullDateForCalendar(new Date(), 'MMM dd, yyyy'))
     setIsDataReceived(false)
     if (isDayView) {
-      const resetDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
+      const resetDate = getFullDateForCalendar(new Date(), 'yyyy-MM-dd')
       setCurrentDateForDayView(
-        getFullDateForCalendar(new Date(), 'DD MMM YYYY')
+        getFullDateForCalendar(new Date(), 'dd MMM yyyy')
       )
       setQueryFromDate(resetDate)
       setQueryToDate(resetDate)

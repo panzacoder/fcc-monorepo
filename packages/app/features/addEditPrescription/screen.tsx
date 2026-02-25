@@ -5,11 +5,10 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
-import { getFullDateForCalendar } from 'app/ui/utils'
+import { getFullDateForCalendar, isEmpty } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import * as z from 'zod'
@@ -79,35 +78,35 @@ export function AddEditPrescriptionScreen() {
   )
 
   const [prescribedDate, setPrescribedDate] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
+    !isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
       ? getFullDateForCalendar(
           prescriptionDetails.prescribedDate,
-          'MMM DD, YYYY'
+          'MMM dd, yyyy'
         )
       : 'Date Prescribed'
   )
   const [prescribedDateUtc, setPrescribedDateUtc] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
+    !isEmpty(prescriptionDetails) && prescriptionDetails.prescribedDate
       ? prescriptionDetails.prescribedDate
       : ''
   )
   const [startDate, setStartDate] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.startDate
-      ? getFullDateForCalendar(prescriptionDetails.startDate, 'MMM DD, YYYY')
+    !isEmpty(prescriptionDetails) && prescriptionDetails.startDate
+      ? getFullDateForCalendar(prescriptionDetails.startDate, 'MMM dd, yyyy')
       : 'Start Date'
   )
   const [startDateUtc, setStartDateUtc] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.startDate
+    !isEmpty(prescriptionDetails) && prescriptionDetails.startDate
       ? prescriptionDetails.startDate
       : ''
   )
   const [endDate, setEndDate] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.endDate
-      ? getFullDateForCalendar(prescriptionDetails.endDate, 'MMM DD, YYYY')
+    !isEmpty(prescriptionDetails) && prescriptionDetails.endDate
+      ? getFullDateForCalendar(prescriptionDetails.endDate, 'MMM dd, yyyy')
       : 'End Date'
   )
   const [endDateUtc, setEndDateUtc] = useState(
-    !_.isEmpty(prescriptionDetails) && prescriptionDetails.endDate
+    !isEmpty(prescriptionDetails) && prescriptionDetails.endDate
       ? prescriptionDetails.endDate
       : ''
   )
@@ -118,7 +117,7 @@ export function AddEditPrescriptionScreen() {
   let typesList: Array<{ id: number; title: string }> =
     staticData.medicineTypeList.map(
       ({ type, id }: MedicineType, index: number) => {
-        if (!_.isEmpty(prescriptionDetails) && prescriptionDetails.type) {
+        if (!isEmpty(prescriptionDetails) && prescriptionDetails.type) {
           if (prescriptionDetails.type.type === type) {
             typeIndex = index + 1
           }
@@ -134,19 +133,19 @@ export function AddEditPrescriptionScreen() {
     defaultValues: {
       typeIndex: selectedTypeIndex,
       drugName:
-        !_.isEmpty(prescriptionDetails) && prescriptionDetails.name
+        !isEmpty(prescriptionDetails) && prescriptionDetails.name
           ? prescriptionDetails.name
           : '',
       strength:
-        !_.isEmpty(prescriptionDetails) && prescriptionDetails.strength
+        !isEmpty(prescriptionDetails) && prescriptionDetails.strength
           ? prescriptionDetails.strength
           : '',
       instructions:
-        !_.isEmpty(prescriptionDetails) && prescriptionDetails.instructions
+        !isEmpty(prescriptionDetails) && prescriptionDetails.instructions
           ? prescriptionDetails.instructions
           : '',
       notes:
-        !_.isEmpty(prescriptionDetails) && prescriptionDetails.notes
+        !isEmpty(prescriptionDetails) && prescriptionDetails.notes
           ? prescriptionDetails.notes
           : ''
     },
@@ -195,7 +194,7 @@ export function AddEditPrescriptionScreen() {
       })
     }
     let medicine = {
-      id: !_.isEmpty(prescriptionDetails) ? prescriptionDetails.id : null,
+      id: !isEmpty(prescriptionDetails) ? prescriptionDetails.id : null,
       name: object.drugName ? object.drugName : '',
       prescribedDate: object.prescribedDate
         ? String(object.prescribedDate)
@@ -216,7 +215,7 @@ export function AddEditPrescriptionScreen() {
         id: object.type ? object.type : ''
       }
     }
-    const mutation = _.isEmpty(prescriptionDetails)
+    const mutation = isEmpty(prescriptionDetails)
       ? createPrescriptionMutation
       : updatePrescriptionMutation
     mutation.mutate(
@@ -224,7 +223,7 @@ export function AddEditPrescriptionScreen() {
       {
         onSuccess: (data) => {
           let details = data?.medicine ? data.medicine : {}
-          if (_.isEmpty(prescriptionDetails)) {
+          if (isEmpty(prescriptionDetails)) {
             router.dismiss(1)
           } else {
             router.dismiss(2)
@@ -269,13 +268,13 @@ export function AddEditPrescriptionScreen() {
   const handleDateChange = (date: Date) => {
     logger.debug('handleDateChange', date)
     if (calenderClickedCount === 0) {
-      setPrescribedDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
+      setPrescribedDate(getFullDateForCalendar(date, 'MMM dd, yyyy'))
       setPrescribedDateUtc(date)
     } else if (calenderClickedCount === 1) {
-      setStartDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
+      setStartDate(getFullDateForCalendar(date, 'MMM dd, yyyy'))
       setStartDateUtc(date)
     } else {
-      setEndDate(getFullDateForCalendar(date, 'MMM DD, YYYY'))
+      setEndDate(getFullDateForCalendar(date, 'MMM dd, yyyy'))
       setEndDateUtc(date)
     }
     setIsShowCalender(false)
@@ -305,7 +304,7 @@ export function AddEditPrescriptionScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(prescriptionDetails)
+          isEmpty(prescriptionDetails)
             ? 'Add Prescription'
             : 'Edit Prescription'
         }
@@ -322,7 +321,7 @@ export function AddEditPrescriptionScreen() {
               list={typesList}
               className="w-full"
               defaultValue={
-                !_.isEmpty(prescriptionDetails) &&
+                !isEmpty(prescriptionDetails) &&
                 prescriptionDetails.type &&
                 prescriptionDetails.type.type
                   ? prescriptionDetails.type.type

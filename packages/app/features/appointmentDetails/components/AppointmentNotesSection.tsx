@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { useState } from 'react'
 import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -100,7 +100,7 @@ export function AppointmentNotesSection({
       shortDescription: title
     }
 
-    if (_.isEmpty(noteData)) {
+    if (isEmpty(noteData)) {
       createNoteMutation.mutate(
         { appointmentNote: appointmentNotePayload },
         {

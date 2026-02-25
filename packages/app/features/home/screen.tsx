@@ -8,13 +8,12 @@ import {
   BackHandler,
   Platform
 } from 'react-native'
-import _ from 'lodash'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
-import { convertTimeToUserLocalTime } from 'app/ui/utils'
+import { convertTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
@@ -323,7 +322,7 @@ export function HomeScreen() {
         data: Record<string, any>
       }
       if (
-        !_.isEmpty(content.data.notificationData) &&
+        !isEmpty(content.data.notificationData) &&
         content.data.notificationData !== undefined
       ) {
         let notificationType = content.data.MessageType

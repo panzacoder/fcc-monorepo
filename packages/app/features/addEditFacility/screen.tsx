@@ -1,5 +1,5 @@
 'use client'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -77,7 +77,7 @@ export function AddEditFacilityScreen() {
   let facilityDetails = item.facilityDetails
     ? JSON.parse(item.facilityDetails)
     : {}
-  if (!_.isEmpty(facilityDetails)) {
+  if (!isEmpty(facilityDetails)) {
     if (facilityDetails.type) {
       selectedTypeRef.current = facilityDetails.type
     }
@@ -258,7 +258,7 @@ export function AddEditFacilityScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(facilityDetails) ? 'Add Facility' : 'Edit Facility Details'
+          isEmpty(facilityDetails) ? 'Add Facility' : 'Edit Facility Details'
         }
         memberData={{}}
       />
@@ -357,7 +357,7 @@ export function AddEditFacilityScreen() {
                 </View>
               </View>
             </View>
-            {_.isEmpty(facilityDetails) ? (
+            {isEmpty(facilityDetails) ? (
               <View className="border-primary mt-[10] w-[95%] flex-1  self-center rounded-[10px] border-[1px] p-5">
                 <View className="">
                   <View className="flex-row items-center">
@@ -420,10 +420,10 @@ export function AddEditFacilityScreen() {
               <Button
                 className="ml-2"
                 leadingIcon="save"
-                title={_.isEmpty(facilityDetails) ? 'Create' : 'Save'}
+                title={isEmpty(facilityDetails) ? 'Create' : 'Save'}
                 variant="default"
                 onPress={
-                  _.isEmpty(facilityDetails)
+                  isEmpty(facilityDetails)
                     ? handleSubmit(createFacility)
                     : handleSubmit(updateFacility)
                 }

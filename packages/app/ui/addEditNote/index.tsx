@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
@@ -77,10 +77,10 @@ export const AddEditNote = ({
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       title:
-        !_.isEmpty(noteData) && noteData.shortDescription
+        !isEmpty(noteData) && noteData.shortDescription
           ? noteData.shortDescription
           : '',
-      note: !_.isEmpty(noteData) && noteData.note ? noteData.note : '',
+      note: !isEmpty(noteData) && noteData.note ? noteData.note : '',
       occurrenceIndex:
         component === 'Appointment' || component === 'Medical Device'
           ? occuranceIndex
@@ -127,7 +127,7 @@ export const AddEditNote = ({
   }
   return (
     <View className="my-2 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#FCF3CF] py-5">
-      <Typography className="self-center font-bold">{`${_.isEmpty(noteData) ? 'Add ' : 'Edit '} ${component} Note`}</Typography>
+      <Typography className="self-center font-bold">{`${isEmpty(noteData) ? 'Add ' : 'Edit '} ${component} Note`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField
@@ -176,7 +176,7 @@ export const AddEditNote = ({
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(noteData) ? 'Create' : 'Save'}
+            title={isEmpty(noteData) ? 'Create' : 'Save'}
             variant="default"
             leadingIcon="save"
             onPress={handleSubmit(callCreateUpdateNote)}

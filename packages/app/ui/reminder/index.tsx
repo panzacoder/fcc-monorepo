@@ -94,7 +94,7 @@ export const Reminder = ({
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Timer
             startDate={convertUserTimeToUTC(
-              reminderData.date,
+              reminderData.date ?? '',
               userAddress,
               memberAddress
             ).toISOString()}

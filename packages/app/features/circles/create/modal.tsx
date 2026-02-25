@@ -12,7 +12,7 @@ import {
   useJoinCircle
 } from 'app/data/circle'
 import { CircleNameSection } from './name-section'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { CircleEmailSection } from './email-section'
 import { CircleAddressSection } from './address-section'
 import { CreateCircleSchema, useCreateCircleForm } from './form-helpers'
@@ -101,7 +101,7 @@ export function CreateCircle() {
               <CircleNameSection />
               <CircleEmailSection />
 
-              {circleExists && !_.isEmpty(circleExists) && email ? (
+              {circleExists && !isEmpty(circleExists) && email ? (
                 <Card className="bg-secondary flex w-full flex-col gap-5 py-5">
                   <Typography className="text-secondary-foreground text-lg">
                     {`A circle already exists for ${firstName}\n`}

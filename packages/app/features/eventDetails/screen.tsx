@@ -7,8 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
-import moment from 'moment'
+import { isBefore } from 'date-fns'
 import type { ComponentProps } from 'react'
 import type {
   EventDetail,
@@ -20,7 +19,7 @@ import type { Transportation } from 'app/ui/transportation'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { formatUrl } from 'app/utils/format-url'
-import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 import { useEventDetailsData } from './hooks/useEventDetailsData'
@@ -135,7 +134,7 @@ export function EventDetailsScreen() {
     status = '',
     description = ''
   let eventAddress = {}
-  if (!_.isEmpty(eventDetails)) {
+  if (!isEmpty(eventDetails)) {
     if (eventDetails.date) {
       eventDate = formatTimeToUserLocalTime(
         eventDetails.date,
@@ -285,9 +284,10 @@ export function EventDetailsScreen() {
                 getUserPermission(eventPrivileges).updatePermission ||
                 getUserPermission(eventPrivileges).deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
-                  {moment(eventDetails.date ? eventDetails.date : '')
-                    .utc()
-                    .isBefore(moment().utc()) ? (
+                  {isBefore(
+                    new Date(eventDetails.date ? eventDetails.date : ''),
+                    new Date()
+                  ) ? (
                     <Button
                       className="w-[50%] bg-[#ef6603]"
                       title="Mark Completed"

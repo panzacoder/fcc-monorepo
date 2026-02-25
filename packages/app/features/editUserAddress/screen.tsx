@@ -6,7 +6,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { formatUrl } from 'app/utils/format-url'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { Button } from 'app/ui/button'
 import {
   useUpdateMemberAddress,
@@ -96,7 +96,7 @@ export function EditUserAddressScreen() {
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  if (_.isEmpty(memberData)) {
+  if (isEmpty(memberData)) {
     let object = {
       member: memberDetails.memberId ? memberDetails.memberId : '',
       component: item.component ? item.component : ''

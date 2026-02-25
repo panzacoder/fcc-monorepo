@@ -7,12 +7,11 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
 import { usePrescription, useDeletePrescription } from 'app/data/prescriptions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getFullDateForCalendar } from 'app/ui/utils'
+import { getFullDateForCalendar, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 import type { PrescriptionDetail } from 'app/data/prescriptions'
@@ -84,23 +83,23 @@ export function PrescriptionDetailsScreen() {
     pharmacy = '',
     instructions = '',
     note = ''
-  if (!_.isEmpty(prescriptionDetails)) {
+  if (!isEmpty(prescriptionDetails)) {
     if (prescriptionDetails.prescribedDate) {
       prescribedDate = getFullDateForCalendar(
         prescriptionDetails.prescribedDate,
-        'MMM DD, YYYY'
+        'MMM dd, yyyy'
       )
     }
     if (prescriptionDetails.startDate) {
       startDate = getFullDateForCalendar(
         prescriptionDetails.startDate,
-        'MMM DD, YYYY'
+        'MMM dd, yyyy'
       )
     }
     if (prescriptionDetails.endDate) {
       endDate = getFullDateForCalendar(
         prescriptionDetails.endDate,
-        'MMM DD, YYYY'
+        'MMM dd, yyyy'
       )
     }
 

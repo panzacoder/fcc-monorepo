@@ -1,5 +1,4 @@
 import { View, ScrollView, TouchableOpacity } from 'react-native'
-import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
 

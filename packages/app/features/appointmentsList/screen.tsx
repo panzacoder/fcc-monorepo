@@ -8,8 +8,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
-import _ from 'lodash'
-import moment from 'moment'
+import { isAfter, isBefore } from 'date-fns'
 import { useAppointments, useDoctorFacilities } from 'app/data/appointments'
 import type {
   GetAppointmentsParams,
@@ -192,14 +191,18 @@ export function AppointmentsListScreen() {
   async function getFilteredList(list: AppointmentListItem[], filter: string) {
     let filteredList: AppointmentListItem[] = []
     if (filter === 'Open Items' || filter === 'Upcoming') {
-      list = _.orderBy(list, (x) => x.date, 'asc')
+      list = [...list].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      )
     } else {
-      list = _.orderBy(list, (x) => x.date, 'desc')
+      list = [...list].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
     }
     list.map((data: AppointmentListItem, index: number) => {
       if (filter === 'Upcoming') {
         if (
-          moment(data.date).utc().isAfter(moment().utc()) &&
+          isAfter(new Date(data.date), new Date()) &&
           (String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase() ||
             String(data.status).toLocaleLowerCase() ===
@@ -209,7 +212,7 @@ export function AppointmentsListScreen() {
         }
       } else if (filter === 'Open Items') {
         if (
-          moment(data.date).utc().isBefore(moment().utc()) &&
+          isBefore(new Date(data.date), new Date()) &&
           (String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase() ||
             String(data.status).toLocaleLowerCase() ===

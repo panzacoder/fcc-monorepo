@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import type { CalendarEventItem } from 'app/ui/expandableCalendarView'
-import moment from 'moment'
+import { format } from 'date-fns'
 import { useAppSelector } from 'app/redux/hooks'
 import type { AllowedDomainObjects } from 'app/data/dashboard'
 export function CalendarScreen() {
@@ -24,11 +24,9 @@ export function CalendarScreen() {
   const [isShowAddModal, setIsShowAddModal] = useState(false)
   const [calenderEvents, setCalenderEvents] = useState<CalendarEventItem[]>([])
   const [currentMonth, setCurrentMonth] = useState(
-    String(moment().format('MMM')).toUpperCase()
+    format(new Date(), 'MMM').toUpperCase()
   )
-  const [currentYear, setCurrentYear] = useState(
-    String(moment().format('YYYY')).toUpperCase()
-  )
+  const [currentYear, setCurrentYear] = useState(format(new Date(), 'yyyy'))
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
@@ -57,8 +55,8 @@ export function CalendarScreen() {
   }, [calendarData])
 
   function handleCurrentMonthChange(currentMonth: { dateString: string }) {
-    let changedMonth = moment(currentMonth.dateString).format('MMM')
-    let changedYear = moment(currentMonth.dateString).format('YYYY')
+    let changedMonth = format(new Date(currentMonth.dateString), 'MMM')
+    let changedYear = format(new Date(currentMonth.dateString), 'yyyy')
     setCurrentMonth(changedMonth)
     setCurrentYear(changedYear)
   }

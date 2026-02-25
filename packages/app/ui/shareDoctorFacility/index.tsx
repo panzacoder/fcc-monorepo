@@ -1,6 +1,5 @@
 import { View } from 'react-native'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'

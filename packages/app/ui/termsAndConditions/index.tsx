@@ -1,5 +1,4 @@
 import { View, ScrollView, TouchableOpacity, Linking } from 'react-native'
-import _ from 'lodash'
 import { Feather } from 'app/ui/icons'
 import { Typography } from '../typography'
 export const TermsAndConditions = ({

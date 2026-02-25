@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -44,7 +44,7 @@ export const AddMessageThread = ({
   const { control, handleSubmit } = useForm({
     defaultValues: {
       subject:
-        !_.isEmpty(noteData) && noteData.shortDescription
+        !isEmpty(noteData) && noteData.shortDescription
           ? noteData.shortDescription
           : ''
     },

@@ -6,9 +6,8 @@ import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getFullDateForCalendar } from 'app/ui/utils'
-import _ from 'lodash'
-import moment from 'moment'
+import { getFullDateForCalendar, isEmpty } from 'app/ui/utils'
+import { format } from 'date-fns'
 import ToggleSwitch from 'toggle-switch-react-native'
 import type {
   ProfileAppUser,
@@ -79,9 +78,10 @@ export function SubscriptionSection({
       isShowRenewButtonRef.current = true
       Alert.alert(
         '',
-        `Your subscription will expire on ${moment(
-          profileData.subscriptionEndDate
-        ).format('DD-MMM-YYYY')}. Please renew to use ad-free services.`,
+        `Your subscription will expire on ${format(
+          new Date(profileData.subscriptionEndDate),
+          'dd-MMM-yyyy'
+        )}. Please renew to use ad-free services.`,
         [
           {
             text: 'Renew',
@@ -217,7 +217,7 @@ export function SubscriptionSection({
           <Typography className=" w-[5%] text-center">{index + 1}</Typography>
           <Typography className=" w-[20%] text-center">{planName}</Typography>
           <Typography className=" w-[30%] text-center">
-            {getFullDateForCalendar(data.date, 'DD-MMM-YYYY')}
+            {getFullDateForCalendar(data.date, 'dd-MMM-yyyy')}
           </Typography>
           <Typography className=" w-[15%] text-center">
             {data.price ? `${'$'}${data.price}` : ''}
@@ -270,7 +270,7 @@ export function SubscriptionSection({
               {'$0.00'}
             </Typography>
           </View>
-          {!_.isEmpty(userSubscription) ? (
+          {!isEmpty(userSubscription) ? (
             <View className="mt-1 rounded-[5px] border-[1px] border-gray-400 py-1">
               <Typography className="mx-2 py-1 font-bold text-black">
                 {'Plan Details'}
@@ -278,13 +278,16 @@ export function SubscriptionSection({
               {getDetailsView(
                 'Start Date',
                 getFullDateForCalendar(
-                  userSubscription.startDate,
-                  'DD-MMM-YYYY'
+                  userSubscription.startDate ?? '',
+                  'dd-MMM-yyyy'
                 )
               )}
               {getDetailsView(
                 'End Date',
-                getFullDateForCalendar(userSubscription.endDate, 'DD-MMM-YYYY')
+                getFullDateForCalendar(
+                  userSubscription.endDate ?? '',
+                  'dd-MMM-yyyy'
+                )
               )}
               {getDetailsView('Status', userSubscription.status ?? '')}
             </View>
@@ -301,14 +304,14 @@ export function SubscriptionSection({
                 'Start Date',
                 getFullDateForCalendar(
                   userProfile.premiumFeatureTrialinfo.startDate,
-                  'DD-MMM-YYYY'
+                  'dd-MMM-yyyy'
                 )
               )}
               {getDetailsView(
                 'End Date',
                 getFullDateForCalendar(
                   userProfile.premiumFeatureTrialinfo.endDate,
-                  'DD-MMM-YYYY'
+                  'dd-MMM-yyyy'
                 )
               )}
               {getDetailsView(
@@ -344,11 +347,17 @@ export function SubscriptionSection({
           )}
           {getDetailsView(
             'Start Date',
-            getFullDateForCalendar(userSubscription.startDate, 'DD-MMM-YYYY')
+            getFullDateForCalendar(
+              userSubscription.startDate ?? '',
+              'dd-MMM-yyyy'
+            )
           )}
           {getDetailsView(
             'End Date',
-            getFullDateForCalendar(userSubscription.endDate, 'DD-MMM-YYYY')
+            getFullDateForCalendar(
+              userSubscription.endDate ?? '',
+              'dd-MMM-yyyy'
+            )
           )}
 
           {getDetailsView(
