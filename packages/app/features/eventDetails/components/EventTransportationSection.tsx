@@ -8,7 +8,7 @@ import { AddEditTransport } from 'app/ui/addEditTransport'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useModal } from 'app/utils/useModal'
-import moment from 'moment'
+import { isAfter } from 'date-fns'
 import type { ComponentProps } from 'react'
 import type { PrivilegeAction } from 'app/data/types.d'
 import type { EventDetailsHookReturn } from '../hooks/useEventDetailsData'
@@ -135,9 +135,7 @@ export function EventTransportationSection({
               <View />
             )}
           </TouchableOpacity>
-          {moment(eventDate ? eventDate : '')
-            .utc()
-            .isAfter(moment().utc()) &&
+          {isAfter(new Date(eventDate ? eventDate : ''), new Date()) &&
           getUserPermission(transportationPrivileges).createPermission ? (
             <Button
               className=""

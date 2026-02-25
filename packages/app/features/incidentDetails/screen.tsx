@@ -13,7 +13,6 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   useIncidentDetails,
@@ -42,7 +41,7 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
-import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
@@ -157,7 +156,7 @@ export function IncidentDetailsScreen() {
     type = '',
     description = ''
   let incidentAddress = {}
-  if (!_.isEmpty(incidentDetails)) {
+  if (!isEmpty(incidentDetails)) {
     if (incidentDetails.date) {
       incidentDate = formatTimeToUserLocalTime(
         incidentDetails.date,
@@ -205,7 +204,7 @@ export function IncidentDetailsScreen() {
       shortDescription: title
     }
 
-    if (_.isEmpty(noteData)) {
+    if (isEmpty(noteData)) {
       createNoteMutation.mutate(
         { note: notePayload },
         {

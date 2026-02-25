@@ -7,7 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import { formatUrl } from 'app/utils/format-url'
 import { useAppSelector } from 'app/redux/hooks'
@@ -38,7 +38,7 @@ export function CaregiverDetailsScreen() {
   >({})
   let memberFullName = ''
 
-  if (!_.isEmpty(memberData)) {
+  if (!isEmpty(memberData)) {
     memberFullName += memberData.firstname ? memberData.firstname : ''
     memberFullName += memberData.lastname ? ' ' + memberData.lastname : ''
   }

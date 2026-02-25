@@ -14,7 +14,6 @@ import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
-import moment from 'moment-timezone'
 import { useAppDispatch } from 'app/redux/hooks'
 import { useRouter } from 'expo-router'
 import { CardView } from 'app/ui/layouts/card-view'
@@ -74,7 +73,8 @@ export function LoginScreen() {
             expiredSubscription: data.expiredSubscription,
             expiringSubscription: data.expiringSubscription
           }
-          data.header.timezone = moment.tz.guess()
+          data.header.timezone =
+            Intl.DateTimeFormat().resolvedOptions().timeZone
           dispatch(
             headerAction.setHeader(
               data.header as unknown as Record<string, unknown>

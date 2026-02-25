@@ -9,11 +9,10 @@ import {
   SafeAreaView,
   ScrollView
 } from 'react-native'
-import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
-import { getAddressFromObject } from 'app/ui/utils'
+import { getAddressFromObject, isEmpty } from 'app/ui/utils'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import {
   usePaymentConfig,
@@ -292,13 +291,13 @@ export function PaymentsScreen() {
               data.userDetails && data.userDetails.appuserVo
                 ? data.userDetails.appuserVo
                 : {}
-            if (!_.isEmpty(appuserVo)) {
+            if (!isEmpty(appuserVo)) {
               dispatch(userProfileAction.setUserProfile(appuserVo))
             }
-            if (!_.isEmpty(userSubscription)) {
+            if (!isEmpty(userSubscription)) {
               dispatch(subscriptionAction.setSubscription(userSubscription))
             }
-            if (!_.isEmpty(userSubscription)) {
+            if (!isEmpty(userSubscription)) {
               dispatch(
                 userSubscriptionAction.setSubscriptionDetails(
                   subscriptionDetailsobject
@@ -409,10 +408,8 @@ export function PaymentsScreen() {
       setUserDataLoaded(true)
     }
   }, [])
-  let planItems = _.orderBy(
-    planDetails.planItems,
-    (e) => e.displaySequence,
-    'asc'
+  let planItems = [...planDetails.planItems].sort(
+    (a, b) => a.displaySequence - b.displaySequence
   )
   async function requestSubscription() {
     try {

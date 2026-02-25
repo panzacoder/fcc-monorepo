@@ -3,8 +3,11 @@ import { View, Alert, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
-import _ from 'lodash'
-import { convertTimeToUserLocalTime, getAddressFromObject } from 'app/ui/utils'
+import {
+  convertTimeToUserLocalTime,
+  getAddressFromObject,
+  isEmpty
+} from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -21,13 +24,13 @@ import {
 } from 'app/data/transportation'
 import type { ComponentProps } from 'react'
 import type { Feather as FeatherType } from 'app/ui/icons'
-import type { MomentInput } from 'moment-timezone'
+import type { DateInput } from 'app/ui/utils'
 
 interface TransportationDisplayData {
   id?: number | string
-  createdOn?: MomentInput
+  createdOn?: DateInput
   accompanyName?: string
-  date?: MomentInput
+  date?: DateInput
   description?: string
   status?: { status?: string }
   address?: Record<string, unknown>
@@ -220,14 +223,14 @@ export const Transportation = ({
       content: title,
       date: date
     }
-    if (!_.isEmpty(reminderData)) {
+    if (!isEmpty(reminderData)) {
       reminderPayload.id = remindersData.id
     }
     if (component === 'Appointment') {
       reminderPayload.appointmentTransportation = {
         id: transportationData.id ? transportationData.id : ''
       }
-      if (_.isEmpty(reminderData)) {
+      if (isEmpty(reminderData)) {
         createReminderMutation.mutate(
           { reminder: reminderPayload },
           {
@@ -252,7 +255,7 @@ export const Transportation = ({
       reminderPayload.eventTransportation = {
         id: transportationData.id ? transportationData.id : ''
       }
-      if (_.isEmpty(reminderData)) {
+      if (isEmpty(reminderData)) {
         createReminderEventMutation.mutate(
           { reminder: reminderPayload },
           {

@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { useState } from 'react'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -43,11 +43,11 @@ export const AddEditReminder = ({
   const { control, handleSubmit } = useForm({
     defaultValues: {
       title:
-        !_.isEmpty(reminderData) && reminderData.content
+        !isEmpty(reminderData) && reminderData.content
           ? reminderData.content
           : '',
       dateTime:
-        !_.isEmpty(reminderData) && reminderData.note ? reminderData.note : ''
+        !isEmpty(reminderData) && reminderData.note ? reminderData.note : ''
     },
     resolver: zodResolver(schema)
   })
@@ -64,7 +64,7 @@ export const AddEditReminder = ({
       key={key}
       className="my-2 w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#fbe2e3] py-5"
     >
-      <Typography className="self-center font-bold">{`${_.isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
+      <Typography className="self-center font-bold">{`${isEmpty(reminderData) ? 'Add ' : 'Edit '} ${component} Reminder`}</Typography>
       <View className="my-5 w-full">
         <View className="w-full flex-row justify-center gap-2">
           <ControlledTextField
@@ -93,7 +93,7 @@ export const AddEditReminder = ({
           />
           <Button
             className="ml-5"
-            title={_.isEmpty(reminderData) ? 'Create' : 'Save'}
+            title={isEmpty(reminderData) ? 'Create' : 'Save'}
             variant="default"
             leadingIcon="save"
             onPress={handleSubmit(createUpdateReminderCall)}

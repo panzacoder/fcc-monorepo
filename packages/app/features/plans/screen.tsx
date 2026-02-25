@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { View, Alert, ScrollView, TouchableOpacity } from 'react-native'
-import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
@@ -148,7 +147,7 @@ export function PlansScreen() {
       plansData.map((planData) => {
         planNamesArr.push(planData.plantype)
       })
-      let first_plan = _.find(plansData, (e) => e.plantype === planNamesArr[0])
+      let first_plan = plansData.find((e) => e.plantype === planNamesArr[0])
       let selectedId = first_plan!.id
       setPlansList(plansData)
       setPlanNames(planNamesList)
@@ -236,7 +235,7 @@ export function PlansScreen() {
     if (planId === -1) {
       return <View />
     }
-    let data = _.find(plansList, (e) => e.id === planId)
+    let data = plansList.find((e) => e.id === planId)
     const colorSet = [
       { headingBackground: 'bg-[#dd4b5e]' },
       { headingBackground: 'bg-[#53cfe9]' },
@@ -249,7 +248,9 @@ export function PlansScreen() {
       return <View />
     }
 
-    let planItems = _.orderBy(data.planItems, (e) => e.displaySequence, 'asc')
+    let planItems = [...data.planItems].sort(
+      (a, b) => a.displaySequence - b.displaySequence
+    )
     return (
       <View>
         <View
@@ -305,8 +306,7 @@ export function PlansScreen() {
               list={planNames}
               onChangeValue={(data) => {
                 if (data) {
-                  let selectedIndex = _.find(
-                    plansList,
+                  let selectedIndex = plansList.find(
                     (e) => e.plantype === data.title
                   )
                   setSelectedPlanId(selectedIndex!.id)

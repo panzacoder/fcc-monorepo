@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
-import moment from 'moment'
 
 interface TimerProps {
   startDate: string
@@ -21,14 +20,14 @@ export const Timer = ({ startDate }: TimerProps) => {
     }
   }, [])
   function timerInit() {
-    const now = moment()
+    const now = new Date()
     if (!startDate) {
       setExpired(true)
       return
     }
 
-    const countDownStartDate = moment(startDate)
-    const distance = countDownStartDate.valueOf() - now.valueOf()
+    const countDownStartDate = new Date(startDate)
+    const distance = countDownStartDate.getTime() - now.getTime()
     const days = Math.floor(distance / (1000 * 60 * 60 * 24))
     const hours = Math.floor(
       (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)

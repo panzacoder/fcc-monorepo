@@ -1,5 +1,4 @@
 'use client'
-import _ from 'lodash'
 import { useState, useEffect, useRef } from 'react'
 import { View, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
@@ -33,8 +32,7 @@ import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import type { DropdownItem } from 'app/ui/PtsDropdown'
 import { useRouter } from 'expo-router'
 import ct from 'countries-and-timezones'
-import moment from 'moment-timezone'
-import { consoleData } from 'app/ui/utils'
+import { consoleData, isEmpty } from 'app/ui/utils'
 import { logger } from 'app/utils/logger'
 import {
   convertPhoneNumberToUsaPhoneNumberFormat,
@@ -121,7 +119,7 @@ export function AddEditLocationScreen() {
         )
       setStatesList(mappedStates)
       setStatesListFull(statesQuery.data.stateList || [])
-      if (!_.isEmpty(locationDetails)) {
+      if (!isEmpty(locationDetails)) {
         let stateName = locationDetails.address.state.name
           ? locationDetails.address.state.name
           : ''
@@ -158,12 +156,12 @@ export function AddEditLocationScreen() {
   }
   useEffect(() => {
     let countryName = ''
-    if (!_.isEmpty(locationDetails)) {
+    if (!isEmpty(locationDetails)) {
       countryName = locationDetails.address.state.country.name
         ? locationDetails.address.state.country.name
         : ''
     } else {
-      let newTimeZone = moment.tz.guess()
+      let newTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const countryObject = ct.getCountriesForTimezone(newTimeZone)
       countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
@@ -190,30 +188,30 @@ export function AddEditLocationScreen() {
   }, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      locationName: !_.isEmpty(locationDetails) ? locationDetails.nickName : '',
-      address: !_.isEmpty(locationDetails) ? locationDetails.address.line : '',
-      city: !_.isEmpty(locationDetails) ? locationDetails.address.city : '',
-      postalCode: !_.isEmpty(locationDetails)
+      locationName: !isEmpty(locationDetails) ? locationDetails.nickName : '',
+      address: !isEmpty(locationDetails) ? locationDetails.address.line : '',
+      city: !isEmpty(locationDetails) ? locationDetails.address.city : '',
+      postalCode: !isEmpty(locationDetails)
         ? locationDetails.address.zipCode
         : '',
 
       fax:
-        !_.isEmpty(locationDetails) && locationDetails.fax
+        !isEmpty(locationDetails) && locationDetails.fax
           ? locationDetails.fax
           : '',
       website:
-        !_.isEmpty(locationDetails) && locationDetails.website
+        !isEmpty(locationDetails) && locationDetails.website
           ? locationDetails.website
           : '',
-      country: !_.isEmpty(locationDetails) ? countryIndexRef.current : 97,
-      state: !_.isEmpty(locationDetails) ? stateIndexRef.current : -1
+      country: !isEmpty(locationDetails) ? countryIndexRef.current : 97,
+      state: !isEmpty(locationDetails) ? stateIndexRef.current : -1
     },
     resolver: zodResolver(schema)
   })
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
       phone:
-        !_.isEmpty(locationDetails) && locationDetails.phone
+        !isEmpty(locationDetails) && locationDetails.phone
           ? locationDetails.phone
           : ''
     },
@@ -285,7 +283,7 @@ export function AddEditLocationScreen() {
         ...addressObject,
         doctor: { id: '' }
       }
-      if (_.isEmpty(locationDetails)) {
+      if (isEmpty(locationDetails)) {
         doctorLocation.doctor = {
           id: details.id ? details.id : '',
           member: {
@@ -303,11 +301,11 @@ export function AddEditLocationScreen() {
         ...doctorLocation.address.state,
         country: countryObject as Partial<Country>
       }
-      if (!_.isEmpty(locationDetails)) {
+      if (!isEmpty(locationDetails)) {
         doctorLocation.id = locationDetails.id
       }
 
-      if (_.isEmpty(locationDetails)) {
+      if (isEmpty(locationDetails)) {
         createDoctorLocationMutation.mutate(
           { doctorLocation },
           { onSuccess: onDoctorSuccess, onError }
@@ -323,7 +321,7 @@ export function AddEditLocationScreen() {
         ...addressObject,
         facility: { id: '' }
       }
-      if (_.isEmpty(locationDetails)) {
+      if (isEmpty(locationDetails)) {
         facilityLocation.facility = {
           id: details.id ? details.id : '',
           member: {
@@ -341,11 +339,11 @@ export function AddEditLocationScreen() {
         ...facilityLocation.address.state,
         country: countryObject as Partial<Country>
       }
-      if (!_.isEmpty(locationDetails)) {
+      if (!isEmpty(locationDetails)) {
         facilityLocation.id = locationDetails.id
       }
 
-      if (_.isEmpty(locationDetails)) {
+      if (isEmpty(locationDetails)) {
         createFacilityLocationMutation.mutate(
           { facilityLocation },
           { onSuccess: onFacilitySuccess, onError }
@@ -363,7 +361,7 @@ export function AddEditLocationScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(locationDetails) ? 'Add Location' : 'Edit Location Details'
+          isEmpty(locationDetails) ? 'Add Location' : 'Edit Location Details'
         }
         memberData={memberData}
       />
@@ -469,7 +467,7 @@ export function AddEditLocationScreen() {
                   />
                   <Button
                     className="ml-5"
-                    title={_.isEmpty(locationDetails) ? 'Create' : 'Save'}
+                    title={isEmpty(locationDetails) ? 'Create' : 'Save'}
                     variant="default"
                     leadingIcon="save"
                     onPress={handleSubmit(addUpdateLocation)}

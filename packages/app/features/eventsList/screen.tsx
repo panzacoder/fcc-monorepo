@@ -9,8 +9,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
-import moment from 'moment'
-import _ from 'lodash'
+import { isAfter, isBefore } from 'date-fns'
 import { useEvents } from 'app/data/events'
 import type { EventListItem } from 'app/data/events/types'
 import type { YearList } from 'app/data/types'
@@ -135,14 +134,18 @@ export function EventsListScreen() {
   async function getFilteredList(list: EventListItem[], filter: string) {
     let filteredList: EventListItem[] = []
     if (filter === 'Open Items') {
-      list = _.orderBy(list, (x) => x.date, 'asc')
+      list = [...list].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      )
     } else {
-      list = _.orderBy(list, (x) => x.date, 'desc')
+      list = [...list].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
     }
     list.map((data: EventListItem, index: number) => {
       if (filter === 'Upcoming') {
         if (
-          moment(data.date).utc().isAfter(moment().utc()) &&
+          isAfter(new Date(data.date), new Date()) &&
           String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase()
         ) {
@@ -150,11 +153,10 @@ export function EventsListScreen() {
         }
       } else if (filter === 'Open Items') {
         if (
-          moment(data.date)
-            .utc()
-            .isBefore(
-              convertUserTimeToUTC(moment().utc(), userAddress, memberAddress)
-            ) &&
+          isBefore(
+            new Date(data.date),
+            convertUserTimeToUTC(new Date(), userAddress, memberAddress)
+          ) &&
           String(data.status).toLocaleLowerCase() ===
             String('Scheduled').toLowerCase()
         ) {

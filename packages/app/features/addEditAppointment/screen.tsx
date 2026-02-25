@@ -1,5 +1,5 @@
 'use client'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { useState, useEffect } from 'react'
 import { Alert, View, BackHandler, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -72,7 +72,7 @@ export function AddEditAppointmentScreen() {
   const [facilityDoctorIndex, setFacilityDoctorIndex] = useState(-1)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [purpose, setPurpose] = useState(
-    !_.isEmpty(appointmentDetails) && appointmentDetails.purpose
+    !isEmpty(appointmentDetails) && appointmentDetails.purpose
       ? appointmentDetails.purpose
       : ''
   )
@@ -128,7 +128,7 @@ export function AddEditAppointmentScreen() {
     setIsDataReceived(true)
     setIsAddDoctorFacility(list.length === 0)
     let facilityDoctorLocationId = -1
-    if (!_.isEmpty(doctorFacilityDetails)) {
+    if (!isEmpty(doctorFacilityDetails)) {
       if (component === 'Doctor') {
         if (
           doctorFacilityDetails.doctorLocationList[0] &&
@@ -170,7 +170,7 @@ export function AddEditAppointmentScreen() {
     })
   }, [doctorsQuery.data, facilitiesQuery.data, fetchDoctors, fetchFacilities])
   let typeIndex: number = -1
-  if (!_.isEmpty(appointmentDetails) && !isLoading) {
+  if (!isEmpty(appointmentDetails) && !isLoading) {
     if (
       appointmentDetails.type &&
       appointmentDetails.type.type === 'Doctor Appointment'
@@ -206,7 +206,7 @@ export function AddEditAppointmentScreen() {
       facilityLocation: {}
     }
     const isCreate =
-      _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+      isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
     if (!isCreate) {
       appointmentData.id = appointmentDetails.id
     }
@@ -235,7 +235,7 @@ export function AddEditAppointmentScreen() {
           appointment?: Record<string, unknown>
         }
         let apptDetails = {}
-        if (_.isEmpty(appointmentDetails)) {
+        if (isEmpty(appointmentDetails)) {
           apptDetails = response?.appointmentWithPreviousAppointment
             ?.appointment
             ? response.appointmentWithPreviousAppointment.appointment
@@ -250,7 +250,7 @@ export function AddEditAppointmentScreen() {
             apptDetails = response?.appointment ? response.appointment : {}
           }
         }
-        if (_.isEmpty(appointmentDetails)) {
+        if (isEmpty(appointmentDetails)) {
           router.dismiss(1)
         } else {
           router.dismiss(2)
@@ -283,7 +283,7 @@ export function AddEditAppointmentScreen() {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       description:
-        !_.isEmpty(appointmentDetails) && appointmentDetails.description
+        !isEmpty(appointmentDetails) && appointmentDetails.description
           ? appointmentDetails.description
           : '',
       appointmentType: typeIndex,
@@ -360,7 +360,7 @@ export function AddEditAppointmentScreen() {
 
   useEffect(() => {
     if (
-      !_.isEmpty(appointmentDetails) ||
+      !isEmpty(appointmentDetails) ||
       component === 'Doctor' ||
       component === 'Facility'
     ) {
@@ -441,7 +441,7 @@ export function AddEditAppointmentScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
+          isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
             ? 'Add Appointment'
             : 'Edit Appointment'
         }
@@ -519,8 +519,7 @@ export function AddEditAppointmentScreen() {
               <Button
                 className="ml-5 bg-[#287CFA]"
                 title={
-                  _.isEmpty(appointmentDetails) ||
-                  isFromCreateSimilar === 'true'
+                  isEmpty(appointmentDetails) || isFromCreateSimilar === 'true'
                     ? 'Create'
                     : 'Save'
                 }

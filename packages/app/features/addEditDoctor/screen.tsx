@@ -1,5 +1,5 @@
 'use client'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { useState, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -81,7 +81,7 @@ export function AddEditDoctorScreen() {
   }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  if (!_.isEmpty(doctorDetails)) {
+  if (!isEmpty(doctorDetails)) {
     if (
       doctorDetails.status &&
       doctorDetails.status.status.toLowerCase() === 'inactive'
@@ -277,7 +277,7 @@ export function AddEditDoctorScreen() {
     <View className="flex-1">
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
-        title={_.isEmpty(doctorDetails) ? 'Add Doctor' : 'Edit Doctor Details'}
+        title={isEmpty(doctorDetails) ? 'Add Doctor' : 'Edit Doctor Details'}
         memberData={{}}
       />
       <View className="h-full w-full flex-1 py-2 ">
@@ -337,7 +337,7 @@ export function AddEditDoctorScreen() {
                     maxHeight={300}
                     list={specializationList}
                     defaultValue={
-                      !_.isEmpty(doctorDetails) && doctorDetails.specialist
+                      !isEmpty(doctorDetails) && doctorDetails.specialist
                         ? doctorDetails.specialist
                         : ''
                     }
@@ -402,7 +402,7 @@ export function AddEditDoctorScreen() {
                 </View>
               </View>
             </View>
-            {_.isEmpty(doctorDetails) ? (
+            {isEmpty(doctorDetails) ? (
               <View className="border-primary mt-[10] w-full flex-1  self-center rounded-[10px] border-[1px] p-5">
                 <View className="mt-2">
                   <View className=" flex-row items-center">
@@ -432,10 +432,10 @@ export function AddEditDoctorScreen() {
               <Button
                 className="ml-2"
                 leadingIcon="save"
-                title={_.isEmpty(doctorDetails) ? 'Create' : 'Save'}
+                title={isEmpty(doctorDetails) ? 'Create' : 'Save'}
                 variant="default"
                 onPress={
-                  _.isEmpty(doctorDetails)
+                  isEmpty(doctorDetails)
                     ? handleSubmit(createDoctor)
                     : handleSubmit(updateDoctor)
                 }

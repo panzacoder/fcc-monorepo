@@ -6,7 +6,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -77,7 +77,7 @@ export function AddEditIncidentScreen() {
     setSelectedDate(date)
     setKey(Math.random())
   }
-  if (!_.isEmpty(incidentDetails) && !isLoading) {
+  if (!isEmpty(incidentDetails) && !isLoading) {
     incidentTypeRef.current = incidentDetails.type ? incidentDetails.type : ''
   }
   const incidentTypeList = staticData.incidentTypeList.map(
@@ -91,11 +91,11 @@ export function AddEditIncidentScreen() {
   const { control, handleSubmit } = useForm({
     defaultValues: {
       description:
-        !_.isEmpty(incidentDetails) && incidentDetails.description
+        !isEmpty(incidentDetails) && incidentDetails.description
           ? incidentDetails.description
           : '',
       title:
-        !_.isEmpty(incidentDetails) && incidentDetails.title
+        !isEmpty(incidentDetails) && incidentDetails.title
           ? incidentDetails.title
           : ''
     },
@@ -103,7 +103,7 @@ export function AddEditIncidentScreen() {
   })
   function handleBackButtonClick() {
     router.dismiss(1)
-    if (_.isEmpty(incidentDetails)) {
+    if (isEmpty(incidentDetails)) {
       router.push(
         formatUrl('/circles/incidentsList', {
           memberData: JSON.stringify(memberData)
@@ -185,14 +185,14 @@ export function AddEditIncidentScreen() {
       location: selectedAddress,
       contactList: []
     }
-    if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
+    if (isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
       incidentData.location.address.id = undefined
       createIncidentMutation.mutate(
         { incident: incidentData },
         {
           onSuccess: (data) => {
             let details = data?.incident ? data.incident : data
-            if (_.isEmpty(incidentDetails)) {
+            if (isEmpty(incidentDetails)) {
               router.dismiss(1)
             } else {
               router.dismiss(2)
@@ -216,7 +216,7 @@ export function AddEditIncidentScreen() {
         {
           onSuccess: (data) => {
             let details = data
-            if (_.isEmpty(incidentDetails)) {
+            if (isEmpty(incidentDetails)) {
               router.dismiss(1)
             } else {
               router.dismiss(2)
@@ -243,7 +243,7 @@ export function AddEditIncidentScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
+          isEmpty(incidentDetails) || isFromCreateSimilar === 'true'
             ? 'Add Incident'
             : 'Edit Incident Details'
         }
@@ -286,7 +286,7 @@ export function AddEditIncidentScreen() {
           <LocationDetails
             component={'AddEditIncident'}
             data={
-              !_.isEmpty(incidentDetails) && incidentDetails.location
+              !isEmpty(incidentDetails) && incidentDetails.location
                 ? incidentDetails.location
                 : {}
             }

@@ -15,8 +15,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
-import moment from 'moment'
+import { isAfter } from 'date-fns'
 import {
   useMedicalDeviceDetails,
   useDeleteMedicalDevice,
@@ -47,7 +46,7 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
-import { formatTimeToUserLocalTime } from 'app/ui/utils'
+import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
@@ -192,7 +191,7 @@ export function MedicalDevicesDetailsScreen() {
     prescriber = '',
     description = ''
   let deviceAddress = {}
-  if (!_.isEmpty(medicalDevicesDetails)) {
+  if (!isEmpty(medicalDevicesDetails)) {
     if (medicalDevicesDetails.date) {
       medicalDeviceDate = formatTimeToUserLocalTime(
         medicalDevicesDetails.date,
@@ -254,7 +253,7 @@ export function MedicalDevicesDetailsScreen() {
       }
     }
 
-    if (_.isEmpty(reminderData)) {
+    if (isEmpty(reminderData)) {
       createReminderMutation.mutate(
         { reminder: reminderPayload },
         {
@@ -315,7 +314,7 @@ export function MedicalDevicesDetailsScreen() {
       shortDescription: title
     }
 
-    if (_.isEmpty(noteData)) {
+    if (isEmpty(noteData)) {
       createNoteMutation.mutate(
         { note: notePayload },
         {
@@ -669,11 +668,12 @@ export function MedicalDevicesDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {moment(
-                medicalDevicesDetails.date ? medicalDevicesDetails.date : ''
-              )
-                .utc()
-                .isAfter(moment().utc()) ? (
+              {isAfter(
+                new Date(
+                  medicalDevicesDetails.date ? medicalDevicesDetails.date : ''
+                ),
+                new Date()
+              ) ? (
                 <Button
                   className=""
                   title="Add Reminder"

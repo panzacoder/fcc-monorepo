@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useAppSelector } from 'app/redux/hooks'
 import { useForm } from 'react-hook-form'
@@ -10,7 +10,6 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useStatesAndTimezones } from 'app/data/locations'
 import ct from 'countries-and-timezones'
-import moment from 'moment-timezone'
 import { logger } from 'app/utils/logger'
 import type { Address, Country, State, Timezone } from 'app/data/types.d'
 import type { DropdownItem } from 'app/ui/PtsDropdown'
@@ -78,16 +77,16 @@ export const LocationDetails = ({
 
   const getInitialCountryId = useCallback(() => {
     let countryName = ''
-    if (!_.isEmpty(locationData)) {
+    if (!isEmpty(locationData)) {
       countryName = locationData.address.state.country.name
         ? locationData.address.state.country.name
         : ''
-    } else if (!_.isEmpty(memberAddress)) {
+    } else if (!isEmpty(memberAddress)) {
       countryName = memberAddress.state.country.name
         ? memberAddress.state.country.name
         : ''
     } else {
-      let newTimeZone = moment.tz.guess()
+      let newTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const countryObject = ct.getCountriesForTimezone(newTimeZone)
       countryName = countryObject[0]?.name ? countryObject[0].name : ''
     }
@@ -109,7 +108,7 @@ export const LocationDetails = ({
   })
 
   useEffect(() => {
-    if (!_.isEmpty(locationData)) {
+    if (!isEmpty(locationData)) {
       let addressObject = {
         nickName: locationData.nickName ? locationData.nickName : '',
         shortDescription: locationData.shortDescription
@@ -118,7 +117,7 @@ export const LocationDetails = ({
         address: locationData.address ? locationData.address : {}
       }
       setAddressObject(addressObject, 6)
-    } else if (!_.isEmpty(memberAddress)) {
+    } else if (!isEmpty(memberAddress)) {
       memberAddress.line = ''
       memberAddress.city = ''
       memberAddress.zipCode = ''
@@ -130,7 +129,7 @@ export const LocationDetails = ({
       }
       setAddressObject(addressObject, 6)
     } else {
-      let newTimeZone = moment.tz.guess()
+      let newTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const countryObject = ct.getCountriesForTimezone(newTimeZone)
       let countryName = countryObject[0]?.name ? countryObject[0].name : ''
       staticData.countryList.map(async (data: Country, index: number) => {
@@ -169,7 +168,7 @@ export const LocationDetails = ({
       ? statesQuery.data.timeZoneList
       : []
     if (component === 'SignUp') {
-      let newTimeZone = moment.tz.guess()
+      let newTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       statesQuery.data.timeZoneList.map((tz: Timezone, index: number) => {
         if (tz.name === newTimeZone) {
           timeZoneIndexRef.current = index + 1
@@ -179,7 +178,7 @@ export const LocationDetails = ({
         timeZoneListFullRef.current[timeZoneIndexRef.current - 1],
         8
       )
-    } else if (!_.isEmpty(locationData)) {
+    } else if (!isEmpty(locationData)) {
       let stateName = locationData.address.state.name
         ? locationData.address.state.name
         : ''
@@ -196,7 +195,7 @@ export const LocationDetails = ({
           timeZoneIndexRef.current = index + 1
         }
       })
-    } else if (!_.isEmpty(memberAddress)) {
+    } else if (!isEmpty(memberAddress)) {
       let stateName = memberAddress.state.name ? memberAddress.state.name : ''
       statesQuery.data.stateList.map((item: State, index: number) => {
         if (item.name === stateName) {
@@ -225,23 +224,23 @@ export const LocationDetails = ({
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       locationName:
-        !_.isEmpty(locationData) && locationData.nickName
+        !isEmpty(locationData) && locationData.nickName
           ? locationData.nickName
           : '',
       line:
-        !_.isEmpty(locationData) && locationData.address.line
+        !isEmpty(locationData) && locationData.address.line
           ? locationData.address.line
           : '',
       city:
-        !_.isEmpty(locationData) && locationData.address.city
+        !isEmpty(locationData) && locationData.address.city
           ? locationData.address.city
           : '',
       postalCode:
-        !_.isEmpty(locationData) && locationData.address.zipCode
+        !isEmpty(locationData) && locationData.address.zipCode
           ? locationData.address.zipCode
           : '',
       country:
-        !_.isEmpty(locationData) || !_.isEmpty(memberAddress)
+        !isEmpty(locationData) || !isEmpty(memberAddress)
           ? countryIndexRef.current
           : -1,
       state: stateIndexRef.current,
@@ -252,7 +251,7 @@ export const LocationDetails = ({
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
       shortName:
-        !_.isEmpty(locationData) && locationData.shortDescription
+        !isEmpty(locationData) && locationData.shortDescription
           ? locationData.shortDescription
           : ''
     },

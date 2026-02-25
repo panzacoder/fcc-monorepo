@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
-import { getAddressFromObject } from 'app/ui/utils'
+import { getAddressFromObject, isEmpty } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { useAppSelector } from 'app/redux/hooks'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
@@ -82,7 +81,7 @@ export const AddEditTransport = ({
     (state) => state.staticDataState.staticData
   ) as StaticData
   const [selectedDate, setSelectedDate] = useState(
-    !_.isEmpty(transportData)
+    !isEmpty(transportData)
       ? new Date(transportData.date ?? new Date())
       : new Date(date)
   )
@@ -109,7 +108,7 @@ export const AddEditTransport = ({
   })
 
   useEffect(() => {
-    if (!memberListQuery.data || !_.isEmpty(transportData)) return
+    if (!memberListQuery.data || !isEmpty(transportData)) return
     let list: Array<{ id: number; title: string }> = memberListQuery.data.map(
       (item: MemberListItem, index: number) => {
         return {
@@ -125,10 +124,10 @@ export const AddEditTransport = ({
   useEffect(() => {
     if (!statesQuery.data) return
     let stateName = ''
-    if (!_.isEmpty(address)) {
+    if (!isEmpty(address)) {
       stateName = address.state?.name ? address.state.name : ''
     } else {
-      if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+      if (!isEmpty(memberAddress) && isEmpty(transportData)) {
         stateName = memberAddress.state.name ? memberAddress.state.name : ''
       }
     }
@@ -156,12 +155,12 @@ export const AddEditTransport = ({
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       description: '',
-      member: _.isEmpty(transportData) ? -1 : 1,
-      addressLine: !_.isEmpty(address) && address.line ? address.line : '',
-      state: _.isEmpty(transportData) ? stateIndexRef.current : 1,
-      country: _.isEmpty(transportData) ? countryIndexRef.current : 1,
-      city: !_.isEmpty(address) && address.city ? address.city : '',
-      postalCode: !_.isEmpty(address) && address.zipCode ? address.zipCode : ''
+      member: isEmpty(transportData) ? -1 : 1,
+      addressLine: !isEmpty(address) && address.line ? address.line : '',
+      state: isEmpty(transportData) ? stateIndexRef.current : 1,
+      country: isEmpty(transportData) ? countryIndexRef.current : 1,
+      city: !isEmpty(address) && address.city ? address.city : '',
+      postalCode: !isEmpty(address) && address.zipCode ? address.zipCode : ''
     },
     resolver: zodResolver(schema)
   })
@@ -170,10 +169,10 @@ export const AddEditTransport = ({
   >([])
   const [statesListFull, setStatesListFull] = useState<State[]>([])
   let countryName = ''
-  if (!_.isEmpty(address)) {
+  if (!isEmpty(address)) {
     countryName = address.state?.country?.name ? address.state.country.name : ''
   } else {
-    if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
+    if (!isEmpty(memberAddress) && isEmpty(transportData)) {
       countryName = memberAddress.state.country.name
         ? memberAddress.state.country.name
         : ''
@@ -205,7 +204,7 @@ export const AddEditTransport = ({
     updateTransportationEventMutation.isPending
 
   async function createUpdateTransport(formData: Schema) {
-    if (_.isEmpty(transportData)) {
+    if (isEmpty(transportData)) {
       let stateObject = statesListFull[formData.state - 1]
       let countryObject: object =
         staticData.countryList[formData.country - 1] ?? {}
@@ -363,10 +362,10 @@ export const AddEditTransport = ({
       className="my-5 mt-0 h-[90%] w-[90%] self-center rounded-[15px] border-[0.5px] border-gray-400 bg-[#f4ecf7] py-5"
     >
       <PtsLoader loading={isLoading} />
-      <Typography className="self-center font-bold">{`${_.isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
+      <Typography className="self-center font-bold">{`${isEmpty(transportData) ? 'Add ' : 'Edit '} ${component} Transportation`}</Typography>
       <SafeAreaView>
         <ScrollView className="my-2 w-full">
-          {_.isEmpty(transportData) ? (
+          {isEmpty(transportData) ? (
             <View>
               <View className="w-full flex-row justify-center">
                 <ControlledDropdown
@@ -480,7 +479,7 @@ export const AddEditTransport = ({
             />
             <Button
               className="ml-5"
-              title={_.isEmpty(transportData) ? 'Send Request' : 'Save'}
+              title={isEmpty(transportData) ? 'Send Request' : 'Save'}
               variant="default"
               leadingIcon="save"
               onPress={handleSubmit(createUpdateTransport)}

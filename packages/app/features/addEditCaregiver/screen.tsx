@@ -3,7 +3,7 @@ import { Alert, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
@@ -68,12 +68,12 @@ export function AddEditCaregiverScreen() {
   const [isMemberFound, setIsMemberFound] = useState(false)
   const [searchEmail, setSearchEmail] = useState('')
   const [status, setStatus] = useState(
-    !_.isEmpty(caregiverDetails) && caregiverDetails.familyMemberMemberStatus
+    !isEmpty(caregiverDetails) && caregiverDetails.familyMemberMemberStatus
       ? caregiverDetails.familyMemberMemberStatus.status
       : ''
   )
   let fullName = ''
-  if (!_.isEmpty(caregiverDetails)) {
+  if (!isEmpty(caregiverDetails)) {
     fullName += caregiverDetails.firstName ? caregiverDetails.firstName : ''
     fullName += caregiverDetails.middleName
       ? ' ' + caregiverDetails.middleName
@@ -93,7 +93,7 @@ export function AddEditCaregiverScreen() {
   const profileList: Array<{ id: number; title: string }> =
     staticData.profileList.map(
       ({ name, id }: ProfileResponse, index: number) => {
-        if (!_.isEmpty(caregiverDetails)) {
+        if (!isEmpty(caregiverDetails)) {
           if (profileRef.current === name) {
             profileIndexRef.current = index + 1
           }
@@ -108,15 +108,15 @@ export function AddEditCaregiverScreen() {
     defaultValues: {
       profileIndex: profileIndexRef.current,
       email:
-        !_.isEmpty(caregiverDetails) && caregiverDetails.email
+        !isEmpty(caregiverDetails) && caregiverDetails.email
           ? caregiverDetails.email
           : '',
       firstName:
-        !_.isEmpty(caregiverDetails) && caregiverDetails.firstName
+        !isEmpty(caregiverDetails) && caregiverDetails.firstName
           ? caregiverDetails.firstName
           : '',
       lastName:
-        !_.isEmpty(caregiverDetails) && caregiverDetails.lastName
+        !isEmpty(caregiverDetails) && caregiverDetails.lastName
           ? caregiverDetails.lastName
           : ''
     },
@@ -125,7 +125,7 @@ export function AddEditCaregiverScreen() {
   const { control: control1, reset: reset1 } = useForm({
     defaultValues: {
       phone:
-        !_.isEmpty(caregiverDetails) && caregiverDetails.phone
+        !isEmpty(caregiverDetails) && caregiverDetails.phone
           ? caregiverDetails.phone
           : ''
     },
@@ -174,7 +174,7 @@ export function AddEditCaregiverScreen() {
     }
   }
   async function createUpdateCaregiver(object: CaregiverFamilyMemberInput) {
-    const mutation = _.isEmpty(caregiverDetails)
+    const mutation = isEmpty(caregiverDetails)
       ? createCaregiverMutation
       : updateCaregiverMutation
 
@@ -183,7 +183,7 @@ export function AddEditCaregiverScreen() {
       {
         onSuccess: (data: CaregiverDetailResponse | null) => {
           let details = data && data.familyMember ? data.familyMember : {}
-          if (_.isEmpty(caregiverDetails)) {
+          if (isEmpty(caregiverDetails)) {
             router.dismiss(1)
           } else {
             router.dismiss(2)
@@ -213,7 +213,7 @@ export function AddEditCaregiverScreen() {
           uid: profile.uid
         }
       }
-    } else if (_.isEmpty(caregiverDetails)) {
+    } else if (isEmpty(caregiverDetails)) {
       object = {
         email: formData.email,
         phone: removeAllSpecialCharFromString(caregiverPhone),
@@ -280,12 +280,12 @@ export function AddEditCaregiverScreen() {
     <View className="flex-1">
       <PtsLoader loading={isSearching || isMutating} />
       <PtsBackHeader
-        title={_.isEmpty(caregiverDetails) ? 'Add Caregiver' : 'Edit Caregiver'}
+        title={isEmpty(caregiverDetails) ? 'Add Caregiver' : 'Edit Caregiver'}
         memberData={memberData}
       />
       <SafeAreaView className="flex-1">
         <ScrollView
-          className={`${_.isEmpty(caregiverDetails) ? ' mt-5 max-h-[90%]' : ' mt-10 max-h-[60%]'} w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2`}
+          className={`${isEmpty(caregiverDetails) ? ' mt-5 max-h-[90%]' : ' mt-10 max-h-[60%]'} w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 bg-white py-2`}
         >
           <View className="my-2 w-full">
             {isMemberFound ? (
@@ -303,7 +303,7 @@ export function AddEditCaregiverScreen() {
                     list={profileList}
                     className="ml-2 mt-2 w-[85%]"
                     defaultValue={
-                      !_.isEmpty(caregiverDetails) ? profileRef.current : ''
+                      !isEmpty(caregiverDetails) ? profileRef.current : ''
                     }
                   />
                   <Feather
@@ -319,7 +319,7 @@ export function AddEditCaregiverScreen() {
               </View>
             ) : (
               <View>
-                {_.isEmpty(caregiverDetails) ? (
+                {isEmpty(caregiverDetails) ? (
                   <View className="my-2 w-full justify-center">
                     <ControlledTextField
                       control={control}
@@ -370,7 +370,7 @@ export function AddEditCaregiverScreen() {
                         list={profileList}
                         className="ml-2 mt-2 w-[85%]"
                         defaultValue={
-                          !_.isEmpty(caregiverDetails) ? profileRef.current : ''
+                          !isEmpty(caregiverDetails) ? profileRef.current : ''
                         }
                       />
                       <Feather
@@ -400,7 +400,7 @@ export function AddEditCaregiverScreen() {
                         list={profileList}
                         className="ml-2 mt-2 w-[85%]"
                         defaultValue={
-                          !_.isEmpty(caregiverDetails) ? profileRef.current : ''
+                          !isEmpty(caregiverDetails) ? profileRef.current : ''
                         }
                       />
                       <Feather
@@ -431,7 +431,7 @@ export function AddEditCaregiverScreen() {
               <Button
                 className="ml-5"
                 leadingIcon="save"
-                title={_.isEmpty(caregiverDetails) ? 'Create' : 'Save'}
+                title={isEmpty(caregiverDetails) ? 'Create' : 'Save'}
                 variant="default"
                 onPress={handleSubmit(callCreateUpdateDevice)}
               />

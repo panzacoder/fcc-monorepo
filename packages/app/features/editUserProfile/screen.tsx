@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import PtsLoader from 'app/ui/PtsLoader'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { Button } from 'app/ui/button'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
@@ -54,21 +54,20 @@ export function EditUserProfileScreen() {
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  if (!_.isEmpty(userDetails)) {
+  if (!isEmpty(userDetails)) {
     userPhone = userDetails.phone ? userDetails.phone : ''
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName:
-        !_.isEmpty(userDetails) && userDetails.firstName
+        !isEmpty(userDetails) && userDetails.firstName
           ? userDetails.firstName
           : '',
       lastName:
-        !_.isEmpty(userDetails) && userDetails.lastName
+        !isEmpty(userDetails) && userDetails.lastName
           ? userDetails.lastName
           : '',
-      email:
-        !_.isEmpty(userDetails) && userDetails.email ? userDetails.email : ''
+      email: !isEmpty(userDetails) && userDetails.email ? userDetails.email : ''
     },
     resolver: zodResolver(profileSchema)
   })
@@ -76,7 +75,7 @@ export function EditUserProfileScreen() {
   const { control: control3, reset: reset2 } = useForm({
     defaultValues: {
       phone:
-        !_.isEmpty(userDetails) && userDetails.phone
+        !isEmpty(userDetails) && userDetails.phone
           ? convertPhoneNumberToUsaPhoneNumberFormat(userDetails.phone)
           : ''
     },

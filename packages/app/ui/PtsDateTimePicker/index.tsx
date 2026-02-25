@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import moment from 'moment'
+import { format } from 'date-fns'
 import { COLORS } from 'app/utils/colors'
 import { Button } from 'react-native-elements'
 export const PtsDateTimePicker = ({
@@ -22,8 +22,8 @@ export const PtsDateTimePicker = ({
   const selectedTimeRef = useRef<string>('')
   const selectedDateRef = useRef<string>('')
   let date = new Date(currentData)
-  selectedTimeRef.current = moment(date).format('hh:mm A')
-  selectedDateRef.current = moment(date).format('DD MMM YYYY')
+  selectedTimeRef.current = format(date as Date, 'hh:mm a')
+  selectedDateRef.current = format(date as Date, 'dd MMM yyyy')
   const [isRender, setIsRender] = useState(false)
   const [isShowDateTimeModal, setDateTimeModal] = useState(false)
   const [isShowDateModal, setDateModal] = useState(false)
@@ -32,9 +32,7 @@ export const PtsDateTimePicker = ({
   const [timeSelected, setTimeSelected] = useState(selectedTimeRef.current)
 
   function getValueForPicker() {
-    let date = new Date()
-    date = new Date(moment(currentData).utc(true).local(true).unix() * 1000)
-    return date
+    return new Date(currentData)
   }
   function cancelClicked() {
     setDateTimeModal(false)
@@ -65,8 +63,8 @@ export const PtsDateTimePicker = ({
               style={{}}
               onChange={(event, date) => {
                 if (event.type === 'set') {
-                  selectedTimeRef.current = moment(date).format('hh:mm A')
-                  selectedDateRef.current = moment(date).format('DD MMM YYYY')
+                  selectedTimeRef.current = format(date as Date, 'hh:mm a')
+                  selectedDateRef.current = format(date as Date, 'dd MMM yyyy')
                   currentData = date as Date
                   setDateSelected(selectedDateRef.current)
                   setTimeSelected(selectedTimeRef.current)

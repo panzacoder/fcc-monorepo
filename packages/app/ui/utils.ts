@@ -1,12 +1,14 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import moment, { MomentInput } from 'moment-timezone'
+import { format } from 'date-fns'
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import { Alert, Platform, Linking } from 'react-native'
-import _ from 'lodash'
 import { logger } from 'app/utils/logger'
+
+export type DateInput = Date | string | number
+
 export const DATE_CONSTANT = {
-  FULL_DATE: 'DD MMM YYYY hh:mm A'
-  // FULL_DATE: 'MMM DD, YYYY'
+  FULL_DATE: 'dd MMM yyyy hh:mm a'
 }
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -19,6 +21,13 @@ export const isNull = (input: unknown) => {
   if (undefined === input || null === input) {
     return true
   }
+  return false
+}
+export const isEmpty = (value: unknown): boolean => {
+  if (value == null) return true
+  if (Array.isArray(value)) return value.length === 0
+  if (typeof value === 'object') return Object.keys(value).length === 0
+  if (typeof value === 'string') return value.length === 0
   return false
 }
 export function googleMapOpenUrl(address: string) {
@@ -145,11 +154,8 @@ export function getAddressFromObject(address: AddressLike | null | undefined) {
 
   return finalAddress
 }
-export const getFullDateForCalendar = (
-  time: MomentInput,
-  formatType: string
-) => {
-  return moment(time).format(formatType)
+export const getFullDateForCalendar = (time: DateInput, formatType: string) => {
+  return format(new Date(time), formatType)
 }
 export const getMonthsList = () => {
   let monthsList: object[] = [
@@ -205,62 +211,64 @@ function getTimezoneName(
   if (timeZoneName) {
     return timeZoneName
   } else {
-    return moment.tz.guess()
+    return Intl.DateTimeFormat().resolvedOptions().timeZone
   }
 }
 
-export const getFullDate = (date: MomentInput) => {
-  return moment(date).format(DATE_CONSTANT.FULL_DATE)
+export const getFullDate = (date: DateInput) => {
+  return format(new Date(date), DATE_CONSTANT.FULL_DATE)
 }
-export const getDay = (date: MomentInput) => {
-  var time = moment(date).format('hh:mm A')
-  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  var formatDate = moment(date).format('MMM DD, YYYY')
-  return formatDate + ' (' + days[moment(date).day()] + ') - ' + time
+export const getDay = (date: DateInput) => {
+  const d = new Date(date)
+  const time = format(d, 'hh:mm a')
+  const dayAbbr = format(d, 'EEE')
+  const formatDate = format(d, 'MMM dd, yyyy')
+  return `${formatDate} (${dayAbbr}) - ${time}`
 }
 export const convertUserTimeToUTC = (
-  time: MomentInput,
+  time: DateInput,
   userAddress: TimezoneHolder | null,
   memberAddress: TimezoneHolder | null
 ) => {
-  let timeZoneName = getTimezoneName(userAddress, memberAddress)
-  let time1 = moment(time).format(DATE_CONSTANT.FULL_DATE)
-  let utcDateTime = moment
-    .tz(time1, DATE_CONSTANT.FULL_DATE, timeZoneName)
-    .utc()
-  return utcDateTime
+  const timeZoneName = getTimezoneName(userAddress, memberAddress)
+  return fromZonedTime(new Date(time), timeZoneName)
 }
 export const getOnlyUserTimeZone = (
   userAddress: TimezoneHolder | null,
   memberAddress: TimezoneHolder | null
 ) => {
-  let timeZoneName = getTimezoneName(userAddress, memberAddress)
+  const timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
-    return `(${moment().tz(timeZoneName).format('z')})`
+    return `(${formatInTimeZone(new Date(), timeZoneName, 'zzz')})`
   }
 }
 export const convertTimeToUserLocalTime = (
-  time: MomentInput,
+  time: DateInput,
   userAddress: TimezoneHolder | null,
   memberAddress: TimezoneHolder | null
 ) => {
-  let timeZoneName = getTimezoneName(userAddress, memberAddress)
+  const timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
-    return `${getFullDate(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
+    return `${formatInTimeZone(new Date(time), timeZoneName, DATE_CONSTANT.FULL_DATE)} (${formatInTimeZone(new Date(), timeZoneName, 'zzz')})`
   } else {
-    return getFullDate(moment(time).utc(true))
+    return format(new Date(time), DATE_CONSTANT.FULL_DATE)
   }
 }
 export const formatTimeToUserLocalTime = (
-  time: MomentInput,
+  time: DateInput,
   userAddress: TimezoneHolder | null,
   memberAddress: TimezoneHolder | null
 ) => {
-  let timeZoneName = getTimezoneName(userAddress, memberAddress)
+  const timeZoneName = getTimezoneName(userAddress, memberAddress)
   if (timeZoneName) {
-    return `${getDay(moment(time).tz(timeZoneName))} (${moment().tz(timeZoneName).format('z')})`
+    const d = new Date(time)
+    const formattedDate = formatInTimeZone(d, timeZoneName, 'MMM dd, yyyy')
+    const dayAbbr = formatInTimeZone(d, timeZoneName, 'EEE')
+    const formattedTime = formatInTimeZone(d, timeZoneName, 'hh:mm a')
+    const tz = formatInTimeZone(new Date(), timeZoneName, 'zzz')
+    return `${formattedDate} (${dayAbbr}) - ${formattedTime} (${tz})`
   } else {
-    return getFullDate(moment(time).utc(true))
+    return format(new Date(time), DATE_CONSTANT.FULL_DATE)
   }
 }
 export const getColorSet = (index: number) => {

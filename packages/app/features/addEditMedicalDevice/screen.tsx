@@ -4,7 +4,7 @@ import { Alert, View } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import { Button } from 'app/ui/button'
-import _ from 'lodash'
+import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { useForm } from 'react-hook-form'
@@ -70,9 +70,7 @@ export function AddEditMedicalDeviceScreen() {
     medicalDeviceDetails.type ? medicalDeviceDetails.type : ''
   )
   const [isPrescribed, setIsPrescribed] = useState(
-    !_.isEmpty(medicalDeviceDetails)
-      ? medicalDeviceDetails.isPrescribedBy
-      : false
+    !isEmpty(medicalDeviceDetails) ? medicalDeviceDetails.isPrescribedBy : false
   )
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
@@ -87,7 +85,7 @@ export function AddEditMedicalDeviceScreen() {
       let list = doctorsQuery.data.list ? doctorsQuery.data.list : []
       doctorListRef.current = list.map(
         (data: DoctorListItem, index: number) => {
-          if (!_.isEmpty(medicalDeviceDetails)) {
+          if (!isEmpty(medicalDeviceDetails)) {
             if (
               medicalDeviceDetails.doctor &&
               data.id === medicalDeviceDetails.doctor.id
@@ -125,7 +123,7 @@ export function AddEditMedicalDeviceScreen() {
     defaultValues: {
       prescriberIndex: !isPrescribed ? 1 : selectedPrescriberIndex,
       description:
-        !_.isEmpty(medicalDeviceDetails) && medicalDeviceDetails.description
+        !isEmpty(medicalDeviceDetails) && medicalDeviceDetails.description
           ? medicalDeviceDetails.description
           : ''
     },
@@ -157,7 +155,7 @@ export function AddEditMedicalDeviceScreen() {
   }) {
     let purchaseData: CreateMedicalDeviceParams['purchase'] = {
       id:
-        !_.isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
+        !isEmpty(medicalDeviceDetails) && isFromCreateSimilar !== 'true'
           ? medicalDeviceDetails.id
           : null,
       date: object.date ? String(object.date) : '',
@@ -172,11 +170,11 @@ export function AddEditMedicalDeviceScreen() {
       }
     }
     const isCreate =
-      _.isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
+      isEmpty(medicalDeviceDetails) || isFromCreateSimilar === 'true'
     const mutationCallbacks = {
       onSuccess: (data: MedicalDeviceDetailsResponse) => {
         let details = data?.purchase ? data.purchase : {}
-        if (_.isEmpty(medicalDeviceDetails)) {
+        if (isEmpty(medicalDeviceDetails)) {
           router.dismiss(1)
         } else {
           router.dismiss(2)
@@ -228,7 +226,7 @@ export function AddEditMedicalDeviceScreen() {
       <PtsLoader loading={isLoading} />
       <PtsBackHeader
         title={
-          _.isEmpty(medicalDeviceDetails)
+          isEmpty(medicalDeviceDetails)
             ? 'Add Medical Device'
             : 'Edit Medical Device'
         }
@@ -277,7 +275,7 @@ export function AddEditMedicalDeviceScreen() {
                   list={doctorListRef.current}
                   className="w-[95%] self-center"
                   defaultValue={
-                    !_.isEmpty(medicalDeviceDetails) ? prescribedBy : ''
+                    !isEmpty(medicalDeviceDetails) ? prescribedBy : ''
                   }
                   // onChangeValue={setPrescriberChange}
                 />
@@ -306,7 +304,7 @@ export function AddEditMedicalDeviceScreen() {
               />
               <Button
                 className="ml-5"
-                title={_.isEmpty(medicalDeviceDetails) ? 'Create' : 'Save'}
+                title={isEmpty(medicalDeviceDetails) ? 'Create' : 'Save'}
                 variant="default"
                 leadingIcon="save"
                 onPress={handleSubmit(callCreateUpdateDevice)}

@@ -1,5 +1,4 @@
 'use client'
-import _ from 'lodash'
 import { useState, useEffect } from 'react'
 import { View, Alert, Linking, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
@@ -8,11 +7,12 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import type { ComponentProps } from 'react'
-import moment from 'moment'
+import { isBefore } from 'date-fns'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import {
   formatTimeToUserLocalTime,
-  convertPhoneNumberToUsaPhoneNumberFormat
+  convertPhoneNumberToUsaPhoneNumberFormat,
+  isEmpty
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { formatUrl } from 'app/utils/format-url'
@@ -195,7 +195,7 @@ export function AppointmentDetailsScreen() {
     description = ''
   let doctorFacilityAddress: Record<string, unknown> = {}
 
-  if (!_.isEmpty(appointmentDetails)) {
+  if (!isEmpty(appointmentDetails)) {
     if (appointmentDetails.date) {
       apptDate = formatTimeToUserLocalTime(
         appointmentDetails.date,
@@ -464,9 +464,10 @@ export function AppointmentDetailsScreen() {
                 getUserPermission(appointmentPrivileges).updatePermission ||
                 getUserPermission(appointmentPrivileges).deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
-                  {moment(appointmentDetails.date ?? '')
-                    .utc()
-                    .isBefore(moment().utc()) ? (
+                  {isBefore(
+                    new Date(appointmentDetails.date ?? ''),
+                    new Date()
+                  ) ? (
                     <Button
                       className="w-[50%] bg-[#ef6603]"
                       title="Mark Completed"
