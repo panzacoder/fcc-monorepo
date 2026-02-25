@@ -134,6 +134,24 @@ export function useWeekView() {
     setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
   }, [])
 
+  function processActivityList(list: MemberActivity[]) {
+    let filtered: MemberActivity[] = []
+    if (isDayView) {
+      list.forEach((option) => {
+        if (
+          currentDate === getFullDateForCalendar(option.date, 'DD MMM YYYY')
+        ) {
+          filtered.push(option)
+        }
+      })
+    }
+    setMemberActivityList(isDayView ? filtered : list)
+    if (isWeekView) {
+      setMemberActivityWithDays(list)
+    }
+    setIsDataReceived(true)
+  }
+
   const getPreviousWeek = useCallback(() => {
     getWeekCurrentLastDays(weekDayUtcDatesRef.current[0]!)
     setIsDataReceived(false)
@@ -201,6 +219,53 @@ export function useWeekView() {
     setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
   }, [])
 
+  const handlePrev = useCallback(() => {
+    if (isDayView) {
+      getPreviousDate()
+    } else {
+      clearLists()
+      getPreviousWeek()
+    }
+  }, [isDayView, getPreviousDate, getPreviousWeek])
+
+  const handleNext = useCallback(() => {
+    if (isDayView) {
+      getNextDate()
+    } else {
+      clearLists()
+      getNextWeek()
+    }
+  }, [isDayView, getNextDate, getNextWeek])
+
+  const applyFilter = useCallback(() => {
+    setIsDataReceived(false)
+    if (isDayView) {
+      setQueryFromDate(fromDate)
+      setQueryToDate(toDate)
+    } else {
+      getWeekCurrentLastDays(selectedDateUtc)
+      setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+      setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
+    }
+  }, [isDayView, fromDate, toDate, selectedDateUtc])
+
+  const resetView = useCallback(() => {
+    setSelectedDate(getFullDateForCalendar(new Date(), 'MMM DD, YYYY'))
+    setIsDataReceived(false)
+    if (isDayView) {
+      const resetDate = getFullDateForCalendar(new Date(), 'YYYY-MM-DD')
+      setCurrentDateForDayView(
+        getFullDateForCalendar(new Date(), 'DD MMM YYYY')
+      )
+      setQueryFromDate(resetDate)
+      setQueryToDate(resetDate)
+    } else {
+      getWeekCurrentLastDays(new Date())
+      setQueryFromDate(weekFirstLastDaysRef.current[0] ?? '')
+      setQueryToDate(weekFirstLastDaysRef.current[6] ?? '')
+    }
+  }, [isDayView])
+
   const dayListRefs = [
     listDayOneRef,
     listDayTwoRef,
@@ -211,40 +276,37 @@ export function useWeekView() {
     listDaySevenRef
   ]
 
+  const dateRangeLabel =
+    weekDaysShort[0] +
+    ', ' +
+    weekDayListDatesRef.current[0] +
+    ' - ' +
+    weekDaysShort[6] +
+    ', ' +
+    weekDayListDatesRef.current[6] +
+    ', ' +
+    currentYear
+
   return {
-    weekDaysShort,
-    weekFirstLastDaysRef,
-    weekDayListDatesRef,
     weekDayListRef,
     dayListRefs,
-    fromDate,
-    toDate,
-    currentDate,
-    currentYear,
     selectedDate,
-    setSelectedDate,
-    selectedDateUtc,
     currentDateForDayView,
-    setCurrentDateForDayView,
     isDayView,
     isWeekView,
     isDataReceived,
-    setIsDataReceived,
     memberActivityList,
-    setMemberActivityList,
     queryFromDate,
-    setQueryFromDate,
     queryToDate,
-    setQueryToDate,
-    clearLists,
-    getWeekCurrentLastDays,
-    setMemberActivityWithDays,
-    getPreviousWeek,
-    getNextWeek,
-    getPreviousDate,
-    getNextDate,
+    dateRangeLabel,
+    processActivityList,
+    setCurrentDateForDayView,
     handleDateChange,
     switchToDayView,
-    switchToWeekView
+    switchToWeekView,
+    handlePrev,
+    handleNext,
+    applyFilter,
+    resetView
   }
 }
