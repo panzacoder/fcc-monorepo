@@ -18,6 +18,20 @@ import type {
 } from 'app/data/profile'
 import type { ProfileDataReturn } from '../hooks/useProfileData'
 
+const titleStyle = 'ml-2 font-400 w-[25%] text-[15px] text-[#1A1A1A]'
+const valueStyle = 'font-400 ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
+
+function getDetailsView(title: string, value: string) {
+  return (
+    <View className="mt-2 w-full flex-row items-center">
+      <View className="w-full flex-row">
+        <Typography className={titleStyle}>{title}</Typography>
+        <Typography className={valueStyle}>{value}</Typography>
+      </View>
+    </View>
+  )
+}
+
 interface SubscriptionSectionProps {
   profileData: UserProfileResponse
   appuserDetails: Partial<ProfileAppUser>
@@ -28,7 +42,6 @@ interface SubscriptionSectionProps {
   autoSubscription: ProfileDataReturn['autoSubscription']
   manualSubscription: ProfileDataReturn['manualSubscription']
   cancelSubscription: ProfileDataReturn['cancelSubscription']
-  getDetailsView: (title: string, value: string) => React.ReactNode
 }
 
 export function SubscriptionSection({
@@ -40,8 +53,7 @@ export function SubscriptionSection({
   userProfile,
   autoSubscription,
   manualSubscription,
-  cancelSubscription,
-  getDetailsView
+  cancelSubscription
 }: SubscriptionSectionProps) {
   const router = useRouter()
   const [isShowOrderList, setIsShowOrderList] = useState(false)
