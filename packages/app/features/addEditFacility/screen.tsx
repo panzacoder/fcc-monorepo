@@ -50,25 +50,11 @@ export function AddEditFacilityScreen() {
     shortDescription: '',
     nickName: '',
     address: {
-      id: '',
       line: '',
       city: '',
       zipCode: '',
       state: {
-        name: '',
-        code: '',
-        namecode: '',
-        description: '',
-        snum: '',
-        id: '',
-        country: {
-          name: '',
-          code: '',
-          namecode: '',
-          isoCode: '',
-          description: '',
-          id: ''
-        }
+        country: {}
       }
     }
   })
@@ -114,7 +100,6 @@ export function AddEditFacilityScreen() {
     }
   )
 
-
   const { control, handleSubmit } = useForm({
     defaultValues: {
       facilityName:
@@ -150,7 +135,7 @@ export function AddEditFacilityScreen() {
       facility: {
         id: facilityDetails.id ? facilityDetails.id : '',
         member: {
-          id: memberData.member
+          id: memberData.member ?? ''
         },
         name: formData.facilityName,
         ispharmacy: isThisPharmacyRef.current,
@@ -165,7 +150,7 @@ export function AddEditFacilityScreen() {
       }
     })
     if (data) {
-      let details = data.facility ? data.facility : {}
+      let details = data.facilityWithAppointment?.facility ?? {}
       router.dismiss(2)
       router.push(
         formatUrl('/circles/facilityDetails', {
@@ -180,18 +165,18 @@ export function AddEditFacilityScreen() {
       Alert.alert('', 'Select Type')
       return
     }
-    let locationList: object[] = []
+    let locationList: FacilityLocationData[] = []
     selectedAddressRef.current.fax = formData.fax
     selectedAddressRef.current.website = formData.website
     selectedAddressRef.current.phone = removeAllSpecialCharFromString(
       locationPhoneRef.current
     )
-    selectedAddressRef.current.address.id = ''
+    selectedAddressRef.current.address.id = undefined
     locationList.push(selectedAddressRef.current)
     const data = await createFacilityMutation.mutateAsync({
       facility: {
         member: {
-          id: memberData.member
+          id: memberData.member ?? ''
         },
         name: formData.facilityName,
         ispharmacy: isThisPharmacyRef.current,
@@ -203,7 +188,7 @@ export function AddEditFacilityScreen() {
       }
     })
     if (data) {
-      let details = data.facility ? data.facility : {}
+      let details = data.facilityWithAppointment?.facility ?? {}
       if (item.component === 'addEditAppointment') {
         router.dismiss(2)
         router.push(
@@ -229,44 +214,44 @@ export function AddEditFacilityScreen() {
   }
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const str = value as string
+      const obj = value as Record<string, string | number>
       if (index === 0) {
-        selectedAddressRef.current.nickName = value
+        selectedAddressRef.current.nickName = str
       }
       if (index === 7) {
-        selectedAddressRef.current.shortDescription = value
+        selectedAddressRef.current.shortDescription = str
       }
       if (index === 1) {
-        selectedAddressRef.current.address.line = value
+        selectedAddressRef.current.address.line = str
       }
       if (index === 2) {
-        selectedAddressRef.current.address.city = value
+        selectedAddressRef.current.address.city = str
       }
       if (index === 3) {
-        selectedAddressRef.current.address.zipCode = value
+        selectedAddressRef.current.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddressRef.current.address.state.country.id = value.id
-        selectedAddressRef.current.address.state.country.name = value.name
-        selectedAddressRef.current.address.state.country.code = value.code
-        selectedAddressRef.current.address.state.country.namecode =
-          value.namecode
-        selectedAddressRef.current.address.state.country.snum = value.snum
-        selectedAddressRef.current.address.state.country.description =
-          value.description
+        const state = (selectedAddressRef.current.address.state ??= {})
+        const country = (state.country ??= {})
+        country.id = obj.id as number
+        country.name = obj.name as string
+        country.code = obj.code as string
+        country.namecode = obj.namecode as string
+        country.isoCode = obj.isoCode as string
       }
       if (index === 5) {
-        selectedAddressRef.current.address.state.id = value.id
-        selectedAddressRef.current.address.state.name = value.name
-        selectedAddressRef.current.address.state.code = value.code
-        selectedAddressRef.current.address.state.namecode = value.namecode
-        selectedAddressRef.current.address.state.snum = value.snum
-        selectedAddressRef.current.address.state.description = value.description
+        const state = (selectedAddressRef.current.address.state ??= {})
+        state.id = obj.id as number
+        state.name = obj.name as string
+        state.code = obj.code as string
+        state.namecode = obj.namecode as string
+        state.snum = obj.snum as string
       }
       if (index === 6) {
-        selectedAddressRef.current = value
+        selectedAddressRef.current = value as FacilityLocationData
       }
     }
-
   }
   return (
     <View className="flex-1">

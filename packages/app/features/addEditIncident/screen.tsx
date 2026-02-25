@@ -13,7 +13,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { useCreateIncident, useUpdateIncident } from 'app/data/incidents'
-import type { IncidentData } from 'app/data/incidents/types'
+import type { IncidentData, IncidentLocation } from 'app/data/incidents/types'
 import type { IncidentType } from 'app/data/types'
 import type { StaticData } from 'app/data/static'
 import { Button } from 'app/ui/button'
@@ -54,29 +54,15 @@ export function AddEditIncidentScreen() {
     : 'false'
   const isLoading =
     createIncidentMutation.isPending || updateIncidentMutation.isPending
-  const [selectedAddress, setSelectedAddress] = useState({
+  const [selectedAddress, setSelectedAddress] = useState<IncidentLocation>({
     shortDescription: '',
     nickName: '',
     address: {
-      id: '',
       line: '',
       city: '',
       zipCode: '',
       state: {
-        name: '',
-        code: '',
-        namecode: '',
-        description: '',
-        snum: '',
-        id: '',
-        country: {
-          name: '',
-          code: '',
-          namecode: '',
-          isoCode: '',
-          description: '',
-          id: ''
-        }
+        country: {}
       }
     }
   })
@@ -147,39 +133,42 @@ export function AddEditIncidentScreen() {
 
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
+      const str = value as string
+      const obj = value as Record<string, string | number>
       if (index === 0) {
-        selectedAddress.nickName = value
+        selectedAddress.nickName = str
       }
       if (index === 7) {
-        selectedAddress.shortDescription = value
+        selectedAddress.shortDescription = str
       }
       if (index === 1) {
-        selectedAddress.address.line = value
+        selectedAddress.address.line = str
       }
       if (index === 2) {
-        selectedAddress.address.city = value
+        selectedAddress.address.city = str
       }
       if (index === 3) {
-        selectedAddress.address.zipCode = value
+        selectedAddress.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = value.id
-        selectedAddress.address.state.country.name = value.name
-        selectedAddress.address.state.country.code = value.code
-        selectedAddress.address.state.country.namecode = value.namecode
-        selectedAddress.address.state.country.description = value.description
+        const state = (selectedAddress.address.state ??= {})
+        const country = (state.country ??= {})
+        country.id = obj.id as number
+        country.name = obj.name as string
+        country.code = obj.code as string
+        country.namecode = obj.namecode as string
+        country.isoCode = obj.isoCode as string
       }
       if (index === 5) {
-        selectedAddress.address.state.id = value.id
-        selectedAddress.address.state.name = value.name
-        selectedAddress.address.state.code = value.code
-        selectedAddress.address.state.namecode = value.namecode
-        selectedAddress.address.state.snum = value.snum
-        selectedAddress.address.state.description = value.description
+        const state = (selectedAddress.address.state ??= {})
+        state.id = obj.id as number
+        state.name = obj.name as string
+        state.code = obj.code as string
+        state.namecode = obj.namecode as string
+        state.snum = obj.snum as string
       }
       if (index === 6) {
-        // selectedAddress = value
-        setSelectedAddress(value)
+        setSelectedAddress(value as IncidentLocation)
       }
       logger.debug('selectedAddress1', JSON.stringify(selectedAddress))
     }
@@ -197,7 +186,7 @@ export function AddEditIncidentScreen() {
       contactList: []
     }
     if (_.isEmpty(incidentDetails) || isFromCreateSimilar === 'true') {
-      incidentData.location.address.id = ''
+      incidentData.location.address.id = undefined
       createIncidentMutation.mutate(
         { incident: incidentData },
         {
