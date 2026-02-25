@@ -6,25 +6,25 @@ Local planning reference. All phases tracked as GitHub issues with `modernizatio
 
 ## Status Overview
 
-| Phase  | Issue                                                             | Title                                    | Status                                                                    |
-| ------ | ----------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- |
-| 0      | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)       | Triage Open PRs & Establish Baseline     | Done                                                                      |
-| 1      | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
-| **2**  | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
-| **3**  | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
-| **4**  | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** ([PR #119](https://github.com/panzacoder/fcc-monorepo/pull/119)) |
-| **5**  | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Done** ([PR #120](https://github.com/panzacoder/fcc-monorepo/pull/120)) |
-| **6**  | [**#103**](https://github.com/panzacoder/fcc-monorepo/issues/103) | **TypeScript Strictness**                | **Done** (branch: `chore/gh-103/phase6-typescript-strictness`)            |
-| **7**  | [**#104**](https://github.com/panzacoder/fcc-monorepo/issues/104) | **Screen Decomposition & Cleanup**       | **Done** ([PR #123](https://github.com/panzacoder/fcc-monorepo/pull/123)) |
-| 8A     | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 7 done)                                                      |
-| **8B** | [**#106**](https://github.com/panzacoder/fcc-monorepo/issues/106) | **Next.js 14 → 16**                      | **Done** ([PR #127](https://github.com/panzacoder/fcc-monorepo/pull/127)) |
-| 8C     | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)     | Redux → Zustand                          | Ready (Phase 3 done)                                                      |
-| 8D     | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Ready (Phase 4 done)                                                      |
-| **8E-F** | [**#109**](https://github.com/panzacoder/fcc-monorepo/issues/109) | **Replace moment-timezone & lodash**   | **Done** ([PR #130](https://github.com/panzacoder/fcc-monorepo/pull/130)) |
-| 8G     | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)     | Storybook 7 → 10                         | Ready (Phase 2 done)                                                      |
-| 8H     | [#111](https://github.com/panzacoder/fcc-monorepo/issues/111)     | NativeWind → Uniwind + TW4               | Blocked by Phase 8A                                                       |
-| 9      | [#112](https://github.com/panzacoder/fcc-monorepo/issues/112)     | Web App Buildout                         | Blocked by Phases 1-8                                                     |
-| Future | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)     | Realtime Data Capabilities               | Ready (Phase 4 done)                                                      |
+| Phase    | Issue                                                             | Title                                    | Status                                                                    |
+| -------- | ----------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- |
+| 0        | [#97](https://github.com/panzacoder/fcc-monorepo/issues/97)       | Triage Open PRs & Establish Baseline     | Done                                                                      |
+| 1        | [#98](https://github.com/panzacoder/fcc-monorepo/issues/98)       | Security Hardening                       | Done ([PR #115](https://github.com/panzacoder/fcc-monorepo/pull/115))     |
+| **2**    | [**#99**](https://github.com/panzacoder/fcc-monorepo/issues/99)   | **Developer Experience & CI Foundation** | **Done** ([PR #116](https://github.com/panzacoder/fcc-monorepo/pull/116)) |
+| **3**    | [**#100**](https://github.com/panzacoder/fcc-monorepo/issues/100) | **State Management Remediation**         | **Done** ([PR #118](https://github.com/panzacoder/fcc-monorepo/pull/118)) |
+| **4**    | [**#101**](https://github.com/panzacoder/fcc-monorepo/issues/101) | **Data Layer Modernization**             | **Done** ([PR #119](https://github.com/panzacoder/fcc-monorepo/pull/119)) |
+| **5**    | [**#102**](https://github.com/panzacoder/fcc-monorepo/issues/102) | **Testing Foundation**                   | **Done** ([PR #120](https://github.com/panzacoder/fcc-monorepo/pull/120)) |
+| **6**    | [**#103**](https://github.com/panzacoder/fcc-monorepo/issues/103) | **TypeScript Strictness**                | **Done** (branch: `chore/gh-103/phase6-typescript-strictness`)            |
+| **7**    | [**#104**](https://github.com/panzacoder/fcc-monorepo/issues/104) | **Screen Decomposition & Cleanup**       | **Done** ([PR #123](https://github.com/panzacoder/fcc-monorepo/pull/123)) |
+| 8A       | [#105](https://github.com/panzacoder/fcc-monorepo/issues/105)     | Expo SDK 50 → 55                         | Ready (Phase 7 done)                                                      |
+| **8B**   | [**#106**](https://github.com/panzacoder/fcc-monorepo/issues/106) | **Next.js 14 → 16**                      | **Done** ([PR #127](https://github.com/panzacoder/fcc-monorepo/pull/127)) |
+| 8C       | [#107](https://github.com/panzacoder/fcc-monorepo/issues/107)     | Redux → Zustand                          | Ready (Phase 3 done)                                                      |
+| 8D       | [#108](https://github.com/panzacoder/fcc-monorepo/issues/108)     | Navigation Strategy (Solito)             | Ready (Phase 4 done)                                                      |
+| **8E-F** | [**#109**](https://github.com/panzacoder/fcc-monorepo/issues/109) | **Replace moment-timezone & lodash**     | **Done** ([PR #130](https://github.com/panzacoder/fcc-monorepo/pull/130)) |
+| 8G       | [#110](https://github.com/panzacoder/fcc-monorepo/issues/110)     | Storybook 7 → 10                         | Ready (Phase 2 done)                                                      |
+| 8H       | [#111](https://github.com/panzacoder/fcc-monorepo/issues/111)     | NativeWind → Uniwind + TW4               | Blocked by Phase 8A                                                       |
+| 9        | [#112](https://github.com/panzacoder/fcc-monorepo/issues/112)     | Web App Buildout                         | Blocked by Phases 1-8                                                     |
+| Future   | [#114](https://github.com/panzacoder/fcc-monorepo/issues/114)     | Realtime Data Capabilities               | Ready (Phase 4 done)                                                      |
 
 ---
 
@@ -152,6 +152,7 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 **Screen decomposition complete** — all feature screens now ≤200 lines (orchestration only). TypeScript errors reduced 362→0, explicit `any` reduced 17→0.
 
 **12 tasks completed:**
+
 - Task 0-2: AddEditAppointment components extracted (3 sections)
 - Task 3-5: EventDetails, AppointmentDetails, Profile sections extracted
 - Task 6-8: AddEditPrescription, AddEditLocation, AddEditCaregiver refactored
@@ -160,6 +161,7 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 - Task 11: Final cleanup — `Object` types → `Record<string, unknown>`, remaining `any` eliminated
 
 **Patterns established:**
+
 - Section components in `features/{feature}/components/`
 - Screens orchestrate layout + coordinate between sections
 - All form logic stays in sections, screens pass handlers down
@@ -173,6 +175,7 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 **moment-timezone → date-fns/date-fns-tz** for better tree-shaking. **lodash → native JS** across 55 files.
 
 **Migrations:**
+
 - `moment().format()` → `format()` from date-fns
 - `moment.tz.guess()` → `Intl.DateTimeFormat().resolvedOptions().timeZone`
 - `moment(date).tz(tz)` → `formatInTimeZone()` from date-fns-tz
@@ -180,6 +183,7 @@ Full audit of all completed phases against their GH issue acceptance criteria.
 - All format strings converted (DD→dd, YYYY→yyyy, A→a)
 
 **Lodash replacements:**
+
 - `_.isEmpty()` → `isEmpty()` utility in `app/ui/utils`
 - `_.orderBy()` → `Array.sort()` with comparator
 - `_.find()` → `Array.find()`
