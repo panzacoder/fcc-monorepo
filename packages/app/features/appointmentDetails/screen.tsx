@@ -1,6 +1,6 @@
 'use client'
 import _ from 'lodash'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View,
   Alert,
@@ -56,8 +56,8 @@ import { AddMessageThread } from 'app/ui/addMessageThread'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { logger } from 'app/utils/logger'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { AppointmentDetailResponse } from 'app/data/appointments/types'
-import type { PrivilegeAction } from 'app/data/types.d'
 import type { ThreadParticipant } from 'app/data/messages/types'
 
 interface NoteItem {
@@ -123,9 +123,6 @@ interface AppointmentDetailData {
 }
 
 export function AppointmentDetailsScreen() {
-  const appointmentPrivilegesRef = useRef<PrivilegeAction[]>([])
-  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
-  const transportationPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -194,6 +191,24 @@ export function AppointmentDetailsScreen() {
   const cancelTransportationMutation = useCancelTransportationRequest(header)
   const { data: allMemberDetailsData } = useAllMemberDetails(header)
 
+  const apptData_ = appointmentDetailsData as
+    | AppointmentDetailResponse
+    | undefined
+  const appointmentPrivileges = usePermissions(
+    apptData_?.domainObjectPrivileges,
+    'Appointment'
+  )
+  const notePrivileges = usePermissions(
+    apptData_?.domainObjectPrivileges,
+    'APPOINTMENTNOTE',
+    'AppointmentNote'
+  )
+  const transportationPrivileges = usePermissions(
+    apptData_?.domainObjectPrivileges,
+    'APPOINTMENTTRANSPORTATION',
+    'AppointmentTransportation'
+  )
+
   const { refetch: refetchParticipants } = useThreadParticipants(header, {
     member: {
       id: memberData.member ? (memberData.member as number | string) : ''
@@ -220,23 +235,6 @@ export function AppointmentDetailsScreen() {
   useEffect(() => {
     if (appointmentDetailsData) {
       const data = appointmentDetailsData as AppointmentDetailResponse
-      if (data.domainObjectPrivileges) {
-        appointmentPrivilegesRef.current = data.domainObjectPrivileges
-          .Appointment
-          ? data.domainObjectPrivileges.Appointment
-          : []
-        notePrivilegesRef.current = data.domainObjectPrivileges.APPOINTMENTNOTE
-          ? data.domainObjectPrivileges.APPOINTMENTNOTE
-          : data.domainObjectPrivileges.AppointmentNote
-            ? data.domainObjectPrivileges.AppointmentNote
-            : []
-        transportationPrivilegesRef.current = data.domainObjectPrivileges
-          .APPOINTMENTTRANSPORTATION
-          ? data.domainObjectPrivileges.APPOINTMENTTRANSPORTATION
-          : data.domainObjectPrivileges.AppointmentTransportation
-            ? data.domainObjectPrivileges.AppointmentTransportation
-            : []
-      }
       if (
         data.appointmentWithPreviousAppointment &&
         data.appointmentWithPreviousAppointment.appointment
@@ -796,7 +794,7 @@ export function AppointmentDetailsScreen() {
           <ScrollView persistentScrollbar={true} className="flex-1">
             <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
               <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-                {getUserPermission(appointmentPrivilegesRef.current)
+                {getUserPermission(appointmentPrivileges)
                   .createPermission ? (
                   <Button
                     className="w-[50%]"
@@ -821,7 +819,7 @@ export function AppointmentDetailsScreen() {
                 ) : (
                   <View />
                 )}
-                {getUserPermission(appointmentPrivilegesRef.current)
+                {getUserPermission(appointmentPrivileges)
                   .updatePermission ? (
                   <Button
                     className="ml-[5px] w-[30%]"
@@ -887,11 +885,11 @@ export function AppointmentDetailsScreen() {
               {getDetailsView('Status', status)}
               {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
-              (getUserPermission(appointmentPrivilegesRef.current)
+              (getUserPermission(appointmentPrivileges)
                 .createPermission ||
-                getUserPermission(appointmentPrivilegesRef.current)
+                getUserPermission(appointmentPrivileges)
                   .updatePermission ||
-                getUserPermission(appointmentPrivilegesRef.current)
+                getUserPermission(appointmentPrivileges)
                   .deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
                   {moment(
@@ -969,7 +967,7 @@ export function AppointmentDetailsScreen() {
                     <View />
                   )}
                 </TouchableOpacity>
-                {getUserPermission(notePrivilegesRef.current)
+                {getUserPermission(notePrivileges)
                   .createPermission ? (
                   <Button
                     className=""
@@ -1007,7 +1005,7 @@ export function AppointmentDetailsScreen() {
                               typeof Note
                             >['messageThreadClicked']
                           }
-                          notePrivileges={notePrivilegesRef.current}
+                          notePrivileges={notePrivileges}
                         />
                       </View>
                     )
@@ -1119,7 +1117,7 @@ export function AppointmentDetailsScreen() {
                 {moment(appointmentDetails.date ? appointmentDetails.date : '')
                   .utc()
                   .isAfter(moment().utc()) &&
-                getUserPermission(transportationPrivilegesRef.current)
+                getUserPermission(transportationPrivileges)
                   .createPermission ? (
                   <Button
                     className=""
@@ -1164,7 +1162,7 @@ export function AppointmentDetailsScreen() {
               )}
             </View>
 
-            {getUserPermission(appointmentPrivilegesRef.current)
+            {getUserPermission(appointmentPrivileges)
               .deletePermission ? (
               <View className="mx-5 my-5 flex-row self-center">
                 <Button

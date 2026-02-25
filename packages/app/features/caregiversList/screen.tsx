@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Alert } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -14,14 +14,13 @@ import {
   useResendCaregiverRequest
 } from 'app/data/caregivers'
 import type { CaregiverListItem } from 'app/data/caregivers/types'
-import type { PrivilegeAction } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function CaregiversListScreen() {
-  const caregiverPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('All')
@@ -41,14 +40,13 @@ export function CaregiversListScreen() {
 
   const isLoading = isCaregiversLoading || resendMutation.isPending
 
+  const caregiverPrivileges = usePermissions(
+    caregiversData?.domainObjectPrivileges,
+    'Caregiver'
+  )
+
   useEffect(() => {
     if (caregiversData) {
-      if (caregiversData.domainObjectPrivileges) {
-        caregiverPrivilegesRef.current = caregiversData.domainObjectPrivileges
-          .Caregiver
-          ? caregiversData.domainObjectPrivileges.Caregiver
-          : []
-      }
       let list = caregiversData.familyMemberList
         ? caregiversData.familyMemberList
         : []
@@ -119,8 +117,7 @@ export function CaregiversListScreen() {
               color={'black'}
             />
           </TouchableOpacity>
-          {getUserPermission(caregiverPrivilegesRef.current)
-            .createPermission ? (
+          {getUserPermission(caregiverPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View,
   Alert,
@@ -28,7 +28,7 @@ import type {
   DoctorLocation
 } from 'app/data/doctors/types'
 import type { AppointmentListItem } from 'app/data/facilities/types'
-import type { PrivilegeAction } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -38,7 +38,6 @@ import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import * as Clipboard from 'expo-clipboard'
 export function DoctorDetailsScreen() {
-  const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -70,14 +69,14 @@ export function DoctorDetailsScreen() {
   const deleteDoctorMutation = useDeleteDoctor(header)
   const shareDoctorMutation = useShareDoctor(header)
 
+  const doctorPrivileges = usePermissions(
+    doctorDetailsData?.domainObjectPrivileges,
+    'Doctor'
+  )
+
   useEffect(() => {
     if (doctorDetailsData) {
       const data = doctorDetailsData
-      if (data.domainObjectPrivileges) {
-        doctorPrivilegesRef.current = data.domainObjectPrivileges.Doctor
-          ? data.domainObjectPrivileges.Doctor
-          : []
-      }
       setDoctorDetails(data.doctor || {})
       if (data.doctor) {
         let details = data.doctor
@@ -549,7 +548,7 @@ export function DoctorDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(doctorPrivilegesRef.current).deletePermission ? (
+          {getUserPermission(doctorPrivileges).deletePermission ? (
             <View className="mx-5 my-5 flex-row self-center">
               <Button
                 className="w-[50%]"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Pressable } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -27,7 +27,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import type { PrivilegeAction } from 'app/data/types.d'
+import { usePermissions } from 'app/utils/usePermissions'
 
 type MemberRouteParams = {
   member: number | string
@@ -47,7 +47,6 @@ export function MessagesScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
   const router = useRouter()
-  const messagePrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -93,16 +92,14 @@ export function MessagesScreen() {
   const isLoading =
     isThreadsLoading || isParticipantsLoading || createThreadMutation.isPending
 
+  const messagePrivileges = usePermissions(
+    threadsData?.domainObjectPrivileges,
+    'MESSAGETHREAD',
+    'MessageThread'
+  )
+
   useEffect(() => {
     if (threadsData) {
-      if (threadsData.domainObjectPrivileges) {
-        messagePrivilegesRef.current = threadsData.domainObjectPrivileges
-          .MESSAGETHREAD
-          ? threadsData.domainObjectPrivileges.MESSAGETHREAD
-          : threadsData.domainObjectPrivileges.MessageThread
-            ? threadsData.domainObjectPrivileges.MessageThread
-            : []
-      }
       let threadList = threadsData.threadList ? threadsData.threadList : []
       setMessagesList(threadList)
       setMessagesListFull(threadList)
@@ -220,7 +217,7 @@ export function MessagesScreen() {
             color={'black'}
           />
         </TouchableOpacity>
-        {getUserPermission(messagePrivilegesRef.current).createPermission ? (
+        {getUserPermission(messagePrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

@@ -7,6 +7,7 @@ import {
   useRef,
   type ComponentProps
 } from 'react'
+import { usePermissions } from 'app/utils/usePermissions'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -37,7 +38,6 @@ import type {
   MedicalDeviceReminder,
   MedicalDeviceDetailsResponse
 } from 'app/data/medical-devices/types'
-import type { PrivilegeAction } from 'app/data/types.d'
 import { useLocalSearchParams } from 'expo-router'
 import { Note } from 'app/ui/note'
 import { Reminder } from 'app/ui/reminder'
@@ -52,8 +52,6 @@ import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
 export function MedicalDevicesDetailsScreen() {
-  const medicalDevicePrivilegesRef = useRef<PrivilegeAction[]>([])
-  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -131,21 +129,22 @@ export function MedicalDevicesDetailsScreen() {
     null
   )
 
+  const medDevData_ = medicalDeviceDetailsData as
+    | MedicalDeviceDetailsResponse
+    | undefined
+  const medicalDevicePrivileges = usePermissions(
+    medDevData_?.domainObjectPrivileges,
+    'Purchase'
+  )
+  const notePrivileges = usePermissions(
+    medDevData_?.domainObjectPrivileges,
+    'PURCHASENOTE',
+    'PurchaseNote'
+  )
+
   useEffect(() => {
     if (medicalDeviceDetailsData) {
       const data = medicalDeviceDetailsData as MedicalDeviceDetailsResponse
-      if (data.domainObjectPrivileges) {
-        medicalDevicePrivilegesRef.current = data.domainObjectPrivileges
-          .Purchase
-          ? data.domainObjectPrivileges.Purchase
-          : []
-        notePrivilegesRef.current = data.domainObjectPrivileges.PURCHASENOTE
-          ? data.domainObjectPrivileges.PURCHASENOTE
-          : data.domainObjectPrivileges.PurchaseNote
-            ? data.domainObjectPrivileges.PurchaseNote
-            : []
-      }
-
       setMedicalDevicesDetails(data.purchase ? data.purchase : {})
       if (data.purchase && data.purchase.noteList) {
         setNotesList(data.purchase.noteList)
@@ -522,7 +521,7 @@ export function MedicalDevicesDetailsScreen() {
         <ScrollView className="flex-1">
           <View className="border-primary mt-[40] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(medicalDevicePrivilegesRef.current)
+              {getUserPermission(medicalDevicePrivileges)
                 .createPermission ? (
                 <Button
                   className="w-[50%]"
@@ -543,7 +542,7 @@ export function MedicalDevicesDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(medicalDevicePrivilegesRef.current)
+              {getUserPermission(medicalDevicePrivileges)
                 .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
@@ -600,7 +599,7 @@ export function MedicalDevicesDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivilegesRef.current).createPermission ? (
+              {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -637,7 +636,7 @@ export function MedicalDevicesDetailsScreen() {
                             typeof Note
                           >['messageThreadClicked']
                         }
-                        notePrivileges={notePrivilegesRef.current}
+                        notePrivileges={notePrivileges}
                       />
                     </View>
                   )
@@ -718,7 +717,7 @@ export function MedicalDevicesDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(medicalDevicePrivilegesRef.current)
+          {getUserPermission(medicalDevicePrivileges)
             .deletePermission ? (
             <View className="mx-5 my-5">
               <Button

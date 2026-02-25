@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,14 +10,13 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMemberFacilities } from 'app/data/facilities'
 import type { FacilityListItem } from 'app/data/facilities/types'
-import type { PrivilegeAction } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useRouter } from 'expo-router'
 import { useAppSelector } from 'app/redux/hooks'
 export function FacilitiesListScreen() {
-  const facilityPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [facilityList, setFacilityList] = useState<FacilityListItem[]>([])
   const [facilityListFull, setFacilityListFull] = useState<FacilityListItem[]>(
@@ -37,14 +36,13 @@ export function FacilitiesListScreen() {
 
   const isLoading = isFacilitiesLoading
 
+  const facilityPrivileges = usePermissions(
+    facilitiesData?.domainObjectPrivileges,
+    'Facility'
+  )
+
   useEffect(() => {
     if (facilitiesData) {
-      if (facilitiesData.domainObjectPrivileges) {
-        facilityPrivilegesRef.current = facilitiesData.domainObjectPrivileges
-          .Facility
-          ? facilitiesData.domainObjectPrivileges.Facility
-          : []
-      }
       let list = facilitiesData.list ? facilitiesData.list : []
       setFacilityListFull(list)
       getFilteredList(list, currentFilter)
@@ -90,7 +88,7 @@ export function FacilitiesListScreen() {
               color={'black'}
             />
           </TouchableOpacity>
-          {getUserPermission(facilityPrivilegesRef.current).createPermission ? (
+          {getUserPermission(facilityPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

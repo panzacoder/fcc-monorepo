@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -36,7 +36,7 @@ import type {
   EventNote,
   EventReminder
 } from 'app/data/events/types'
-import type { PrivilegeAction } from 'app/data/types.d'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { ThreadParticipant } from 'app/data/messages/types'
 import type { ComponentProps } from 'react'
 import { useLocalSearchParams } from 'expo-router'
@@ -63,9 +63,6 @@ type ReminderData = ComponentProps<typeof AddEditReminder>['reminderData'] & {
 }
 
 export function EventDetailsScreen() {
-  const eventPrivilegesRef = useRef<PrivilegeAction[]>([])
-  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
-  const transportationPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isAddNote, setIsAddNote] = useState(false)
   const [isRender, setIsRender] = useState(false)
@@ -147,25 +144,25 @@ export function EventDetailsScreen() {
     messageThreadType: { type: 'Event' }
   })
 
+  const eventData_ = eventDetailsData as EventDetailResponse | undefined
+  const eventPrivileges = usePermissions(
+    eventData_?.domainObjectPrivileges,
+    'Event'
+  )
+  const notePrivileges = usePermissions(
+    eventData_?.domainObjectPrivileges,
+    'EVENTNOTE',
+    'EventNote'
+  )
+  const transportationPrivileges = usePermissions(
+    eventData_?.domainObjectPrivileges,
+    'EVENTTRANSPORTATION',
+    'EventTransportation'
+  )
+
   useEffect(() => {
     if (eventDetailsData) {
       const data = eventDetailsData as EventDetailResponse
-      if (data.domainObjectPrivileges) {
-        eventPrivilegesRef.current = data.domainObjectPrivileges.Event
-          ? data.domainObjectPrivileges.Event
-          : []
-        notePrivilegesRef.current = data.domainObjectPrivileges.EVENTNOTE
-          ? data.domainObjectPrivileges.EVENTNOTE
-          : data.domainObjectPrivileges.EventNote
-            ? data.domainObjectPrivileges.EventNote
-            : []
-        transportationPrivilegesRef.current = data.domainObjectPrivileges
-          .EVENTTRANSPORTATION
-          ? data.domainObjectPrivileges.EVENTTRANSPORTATION
-          : data.domainObjectPrivileges.EventTransportation
-            ? data.domainObjectPrivileges.EventTransportation
-            : []
-      }
       setEventDetails(data.event ? data.event : {})
       if (data.event && data.event.status) {
         setEventStatus(data.event.status.status)
@@ -576,7 +573,7 @@ export function EventDetailsScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(eventPrivilegesRef.current)
+              {getUserPermission(eventPrivileges)
                 .createPermission ? (
                 <Button
                   className="w-[50%]"
@@ -595,7 +592,7 @@ export function EventDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(eventPrivilegesRef.current)
+              {getUserPermission(eventPrivileges)
                 .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
@@ -624,10 +621,10 @@ export function EventDetailsScreen() {
               {getDetailsView('Status', status)}
               {getDetailsView('Description', description)}
               {(status === 'Scheduled' || status === 'ReScheduled') &&
-              (getUserPermission(eventPrivilegesRef.current).createPermission ||
-                getUserPermission(eventPrivilegesRef.current)
+              (getUserPermission(eventPrivileges).createPermission ||
+                getUserPermission(eventPrivileges)
                   .updatePermission ||
-                getUserPermission(eventPrivilegesRef.current)
+                getUserPermission(eventPrivileges)
                   .deletePermission) ? (
                 <View className="mt-5 w-full flex-row justify-center">
                   {moment(eventDetails.date ? eventDetails.date : '')
@@ -703,7 +700,7 @@ export function EventDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivilegesRef.current).createPermission ? (
+              {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -740,7 +737,7 @@ export function EventDetailsScreen() {
                             typeof Note
                           >['messageThreadClicked']
                         }
-                        notePrivileges={notePrivilegesRef.current}
+                        notePrivileges={notePrivileges}
                       />
                     </View>
                   )
@@ -849,7 +846,7 @@ export function EventDetailsScreen() {
               {moment(eventDetails.date ? eventDetails.date : '')
                 .utc()
                 .isAfter(moment().utc()) &&
-              getUserPermission(transportationPrivilegesRef.current)
+              getUserPermission(transportationPrivileges)
                 .createPermission ? (
                 <Button
                   className=""
@@ -886,7 +883,7 @@ export function EventDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(eventPrivilegesRef.current).deletePermission ? (
+          {getUserPermission(eventPrivileges).deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""

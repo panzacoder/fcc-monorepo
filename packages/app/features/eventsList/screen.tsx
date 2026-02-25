@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -13,7 +13,8 @@ import moment from 'moment'
 import _ from 'lodash'
 import { useEvents } from 'app/data/events'
 import type { EventListItem } from 'app/data/events/types'
-import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { YearList } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -37,7 +38,6 @@ export type Schema = z.infer<typeof schema>
 const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 // let currentFilter = 'Upcoming'
 export function EventsListScreen() {
-  const eventsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const router = useRouter()
@@ -83,13 +83,13 @@ export function EventsListScreen() {
     year: selectedYear
   })
 
+  const eventsPrivileges = usePermissions(
+    eventsData?.domainObjectPrivileges,
+    'Event'
+  )
+
   useEffect(() => {
     if (eventsData) {
-      if (eventsData.domainObjectPrivileges) {
-        eventsPrivilegesRef.current = eventsData.domainObjectPrivileges.Event
-          ? eventsData.domainObjectPrivileges.Event
-          : []
-      }
       let list = eventsData.eventList ? eventsData.eventList : []
       setEventsList(list)
       setEventsListFull(list)
@@ -229,7 +229,7 @@ export function EventsListScreen() {
           />
         </TouchableOpacity>
         <View className="w-[35%]" />
-        {getUserPermission(eventsPrivilegesRef.current).createPermission ? (
+        {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

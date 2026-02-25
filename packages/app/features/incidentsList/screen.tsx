@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -11,7 +11,8 @@ import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import { useIncidents } from 'app/data/incidents'
 import type { IncidentListItem } from 'app/data/incidents/types'
-import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { YearList } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -31,7 +32,6 @@ export type Schema = z.infer<typeof schema>
 
 const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 export function IncidentsListScreen() {
-  const incidentsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
@@ -72,14 +72,13 @@ export function IncidentsListScreen() {
     year: selectedYear
   })
 
+  const incidentsPrivileges = usePermissions(
+    incidentsData?.domainObjectPrivileges,
+    'Incident'
+  )
+
   useEffect(() => {
     if (incidentsData) {
-      if (incidentsData.domainObjectPrivileges) {
-        incidentsPrivilegesRef.current = incidentsData.domainObjectPrivileges
-          .Incident
-          ? incidentsData.domainObjectPrivileges.Incident
-          : []
-      }
       setIncidentsList(incidentsData.list ? incidentsData.list : [])
       setIsDataReceived(true)
       setIsFilter(false)
@@ -153,7 +152,7 @@ export function IncidentsListScreen() {
       <View className="flex-row">
         <View className="w-[75%]" />
 
-        {getUserPermission(incidentsPrivilegesRef.current).createPermission ? (
+        {getUserPermission(incidentsPrivileges).createPermission ? (
           <View className="self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

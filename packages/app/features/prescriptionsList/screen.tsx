@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -14,7 +14,8 @@ import { usePharmacyList } from 'app/data/facilities'
 import type { PharmacyListItem } from 'app/data/facilities/types'
 import { useActiveDoctors } from 'app/data/doctors'
 import type { ActiveDoctorItem } from 'app/data/doctors/types'
-import type { PrivilegeAction, MedicineType } from 'app/data/types'
+import type { MedicineType } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -62,7 +63,6 @@ export function PrescriptionsListScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
-  const prescriptionPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedType, setSelectedType] = useState('All')
   const [selectedPrescriber, setSelectedPrescriber] = useState('All')
   const [selectedPharmacy, setSelectedPharmacy] = useState('All')
@@ -121,14 +121,13 @@ export function PrescriptionsListScreen() {
   const isLoading =
     isPrescriptionsLoading || isPharmacyLoading || isDoctorsLoading
 
+  const prescriptionPrivileges = usePermissions(
+    prescriptionData?.domainObjectPrivileges,
+    'Medicine'
+  )
+
   useEffect(() => {
     if (prescriptionData) {
-      if (prescriptionData.domainObjectPrivileges) {
-        prescriptionPrivilegesRef.current = prescriptionData
-          .domainObjectPrivileges.Medicine
-          ? prescriptionData.domainObjectPrivileges.Medicine
-          : []
-      }
       let list = prescriptionData.medicineList
         ? prescriptionData.medicineList
         : []
@@ -262,8 +261,7 @@ export function PrescriptionsListScreen() {
               />
             </TouchableOpacity>
           </View>
-          {getUserPermission(prescriptionPrivilegesRef.current)
-            .createPermission ? (
+          {getUserPermission(prescriptionPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

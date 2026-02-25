@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  type ComponentProps
-} from 'react'
+import { useState, useEffect, useCallback, type ComponentProps } from 'react'
 import {
   View,
   Alert,
@@ -39,7 +33,7 @@ import {
   useCreateMessageThread
 } from 'app/data/messages'
 import type { ThreadParticipant } from 'app/data/messages/types'
-import type { PrivilegeAction } from 'app/data/types.d'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { Location } from 'app/ui/location'
 import { Note } from 'app/ui/note'
@@ -59,8 +53,6 @@ type MemberRouteParams = {
 }
 
 export function IncidentDetailsScreen() {
-  const incidentPrivilegesRef = useRef<PrivilegeAction[]>([])
-  const notePrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
   const [isAddNote, setIsAddNote] = useState(false)
@@ -119,20 +111,22 @@ export function IncidentDetailsScreen() {
     refetch: refetchParticipants
   } = useThreadParticipants(header, threadParticipantsParams)
 
+  const incidentData_ = incidentDetailsData as
+    | IncidentDetailResponse
+    | undefined
+  const incidentPrivileges = usePermissions(
+    incidentData_?.domainObjectPrivileges,
+    'Incident'
+  )
+  const notePrivileges = usePermissions(
+    incidentData_?.domainObjectPrivileges,
+    'INCIDENTNOTE',
+    'IncidentNote'
+  )
+
   useEffect(() => {
     if (incidentDetailsData) {
       const data = incidentDetailsData as IncidentDetailResponse
-      if (data.domainObjectPrivileges) {
-        incidentPrivilegesRef.current = data.domainObjectPrivileges.Incident
-          ? data.domainObjectPrivileges.Incident
-          : []
-        notePrivilegesRef.current = data.domainObjectPrivileges.INCIDENTNOTE
-          ? data.domainObjectPrivileges.INCIDENTNOTE
-          : data.domainObjectPrivileges.IncidentNote
-            ? data.domainObjectPrivileges.IncidentNote
-            : []
-      }
-
       setIncidentDetails(data.incident ? data.incident : {})
       if (data.incident && data.incident.noteList) {
         setNotesList(data.incident.noteList)
@@ -387,7 +381,7 @@ export function IncidentDetailsScreen() {
         <ScrollView persistentScrollbar={true} className="flex-1">
           <View className="border-primary mt-[5] w-[95%] flex-1 self-center rounded-[10px] border-[1px] p-5">
             <View style={{ justifyContent: 'flex-end' }} className="flex-row">
-              {getUserPermission(incidentPrivilegesRef.current)
+              {getUserPermission(incidentPrivileges)
                 .createPermission ? (
                 <Button
                   className="w-[50%]"
@@ -406,7 +400,7 @@ export function IncidentDetailsScreen() {
               ) : (
                 <View />
               )}
-              {getUserPermission(incidentPrivilegesRef.current)
+              {getUserPermission(incidentPrivileges)
                 .updatePermission ? (
                 <Button
                   className="ml-[5px] w-[30%]"
@@ -468,7 +462,7 @@ export function IncidentDetailsScreen() {
                   <View />
                 )}
               </TouchableOpacity>
-              {getUserPermission(notePrivilegesRef.current).createPermission ? (
+              {getUserPermission(notePrivileges).createPermission ? (
                 <Button
                   className=""
                   title="Add Note"
@@ -506,7 +500,7 @@ export function IncidentDetailsScreen() {
                           >['messageThreadClicked']
                         }
                         notePrivileges={
-                          notePrivilegesRef.current as unknown as ComponentProps<
+                          notePrivileges as unknown as ComponentProps<
                             typeof Note
                           >['notePrivileges']
                         }
@@ -520,7 +514,7 @@ export function IncidentDetailsScreen() {
             )}
           </View>
 
-          {getUserPermission(incidentPrivilegesRef.current).deletePermission ? (
+          {getUserPermission(incidentPrivileges).deletePermission ? (
             <View className="mx-5 my-5">
               <Button
                 className=""
