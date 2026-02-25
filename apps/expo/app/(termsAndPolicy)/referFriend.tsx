@@ -1,4 +1,4 @@
-import { ReferFriendScreen } from 'app/features/refreFriend/screen'
+import { ReferFriendScreen } from 'app/features/referFriend/screen'
 import { Stack } from 'expo-router'
 export default function ReferFriend() {
   return (
