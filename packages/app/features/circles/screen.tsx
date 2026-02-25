@@ -27,7 +27,7 @@ import { useForm } from 'react-hook-form'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
+import currentMemberAddressAction from 'app/redux/currentMemberAddress/currentMemberAddressAction'
 import {
   useAllMemberDetails,
   useAcceptSharedInfo,

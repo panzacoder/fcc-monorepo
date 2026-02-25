@@ -19,7 +19,7 @@ import type {
   GetMemberMenusResponse,
   MemberMenu
 } from 'app/data/circle'
-import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
+import currentMemberAddressAction from 'app/redux/currentMemberAddress/currentMemberAddressAction'
 
 export function CircleDetailsScreen() {
   const header = useAppSelector((state) => state.headerState.header)

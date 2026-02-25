@@ -6,7 +6,7 @@ import paidAdReducer from './paidAdvertiser/paidAdReducer'
 import userProfileReducer from './userProfile/userProfileReducer'
 import subscriptionReducer from './userSubscription/subscriptionReducer'
 import subscriptionDetailsReducer from './userSubscriptionDetails/userSubscriptionReducer'
-import currentMemberAddressReducer from './curenMemberAddress/currentMemberAddressReducer'
+import currentMemberAddressReducer from './currentMemberAddress/currentMemberAddressReducer'
 import memberNamesReducer from './memberNames/memberNamesReducer'
 import messageListReducer from './messageList/messageListReducer'
 
