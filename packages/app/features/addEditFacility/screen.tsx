@@ -79,7 +79,6 @@ export function AddEditFacilityScreen() {
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
   ) as StaticData
-  // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const createFacilityMutation = useCreateFacility(header)
   const updateFacilityMutation = useUpdateFacility(header)
@@ -115,7 +114,6 @@ export function AddEditFacilityScreen() {
     }
   )
 
-  // console.log('facilityTypeIndex', '' + facilityTypeIndex)
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -228,7 +226,6 @@ export function AddEditFacilityScreen() {
   }
   const onSelectionType = (data: string) => {
     selectedTypeRef.current = data
-    // console.log('purpose1', purpose)
   }
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
@@ -270,7 +267,6 @@ export function AddEditFacilityScreen() {
       }
     }
 
-    // console.log('selectedAddressRef.current', JSON.stringify(selectedAddressRef.current))
   }
   return (
     <View className="flex-1">

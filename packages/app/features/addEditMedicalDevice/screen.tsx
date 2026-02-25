@@ -114,7 +114,6 @@ export function AddEditMedicalDeviceScreen() {
     doctorsQuery.isLoading ||
     createMedicalDeviceMutation.isPending ||
     updateMedicalDeviceMutation.isPending
-  // console.log('medicalDeviceDetails', JSON.stringify(medicalDeviceDetails))
   const typesList = staticData.purchaseTypeList.map(
     (data: PurchaseType, index: number) => {
       return {
@@ -212,7 +211,6 @@ export function AddEditMedicalDeviceScreen() {
   }
   const onSelectionType = (data: string) => {
     setSelectedType(data)
-    // console.log('purpose1', purpose)
   }
   const onSelection = (date: Date) => {
     setSelectedDate(date)

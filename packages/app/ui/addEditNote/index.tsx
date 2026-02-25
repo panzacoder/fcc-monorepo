@@ -52,7 +52,6 @@ export const AddEditNote = ({
     (state) => state.staticDataState.staticData
   ) as StaticData
   let occurance = ''
-  // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
     occurance = noteData.occurance.occurance
@@ -70,7 +69,6 @@ export const AddEditNote = ({
         async (data: PurchaseOccurance, index: number) => {
           if (data.occurance === noteData.occurance.occurance) {
             occuranceIndex = index + 1
-            // console.log('occuranceIndex', '' + occuranceIndex)
           }
         }
       )

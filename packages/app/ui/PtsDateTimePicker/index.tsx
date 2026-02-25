@@ -21,11 +21,7 @@ export const PtsDateTimePicker = ({
 }) => {
   const selectedTimeRef = useRef<string>('')
   const selectedDateRef = useRef<string>('')
-  // console.log('defaultValue', JSON.stringify(defaultValue))
-  // console.log('currentData', JSON.stringify(currentData))
-  // console.log('onSelection', JSON.stringify(onSelection))
   let date = new Date(currentData)
-  // console.log('date', date)
   selectedTimeRef.current = moment(date).format('hh:mm A')
   selectedDateRef.current = moment(date).format('DD MMM YYYY')
   const [isRender, setIsRender] = useState(false)
@@ -75,9 +71,6 @@ export const PtsDateTimePicker = ({
                   setDateSelected(selectedDateRef.current)
                   setTimeSelected(selectedTimeRef.current)
                   cancelClicked()
-                  // console.log('date', date)
-                  // console.log('selectedTime', selectedTime)
-                  // console.log('selectedDate', selectedDate)
                   onSelection(date as Date)
                 } else {
                   cancelClicked()

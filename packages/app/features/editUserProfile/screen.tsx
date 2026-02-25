@@ -54,7 +54,6 @@ export function EditUserProfileScreen() {
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
   let memberDetails = item.memberDetails ? JSON.parse(item.memberDetails) : {}
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
-  // console.log('memberData', JSON.stringify(item.memberData))
   if (!_.isEmpty(userDetails)) {
     userPhone = userDetails.phone ? userDetails.phone : ''
   }

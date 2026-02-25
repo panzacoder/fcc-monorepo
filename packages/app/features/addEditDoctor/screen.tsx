@@ -72,7 +72,6 @@ export function AddEditDoctorScreen() {
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
   ) as StaticData
-  // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const createDoctorMutation = useCreateDoctor(header)
   const updateDoctorMutation = useUpdateDoctor(header)
@@ -83,7 +82,6 @@ export function AddEditDoctorScreen() {
   }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  // console.log('doctorDetails', JSON.stringify(doctorDetails))
   if (!_.isEmpty(doctorDetails)) {
     if (
       doctorDetails.status &&
@@ -150,7 +148,6 @@ export function AddEditDoctorScreen() {
       }
     }
 
-    // console.log('selectedAddressRef.current', JSON.stringify(selectedAddressRef.current))
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {

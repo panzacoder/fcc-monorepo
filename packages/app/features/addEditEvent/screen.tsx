@@ -76,7 +76,6 @@ export function AddEditEventScreen() {
       ? eventDetails.date
       : new Date()
   )
-  // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: Date | string) => {
     setSelectedDate(date)
     setKey(Math.random())
@@ -161,7 +160,6 @@ export function AddEditEventScreen() {
       }
     }
 
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function addEditEvent(formData: Schema) {
     let eventData: Record<string, unknown> = {

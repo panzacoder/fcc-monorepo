@@ -114,7 +114,6 @@ export function AddEditPrescriptionScreen() {
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
   ) as StaticData
-  // console.log('prescriptionDetails', JSON.stringify(prescriptionDetails))
   let typeIndex = -1
   let typesList: Array<{ id: number; title: string }> =
     staticData.medicineTypeList.map(
@@ -242,7 +241,6 @@ export function AddEditPrescriptionScreen() {
     )
   }
   async function callCreateUpdatePrescription(formData: Schema) {
-    // console.log('in callCreateUpdatePrescription', formData.strength)
     let type = staticData.medicineTypeList[formData.typeIndex - 1].id
     let object = {
       type: type,
@@ -261,11 +259,9 @@ export function AddEditPrescriptionScreen() {
   }
   const onSelectionPrescriber = (data: string) => {
     setPrescribedBy(data)
-    // console.log('purpose1', purpose)
   }
   const onSelectionPharmacy = (data: string) => {
     setSelectedPharmacy(data)
-    // console.log('purpose1', purpose)
   }
 
   const handleDateChange = (date: Date) => {

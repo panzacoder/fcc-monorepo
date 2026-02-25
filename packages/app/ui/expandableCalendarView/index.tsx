@@ -60,7 +60,6 @@ export const ExpandableCalendarView = ({
   )
   const [isLoading, setLoading] = useState(false)
   const [markedObject, setMarkedObject] = useState({})
-  // console.log('data.data.calenderItemList', JSON.stringify(calenderEvents))
   useEffect(() => {
     getMarkedDates()
   }, [])
@@ -70,7 +69,6 @@ export const ExpandableCalendarView = ({
     month: { dateString: string },
     _updateSource: string
   ) {
-    // console.log('onMonthChange: ', '' + month)
     await handleChange(month)
     getMarkedDates()
   }

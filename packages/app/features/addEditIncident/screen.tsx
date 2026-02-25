@@ -87,7 +87,6 @@ export function AddEditIncidentScreen() {
     incidentDetails.date ? incidentDetails.date : new Date()
   )
   const [key, setKey] = useState(0)
-  // console.log('incidentDetails', JSON.stringify(incidentDetails))
   const onSelection = (date: Date) => {
     setSelectedDate(date)
     setKey(Math.random())
@@ -182,8 +181,6 @@ export function AddEditIncidentScreen() {
         // selectedAddress = value
         setSelectedAddress(value)
       }
-      // console.log('value', JSON.stringify(value))
-      // console.log('index', JSON.stringify(index))
       logger.debug('selectedAddress1', JSON.stringify(selectedAddress))
     }
   }
@@ -251,7 +248,6 @@ export function AddEditIncidentScreen() {
   }
   const onSelectionIncidentType = (data: string) => {
     incidentTypeRef.current = data
-    // console.log('purpose1', purpose)
   }
   return (
     <View className="flex-1">

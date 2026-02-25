@@ -213,7 +213,6 @@ export const getFullDate = (date: MomentInput) => {
   return moment(date).format(DATE_CONSTANT.FULL_DATE)
 }
 export const getDay = (date: MomentInput) => {
-  // console.log('date./.', date)
   var time = moment(date).format('hh:mm A')
   var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   var formatDate = moment(date).format('MMM DD, YYYY')

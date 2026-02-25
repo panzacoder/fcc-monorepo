@@ -56,10 +56,8 @@ export function AddEditAppointmentScreen() {
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
-  // console.log('doctorFacilityDetails', JSON.stringify(doctorFacilityDetails))
 
   let component = item.component ? item.component : ''
-  // console.log('component', component)
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
@@ -187,7 +185,6 @@ export function AddEditAppointmentScreen() {
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
 
-    // console.log('typeIndex1', '' + typeIndex)
   }
 
   async function addEditAppointment(formData: Schema) {
@@ -307,7 +304,6 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: Date) => {
-    // console.log('onSelection', '' + date)
     setSelectedDate(date)
     setKey(Math.random())
   }
@@ -336,7 +332,6 @@ export function AddEditAppointmentScreen() {
     value: { id: number; title: string } | null
   ) {
     if (value && !isLoading) {
-      // console.log('value', JSON.stringify(value))
       if (value.title === 'Add New Doctor') {
         router.push(
           formatUrl('/circles/addEditDoctor', {

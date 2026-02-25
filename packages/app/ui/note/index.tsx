@@ -44,7 +44,6 @@ export const Note = ({
   let creationDate = noteData.createdOn
     ? convertTimeToUserLocalTime(noteData.createdOn, userAddress, memberAddress)
     : ''
-  // console.log('noteData', JSON.stringify(data))
   async function callDeletNote() {
     deleteNote(noteData.id)
   }
