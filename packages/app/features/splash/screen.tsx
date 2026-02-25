@@ -11,20 +11,21 @@ import type { LoginResponse } from 'app/data/auth'
 import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import { ApiError } from 'app/data/base'
 import { getCredentials } from 'app/utils/secure-storage'
-import headerAction from 'app/redux/header/headerAction'
-import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
-import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
-import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
-import sponsorAction from 'app/redux/sponsor/sponsorAction'
-import { useAppDispatch } from 'app/redux/hooks'
+import { useStore } from 'app/store'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
 export function SplashScreen() {
   const notificationDataRef =
     useRef<FirebaseMessagingTypes.RemoteMessage | null>(null)
-  const dispatch = useAppDispatch()
+  const {
+    setHeader,
+    setUserProfile,
+    setSubscription,
+    setSubscriptionDetails,
+    setSponsor,
+    setPaidAd
+  } = useStore()
   const router = useRouter()
   const loginMutation = useLogin({})
   const [isShowButtons, setIsShowButtons] = useState(false)
@@ -192,32 +193,20 @@ export function SplashScreen() {
           }
           data.header.timezone =
             Intl.DateTimeFormat().resolvedOptions().timeZone
-          dispatch(
-            headerAction.setHeader(
-              data.header as unknown as Record<string, unknown>
-            )
-          )
-          dispatch(userProfileAction.setUserProfile(data.appuserVo))
-          dispatch(subscriptionAction.setSubscription(data.userSubscription))
-          dispatch(
-            userSubscriptionAction.setSubscriptionDetails(
-              subscriptionDetailsobject
-            )
-          )
-          dispatch(
-            sponsorAction.setSponsor({
-              sponsorDetails: data.sponsorUser,
-              sponsorShipDetails: data.sponsorship
-            })
-          )
+          setHeader(data.header as unknown as Record<string, unknown>)
+          setUserProfile(data.appuserVo)
+          setSubscription(data.userSubscription)
+          setSubscriptionDetails(subscriptionDetailsobject)
+          setSponsor({
+            sponsorDetails: data.sponsorUser,
+            sponsorShipDetails: data.sponsorship
+          })
           if (data.commercialsDetails) {
-            dispatch(
-              paidAdAction.setPaidAd({
-                commercialsDetails: data.commercialsDetails.commercials,
-                commercialPageMappings:
-                  data.commercialsDetails.commercialPageMappings
-              })
-            )
+            setPaidAd({
+              commercialsDetails: data.commercialsDetails.commercials,
+              commercialPageMappings:
+                data.commercialsDetails.commercialPageMappings
+            })
           }
           navigateToNotification()
         }

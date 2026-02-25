@@ -8,13 +8,7 @@ import { storeCredentials } from 'app/utils/secure-storage'
 import PtsLoader from 'app/ui/PtsLoader'
 import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
-import headerAction from 'app/redux/header/headerAction'
-import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
-import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
-import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
-import sponsorAction from 'app/redux/sponsor/sponsorAction'
-import { useAppDispatch } from 'app/redux/hooks'
+import { useStore } from 'app/store'
 import { useRouter } from 'expo-router'
 import { CardView } from 'app/ui/layouts/card-view'
 import { CardHeader } from '../card-header'
@@ -35,7 +29,14 @@ type Schema = z.infer<typeof schema>
 
 export function LoginScreen() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
+  const {
+    setHeader,
+    setUserProfile,
+    setSubscription,
+    setSubscriptionDetails,
+    setSponsor,
+    setPaidAd
+  } = useStore()
   const loginMutation = useLogin({})
 
   const { control, handleSubmit } = useForm({
@@ -75,32 +76,20 @@ export function LoginScreen() {
           }
           data.header.timezone =
             Intl.DateTimeFormat().resolvedOptions().timeZone
-          dispatch(
-            headerAction.setHeader(
-              data.header as unknown as Record<string, unknown>
-            )
-          )
-          dispatch(userProfileAction.setUserProfile(data.appuserVo))
-          dispatch(subscriptionAction.setSubscription(data.userSubscription))
-          dispatch(
-            userSubscriptionAction.setSubscriptionDetails(
-              subscriptionDetailsobject
-            )
-          )
-          dispatch(
-            sponsorAction.setSponsor({
-              sponsorDetails: data.sponsorUser,
-              sponsorShipDetails: data.sponsorship
-            })
-          )
+          setHeader(data.header as unknown as Record<string, unknown>)
+          setUserProfile(data.appuserVo)
+          setSubscription(data.userSubscription)
+          setSubscriptionDetails(subscriptionDetailsobject)
+          setSponsor({
+            sponsorDetails: data.sponsorUser,
+            sponsorShipDetails: data.sponsorship
+          })
           if (data.commercialsDetails) {
-            dispatch(
-              paidAdAction.setPaidAd({
-                commercialsDetails: data.commercialsDetails.commercials,
-                commercialPageMappings:
-                  data.commercialsDetails.commercialPageMappings
-              })
-            )
+            setPaidAd({
+              commercialsDetails: data.commercialsDetails.commercials,
+              commercialPageMappings:
+                data.commercialsDetails.commercialPageMappings
+            })
           }
           await storeCredentials(formData.email, formData.password)
           router.push('/home')
