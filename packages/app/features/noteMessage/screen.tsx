@@ -17,9 +17,9 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Typography } from 'app/ui/typography'
-import messageListAction from 'app/redux/messageList/messageListAction'
+import { useStore } from 'app/store'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Feather } from 'app/ui/icons'
@@ -70,7 +70,7 @@ export function NoteMessageScreen() {
   >([])
   const [threadDetails, setThreadDetails] = useState<MessageThread | null>(null)
   const [fetchParticipants, setFetchParticipants] = useState(false)
-  const dispatch = useAppDispatch()
+  const { setMessageList: setMessageListStore } = useStore()
   const header = useAppSelector((state) => state.headerState.header)
   const userDetails = useAppSelector((state) => state.userProfileState.header)
   const userAddress = useAppSelector(
@@ -174,11 +174,7 @@ export function NoteMessageScreen() {
         ? messageThread.messageList
         : []
     setMessageList(msgList)
-    dispatch(
-      messageListAction.setMessageList(
-        msgList as unknown as Record<string, unknown>[]
-      )
-    )
+    setMessageListStore(msgList as unknown as Record<string, unknown>[])
     let participantList =
       messageThread.participantList !== undefined &&
       messageThread.participantList !== null

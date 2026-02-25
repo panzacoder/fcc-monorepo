@@ -7,7 +7,7 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import { isEmpty } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { Button } from 'app/ui/button'
-import userProfileAction from 'app/redux/userProfile/userProfileAction'
+import { useStore } from 'app/store'
 import {
   useUpdateProfile,
   useUpdateMemberAuthorizedCaregiver
@@ -25,7 +25,7 @@ import {
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/redux/hooks'
 const phoneSchema = z.object({
   phone: z.string()
 })
@@ -36,7 +36,7 @@ const profileSchema = z.object({
 })
 export type ProfileSchema = z.infer<typeof profileSchema>
 export function EditUserProfileScreen() {
-  const dispatch = useAppDispatch()
+  const { setUserProfile } = useStore()
   let userPhone = ''
   const user = useAppSelector((state) => state.userProfileState.header)
   const header = useAppSelector((state) => state.headerState.header)
@@ -102,7 +102,7 @@ export function EditUserProfileScreen() {
           let fullName = data?.firstName ? data.firstName : ''
           fullName += data?.lastName ? ' ' + data.lastName : ''
           user.memberName = fullName
-          dispatch(userProfileAction.setUserProfile(user))
+          setUserProfile(user)
           router.dismiss(2)
           if (item.component === 'Profile') {
             router.push('/profile')

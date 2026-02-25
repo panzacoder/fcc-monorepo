@@ -14,7 +14,8 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/redux/hooks'
+import { useStore } from 'app/store'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import messaging from '@react-native-firebase/messaging'
@@ -25,7 +26,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { logger } from 'app/utils/logger'
 import { TabsHeader } from 'app/ui/tabs-header'
-import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import Constants from 'expo-constants'
@@ -70,7 +70,7 @@ export function HomeScreen() {
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  const dispatch = useAppDispatch()
+  const { setMemberNames } = useStore()
   const memberNamesList = useAppSelector((state) =>
     state.memberNames.memberNamesList !== undefined
       ? state.memberNames.memberNamesList
@@ -90,7 +90,7 @@ export function HomeScreen() {
   if (memberNamesList.includes(fullName) === false) {
     memberNamesList.push(fullName)
   }
-  dispatch(memberNamesAction.setMemberNames(memberNamesList))
+  setMemberNames(memberNamesList)
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] =
     useState<TransportRequestItem | null>(null)
@@ -162,7 +162,7 @@ export function HomeScreen() {
           memberNamesList.push(fullName)
         }
       })
-      dispatch(memberNamesAction.setMemberNames(memberNamesList))
+      setMemberNames(memberNamesList)
       let sentence = ''
       sentence +=
         weekDetailsData.upcomingAppointmentCount &&

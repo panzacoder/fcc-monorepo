@@ -8,7 +8,8 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { Typography } from 'app/ui/typography'
 import { useRouter } from 'expo-router'
 import { Feather } from 'app/ui/icons'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/redux/hooks'
+import { useStore } from 'app/store'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { logger } from 'app/utils/logger'
@@ -19,12 +20,11 @@ import type {
   GetMemberMenusResponse,
   MemberMenu
 } from 'app/data/circle'
-import currentMemberAddressAction from 'app/redux/currentMemberAddress/currentMemberAddressAction'
 
 export function CircleDetailsScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const router = useRouter()
-  const dispatch = useAppDispatch()
+  const { setMemberAddress } = useStore()
   const userDetails = useAppSelector((state) => state.userProfileState.header)
   const [isMessages, setIsMessages] = useState(false)
   const [isAppointments, setIsAppointments] = useState(false)
@@ -86,9 +86,7 @@ export function CircleDetailsScreen() {
     if (memberMenusData) {
       const data = memberMenusData as GetMemberMenusResponse
       if (data.member && data.member.address) {
-        dispatch(
-          currentMemberAddressAction.setMemberAddress(data.member.address)
-        )
+        setMemberAddress(data.member.address)
         let list = data.member.menuList ? data.member.menuList : []
         list.map((entry: MemberMenu) => {
           if (entry.menuid === 'MyAppointments') {

@@ -10,7 +10,7 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { AddMessageThread } from 'app/ui/addMessageThread'
-import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
+import { useStore } from 'app/store'
 import {
   useMemberThreads,
   useThreadParticipants,
@@ -22,7 +22,7 @@ import type {
   ParticipantDetail
 } from 'app/data/messages/types'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -35,7 +35,7 @@ type MemberRouteParams = {
   lastname?: string
 }
 export function MessagesScreen() {
-  const dispatch = useAppDispatch()
+  const { setMemberNames } = useStore()
   const header = useAppSelector((state) => state.headerState.header)
   const memberNamesList: string[] =
     useAppSelector((state) => state.memberNames.memberNamesList) ?? []
@@ -367,9 +367,7 @@ export function MessagesScreen() {
                           let fullName = data.name ? data.name : ''
                           if (memberNamesList.includes(fullName) === false) {
                             memberNamesList.push(fullName)
-                            dispatch(
-                              memberNamesAction.setMemberNames(memberNamesList)
-                            )
+                            setMemberNames(memberNamesList)
                           }
                           return (
                             <View key={index} className="ml-2">

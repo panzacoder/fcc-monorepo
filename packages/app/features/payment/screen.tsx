@@ -32,13 +32,9 @@ import RNIap, {
   purchaseUpdatedListener
 } from 'react-native-iap'
 type InAppPurchase = SubscriptionPurchase
-import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
-import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
-import sponsororAction from 'app/redux/sponsor/sponsorAction'
-import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import { logger } from 'app/utils/logger'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useStore } from 'app/store'
+import { useAppSelector } from 'app/redux/hooks'
 import type {
   CheckOutSessionResponse,
   PaymentSuccessResponse,
@@ -86,7 +82,13 @@ const itemSubs = Platform.select({
 }) as string[] | undefined
 
 export function PaymentsScreen() {
-  const dispatch = useAppDispatch()
+  const {
+    setUserProfile,
+    setSubscription,
+    setSubscriptionDetails,
+    setSponsor,
+    setPaidAd
+  } = useStore()
   const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
     useStripe()
   const [isUserDataLoaded, setUserDataLoaded] = useState(false)
@@ -292,30 +294,22 @@ export function PaymentsScreen() {
                 ? data.userDetails.appuserVo
                 : {}
             if (!isEmpty(appuserVo)) {
-              dispatch(userProfileAction.setUserProfile(appuserVo))
+              setUserProfile(appuserVo)
             }
             if (!isEmpty(userSubscription)) {
-              dispatch(subscriptionAction.setSubscription(userSubscription))
+              setSubscription(userSubscription)
             }
             if (!isEmpty(userSubscription)) {
-              dispatch(
-                userSubscriptionAction.setSubscriptionDetails(
-                  subscriptionDetailsobject
-                )
-              )
+              setSubscriptionDetails(subscriptionDetailsobject)
             }
-            await dispatch(
-              sponsororAction.setSponsor({
-                sponsorDetails: {},
-                sponsorShipDetails: {}
-              })
-            )
-            await dispatch(
-              paidAdAction.setPaidAd({
-                commercialsDetails: {},
-                commercialPageMappings: {}
-              })
-            )
+            setSponsor({
+              sponsorDetails: {},
+              sponsorShipDetails: {}
+            })
+            setPaidAd({
+              commercialsDetails: {},
+              commercialPageMappings: {}
+            })
             router.push('/profile')
           }
         },
