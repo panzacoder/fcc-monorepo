@@ -13,12 +13,14 @@ import { formatUrl } from 'app/utils/format-url'
 import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useCaregiverDetails, useDeleteCaregiver } from 'app/data/caregivers'
+import type { CaregiverDetail } from 'app/data/caregivers'
+import type { PrivilegeAction } from 'app/data/types.d'
 export function CaregiverDetailsScreen() {
-  const caregiverPrivilegesRef = useRef<any>({})
+  const caregiverPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let caregiverInfo = item.caregiverDetails
@@ -31,7 +33,9 @@ export function CaregiverDetailsScreen() {
   const [status, setStatus] = useState('')
   const [profile, setProfile] = useState('')
   const [email, setEmail] = useState('')
-  const [caregiverDetails, setCaregiverDetails] = useState({}) as any
+  const [caregiverDetails, setCaregiverDetails] = useState<
+    Partial<CaregiverDetail>
+  >({})
   let memberFullName = ''
 
   if (!_.isEmpty(memberData)) {
@@ -50,12 +54,12 @@ export function CaregiverDetailsScreen() {
 
   useEffect(() => {
     if (caregiverData) {
-      const data = caregiverData as any
+      const data = caregiverData
       setCaregiverDetails(data.familyMember || {})
       if (data.domainObjectPrivileges) {
         caregiverPrivilegesRef.current = data.domainObjectPrivileges.Caregiver
           ? data.domainObjectPrivileges.Caregiver
-          : {}
+          : []
       }
       if (data.familyMember) {
         let details = data.familyMember

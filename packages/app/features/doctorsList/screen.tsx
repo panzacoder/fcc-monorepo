@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,14 +10,13 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMemberDoctors } from 'app/data/doctors'
 import type { DoctorListItem } from 'app/data/doctors/types'
-import type { PrivilegeAction } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function DoctorsListScreen() {
-  const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [doctorList, setDoctorList] = useState<DoctorListItem[]>([])
   const [doctorListFull, setDoctorListFull] = useState<DoctorListItem[]>([])
@@ -26,19 +25,19 @@ export function DoctorsListScreen() {
   const header = useAppSelector((state) => state.headerState.header)
   const item = useLocalSearchParams<{ memberData: string }>()
   const router = useRouter()
-  let memberData = JSON.parse(item.memberData)
+  let memberData = JSON.parse(item.memberData ?? '{}')
 
   const { data: doctorsData, isLoading } = useMemberDoctors(header, {
     memberId: memberData.member ? memberData.member : ''
   })
 
+  const doctorPrivileges = usePermissions(
+    doctorsData?.domainObjectPrivileges,
+    'Doctor'
+  )
+
   useEffect(() => {
     if (doctorsData) {
-      if (doctorsData.domainObjectPrivileges) {
-        doctorPrivilegesRef.current = doctorsData.domainObjectPrivileges.Doctor
-          ? doctorsData.domainObjectPrivileges.Doctor
-          : []
-      }
       let list = doctorsData.list ? doctorsData.list : []
       setDoctorList(list)
       setDoctorListFull(list)
@@ -85,7 +84,7 @@ export function DoctorsListScreen() {
               color={'black'}
             />
           </TouchableOpacity>
-          {getUserPermission(doctorPrivilegesRef.current).createPermission ? (
+          {getUserPermission(doctorPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

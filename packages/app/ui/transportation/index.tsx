@@ -133,7 +133,7 @@ export const Transportation = ({
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: ComponentProps<typeof FeatherType>['name']
+    iconValue?: ComponentProps<typeof FeatherType>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -144,7 +144,7 @@ export const Transportation = ({
         {isIcon ? (
           <Feather
             className="ml-[-10px]"
-            name={iconValue}
+            name={iconValue ?? 'info'}
             size={20}
             color={'black'}
           />
@@ -207,8 +207,8 @@ export const Transportation = ({
   }
   async function createUpdateReminder(
     title: string,
-    date: Date | string,
-    reminderData: ReminderItem
+    date: Date,
+    reminderData: { date?: Date; content?: string; note?: string }
   ) {
     let reminderPayload: {
       content: string
@@ -221,7 +221,7 @@ export const Transportation = ({
       date: date
     }
     if (!_.isEmpty(reminderData)) {
-      reminderPayload.id = reminderData.id
+      reminderPayload.id = remindersData.id
     }
     if (component === 'Appointment') {
       reminderPayload.appointmentTransportation = {
@@ -324,11 +324,11 @@ export const Transportation = ({
         </View>
       </View>
 
-      {getDetailsView('Acompany', acompanyName, false, '')}
-      {getDetailsView('Date', transportationDate, false, '')}
-      {getDetailsView('Description', description, false, '')}
-      {getDetailsView('Status', status, false, '')}
-      {getDetailsView('Address', address, false, '')}
+      {getDetailsView('Acompany', acompanyName, false)}
+      {getDetailsView('Date', transportationDate, false)}
+      {getDetailsView('Description', description, false)}
+      {getDetailsView('Status', status, false)}
+      {getDetailsView('Address', address, false)}
       <View className="f-full ml-2 flex-row">
         <Typography className="w-[85%]">{'Reminder'}</Typography>
         <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
@@ -347,7 +347,12 @@ export const Transportation = ({
         <View className="">
           <AddEditReminder
             component={'Transportation'}
-            reminderData={remindersData}
+            reminderData={{
+              note: remindersData.content,
+              date: remindersData.date
+                ? new Date(remindersData.date)
+                : undefined
+            }}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}
           />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -10,13 +10,15 @@ import { Feather } from 'app/ui/icons'
 import { COLORS } from 'app/utils/colors'
 import { useMedicalDevices } from 'app/data/medical-devices'
 import type { MedicalDeviceListItem } from 'app/data/medical-devices/types'
-import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { YearList } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
@@ -30,7 +32,6 @@ const schema = z.object({
 })
 export type Schema = z.infer<typeof schema>
 export function MedicalDevicesListScreen() {
-  const medicalDevicesPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [devicesList, setDevicesList] = useState<MedicalDeviceListItem[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
@@ -65,14 +66,13 @@ export function MedicalDevicesListScreen() {
     year: filterYear
   })
 
+  const medicalDevicesPrivileges = usePermissions(
+    devicesData?.domainObjectPrivileges,
+    'Purchase'
+  )
+
   useEffect(() => {
     if (devicesData) {
-      if (devicesData.domainObjectPrivileges) {
-        medicalDevicesPrivilegesRef.current = devicesData.domainObjectPrivileges
-          .Purchase
-          ? devicesData.domainObjectPrivileges.Purchase
-          : []
-      }
       let list = devicesData.list ? devicesData.list : []
       setDevicesList(list)
       setIsFilter(false)
@@ -91,10 +91,12 @@ export function MedicalDevicesListScreen() {
   function filterDevice(formData: Schema) {
     const month =
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     const year =
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     setFilterMonth(month)
     setFilterYear(year)
   }
@@ -107,15 +109,15 @@ export function MedicalDevicesListScreen() {
     })
   }
 
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  function setYearChange(item: DropdownItem) {
+    if (!item) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  function setMonthChange(item: DropdownItem) {
+    if (!item) {
       reset({
         monthIndex: -1
       })
@@ -128,8 +130,7 @@ export function MedicalDevicesListScreen() {
         <PtsBackHeader title="Medical Devices" memberData={memberData} />
         <View className="flex-row ">
           <View className="w-[70%]" />
-          {getUserPermission(medicalDevicesPrivilegesRef.current)
-            .createPermission ? (
+          {getUserPermission(medicalDevicesPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

@@ -25,6 +25,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
 
+const ADDRESS_FIELD = {
+  NICK_NAME: 0,
+  LINE: 1,
+  CITY: 2,
+  ZIP_CODE: 3,
+  COUNTRY: 4,
+  STATE: 5,
+  FULL_ADDRESS: 6,
+  SHORT_DESCRIPTION: 7,
+  TIMEZONE: 8
+} as const
+
 type AddressFormData = {
   shortDescription: string
   nickName: string
@@ -93,6 +105,7 @@ const schema = z
         message: 'Password must contain a special character !@#$%^&*'
       }),
     confirmPassword: z.string().min(1, { message: 'Confirm new password' }),
+    phone: z.string(),
     acceptTc: z.boolean()
   })
   .superRefine(({ password, confirmPassword }, ctx) => {
@@ -104,9 +117,6 @@ const schema = z
       })
     }
   })
-const phoneSchema = z.object({
-  phone: z.string()
-})
 type Schema = z.infer<typeof schema>
 
 export function SignUpScreen() {
@@ -123,11 +133,8 @@ export function SignUpScreen() {
   const [isFirstTimeView, setIsFirstTimeView] = useState(true)
   const [isTandCAccepted, setIsTandCAccepted] = useState(false)
 
-  const formMethods = useForm<Schema>({
-    resolver: zodResolver(schema)
-  })
   const router = useRouter()
-  const { control, handleSubmit, reset, setFocus } = useForm({
+  const { control, handleSubmit, setFocus, setValue } = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -138,12 +145,6 @@ export function SignUpScreen() {
       acceptTc: false
     },
     resolver: zodResolver(schema)
-  })
-  const { control: control1, reset: reset1 } = useForm({
-    defaultValues: {
-      phone: ''
-    },
-    resolver: zodResolver(phoneSchema)
   })
   async function submitRegistration(formData: Schema) {
     if (selectedAddress.current.address.state.id === '') {
@@ -182,52 +183,53 @@ export function SignUpScreen() {
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
       const str = value as string
-      const obj = value as Record<string, string>
-      if (index === 0) {
+      const obj = value as Record<string, string | number>
+      if (index === ADDRESS_FIELD.NICK_NAME) {
         selectedAddress.current.nickName = str
       }
-      if (index === 7) {
+      if (index === ADDRESS_FIELD.SHORT_DESCRIPTION) {
         selectedAddress.current.shortDescription = str
       }
-      if (index === 1) {
+      if (index === ADDRESS_FIELD.LINE) {
         selectedAddress.current.address.line = str
       }
-      if (index === 2) {
+      if (index === ADDRESS_FIELD.CITY) {
         selectedAddress.current.address.city = str
       }
-      if (index === 3) {
+      if (index === ADDRESS_FIELD.ZIP_CODE) {
         selectedAddress.current.address.zipCode = str
       }
-      if (index === 4) {
-        selectedAddress.current.address.state.country.id = obj.id
-        selectedAddress.current.address.state.country.name = obj.name
-        selectedAddress.current.address.state.country.code = obj.code
-        selectedAddress.current.address.state.country.namecode = obj.namecode
-        selectedAddress.current.address.state.country.snum = obj.snum
-        selectedAddress.current.address.state.country.description =
-          obj.description
+      if (index === ADDRESS_FIELD.COUNTRY) {
+        const country = (selectedAddress.current.address.state.country ??=
+          {} as AddressFormData['address']['state']['country'])
+        country.id = obj.id as string
+        country.name = obj.name as string
+        country.code = obj.code as string
+        country.namecode = obj.namecode as string
+        country.isoCode = obj.isoCode as string
+        country.description = obj.description as string
       }
-      if (index === 5) {
-        selectedAddress.current.address.state.id = obj.id
-        selectedAddress.current.address.state.name = obj.name
-        selectedAddress.current.address.state.code = obj.code
-        selectedAddress.current.address.state.namecode = obj.namecode
-        selectedAddress.current.address.state.snum = obj.snum
-        selectedAddress.current.address.state.description = obj.description
+      if (index === ADDRESS_FIELD.STATE) {
+        const state = (selectedAddress.current.address.state ??=
+          {} as AddressFormData['address']['state'])
+        state.id = obj.id as string
+        state.name = obj.name as string
+        state.code = obj.code as string
+        state.namecode = obj.namecode as string
+        state.snum = obj.snum as string
+        state.description = obj.description as string
       }
-      if (index === 6) {
+      if (index === ADDRESS_FIELD.FULL_ADDRESS) {
         selectedAddress.current = value as AddressFormData
       }
-      if (index === 8) {
-        let tz = obj.name ? obj.name : ''
+      if (index === ADDRESS_FIELD.TIMEZONE) {
+        const tz = obj.name ? (obj.name as string) : ''
         setTimeZone(tz)
         logger.debug('timeZone', tz)
       }
     }
     setAddress(selectedAddress.current)
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
-  async function acceptNewRequest(_data: unknown) {}
   const cancelClicked = (address: Record<string, unknown>) => {
     setAddress(address)
     setIsShowPrivacyPolicy(false)
@@ -290,7 +292,7 @@ export function SignUpScreen() {
               />
               <ControlledTextField
                 name="phone"
-                control={control1}
+                control={control}
                 placeholder={'Phone'}
                 keyboard={'numeric'}
                 onSubmitEditing={() => {
@@ -298,10 +300,8 @@ export function SignUpScreen() {
                 }}
                 onChangeText={(value) => {
                   userPhone.current =
-                    convertPhoneNumberToUsaPhoneNumberFormat(value)
-                  reset1({
-                    phone: userPhone.current
-                  })
+                    convertPhoneNumberToUsaPhoneNumberFormat(value) ?? ''
+                  setValue('phone', userPhone.current)
                 }}
               />
               <ControlledSecureField
@@ -386,7 +386,7 @@ export function SignUpScreen() {
               >['cancelClicked']
             }
             acceptClicked={
-              acceptNewRequest as ComponentProps<
+              (() => {}) as ComponentProps<
                 typeof PrivacyPolicy
               >['acceptClicked']
             }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -13,7 +13,8 @@ import moment from 'moment'
 import _ from 'lodash'
 import { useEvents } from 'app/data/events'
 import type { EventListItem } from 'app/data/events/types'
-import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { YearList } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
@@ -24,11 +25,12 @@ import {
   convertUserTimeToUTC
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
@@ -37,7 +39,6 @@ export type Schema = z.infer<typeof schema>
 const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 // let currentFilter = 'Upcoming'
 export function EventsListScreen() {
-  const eventsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const router = useRouter()
@@ -73,7 +74,7 @@ export function EventsListScreen() {
   staticData.yearList.map(({ name, id }: YearList, index: number) => {
     yearList.push({
       id: index + 2,
-      title: name
+      title: String(name)
     })
   })
 
@@ -83,13 +84,13 @@ export function EventsListScreen() {
     year: selectedYear
   })
 
+  const eventsPrivileges = usePermissions(
+    eventsData?.domainObjectPrivileges,
+    'Event'
+  )
+
   useEffect(() => {
     if (eventsData) {
-      if (eventsData.domainObjectPrivileges) {
-        eventsPrivilegesRef.current = eventsData.domainObjectPrivileges.Event
-          ? eventsData.domainObjectPrivileges.Event
-          : []
-      }
       let list = eventsData.eventList ? eventsData.eventList : []
       setEventsList(list)
       setEventsListFull(list)
@@ -176,11 +177,13 @@ export function EventsListScreen() {
   function filterEvents(formData: Schema) {
     setSelectedMonth(
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     )
     setSelectedYear(
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     )
   }
   function resetFilter() {
@@ -192,15 +195,15 @@ export function EventsListScreen() {
     })
   }
 
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  function setYearChange(item: DropdownItem) {
+    if (item === null) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  function setMonthChange(item: DropdownItem) {
+    if (item === null) {
       reset({
         monthIndex: -1
       })
@@ -229,7 +232,7 @@ export function EventsListScreen() {
           />
         </TouchableOpacity>
         <View className="w-[35%]" />
-        {getUserPermission(eventsPrivilegesRef.current).createPermission ? (
+        {getUserPermission(eventsPrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

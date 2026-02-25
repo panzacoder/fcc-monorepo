@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -14,12 +14,13 @@ import { usePharmacyList } from 'app/data/facilities'
 import type { PharmacyListItem } from 'app/data/facilities/types'
 import { useActiveDoctors } from 'app/data/doctors'
 import type { ActiveDoctorItem } from 'app/data/doctors/types'
-import type { PrivilegeAction, MedicineType } from 'app/data/types'
+import type { MedicineType } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
@@ -62,7 +63,6 @@ export function PrescriptionsListScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
   const [currentFilter, setCurrentFilter] = useState('Active')
-  const prescriptionPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedType, setSelectedType] = useState('All')
   const [selectedPrescriber, setSelectedPrescriber] = useState('All')
   const [selectedPharmacy, setSelectedPharmacy] = useState('All')
@@ -121,14 +121,13 @@ export function PrescriptionsListScreen() {
   const isLoading =
     isPrescriptionsLoading || isPharmacyLoading || isDoctorsLoading
 
+  const prescriptionPrivileges = usePermissions(
+    prescriptionData?.domainObjectPrivileges,
+    'Medicine'
+  )
+
   useEffect(() => {
     if (prescriptionData) {
-      if (prescriptionData.domainObjectPrivileges) {
-        prescriptionPrivilegesRef.current = prescriptionData
-          .domainObjectPrivileges.Medicine
-          ? prescriptionData.domainObjectPrivileges.Medicine
-          : []
-      }
       let list = prescriptionData.medicineList
         ? prescriptionData.medicineList
         : []
@@ -183,7 +182,7 @@ export function PrescriptionsListScreen() {
   async function getFilteredList(list: PrescriptionListItem[], filter: string) {
     let filteredList: PrescriptionListItem[] = []
     list.map((data: PrescriptionListItem, index: number) => {
-      let type = data.type && data.type.type ? data.type.type : ''
+      let type = data.type ? data.type : ''
       if (filter === 'All') {
         filteredList = list
       } else if (filter === data.status) {
@@ -206,16 +205,18 @@ export function PrescriptionsListScreen() {
     let newDrugName = formData.drugName
     let newType = 'All'
     let newPharmacy = 'All'
-    let newPrescriber: string | ActiveDoctorItem = 'All'
+    let newPrescriber = 'All'
 
     if (formData.typeIndex !== 1) {
-      newType = staticData.medicineTypeList[formData.typeIndex - 2].type
+      newType =
+        staticData.medicineTypeList[formData.typeIndex - 2]?.type ?? 'All'
     }
 
-    newPharmacy = pharmacyList[formData.pharmacyIndex - 1].title
+    newPharmacy = pharmacyList[formData.pharmacyIndex - 1]?.title ?? 'All'
 
     if (formData.prescribedIndex !== 1) {
-      newPrescriber = doctorListFull[formData.prescribedIndex - 2]
+      newPrescriber =
+        doctorListFull[formData.prescribedIndex - 2]?.name ?? 'All'
     }
 
     setDrugName(newDrugName)
@@ -262,8 +263,7 @@ export function PrescriptionsListScreen() {
               />
             </TouchableOpacity>
           </View>
-          {getUserPermission(prescriptionPrivilegesRef.current)
-            .createPermission ? (
+          {getUserPermission(prescriptionPrivileges).createPermission ? (
             <View className=" mt-[20] self-center">
               <TouchableOpacity
                 className=" h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

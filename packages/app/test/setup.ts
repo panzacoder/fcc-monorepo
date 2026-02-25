@@ -1,7 +1,10 @@
 import { vi, beforeEach } from 'vitest'
 
 beforeEach(async () => {
-  const { _clear } = (await import('expo-secure-store')) as any
+  // @ts-expect-error dynamic import for test mock
+  const { _clear } = (await import('expo-secure-store')) as {
+    _clear: () => void
+  }
   _clear()
 })
 

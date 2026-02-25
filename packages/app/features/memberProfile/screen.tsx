@@ -32,6 +32,7 @@ import {
   getAddressFromObject
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
+import type { MemberProfileResponse } from 'app/data/profile'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })
 })
@@ -39,11 +40,13 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 
 export function MemberProfileScreen() {
-  const [memberDetails, setMemberDetails] = useState({}) as any
+  const [memberDetails, setMemberDetails] = useState<
+    Partial<MemberProfileResponse>
+  >({})
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
   const [isFromSelfCircle, setIsFromSelfCircle] = useState(false)
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let userDetails = item.userDetails ? JSON.parse(item.userDetails) : {}
@@ -66,7 +69,7 @@ export function MemberProfileScreen() {
 
   useEffect(() => {
     if (memberProfileData) {
-      const data = memberProfileData as any
+      const data = memberProfileData
       setMemberDetails(data || {})
     }
   }, [memberProfileData])
@@ -269,7 +272,7 @@ export function MemberProfileScreen() {
                   className="font-400 text-primary ml-2 w-[70%] text-[15px] font-bold"
                 >
                   {convertPhoneNumberToUsaPhoneNumberFormat(
-                    memberDetails.phone
+                    memberDetails.phone ?? ''
                   )}
                 </Typography>
               </View>

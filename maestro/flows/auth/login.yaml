@@ -1,0 +1,25 @@
+# Login flow test
+# Run: maestro test -e TEST_PASSWORD=xxx flows/auth/login.yaml
+
+appId: app.familycarecircle.fcc
+---
+- launchApp
+
+# Wait for initial screen
+- assertVisible: 'Email Address'
+
+# Enter credentials
+- tapOn: 'Email Address'
+- inputText: ${TEST_EMAIL}
+- tapOn: 'Password'
+- inputText: ${TEST_PASSWORD}
+
+# Submit login
+- tapOn: 'Sign In'
+
+# Verify successful login - should see home screen
+- assertVisible:
+    text: 'Home'
+    optional: false
+# Cleanup: logout for test repeatability
+# TODO: Add logout flow once we have it

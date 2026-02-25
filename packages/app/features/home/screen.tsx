@@ -448,7 +448,7 @@ export function HomeScreen() {
     transportData: TransportRequestItem
   ) {
     const params = {
-      transport: {
+      transportationVo: {
         id: transportData.id ? transportData.id : '',
         reason: '',
         isApprove: true
@@ -464,9 +464,9 @@ export function HomeScreen() {
       logger.debug(error)
     }
     if (transportData.type === 'Event') {
-      eventAcceptMutation.mutate(params as any, { onSuccess, onError })
+      eventAcceptMutation.mutate(params, { onSuccess, onError })
     } else {
-      approveTransportMutation.mutate(params as any, { onSuccess, onError })
+      approveTransportMutation.mutate(params, { onSuccess, onError })
     }
   }
   const showRequestModal = () => {
@@ -538,7 +538,7 @@ export function HomeScreen() {
   }
   async function rejectRequest(formData: Schema) {
     const params = {
-      transport: {
+      transportationVo: {
         id: transportRequestData?.id ? transportRequestData.id : '',
         reason: formData.rejectReason,
         isApprove: false
@@ -554,9 +554,9 @@ export function HomeScreen() {
       logger.debug(error)
     }
     if (transportRequestData?.type === 'Event') {
-      eventRejectMutation.mutate(params as any, { onSuccess, onError })
+      eventRejectMutation.mutate(params, { onSuccess, onError })
     } else {
-      rejectTransportMutation.mutate(params as any, { onSuccess, onError })
+      rejectTransportMutation.mutate(params, { onSuccess, onError })
     }
   }
   const shwoRejectModal = () => {

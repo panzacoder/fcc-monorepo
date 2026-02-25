@@ -13,7 +13,7 @@ import { ApiError } from 'app/data/base'
 import { getCredentials } from 'app/utils/secure-storage'
 import headerAction from 'app/redux/header/headerAction'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
+import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
@@ -23,7 +23,8 @@ import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
 export function SplashScreen() {
-  const notificationDataRef = useRef<FirebaseMessagingTypes.RemoteMessage>({})
+  const notificationDataRef =
+    useRef<FirebaseMessagingTypes.RemoteMessage | null>(null)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const loginMutation = useLogin({})
@@ -69,6 +70,7 @@ export function SplashScreen() {
   }, [])
   async function navigateToNotification() {
     if (
+      notificationDataRef.current &&
       !_.isEmpty(notificationDataRef.current.data) &&
       notificationDataRef.current.data !== undefined
     ) {
@@ -190,7 +192,11 @@ export function SplashScreen() {
             expiringSubscription: data.expiringSubscription
           }
           data.header.timezone = moment.tz.guess()
-          dispatch(headerAction.setHeader(data.header))
+          dispatch(
+            headerAction.setHeader(
+              data.header as unknown as Record<string, unknown>
+            )
+          )
           dispatch(userProfileAction.setUserProfile(data.appuserVo))
           dispatch(subscriptionAction.setSubscription(data.userSubscription))
           dispatch(

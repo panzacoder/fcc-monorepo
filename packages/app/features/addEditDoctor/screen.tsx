@@ -48,7 +48,6 @@ export function AddEditDoctorScreen() {
     shortDescription: '',
     nickName: '',
     address: {
-      id: '',
       line: '',
       city: '',
       zipCode: '',
@@ -65,14 +64,13 @@ export function AddEditDoctorScreen() {
         }
       }
     }
-  })
+  } as DoctorLocationData)
   const isDoctorActiveRef = useRef(true)
   let doctorPhone = ''
   const router = useRouter()
   const staticData = useAppSelector(
     (state) => state.staticDataState.staticData
   ) as StaticData
-  // console.log('header', JSON.stringify(header))
   const header = useAppSelector((state) => state.headerState.header)
   const createDoctorMutation = useCreateDoctor(header)
   const updateDoctorMutation = useUpdateDoctor(header)
@@ -83,7 +81,6 @@ export function AddEditDoctorScreen() {
   }>()
   let memberData = item.memberData ? JSON.parse(item.memberData) : {}
   let doctorDetails = item.doctorDetails ? JSON.parse(item.doctorDetails) : {}
-  // console.log('doctorDetails', JSON.stringify(doctorDetails))
   if (!_.isEmpty(doctorDetails)) {
     if (
       doctorDetails.status &&
@@ -136,7 +133,9 @@ export function AddEditDoctorScreen() {
       }
       if (index === 4) {
         const country = value as Partial<Country>
-        selectedAddressRef.current.address.state.country = country
+        if (selectedAddressRef.current.address.state) {
+          selectedAddressRef.current.address.state.country = country
+        }
       }
       if (index === 5) {
         const state = value as Partial<State>
@@ -149,8 +148,6 @@ export function AddEditDoctorScreen() {
         selectedAddressRef.current = value as DoctorLocationData
       }
     }
-
-    // console.log('selectedAddressRef.current', JSON.stringify(selectedAddressRef.current))
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -201,7 +198,7 @@ export function AddEditDoctorScreen() {
           phone: removeAllSpecialCharFromString(doctorPhone),
           website: formData.website,
           websiteuser: formData.username,
-          specialist: findSpecializationFromId(formData.specialization),
+          specialist: findSpecializationFromId(formData.specialization) ?? '',
           status: {
             status: isDoctorActiveRef.current === true ? 'Active' : 'InActive',
             id: isDoctorActiveRef.current === true ? 1 : 2
@@ -228,7 +225,7 @@ export function AddEditDoctorScreen() {
   }
   async function createDoctor(formData: Schema) {
     let locationList: DoctorLocationData[] = []
-    selectedAddressRef.current.address.id = ''
+    selectedAddressRef.current.address.id = undefined
     locationList.push(selectedAddressRef.current)
     createDoctorMutation.mutate(
       {
@@ -243,7 +240,7 @@ export function AddEditDoctorScreen() {
           phone: removeAllSpecialCharFromString(doctorPhone),
           website: formData.website,
           websiteuser: formData.username,
-          specialist: findSpecializationFromId(formData.specialization),
+          specialist: findSpecializationFromId(formData.specialization) ?? '',
           isSelf: true,
           doctorLocationList: locationList
         }
@@ -362,7 +359,8 @@ export function AddEditDoctorScreen() {
                     keyboard="number-pad"
                     onChangeText={(value) => {
                       doctorPhone =
-                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+                        convertPhoneNumberToUsaPhoneNumberFormat(value ?? '') ??
+                        ''
 
                       reset1({
                         phone: doctorPhone

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View,
   Alert,
@@ -17,6 +17,7 @@ import {
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
 import { Feather } from 'app/ui/icons'
+import type { ComponentProps } from 'react'
 import {
   useDoctorDetails,
   useDeleteDoctor,
@@ -28,17 +29,16 @@ import type {
   DoctorLocation
 } from 'app/data/doctors/types'
 import type { AppointmentListItem } from 'app/data/facilities/types'
-import type { PrivilegeAction } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import * as Clipboard from 'expo-clipboard'
 export function DoctorDetailsScreen() {
-  const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])
   const header = useAppSelector((state) => state.headerState.header)
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
@@ -70,14 +70,14 @@ export function DoctorDetailsScreen() {
   const deleteDoctorMutation = useDeleteDoctor(header)
   const shareDoctorMutation = useShareDoctor(header)
 
+  const doctorPrivileges = usePermissions(
+    doctorDetailsData?.domainObjectPrivileges,
+    'Doctor'
+  )
+
   useEffect(() => {
     if (doctorDetailsData) {
       const data = doctorDetailsData
-      if (data.domainObjectPrivileges) {
-        doctorPrivilegesRef.current = data.domainObjectPrivileges.Doctor
-          ? data.domainObjectPrivileges.Doctor
-          : []
-      }
       setDoctorDetails(data.doctor || {})
       if (data.doctor) {
         let details = data.doctor
@@ -139,7 +139,7 @@ export function DoctorDetailsScreen() {
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: string
+    iconValue?: ComponentProps<typeof Feather>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -171,7 +171,7 @@ export function DoctorDetailsScreen() {
               iconPressed(title, value)
             }}
           >
-            <Feather className="" name={iconValue} size={20} color={'black'} />
+            <Feather className="" name={iconValue!} size={20} color={'black'} />
           </TouchableOpacity>
         ) : (
           <View />
@@ -181,7 +181,7 @@ export function DoctorDetailsScreen() {
   }
   async function deleteDoctor() {
     deleteDoctorMutation.mutate(
-      { doctor: { id: doctorDetails.id } },
+      { doctor: { id: doctorDetails.id ?? 0 } },
       {
         onSuccess: () => {
           router.dismiss(2)
@@ -266,7 +266,9 @@ export function DoctorDetailsScreen() {
               {doctorDetails.phone && doctorDetails.phone !== '' ? (
                 getDetailsView(
                   'Phone',
-                  convertPhoneNumberToUsaPhoneNumberFormat(doctorDetails.phone),
+                  convertPhoneNumberToUsaPhoneNumberFormat(
+                    doctorDetails.phone ?? ''
+                  ) ?? '',
                   true,
                   'phone'
                 )
@@ -308,8 +310,7 @@ export function DoctorDetailsScreen() {
                 doctorDetails.status && doctorDetails.status.status
                   ? doctorDetails.status.status
                   : '',
-                false,
-                ''
+                false
               )}
             </View>
           </View>
@@ -549,7 +550,7 @@ export function DoctorDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(doctorPrivilegesRef.current).deletePermission ? (
+          {getUserPermission(doctorPrivileges).deletePermission ? (
             <View className="mx-5 my-5 flex-row self-center">
               <Button
                 className="w-[50%]"

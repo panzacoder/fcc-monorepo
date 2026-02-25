@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -11,18 +11,20 @@ import { COLORS } from 'app/utils/colors'
 import { Button } from 'app/ui/button'
 import { useIncidents } from 'app/data/incidents'
 import type { IncidentListItem } from 'app/data/incidents/types'
-import type { PrivilegeAction, YearList } from 'app/data/types'
+import type { YearList } from 'app/data/types'
+import { usePermissions } from 'app/utils/usePermissions'
 import type { StaticData } from 'app/data/static'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 const schema = z.object({
   monthIndex: z.number(),
   yearIndex: z.number()
@@ -31,7 +33,6 @@ export type Schema = z.infer<typeof schema>
 
 const monthsList = getMonthsList() as Array<{ id: number; title: string }>
 export function IncidentsListScreen() {
-  const incidentsPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isFilter, setIsFilter] = useState(false)
@@ -72,14 +73,13 @@ export function IncidentsListScreen() {
     year: selectedYear
   })
 
+  const incidentsPrivileges = usePermissions(
+    incidentsData?.domainObjectPrivileges,
+    'Incident'
+  )
+
   useEffect(() => {
     if (incidentsData) {
-      if (incidentsData.domainObjectPrivileges) {
-        incidentsPrivilegesRef.current = incidentsData.domainObjectPrivileges
-          .Incident
-          ? incidentsData.domainObjectPrivileges.Incident
-          : []
-      }
       setIncidentsList(incidentsData.list ? incidentsData.list : [])
       setIsDataReceived(true)
       setIsFilter(false)
@@ -117,11 +117,13 @@ export function IncidentsListScreen() {
   function filterEvents(formData: Schema) {
     setSelectedMonth(
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     )
     setSelectedYear(
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     )
   }
   function resetFilter() {
@@ -132,15 +134,15 @@ export function IncidentsListScreen() {
       yearIndex: 1
     })
   }
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  function setYearChange(item: DropdownItem) {
+    if (!item) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  function setMonthChange(item: DropdownItem) {
+    if (!item) {
       reset({
         monthIndex: -1
       })
@@ -153,7 +155,7 @@ export function IncidentsListScreen() {
       <View className="flex-row">
         <View className="w-[75%]" />
 
-        {getUserPermission(incidentsPrivilegesRef.current).createPermission ? (
+        {getUserPermission(incidentsPrivileges).createPermission ? (
           <View className="self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

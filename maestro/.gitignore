@@ -1,0 +1,7 @@
+# Maestro generated files
+.maestro/
+recordings/
+test-results/
+
+# Don't commit test passwords
+.env.local

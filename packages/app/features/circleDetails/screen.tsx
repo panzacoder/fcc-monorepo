@@ -19,7 +19,7 @@ import type {
   GetMemberMenusResponse,
   MemberMenu
 } from 'app/data/circle'
-import currentMemberAddressAction from 'app/redux/curenMemberAddress/currentMemberAddressAction'
+import currentMemberAddressAction from 'app/redux/currentMemberAddress/currentMemberAddressAction'
 
 export function CircleDetailsScreen() {
   const header = useAppSelector((state) => state.headerState.header)
@@ -34,7 +34,7 @@ export function CircleDetailsScreen() {
     memberData?: string
     component?: string
   }>()
-  const [menuList, setMenuList] = useState(null)
+  const [menuList, setMenuList] = useState<MemberMenu[] | null>(null)
   const [memberData, setMemberData] = useState(
     item.memberData ? JSON.parse(item.memberData) : {}
   )

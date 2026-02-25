@@ -13,15 +13,19 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getFullDateForCalendar } from 'app/ui/utils'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
+import type { PrescriptionDetail } from 'app/data/prescriptions'
+import type { PrivilegeAction } from 'app/data/types.d'
 
 export function PrescriptionDetailsScreen() {
-  const prescriptionPrivilegesRef = useRef<any>({})
+  const prescriptionPrivilegesRef = useRef<PrivilegeAction[]>([])
   const router = useRouter()
-  const [prescriptionDetails, setPrescriptionDetails] = useState({}) as any
+  const [prescriptionDetails, setPrescriptionDetails] = useState<
+    Partial<PrescriptionDetail>
+  >({})
   const header = useAppSelector((state) => state.headerState.header)
-  const item = useLocalSearchParams<any>()
+  const item = useLocalSearchParams<Record<string, string>>()
   let memberData =
     item.memberData && item.memberData !== undefined
       ? JSON.parse(item.memberData)
@@ -41,11 +45,11 @@ export function PrescriptionDetailsScreen() {
 
   useEffect(() => {
     if (prescriptionQueryData) {
-      const data = prescriptionQueryData as any
+      const data = prescriptionQueryData
       if (data.domainObjectPrivileges) {
         prescriptionPrivilegesRef.current = data.domainObjectPrivileges.Medicine
           ? data.domainObjectPrivileges.Medicine
-          : {}
+          : []
       }
       setPrescriptionDetails(data.medicine ? data.medicine : {})
     }

@@ -12,7 +12,7 @@ const PtsNameInitials = ({ fullName, className }: Props) => {
     (state) => state.memberNames.memberNamesList
   )
   let backgroundColor = getColorSet(
-    (memberNamesList ?? []).indexOf(fullName) % 26
+    (memberNamesList ?? []).indexOf(fullName ?? '') % 26
   )
   return (
     <View

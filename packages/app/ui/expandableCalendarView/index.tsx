@@ -13,7 +13,7 @@ import testIDs from '../../utils/testIDs'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
 
-interface CalendarEventItem {
+export interface CalendarEventItem {
   date: string
   type: string
   action: string
@@ -45,7 +45,7 @@ interface ExpandableCalendarViewProps {
   handleChange: (month: { dateString: string }) => void
 }
 
-const today = new Date().toISOString().split('T')[0]
+const today = new Date().toISOString().split('T')[0] as string
 export const ExpandableCalendarView = ({
   memberData,
   calenderEvents,
@@ -60,7 +60,6 @@ export const ExpandableCalendarView = ({
   )
   const [isLoading, setLoading] = useState(false)
   const [markedObject, setMarkedObject] = useState({})
-  // console.log('data.data.calenderItemList', JSON.stringify(calenderEvents))
   useEffect(() => {
     getMarkedDates()
   }, [])
@@ -70,7 +69,6 @@ export const ExpandableCalendarView = ({
     month: { dateString: string },
     _updateSource: string
   ) {
-    // console.log('onMonthChange: ', '' + month)
     await handleChange(month)
     getMarkedDates()
   }
@@ -254,10 +252,6 @@ export const ExpandableCalendarView = ({
         showTodayButton={true}
         date={today}
         disabledOpacity={0.6}
-        markingType={'multi-dot'}
-        renderEmptyData={() => {
-          return <View />
-        }}
         todayBottomMargin={16}
       >
         <ExpandableCalendar

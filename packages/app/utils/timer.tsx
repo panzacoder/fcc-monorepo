@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import moment from 'moment'
@@ -13,8 +13,12 @@ export const Timer = ({ startDate }: TimerProps) => {
   const [hours, setHours] = useState(-1)
   const [minutes, setMinutes] = useState(-1)
   const [seconds, setSeconds] = useState(-1)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   useEffect(() => {
-    setInterval(timerInit, 1000)
+    intervalRef.current = setInterval(timerInit, 1000)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [])
   function timerInit() {
     const now = moment()
@@ -33,7 +37,7 @@ export const Timer = ({ startDate }: TimerProps) => {
     const seconds = Math.floor((distance % (1000 * 60)) / 1000)
 
     if (distance < 0 || isNaN(distance)) {
-      clearInterval(this.countDownId)
+      if (intervalRef.current) clearInterval(intervalRef.current)
       setDays(0)
       setHours(0)
       setMinutes(0)

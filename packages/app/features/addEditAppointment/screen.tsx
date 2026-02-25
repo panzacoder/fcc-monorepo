@@ -33,13 +33,13 @@ import type {
   DoctorFacilityLocationItem
 } from 'app/data/appointments/types'
 import type { AppointmentPurpose } from 'app/data/types.d'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 const schema = z.object({
   description: z.string(),
   appointmentType: z.number().min(0, { message: 'Select Appointment Type' }),
   doctoFacilityIndex: z.number().min(0, { message: 'Select Doctor/Facility' })
 })
 export type Schema = z.infer<typeof schema>
-// let selectedDate: any = new Date()
 type TypeResponse = {
   id: number
   type: string
@@ -57,10 +57,8 @@ export function AddEditAppointmentScreen() {
   let isFromCreateSimilar = item.isFromCreateSimilar
     ? item.isFromCreateSimilar
     : 'false'
-  // console.log('doctorFacilityDetails', JSON.stringify(doctorFacilityDetails))
 
   let component = item.component ? item.component : ''
-  // console.log('component', component)
   let appointmentDetails = item.appointmentDetails
     ? JSON.parse(item.appointmentDetails)
     : {}
@@ -187,8 +185,6 @@ export function AddEditAppointmentScreen() {
   }
   if (component === 'Doctor' || component === 'Facility') {
     typeIndex = component === 'Doctor' ? 1 : 2
-
-    // console.log('typeIndex1', '' + typeIndex)
   }
 
   async function addEditAppointment(formData: Schema) {
@@ -216,11 +212,15 @@ export function AddEditAppointmentScreen() {
     }
     if (formData.doctoFacilityIndex !== 1) {
       if (selectedDoctorFacility === 1) {
-        appointmentData.doctorLocation.id =
-          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+        if (appointmentData.doctorLocation) {
+          appointmentData.doctorLocation.id =
+            doctorFacilityListFull[formData.doctoFacilityIndex - 2]?.locationId
+        }
       } else {
-        appointmentData.facilityLocation.id =
-          doctorFacilityListFull[formData.doctoFacilityIndex - 2].locationId
+        if (appointmentData.facilityLocation) {
+          appointmentData.facilityLocation.id =
+            doctorFacilityListFull[formData.doctoFacilityIndex - 2]?.locationId
+        }
       }
     } else {
       Alert.alert('', 'Please Select Doctor/Facility')
@@ -308,7 +308,6 @@ export function AddEditAppointmentScreen() {
       }
     )
   const onSelection = (date: Date) => {
-    // console.log('onSelection', '' + date)
     setSelectedDate(date)
     setKey(Math.random())
   }
@@ -317,12 +316,13 @@ export function AddEditAppointmentScreen() {
     setPurpose(data)
     logger.debug('purpose1', purpose)
   }
-  async function setSelectedTypeChange(value: { id: number } | null) {
+  async function setSelectedTypeChange(value: DropdownItem) {
     if (value) {
+      const numId = Number(value.id)
       setIsShowDoctorFacilityDropdown(true)
-      setSelectedDoctorFacility(value.id)
+      setSelectedDoctorFacility(numId)
       setIsDataReceived(false)
-      if (value.id - 1 === 0) {
+      if (numId - 1 === 0) {
         setFetchDoctors(true)
         setFetchFacilities(false)
         doctorsQuery.refetch()
@@ -333,11 +333,8 @@ export function AddEditAppointmentScreen() {
       }
     }
   }
-  async function selectedDoctorFacilityChange(
-    value: { id: number; title: string } | null
-  ) {
+  async function selectedDoctorFacilityChange(value: DropdownItem) {
     if (value && !isLoading) {
-      // console.log('value', JSON.stringify(value))
       if (value.title === 'Add New Doctor') {
         router.push(
           formatUrl('/circles/addEditDoctor', {

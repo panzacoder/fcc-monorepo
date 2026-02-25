@@ -10,7 +10,34 @@ type TransportationRequest = {
   count: number
 }
 
-export function CardView(data: { data: string }) {
+type Appointment = {
+  date?: string
+  purpose?: string
+  location?: string
+}
+
+type Incident = {
+  date?: string
+  title?: string
+  location?: string
+}
+
+type Event = {
+  date?: string
+  title?: string
+  location?: string
+}
+
+type CardViewMember = {
+  firstname?: string
+  lastname?: string
+  transportationRequests: TransportationRequest[]
+  upcomingAppointment?: Appointment
+  recentIncident?: Incident
+  upcomingEvent?: Event
+}
+
+export function CardView(data: { data: CardViewMember }) {
   const router = useRouter()
   let memberData = data.data
   let textStyle =

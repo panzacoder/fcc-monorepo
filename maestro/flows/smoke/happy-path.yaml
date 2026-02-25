@@ -1,0 +1,38 @@
+# Happy path smoke test
+# Tests: Login → Home → Appointments list → Back to home
+# Run: maestro test -e TEST_PASSWORD=xxx flows/smoke/happy-path.yaml
+
+appId: app.familycarecircle.fcc
+---
+- launchApp:
+    clearState: true
+
+# --- LOGIN ---
+- assertVisible: 'Email Address'
+- tapOn: 'Email Address'
+- inputText: ${TEST_EMAIL}
+- tapOn: 'Password'
+- inputText: ${TEST_PASSWORD}
+- tapOn: 'Sign In'
+
+# Verify home screen loaded
+- assertVisible:
+    text: 'Home'
+    optional: false
+
+# --- NAVIGATE TO APPOINTMENTS ---
+# Note: Selector might need adjustment based on actual UI
+- tapOn:
+    text: 'Appointments'
+    optional: true
+
+# If Appointments is a tab or menu item, wait for list
+- extendedWaitUntil:
+    visible: 'Upcoming'
+    timeout: 10000
+
+# --- BACK TO HOME ---
+- back
+
+# Verify we're back home
+- assertVisible: 'Home'

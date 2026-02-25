@@ -1,5 +1,3 @@
-// @ts-check
-
 const { theme } = require('app/config/tailwind/theme')
 
 /**

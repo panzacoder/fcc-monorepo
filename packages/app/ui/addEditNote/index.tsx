@@ -52,7 +52,6 @@ export const AddEditNote = ({
     (state) => state.staticDataState.staticData
   ) as StaticData
   let occurance = ''
-  // console.log('notesData', noteData.occurance)
   let occuranceIndex = -1
   if (noteData.occurance && noteData.occurance.occurance) {
     occurance = noteData.occurance.occurance
@@ -60,7 +59,7 @@ export const AddEditNote = ({
     if (component === 'Appointment') {
       staticData.taskOccuranceList.map(
         async (data: TaskOccurance, index: number) => {
-          if (data.occurance === noteData.occurance.occurance) {
+          if (data.occurance === noteData.occurance?.occurance) {
             occuranceIndex = index + 1
           }
         }
@@ -68,9 +67,8 @@ export const AddEditNote = ({
     } else if (component === 'Medical Device') {
       staticData.purchaseOccuranceList.map(
         async (data: PurchaseOccurance, index: number) => {
-          if (data.occurance === noteData.occurance.occurance) {
+          if (data.occurance === noteData.occurance?.occurance) {
             occuranceIndex = index + 1
-            // console.log('occuranceIndex', '' + occuranceIndex)
           }
         }
       )
@@ -115,7 +113,7 @@ export const AddEditNote = ({
   async function callCreateUpdateNote(formData: Schema) {
     let occurance =
       formData.occurrenceIndex !== -1
-        ? occuranceList[formData.occurrenceIndex - 1]?.title
+        ? occuranceList[formData.occurrenceIndex - 1]?.title ?? ''
         : ''
     createUpdateNote(occurance, formData.note, formData.title, noteData)
   }

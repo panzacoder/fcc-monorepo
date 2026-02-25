@@ -13,6 +13,7 @@ import { SafeAreaView } from 'app/ui/safe-area-view'
 import _ from 'lodash'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
@@ -174,7 +175,11 @@ export function NoteMessageScreen() {
         ? messageThread.messageList
         : []
     setMessageList(msgList)
-    dispatch(messageListAction.setMessageList(msgList))
+    dispatch(
+      messageListAction.setMessageList(
+        msgList as unknown as Record<string, unknown>[]
+      )
+    )
     let participantList =
       messageThread.participantList !== undefined &&
       messageThread.participantList !== null
@@ -204,14 +209,16 @@ export function NoteMessageScreen() {
 
   useEffect(() => {
     if (isGeneral) return
-    let noteResult: {
+    type NoteResult = {
       messageThread?: MessageThread
       purchaseNote?: { messageThread?: MessageThread }
-    } | null = null
-    if (isAppointment) noteResult = appointmentNoteData
-    else if (isIncident) noteResult = incidentNoteData
-    else if (isMedicalDevice) noteResult = medicalDeviceNoteData
-    else if (isEvent) noteResult = eventNoteData
+    }
+    let noteResult: NoteResult | null = null
+    if (isAppointment) noteResult = appointmentNoteData as unknown as NoteResult
+    else if (isIncident) noteResult = incidentNoteData as unknown as NoteResult
+    else if (isMedicalDevice)
+      noteResult = medicalDeviceNoteData as unknown as NoteResult
+    else if (isEvent) noteResult = eventNoteData as unknown as NoteResult
     if (!noteResult) return
     if (noteResult.messageThread) {
       processMessageThread(noteResult.messageThread)
@@ -225,7 +232,7 @@ export function NoteMessageScreen() {
       let messageThread = noteResult.purchaseNote.messageThread
         ? noteResult.purchaseNote.messageThread
         : {}
-      processMessageThread(messageThread)
+      processMessageThread(messageThread as MessageThread)
     }
     setIsDataReceived(true)
   }, [
@@ -238,27 +245,31 @@ export function NoteMessageScreen() {
   const handleFcmMessage = useCallback(async () => {
     try {
       Notifications.setNotificationHandler(null)
-      await messaging().setBackgroundMessageHandler(async (message: any) => {
-        updateMessageList(message)
-      })
-      await messaging().onMessage((message: any) => {
-        updateMessageList(message)
-      })
+      await messaging().setBackgroundMessageHandler(
+        async (message: FirebaseMessagingTypes.RemoteMessage) => {
+          updateMessageList(message)
+        }
+      )
+      await messaging().onMessage(
+        (message: FirebaseMessagingTypes.RemoteMessage) => {
+          updateMessageList(message)
+        }
+      )
     } catch (e: unknown) {}
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
   )
-  async function updateMessageList(message: any) {
-    let messageList: Message[] = messageListFromStore
+  async function updateMessageList(
+    message: FirebaseMessagingTypes.RemoteMessage
+  ) {
+    let messageList: Message[] = messageListFromStore as unknown as Message[]
     let messeageContent = message.data ? message.data : {}
-    let messageObject = {
-      sender: messeageContent.MemberId ? messeageContent.MemberId : '',
-      senderName: messeageContent.MsgCreatedBy
-        ? messeageContent.MsgCreatedBy
-        : '',
-      body: messeageContent.MsgContent ? messeageContent.MsgContent : '',
-      createdOn: messeageContent.MsgDateUTC ? messeageContent.MsgDateUTC : ''
+    let messageObject: Message = {
+      sender: Number(messeageContent.MemberId ?? 0),
+      senderName: String(messeageContent.MsgCreatedBy ?? ''),
+      body: String(messeageContent.MsgContent ?? ''),
+      createdOn: String(messeageContent.MsgDateUTC ?? '')
     }
     messageList.push(messageObject)
     setMessageList(messageList)
@@ -297,8 +308,9 @@ export function NoteMessageScreen() {
   }
 
   function isParticipantSelected(index: number) {
-    threadParticipantsList[index].isSelected =
-      !threadParticipantsList[index].isSelected
+    if (!threadParticipantsList[index]) return
+    threadParticipantsList[index]!.isSelected =
+      !threadParticipantsList[index]!.isSelected
     setIsRender(!isRender)
     setThreadParticipantsList(threadParticipantsList)
   }
@@ -307,7 +319,7 @@ export function NoteMessageScreen() {
   }
   async function updateMessageThreadParticipants() {
     setLoading(true)
-    let list: object[] = []
+    let list: { user: { id: number }; operation: string }[] = []
     threadParticipantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
@@ -322,7 +334,7 @@ export function NoteMessageScreen() {
     updateParticipantsMutation.mutate(
       {
         messageThread: {
-          id: threadDetails.id ? threadDetails.id : '',
+          id: threadDetails!.id ? threadDetails!.id : '',
           type: {
             type: item.component
               ? item.component === 'Medical Device'
@@ -358,7 +370,7 @@ export function NoteMessageScreen() {
       Alert.alert('', 'Please type a message')
     } else {
       setLoading(true)
-      let list: object[] = []
+      let list: { body: string; operation: string }[] = []
       let object = {
         body: message,
         operation: 'Add'
@@ -367,7 +379,7 @@ export function NoteMessageScreen() {
       updateThreadMutation.mutate(
         {
           messageThread: {
-            id: threadDetails.id ? threadDetails.id : '',
+            id: threadDetails!.id ? threadDetails!.id : '',
             messageList: list
           }
         },
@@ -412,9 +424,9 @@ export function NoteMessageScreen() {
       ) : (
         <View />
       )}
-      {isValidObject(threadDetails) ? (
+      {isValidObject(threadDetails ?? undefined) ? (
         <Typography className="mt-5 text-left text-[16px] font-bold">
-          {threadDetails.subject ? threadDetails.subject : ''}
+          {threadDetails!.subject ? threadDetails!.subject : ''}
         </Typography>
       ) : (
         <View />
@@ -428,12 +440,13 @@ export function NoteMessageScreen() {
           }}
           className="w-full flex-row items-center py-2"
         >
-          {isValidObject(participantsList) && participantsList.length > 0 ? (
+          {isValidObject(participantsList ?? undefined) &&
+          participantsList!.length > 0 ? (
             <ScrollView
               horizontal={true}
               className="w-[85%] max-w-[85%] flex-row"
             >
-              {participantsList.map(
+              {participantsList!.map(
                 (participant: Participant, index: number) => {
                   return (
                     <View key={index} className="ml-2">
@@ -461,8 +474,8 @@ export function NoteMessageScreen() {
             <View />
           )}
           <View>
-            {isValidObject(threadDetails) &&
-            true === threadDetails.isCreatedByUser ? (
+            {isValidObject(threadDetails ?? undefined) &&
+            true === threadDetails!.isCreatedByUser ? (
               <View>
                 <Feather
                   className="mr-2"
@@ -481,7 +494,8 @@ export function NoteMessageScreen() {
           </View>
         </View>
         <View key={key} className=" h-[90%] w-full bg-[#e0d8d0]">
-          {isValidObject(messageList) && messageList.length > 0 ? (
+          {isValidObject(messageList ?? undefined) &&
+          messageList!.length > 0 ? (
             <ScrollView
               ref={scrollViewRef}
               onContentSizeChange={() =>
@@ -489,7 +503,7 @@ export function NoteMessageScreen() {
               }
               className="max-h-[90%] "
             >
-              {messageList.map((message: Message, index: number) => {
+              {messageList!.map((message: Message, index: number) => {
                 if (isValidObject(userDetails) && isValidObject(message)) {
                   if (message.sender !== userDetails.id) {
                     return (

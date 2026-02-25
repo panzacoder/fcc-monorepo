@@ -18,7 +18,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as Contacts from 'expo-contacts'
-import type { Member } from 'app/data/types'
+import type { Member, Address } from 'app/data/types'
 import type { JoinCircleParams } from 'app/data/circle'
 
 type AddressFormData = {
@@ -42,8 +42,12 @@ type AddressFormData = {
         namecode: string
         isoCode: string
         description: string
+        snum: string
         id: string
       }
+    }
+    timezone: {
+      id: string
     }
   }
 }
@@ -82,8 +86,12 @@ export function CreateCircleScreen() {
           namecode: '',
           isoCode: '',
           description: '',
+          snum: '',
           id: ''
         }
+      },
+      timezone: {
+        id: ''
       }
     }
   })
@@ -164,27 +172,29 @@ export function CreateCircleScreen() {
         selectedAddressRef.current.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddressRef.current.address.state.country.id = obj.id
-        selectedAddressRef.current.address.state.country.name = obj.name
-        selectedAddressRef.current.address.state.country.code = obj.code
-        selectedAddressRef.current.address.state.country.namecode = obj.namecode
-        selectedAddressRef.current.address.state.country.snum = obj.snum
+        selectedAddressRef.current.address.state.country.id = obj.id ?? ''
+        selectedAddressRef.current.address.state.country.name = obj.name ?? ''
+        selectedAddressRef.current.address.state.country.code = obj.code ?? ''
+        selectedAddressRef.current.address.state.country.namecode =
+          obj.namecode ?? ''
+        selectedAddressRef.current.address.state.country.snum = obj.snum ?? ''
         selectedAddressRef.current.address.state.country.description =
-          obj.description
+          obj.description ?? ''
       }
       if (index === 5) {
-        selectedAddressRef.current.address.state.id = obj.id
-        selectedAddressRef.current.address.state.name = obj.name
-        selectedAddressRef.current.address.state.code = obj.code
-        selectedAddressRef.current.address.state.namecode = obj.namecode
-        selectedAddressRef.current.address.state.snum = obj.snum
-        selectedAddressRef.current.address.state.description = obj.description
+        selectedAddressRef.current.address.state.id = obj.id ?? ''
+        selectedAddressRef.current.address.state.name = obj.name ?? ''
+        selectedAddressRef.current.address.state.code = obj.code ?? ''
+        selectedAddressRef.current.address.state.namecode = obj.namecode ?? ''
+        selectedAddressRef.current.address.state.snum = obj.snum ?? ''
+        selectedAddressRef.current.address.state.description =
+          obj.description ?? ''
       }
       if (index === 6) {
         selectedAddressRef.current = value as AddressFormData
       }
       if (index === 8) {
-        timeZoneIdRef.current = obj.id
+        timeZoneIdRef.current = obj.id ?? ''
       }
     }
   }
@@ -201,7 +211,7 @@ export function CreateCircleScreen() {
         lastName: formData.lastName,
         phone: formData.phone,
         email: emailRef.current,
-        address: selectedAddressRef.current.address
+        address: selectedAddressRef.current.address as unknown as Address
       }
     }
     joinCircleMutation.mutate(
@@ -229,7 +239,7 @@ export function CreateCircleScreen() {
           lastName: formData.lastName,
           phone: formData.phone,
           email: isYesNoClicked ? emailRef.current : null,
-          address: selectedAddressRef.current.address
+          address: selectedAddressRef.current.address as unknown as Address
         }
       },
       {

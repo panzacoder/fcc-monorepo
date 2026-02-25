@@ -1,0 +1,14 @@
+# Maestro global configuration
+# https://maestro.mobile.dev/cli/test-suites-and-reports#configuration
+
+# App identifiers
+appId: app.familycarecircle.fcc
+
+# Timeout settings (milliseconds)
+launchTimeout: 30000
+waitTimeout: 10000
+
+# Environment variables available to all flows
+env:
+  TEST_EMAIL: 'test@example.com'
+  # TEST_PASSWORD should be set via CLI: maestro test -e TEST_PASSWORD=xxx flows/

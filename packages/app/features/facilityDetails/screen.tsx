@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Alert, TouchableOpacity, BackHandler } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -22,8 +22,8 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
-import { getUserPermission } from 'app/utils/getUserPemissions'
-import type { PrivilegeAction } from 'app/data/types'
+import { getUserPermission } from 'app/utils/getUserPermissions'
+import { usePermissions } from 'app/utils/usePermissions'
 import type {
   Facility,
   FacilityDetailsResponse,
@@ -31,7 +31,6 @@ import type {
   AppointmentListItem
 } from 'app/data/facilities'
 export function FacilityDetailsScreen() {
-  const facilityPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [facilityDetails, setFacilityDetails] = useState<Partial<Facility>>({})
   const [isShowLocations, setIsShowLocations] = useState(false)
   const [isShowAppointments, setIsShowAppointments] = useState(false)
@@ -65,14 +64,17 @@ export function FacilityDetailsScreen() {
   const deleteFacilityMutation = useDeleteFacility(header)
   const shareFacilityMutation = useShareFacility(header)
 
+  const facilityData_ = facilityDetailsData as
+    | FacilityDetailsResponse
+    | undefined
+  const facilityPrivileges = usePermissions(
+    facilityData_?.domainObjectPrivileges,
+    'Facility'
+  )
+
   useEffect(() => {
     if (facilityDetailsData) {
       const data = facilityDetailsData as FacilityDetailsResponse
-      if (data.domainObjectPrivileges) {
-        facilityPrivilegesRef.current = data.domainObjectPrivileges.Facility
-          ? data.domainObjectPrivileges.Facility
-          : []
-      }
       setFacilityDetails(
         data.facilityWithAppointment
           ? data.facilityWithAppointment.facility || {}
@@ -257,7 +259,7 @@ export function FacilityDetailsScreen() {
                   <TouchableOpacity
                     className=""
                     onPress={() => {
-                      copyToClipboard(facilityDetails.websiteuser)
+                      copyToClipboard(facilityDetails.websiteuser ?? '')
                     }}
                   >
                     <Feather
@@ -339,11 +341,15 @@ export function FacilityDetailsScreen() {
             {locationList.length > 0 && isShowLocations ? (
               <ScrollView className="">
                 {locationList.map((data, index: number) => {
-                  const extendedData = data as FacilityLocation &
-                    Record<string, unknown>
-                  extendedData.component = 'Facility'
-                  extendedData.doctorFacilityId = facilityInfo.id
-                  extendedData.memberData = memberData
+                  const extendedData = {
+                    ...data,
+                    phone: data.phone ?? undefined,
+                    fax: data.fax ?? undefined,
+                    website: data.website ?? undefined,
+                    component: 'Facility' as const,
+                    doctorFacilityId: facilityInfo.id,
+                    memberData
+                  }
                   return (
                     <View key={index}>
                       <Location data={extendedData} />
@@ -530,7 +536,7 @@ export function FacilityDetailsScreen() {
               <View />
             )}
           </View>
-          {getUserPermission(facilityPrivilegesRef.current).deletePermission ? (
+          {getUserPermission(facilityPrivileges).deletePermission ? (
             <View className="mx-5 my-5 flex-row self-center">
               <Button
                 className="w-[50%]"

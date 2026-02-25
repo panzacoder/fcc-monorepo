@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Pressable } from 'react-native'
 import { ScrollView } from 'app/ui/scroll-view'
 import PtsLoader from 'app/ui/PtsLoader'
@@ -26,8 +26,8 @@ import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getUserPermission } from 'app/utils/getUserPemissions'
-import type { PrivilegeAction } from 'app/data/types.d'
+import { getUserPermission } from 'app/utils/getUserPermissions'
+import { usePermissions } from 'app/utils/usePermissions'
 
 type MemberRouteParams = {
   member: number | string
@@ -37,9 +37,8 @@ type MemberRouteParams = {
 export function MessagesScreen() {
   const dispatch = useAppDispatch()
   const header = useAppSelector((state) => state.headerState.header)
-  const memberNamesList: string[] = useAppSelector(
-    (state) => state.memberNames.memberNamesList
-  )
+  const memberNamesList: string[] =
+    useAppSelector((state) => state.memberNames.memberNamesList) ?? []
   const userAddress = useAppSelector(
     (state) => state.userProfileState.header.address
   )
@@ -47,7 +46,6 @@ export function MessagesScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
   const router = useRouter()
-  const messagePrivilegesRef = useRef<PrivilegeAction[]>([])
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [isRender, setIsRender] = useState(false)
   const [isMessageThread, setIsMessageThread] = useState(false)
@@ -93,16 +91,14 @@ export function MessagesScreen() {
   const isLoading =
     isThreadsLoading || isParticipantsLoading || createThreadMutation.isPending
 
+  const messagePrivileges = usePermissions(
+    threadsData?.domainObjectPrivileges,
+    'MESSAGETHREAD',
+    'MessageThread'
+  )
+
   useEffect(() => {
     if (threadsData) {
-      if (threadsData.domainObjectPrivileges) {
-        messagePrivilegesRef.current = threadsData.domainObjectPrivileges
-          .MESSAGETHREAD
-          ? threadsData.domainObjectPrivileges.MESSAGETHREAD
-          : threadsData.domainObjectPrivileges.MessageThread
-            ? threadsData.domainObjectPrivileges.MessageThread
-            : []
-      }
       let threadList = threadsData.threadList ? threadsData.threadList : []
       setMessagesList(threadList)
       setMessagesListFull(threadList)
@@ -133,7 +129,7 @@ export function MessagesScreen() {
     subject: string,
     noteData: Record<string, unknown>
   ) {
-    let list: object[] = []
+    let list: { user: { id: number } }[] = []
     participantsList.map((data: ThreadParticipant, index: number) => {
       if (data.isSelected === true) {
         let object = {
@@ -195,7 +191,9 @@ export function MessagesScreen() {
     setIsMessageThread(false)
   }
   function isParticipantSelected(index: number) {
-    participantsList[index].isSelected = !participantsList[index].isSelected
+    const participant = participantsList[index]
+    if (!participant) return
+    participant.isSelected = !participant.isSelected
     setIsRender(!isRender)
     setParticipantsList(participantsList)
   }
@@ -220,7 +218,7 @@ export function MessagesScreen() {
             color={'black'}
           />
         </TouchableOpacity>
-        {getUserPermission(messagePrivilegesRef.current).createPermission ? (
+        {getUserPermission(messagePrivileges).createPermission ? (
           <View className="mt-[20] self-center">
             <TouchableOpacity
               className="h-[30px] w-[30px] items-center justify-center rounded-[15px] bg-[#c5dbfd]"

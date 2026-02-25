@@ -1,0 +1,12 @@
+# Shared login sub-flow
+# Usage: runFlow: ../shared/login.yaml
+
+- assertVisible: 'Email Address'
+- tapOn: 'Email Address'
+- inputText: ${TEST_EMAIL}
+- tapOn: 'Password'
+- inputText: ${TEST_PASSWORD}
+- tapOn: 'Sign In'
+- assertVisible:
+    text: 'Home'
+    optional: false

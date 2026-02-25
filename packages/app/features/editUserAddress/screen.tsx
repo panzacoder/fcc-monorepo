@@ -18,6 +18,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
+import type { Address } from 'app/data/types'
 
 type AddressFormData = {
   shortDescription: string
@@ -40,6 +41,7 @@ type AddressFormData = {
         namecode: string
         isoCode: string
         description: string
+        snum: string
         id: string
       }
     }
@@ -71,6 +73,7 @@ export function EditUserAddressScreen() {
           namecode: '',
           isoCode: '',
           description: '',
+          snum: '',
           id: ''
         }
       },
@@ -121,27 +124,29 @@ export function EditUserAddressScreen() {
         selectedAddressRef.current.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddressRef.current.address.state.country.id = obj.id
-        selectedAddressRef.current.address.state.country.name = obj.name
-        selectedAddressRef.current.address.state.country.code = obj.code
-        selectedAddressRef.current.address.state.country.namecode = obj.namecode
-        selectedAddressRef.current.address.state.country.snum = obj.snum
+        selectedAddressRef.current.address.state.country.id = obj.id ?? ''
+        selectedAddressRef.current.address.state.country.name = obj.name ?? ''
+        selectedAddressRef.current.address.state.country.code = obj.code ?? ''
+        selectedAddressRef.current.address.state.country.namecode =
+          obj.namecode ?? ''
+        selectedAddressRef.current.address.state.country.snum = obj.snum ?? ''
         selectedAddressRef.current.address.state.country.description =
-          obj.description
+          obj.description ?? ''
       }
       if (index === 5) {
-        selectedAddressRef.current.address.state.id = obj.id
-        selectedAddressRef.current.address.state.name = obj.name
-        selectedAddressRef.current.address.state.code = obj.code
-        selectedAddressRef.current.address.state.namecode = obj.namecode
-        selectedAddressRef.current.address.state.snum = obj.snum
-        selectedAddressRef.current.address.state.description = obj.description
+        selectedAddressRef.current.address.state.id = obj.id ?? ''
+        selectedAddressRef.current.address.state.name = obj.name ?? ''
+        selectedAddressRef.current.address.state.code = obj.code ?? ''
+        selectedAddressRef.current.address.state.namecode = obj.namecode ?? ''
+        selectedAddressRef.current.address.state.snum = obj.snum ?? ''
+        selectedAddressRef.current.address.state.description =
+          obj.description ?? ''
       }
       if (index === 6) {
         selectedAddressRef.current = value as AddressFormData
       }
       if (index === 7) {
-        selectedAddressRef.current.address.timezone.id = obj.id
+        selectedAddressRef.current.address.timezone.id = obj.id ?? ''
       }
     }
   }
@@ -171,7 +176,7 @@ export function EditUserAddressScreen() {
         memberVo: {
           id: memberDetails.id ? memberDetails.id : '',
           isMemberUpdate: true,
-          address: selectedAddressRef.current.address
+          address: selectedAddressRef.current.address as unknown as Address
         }
       },
       {

@@ -82,7 +82,9 @@ export const AddEditTransport = ({
     (state) => state.staticDataState.staticData
   ) as StaticData
   const [selectedDate, setSelectedDate] = useState(
-    !_.isEmpty(transportData) ? new Date(transportData.date) : new Date(date)
+    !_.isEmpty(transportData)
+      ? new Date(transportData.date ?? new Date())
+      : new Date(date)
   )
   const [key, setKey] = useState(0)
   const [memberList, setMemberList] = useState<
@@ -124,7 +126,7 @@ export const AddEditTransport = ({
     if (!statesQuery.data) return
     let stateName = ''
     if (!_.isEmpty(address)) {
-      stateName = address.state.name ? address.state.name : ''
+      stateName = address.state?.name ? address.state.name : ''
     } else {
       if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
         stateName = memberAddress.state.name ? memberAddress.state.name : ''
@@ -169,7 +171,7 @@ export const AddEditTransport = ({
   const [statesListFull, setStatesListFull] = useState<State[]>([])
   let countryName = ''
   if (!_.isEmpty(address)) {
-    countryName = address.state.country.name ? address.state.country.name : ''
+    countryName = address.state?.country?.name ? address.state.country.name : ''
   } else {
     if (!_.isEmpty(memberAddress) && _.isEmpty(transportData)) {
       countryName = memberAddress.state.country.name
@@ -205,7 +207,8 @@ export const AddEditTransport = ({
   async function createUpdateTransport(formData: Schema) {
     if (_.isEmpty(transportData)) {
       let stateObject = statesListFull[formData.state - 1]
-      let countryObject: object = staticData.countryList[formData.country - 1]
+      let countryObject: object =
+        staticData.countryList[formData.country - 1] ?? {}
 
       let transportAddress = {
         line: formData.addressLine,
@@ -216,8 +219,8 @@ export const AddEditTransport = ({
       let transportPayload: TransportationData = {
         date: selectedDate,
         description: formData.description,
-        accompany: memberListFull[formData.member - 1].memberId
-          ? memberListFull[formData.member - 1].memberId
+        accompany: memberListFull[formData.member - 1]?.memberId
+          ? memberListFull[formData.member - 1]!.memberId
           : '',
         accompanyType: {
           type: 'Family Member'
@@ -320,8 +323,8 @@ export const AddEditTransport = ({
   async function setSelectedCountryChange(value: DropdownItem) {
     if (value) {
       const idx = Number(value.id) - 1
-      let countryId = staticData.countryList[idx].id
-        ? staticData.countryList[idx].id
+      let countryId = staticData.countryList[idx]?.id
+        ? staticData.countryList[idx]!.id
         : 101
       setSelectedCountryId(countryId)
     }
@@ -332,7 +335,7 @@ export const AddEditTransport = ({
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: ComponentProps<typeof FeatherType>['name']
+    iconValue?: ComponentProps<typeof FeatherType>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -340,7 +343,7 @@ export const AddEditTransport = ({
           <Typography className={titleStyle}>{title}</Typography>
           <Typography className={valueStyle}>{value}</Typography>
         </View>
-        {isIcon ? (
+        {isIcon && iconValue ? (
           <Feather
             className="ml-[-10px]"
             name={iconValue}
@@ -442,8 +445,7 @@ export const AddEditTransport = ({
               {getDetailsView(
                 'Acompany',
                 transportData.accompanyName ? transportData.accompanyName : '',
-                false,
-                ''
+                false
               )}
               <View className="my-2 w-[95%] self-center">
                 <PtsDateTimePicker
@@ -454,16 +456,14 @@ export const AddEditTransport = ({
               {getDetailsView(
                 'Description',
                 transportData.description ? transportData.description : '',
-                false,
-                ''
+                false
               )}
               {getDetailsView(
                 'Address',
                 transportData.address
                   ? getAddressFromObject(transportData.address)
                   : '',
-                false,
-                ''
+                false
               )}
             </View>
           )}

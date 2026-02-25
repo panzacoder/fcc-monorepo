@@ -20,7 +20,6 @@ export const SharedContactList = ({
   sharedContactsList,
   acceptRejectClicked
 }: SharedContactListProps) => {
-  // console.log('sharedContactsList', JSON.stringify(sharedContactsList))
   return (
     <View className="my-2 max-h-[90%] w-[95%] self-center rounded-[15px] border-[1px] border-[#e0deda]">
       <View className="bg-primary h-[50] w-full flex-row rounded-tl-[15px] rounded-tr-[15px]">

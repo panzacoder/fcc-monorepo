@@ -10,7 +10,7 @@ import { Button } from 'app/ui/button'
 import { Typography } from 'app/ui/typography'
 import headerAction from 'app/redux/header/headerAction'
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
+import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
 import sponsorAction from 'app/redux/sponsor/sponsorAction'
@@ -75,7 +75,11 @@ export function LoginScreen() {
             expiringSubscription: data.expiringSubscription
           }
           data.header.timezone = moment.tz.guess()
-          dispatch(headerAction.setHeader(data.header))
+          dispatch(
+            headerAction.setHeader(
+              data.header as unknown as Record<string, unknown>
+            )
+          )
           dispatch(userProfileAction.setUserProfile(data.appuserVo))
           dispatch(subscriptionAction.setSubscription(data.userSubscription))
           dispatch(

@@ -20,7 +20,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
 import { useAppSelector } from 'app/redux/hooks'
-import type { EventDetailResponse } from 'app/data/events'
+import type {
+  EventDetailResponse,
+  CreateEventParams,
+  UpdateEventParams
+} from 'app/data/events'
 
 const schema = z.object({
   description: z.string(),
@@ -76,7 +80,6 @@ export function AddEditEventScreen() {
       ? eventDetails.date
       : new Date()
   )
-  // console.log('eventDetails', JSON.stringify(eventDetails))
   const onSelection = (date: Date | string) => {
     setSelectedDate(date)
     setKey(Math.random())
@@ -142,26 +145,25 @@ export function AddEditEventScreen() {
         selectedAddress.address.zipCode = str
       }
       if (index === 4) {
-        selectedAddress.address.state.country.id = obj.id
-        selectedAddress.address.state.country.name = obj.name
-        selectedAddress.address.state.country.code = obj.code
-        selectedAddress.address.state.country.namecode = obj.namecode
-        selectedAddress.address.state.country.description = obj.description
+        selectedAddress.address.state.country.id = obj.id ?? ''
+        selectedAddress.address.state.country.name = obj.name ?? ''
+        selectedAddress.address.state.country.code = obj.code ?? ''
+        selectedAddress.address.state.country.namecode = obj.namecode ?? ''
+        selectedAddress.address.state.country.description =
+          obj.description ?? ''
       }
       if (index === 5) {
-        selectedAddress.address.state.id = obj.id
-        selectedAddress.address.state.name = obj.name
-        selectedAddress.address.state.code = obj.code
-        selectedAddress.address.state.namecode = obj.namecode
-        selectedAddress.address.state.snum = obj.snum
-        selectedAddress.address.state.description = obj.description
+        selectedAddress.address.state.id = obj.id ?? ''
+        selectedAddress.address.state.name = obj.name ?? ''
+        selectedAddress.address.state.code = obj.code ?? ''
+        selectedAddress.address.state.namecode = obj.namecode ?? ''
+        selectedAddress.address.state.snum = obj.snum ?? ''
+        selectedAddress.address.state.description = obj.description ?? ''
       }
       if (index === 6) {
         setSelectedAddress(value as typeof selectedAddress)
       }
     }
-
-    // console.log('selectedAddress', JSON.stringify(selectedAddress))
   }
   async function addEditEvent(formData: Schema) {
     let eventData: Record<string, unknown> = {
@@ -190,11 +192,15 @@ export function AddEditEventScreen() {
       )
     }
     if (_.isEmpty(eventDetails) || isFromCreateSimilar === 'true') {
-      eventData.location.address.id = ''
-      createEventMutation.mutate({ event: eventData }, { onSuccess })
+      ;(eventData.location as typeof selectedAddress).address.id = ''
+      createEventMutation.mutate({ event: eventData } as CreateEventParams, {
+        onSuccess
+      })
     } else {
       eventData.id = eventDetails.id
-      updateEventMutation.mutate({ event: eventData }, { onSuccess })
+      updateEventMutation.mutate({ event: eventData } as UpdateEventParams, {
+        onSuccess
+      })
     }
   }
   return (

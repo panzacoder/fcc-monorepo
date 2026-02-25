@@ -1,4 +1,3 @@
-// @ts-check
 const crypto = require('crypto')
 const express = require('express')
 const bodyParser = require('body-parser')

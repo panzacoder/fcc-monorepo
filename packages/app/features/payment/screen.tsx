@@ -26,15 +26,15 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import RNIap, {
-  InAppPurchase,
   PurchaseError,
   SubscriptionPurchase,
   finishTransaction,
   purchaseErrorListener,
   purchaseUpdatedListener
 } from 'react-native-iap'
+type InAppPurchase = SubscriptionPurchase
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
-import subscriptionAction from 'app/redux/userSubscription/subcriptionAction'
+import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
 import sponsororAction from 'app/redux/sponsor/sponsorAction'
 import paidAdAction from 'app/redux/paidAdvertiser/paidAdAction'
@@ -43,25 +43,39 @@ import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
 import type {
   CheckOutSessionResponse,
   PaymentSuccessResponse,
+  PaymentUserSubscription,
   IosReceiptVerificationResponse,
   IosReceiptInfo,
   PlanDetail
 } from 'app/data/payment/types'
-// Platform-conditional import, types unavailable at this point
-let StripeProvider: any
-let useStripe: any
+import type { ReactNode } from 'react'
+
+interface StripeHookResult {
+  initPaymentSheet: (
+    params: Record<string, string>
+  ) => Promise<{ error?: string }>
+  presentPaymentSheet: (
+    params?: Record<string, string>
+  ) => Promise<{ error?: { code: string; message: string } }>
+  confirmPaymentSheetPayment: () => Promise<void>
+}
+
+let StripeProvider: React.ComponentType<{
+  publishableKey: string
+  setUrlSchemeOnAndroid?: boolean
+  children?: ReactNode
+}>
+let useStripe: () => StripeHookResult
 
 if (Platform.OS === 'android') {
   StripeProvider = require('@stripe/stripe-react-native').StripeProvider
   useStripe = require('@stripe/stripe-react-native').useStripe
 } else {
-  useStripe = () => {
-    return {
-      initPaymentSheet: () => {},
-      presentPaymentSheet: () => {},
-      confirmPaymentSheetPayment: () => {}
-    }
-  }
+  useStripe = () => ({
+    initPaymentSheet: async () => ({}),
+    presentPaymentSheet: async () => ({}),
+    confirmPaymentSheetPayment: async () => {}
+  })
 }
 const itemSubs = Platform.select({
   ios: [
@@ -77,11 +91,18 @@ export function PaymentsScreen() {
   const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
     useStripe()
   const [isUserDataLoaded, setUserDataLoaded] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState({})
+  const [selectedPlan, setSelectedPlan] = useState<Record<string, unknown>>({})
 
   const [email, setEmail] = useState('')
   const header = useAppSelector((state) => state.headerState.header)
-  const userDetails = useAppSelector((state) => state.userProfileState.header)
+  const userDetails = useAppSelector(
+    (state) => state.userProfileState.header
+  ) as {
+    email?: string
+    memberName?: string
+    phone?: string
+    address?: Record<string, unknown>
+  }
   const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let planDetails: PlanDetail = item.planDetails
@@ -137,7 +158,7 @@ export function PaymentsScreen() {
         notificationType: 'PTS_PURCHASED',
         notificationUUID: '',
         subtype: '',
-        email: userDetails.email,
+        email: userDetails.email ?? '',
         version: '',
         renewableInfo: {
           expirationIntent: '1',
@@ -180,11 +201,11 @@ export function PaymentsScreen() {
     try {
       const data: CheckOutSessionResponse =
         await checkOutSessionMutation.mutateAsync({
-          user: { email: userDetails.email },
+          user: { email: userDetails.email ?? '' },
           order: {
             id: null,
             description: null,
-            email: userDetails.email,
+            email: userDetails.email ?? '',
             price: planDetails.price ? '' + planDetails.price : '',
             currency: null,
             status: null,
@@ -255,7 +276,7 @@ export function PaymentsScreen() {
         onSuccess: async (data: PaymentSuccessResponse) => {
           logger.debug('payment response', data)
           if (data) {
-            let userSubscription =
+            let userSubscription: Partial<PaymentUserSubscription> =
               data.userDetails && data.userDetails.userSubscription
                 ? data.userDetails.userSubscription
                 : {}
@@ -354,7 +375,10 @@ export function PaymentsScreen() {
           RNIap.initConnection()
           RNIap.clearTransactionIOS()
         } catch (err: unknown) {
-          const code = err instanceof Error ? (err as any).code : undefined
+          const code =
+            err instanceof Error
+              ? (err as Error & { code?: string }).code
+              : undefined
           const message = err instanceof Error ? err.message : String(err)
           logger.warn(code, message)
         }
@@ -363,7 +387,7 @@ export function PaymentsScreen() {
           async (purchase: InAppPurchase | SubscriptionPurchase) => {
             const receipt = purchase.transactionReceipt
               ? purchase.transactionReceipt
-              : purchase.originalJson
+              : (purchase as unknown as Record<string, string>).originalJson
             if (receipt) {
               try {
                 verifyInAppPurchaseReceipt(receipt)
@@ -403,7 +427,9 @@ export function PaymentsScreen() {
       } else {
         identifier = 'com.familycarecircle.yearly'
       }
-      RNIap.requestSubscription(identifier)
+      RNIap.requestSubscription(
+        identifier as unknown as Parameters<typeof RNIap.requestSubscription>[0]
+      )
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       logger.debug('err', message)
