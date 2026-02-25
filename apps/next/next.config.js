@@ -69,6 +69,7 @@ const nextConfig = {
     ]
   },
   rewrites() {
+    if (!process.env.BASE_URL) return []
     return [
       {
         source: '/fccApi/2.0/:path*',
