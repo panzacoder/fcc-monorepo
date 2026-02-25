@@ -183,7 +183,7 @@ export function SignUpScreen() {
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
       const str = value as string
-      const obj = value as Record<string, string>
+      const obj = value as Record<string, string | number>
       if (index === ADDRESS_FIELD.NICK_NAME) {
         selectedAddress.current.nickName = str
       }
@@ -200,27 +200,30 @@ export function SignUpScreen() {
         selectedAddress.current.address.zipCode = str
       }
       if (index === ADDRESS_FIELD.COUNTRY) {
-        selectedAddress.current.address.state.country.id = obj.id
-        selectedAddress.current.address.state.country.name = obj.name
-        selectedAddress.current.address.state.country.code = obj.code
-        selectedAddress.current.address.state.country.namecode = obj.namecode
-        selectedAddress.current.address.state.country.snum = obj.snum
-        selectedAddress.current.address.state.country.description =
-          obj.description
+        const country = (selectedAddress.current.address.state.country ??=
+          {} as AddressFormData['address']['state']['country'])
+        country.id = obj.id as string
+        country.name = obj.name as string
+        country.code = obj.code as string
+        country.namecode = obj.namecode as string
+        country.isoCode = obj.isoCode as string
+        country.description = obj.description as string
       }
       if (index === ADDRESS_FIELD.STATE) {
-        selectedAddress.current.address.state.id = obj.id
-        selectedAddress.current.address.state.name = obj.name
-        selectedAddress.current.address.state.code = obj.code
-        selectedAddress.current.address.state.namecode = obj.namecode
-        selectedAddress.current.address.state.snum = obj.snum
-        selectedAddress.current.address.state.description = obj.description
+        const state = (selectedAddress.current.address.state ??=
+          {} as AddressFormData['address']['state'])
+        state.id = obj.id as string
+        state.name = obj.name as string
+        state.code = obj.code as string
+        state.namecode = obj.namecode as string
+        state.snum = obj.snum as string
+        state.description = obj.description as string
       }
       if (index === ADDRESS_FIELD.FULL_ADDRESS) {
         selectedAddress.current = value as AddressFormData
       }
       if (index === ADDRESS_FIELD.TIMEZONE) {
-        const tz = obj.name ? obj.name : ''
+        const tz = obj.name ? (obj.name as string) : ''
         setTimeZone(tz)
         logger.debug('timeZone', tz)
       }
@@ -297,7 +300,7 @@ export function SignUpScreen() {
                 }}
                 onChangeText={(value) => {
                   userPhone.current =
-                    convertPhoneNumberToUsaPhoneNumberFormat(value)
+                    convertPhoneNumberToUsaPhoneNumberFormat(value) ?? ''
                   setValue('phone', userPhone.current)
                 }}
               />

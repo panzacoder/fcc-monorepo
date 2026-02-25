@@ -65,7 +65,7 @@ export function AddEditDoctorScreen() {
         }
       }
     }
-  })
+  } as DoctorLocationData)
   const isDoctorActiveRef = useRef(true)
   let doctorPhone = ''
   const router = useRouter()
@@ -134,7 +134,9 @@ export function AddEditDoctorScreen() {
       }
       if (index === 4) {
         const country = value as Partial<Country>
-        selectedAddressRef.current.address.state.country = country
+        if (selectedAddressRef.current.address.state) {
+          selectedAddressRef.current.address.state.country = country
+        }
       }
       if (index === 5) {
         const state = value as Partial<State>
@@ -147,7 +149,6 @@ export function AddEditDoctorScreen() {
         selectedAddressRef.current = value as DoctorLocationData
       }
     }
-
   }
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -198,7 +199,7 @@ export function AddEditDoctorScreen() {
           phone: removeAllSpecialCharFromString(doctorPhone),
           website: formData.website,
           websiteuser: formData.username,
-          specialist: findSpecializationFromId(formData.specialization),
+          specialist: findSpecializationFromId(formData.specialization) ?? '',
           status: {
             status: isDoctorActiveRef.current === true ? 'Active' : 'InActive',
             id: isDoctorActiveRef.current === true ? 1 : 2

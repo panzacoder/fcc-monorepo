@@ -182,7 +182,7 @@ export function PrescriptionsListScreen() {
   async function getFilteredList(list: PrescriptionListItem[], filter: string) {
     let filteredList: PrescriptionListItem[] = []
     list.map((data: PrescriptionListItem, index: number) => {
-      let type = data.type && data.type.type ? data.type.type : ''
+      let type = data.type ? data.type : ''
       if (filter === 'All') {
         filteredList = list
       } else if (filter === data.status) {
@@ -205,16 +205,18 @@ export function PrescriptionsListScreen() {
     let newDrugName = formData.drugName
     let newType = 'All'
     let newPharmacy = 'All'
-    let newPrescriber: string | ActiveDoctorItem = 'All'
+    let newPrescriber = 'All'
 
     if (formData.typeIndex !== 1) {
-      newType = staticData.medicineTypeList[formData.typeIndex - 2].type
+      newType =
+        staticData.medicineTypeList[formData.typeIndex - 2]?.type ?? 'All'
     }
 
-    newPharmacy = pharmacyList[formData.pharmacyIndex - 1].title
+    newPharmacy = pharmacyList[formData.pharmacyIndex - 1]?.title ?? 'All'
 
     if (formData.prescribedIndex !== 1) {
-      newPrescriber = doctorListFull[formData.prescribedIndex - 2]
+      newPrescriber =
+        doctorListFull[formData.prescribedIndex - 2]?.name ?? 'All'
     }
 
     setDrugName(newDrugName)

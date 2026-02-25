@@ -17,6 +17,8 @@ import type {
   DoctorFacilityItem
 } from 'app/data/appointments'
 import type { StaticData } from 'app/data/static'
+import type { YearList, PrivilegeAction } from 'app/data/types'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
@@ -50,7 +52,7 @@ type MemberRouteParams = {
 }
 export type Schema = z.infer<typeof schema>
 export function AppointmentsListScreen() {
-  const appointmentPrivilegesRef = useRef({})
+  const appointmentPrivilegesRef = useRef<PrivilegeAction[]>([])
   const [selectedMonth, setSelectedMonth] = useState('All')
   const [selectedYear, setSelectedYear] = useState('All')
   const [selectedType, setSelectedType] = useState('All')
@@ -98,15 +100,11 @@ export function AppointmentsListScreen() {
       ? (JSON.parse(item.memberData) as MemberRouteParams)
       : ({} as MemberRouteParams)
 
-  type Response = {
-    id: number
-    name: string
-  }
   let yearList: Array<{ id: number; title: string }> = [{ id: 1, title: 'All' }]
-  staticData.yearList.map(({ name, id }: Response, index: number) => {
+  staticData.yearList.map(({ name }: YearList, index: number) => {
     yearList.push({
       id: index + 2,
-      title: name
+      title: String(name)
     })
   })
 
@@ -136,7 +134,7 @@ export function AppointmentsListScreen() {
         appointmentPrivilegesRef.current = appointmentsData
           .domainObjectPrivileges.Appointment
           ? appointmentsData.domainObjectPrivileges.Appointment
-          : {}
+          : []
       }
       setAppointmentsListFull(
         appointmentsData.list ? appointmentsData.list : []
@@ -241,20 +239,24 @@ export function AppointmentsListScreen() {
   function filterAppointment(formData: Schema) {
     setSelectedMonth(
       formData.monthIndex !== -1
-        ? monthsList[formData.monthIndex - 1].title
+        ? monthsList[formData.monthIndex - 1]?.title ?? 'All'
         : 'All'
     )
     setSelectedYear(
-      formData.yearIndex !== -1 ? yearList[formData.yearIndex - 1].title : 'All'
+      formData.yearIndex !== -1
+        ? yearList[formData.yearIndex - 1]?.title ?? 'All'
+        : 'All'
     )
     setDoctorId(
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
-        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].doctorId
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1]?.doctorId ??
+            'All'
         : 'All'
     )
     setFacilityId(
       formData.doctorFacilityIndex !== 1 && formData.doctorFacilityIndex !== -1
-        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1].facilityId
+        ? doctorFacilityListFull[formData.doctorFacilityIndex - 1]
+            ?.facilityId ?? 'All'
         : 'All'
     )
   }
@@ -271,30 +273,30 @@ export function AppointmentsListScreen() {
       typeIndex: 1
     })
   }
-  async function setDoctorFacilityChange(value: number | null) {
-    if (value === null) {
+  async function setDoctorFacilityChange(value: DropdownItem) {
+    if (!value) {
       reset({
         doctorFacilityIndex: -1
       })
     }
   }
-  async function setYearChange(value: number | null) {
-    if (value === null) {
+  async function setYearChange(value: DropdownItem) {
+    if (!value) {
       reset({
         yearIndex: -1
       })
     }
   }
-  async function setMonthChange(value: number | null) {
-    if (value === null) {
+  async function setMonthChange(value: DropdownItem) {
+    if (!value) {
       reset({
         monthIndex: -1
       })
     }
   }
-  async function setSelectedTypeChange(value: { id: number } | null) {
+  async function setSelectedTypeChange(value: DropdownItem) {
     if (value) {
-      let id = value.id - 1
+      let id = Number(value.id) - 1
       logger.debug('value', JSON.stringify(value))
       if (id === 0) {
         setSelectedType('All')

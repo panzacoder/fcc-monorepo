@@ -26,13 +26,13 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import RNIap, {
-  InAppPurchase,
   PurchaseError,
   SubscriptionPurchase,
   finishTransaction,
   purchaseErrorListener,
   purchaseUpdatedListener
 } from 'react-native-iap'
+type InAppPurchase = SubscriptionPurchase
 import userProfileAction from 'app/redux/userProfile/userProfileAction'
 import subscriptionAction from 'app/redux/userSubscription/subscriptionAction'
 import userSubscriptionAction from 'app/redux/userSubscriptionDetails/userSubscriptionAction'
@@ -90,11 +90,18 @@ export function PaymentsScreen() {
   const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
     useStripe()
   const [isUserDataLoaded, setUserDataLoaded] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState({})
+  const [selectedPlan, setSelectedPlan] = useState<Record<string, unknown>>({})
 
   const [email, setEmail] = useState('')
   const header = useAppSelector((state) => state.headerState.header)
-  const userDetails = useAppSelector((state) => state.userProfileState.header)
+  const userDetails = useAppSelector(
+    (state) => state.userProfileState.header
+  ) as {
+    email?: string
+    memberName?: string
+    phone?: string
+    address?: Record<string, unknown>
+  }
   const item = useLocalSearchParams<Record<string, string>>()
   const router = useRouter()
   let planDetails: PlanDetail = item.planDetails
@@ -419,7 +426,9 @@ export function PaymentsScreen() {
       } else {
         identifier = 'com.familycarecircle.yearly'
       }
-      RNIap.requestSubscription(identifier)
+      RNIap.requestSubscription(
+        identifier as unknown as Parameters<typeof RNIap.requestSubscription>[0]
+      )
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       logger.debug('err', message)

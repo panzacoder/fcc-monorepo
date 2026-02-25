@@ -133,7 +133,7 @@ export const Transportation = ({
     title: string,
     value: string,
     isIcon: boolean,
-    iconValue: ComponentProps<typeof FeatherType>['name']
+    iconValue?: ComponentProps<typeof FeatherType>['name']
   ) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -324,11 +324,11 @@ export const Transportation = ({
         </View>
       </View>
 
-      {getDetailsView('Acompany', acompanyName, false, '')}
-      {getDetailsView('Date', transportationDate, false, '')}
-      {getDetailsView('Description', description, false, '')}
-      {getDetailsView('Status', status, false, '')}
-      {getDetailsView('Address', address, false, '')}
+      {getDetailsView('Acompany', acompanyName, false)}
+      {getDetailsView('Date', transportationDate, false)}
+      {getDetailsView('Description', description, false)}
+      {getDetailsView('Status', status, false)}
+      {getDetailsView('Address', address, false)}
       <View className="f-full ml-2 flex-row">
         <Typography className="w-[85%]">{'Reminder'}</Typography>
         <TouchableOpacity className="bg-primary mx-1 h-[30] w-[30] items-center justify-center rounded-[15px]">
@@ -347,7 +347,12 @@ export const Transportation = ({
         <View className="">
           <AddEditReminder
             component={'Transportation'}
-            reminderData={remindersData}
+            reminderData={{
+              note: remindersData.content,
+              date: remindersData.date
+                ? new Date(remindersData.date)
+                : undefined
+            }}
             cancelClicked={cancelClicked}
             createUpdateReminder={createUpdateReminder}
           />

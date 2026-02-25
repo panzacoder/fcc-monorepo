@@ -202,14 +202,15 @@ export function AddEditCaregiverScreen() {
     )
   }
   async function callCreateUpdateDevice(formData: Schema) {
-    let object = {}
+    const profile = staticData.profileList[formData.profileIndex - 1]!
+    let object: CaregiverFamilyMemberInput
     if (isMemberFound) {
       object = {
         memberId: memberData.member ? memberData.member : '',
         familyMemberId: memberId,
         relationRole: {
-          name: staticData.profileList[formData.profileIndex - 1].name,
-          uid: staticData.profileList[formData.profileIndex - 1].uid
+          name: profile.name,
+          uid: profile.uid
         }
       }
     } else if (_.isEmpty(caregiverDetails)) {
@@ -220,8 +221,8 @@ export function AddEditCaregiverScreen() {
         lastName: formData.lastName,
         memberId: memberData.member ? memberData.member : '',
         relationRole: {
-          name: staticData.profileList[formData.profileIndex - 1].name,
-          uid: staticData.profileList[formData.profileIndex - 1].uid
+          name: profile.name,
+          uid: profile.uid
         }
       }
     } else {
@@ -232,8 +233,8 @@ export function AddEditCaregiverScreen() {
           status: status
         },
         relationRole: {
-          name: staticData.profileList[formData.profileIndex - 1].name,
-          uid: staticData.profileList[formData.profileIndex - 1].uid
+          name: profile.name,
+          uid: profile.uid
         }
       }
     }
@@ -341,7 +342,7 @@ export function AddEditCaregiverScreen() {
                       keyboard="number-pad"
                       onChangeText={(value) => {
                         caregiverPhone =
-                          convertPhoneNumberToUsaPhoneNumberFormat(value)
+                          convertPhoneNumberToUsaPhoneNumberFormat(value) ?? ''
 
                         reset1({
                           phone: caregiverPhone

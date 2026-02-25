@@ -15,6 +15,7 @@ import {
   useUpdateFacilityLocation
 } from 'app/data/locations'
 import type {
+  LocationData,
   DoctorLocationData,
   FacilityLocationData,
   CreateDoctorLocationResponse,
@@ -29,6 +30,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
+import type { DropdownItem } from 'app/ui/PtsDropdown'
 import { useRouter } from 'expo-router'
 import ct from 'countries-and-timezones'
 import moment from 'moment-timezone'
@@ -85,7 +87,7 @@ export function AddEditLocationScreen() {
   const [statesList, setStatesList] = useState<
     Array<{ id: number; title: string }>
   >([])
-  const [statesListFull, setStatesListFull] = useState([])
+  const [statesListFull, setStatesListFull] = useState<StateType[]>([])
   type Response = {
     id: number
     name: string
@@ -175,9 +177,8 @@ export function AddEditLocationScreen() {
         })
       }
     })
-    let countryId = staticData.countryList[countryIndexRef.current - 1]?.id
-      ? staticData.countryList[countryIndexRef.current - 1].id
-      : 101
+    let countryId =
+      staticData.countryList[countryIndexRef.current - 1]?.id ?? 101
     setSelectedCountryId(countryId)
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
     return () => {
@@ -218,11 +219,10 @@ export function AddEditLocationScreen() {
     },
     resolver: zodResolver(phoneSchema)
   })
-  function setSelectedCountryChange(value: { id: number } | null) {
+  function setSelectedCountryChange(value: DropdownItem) {
     if (value) {
-      let countryId = staticData.countryList[value.id - 1]?.id
-        ? staticData.countryList[value.id - 1].id
-        : 101
+      let numId = Number(value.id)
+      let countryId = staticData.countryList[numId - 1]?.id ?? 101
       setSelectedCountryId(countryId)
     }
   }
@@ -235,8 +235,10 @@ export function AddEditLocationScreen() {
     updateFacilityLocationMutation.isPending
 
   async function addUpdateLocation(formData: Schema) {
-    let stateObject = statesListFull[formData.state - 1]
-    let countryObject: object = staticData.countryList[formData.country - 1]
+    let stateObject: Partial<StateType> =
+      statesListFull[formData.state - 1] ?? {}
+    let countryObject: object =
+      staticData.countryList[formData.country - 1] ?? {}
     let addressObject = {
       operation: 'add',
       shortDescription: formData.locationName,
@@ -245,12 +247,11 @@ export function AddEditLocationScreen() {
       website: formData.website,
       phone: removeAllSpecialCharFromString(locationPhone),
       address: {
-        id: '',
         line: formData.address,
         city: formData.city,
         zipCode: formData.postalCode,
         state: stateObject
-      }
+      } as LocationData['address']
     }
 
     const onDoctorSuccess = (data: CreateDoctorLocationResponse) => {
@@ -298,7 +299,10 @@ export function AddEditLocationScreen() {
             : ''
         }
       }
-      doctorLocation.address.state.country = countryObject
+      doctorLocation.address.state = {
+        ...doctorLocation.address.state,
+        country: countryObject as Partial<Country>
+      }
       if (!_.isEmpty(locationDetails)) {
         doctorLocation.id = locationDetails.id
       }
@@ -333,7 +337,10 @@ export function AddEditLocationScreen() {
             : ''
         }
       }
-      facilityLocation.address.state.country = countryObject
+      facilityLocation.address.state = {
+        ...facilityLocation.address.state,
+        country: countryObject as Partial<Country>
+      }
       if (!_.isEmpty(locationDetails)) {
         facilityLocation.id = locationDetails.id
       }
@@ -399,7 +406,7 @@ export function AddEditLocationScreen() {
                     defaultValue={
                       stateIndexRef.current !== -1 &&
                       statesList[stateIndexRef.current - 1]
-                        ? statesList[stateIndexRef.current - 1].title
+                        ? statesList[stateIndexRef.current - 1]?.title
                         : ''
                     }
                     maxHeight={300}
@@ -428,7 +435,7 @@ export function AddEditLocationScreen() {
                     keyboard="number-pad"
                     onChangeText={(value) => {
                       locationPhone =
-                        convertPhoneNumberToUsaPhoneNumberFormat(value)
+                        convertPhoneNumberToUsaPhoneNumberFormat(value) ?? ''
 
                       reset1({
                         phone: locationPhone

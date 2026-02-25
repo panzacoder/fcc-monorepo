@@ -97,7 +97,11 @@ export function NotificationNoteMessageScreen() {
             ? messageThread.messageList
             : []
         setMessageList(msgList)
-        dispatch(messageListAction.setMessageList(msgList))
+        dispatch(
+          messageListAction.setMessageList(
+            msgList as unknown as Record<string, unknown>[]
+          )
+        )
       }
     }
   }, [threadData])
@@ -119,15 +123,13 @@ export function NotificationNoteMessageScreen() {
   async function updateMessageList(
     message: FirebaseMessagingTypes.RemoteMessage
   ) {
-    let messageList = [...messageListFromStore]
+    let messageList: Message[] = messageListFromStore as unknown as Message[]
     let messeageContent = message.data ? message.data : {}
-    let messageObject = {
-      sender: messeageContent.MemberId ? messeageContent.MemberId : '',
-      senderName: messeageContent.MsgCreatedBy
-        ? messeageContent.MsgCreatedBy
-        : '',
-      body: messeageContent.MsgContent ? messeageContent.MsgContent : '',
-      createdOn: messeageContent.MsgDateUTC ? messeageContent.MsgDateUTC : ''
+    let messageObject: Message = {
+      sender: Number(messeageContent.MemberId ?? 0),
+      senderName: String(messeageContent.MsgCreatedBy ?? ''),
+      body: String(messeageContent.MsgContent ?? ''),
+      createdOn: String(messeageContent.MsgDateUTC ?? '')
     }
     messageList.push(messageObject)
     setMessageList(messageList)
@@ -143,7 +145,7 @@ export function NotificationNoteMessageScreen() {
       Alert.alert('', 'Please type a message')
     } else {
       setLoading(true)
-      let list: object[] = []
+      let list: { body: string; operation: string }[] = []
       let object = {
         body: message,
         operation: 'Add'
@@ -152,7 +154,7 @@ export function NotificationNoteMessageScreen() {
       updateThreadMutation.mutate(
         {
           messageThread: {
-            id: threadDetails.id ? threadDetails.id : '',
+            id: threadDetails!.id ? threadDetails!.id : '',
             messageList: list
           }
         },
@@ -180,16 +182,17 @@ export function NotificationNoteMessageScreen() {
       ) : (
         <View />
       )}
-      {isValidObject(threadDetails) ? (
+      {isValidObject(threadDetails ?? undefined) ? (
         <Typography className="mt-5 text-left text-[16px] font-bold">
-          {threadDetails.subject ? threadDetails.subject : ''}
+          {threadDetails!.subject ? threadDetails!.subject : ''}
         </Typography>
       ) : (
         <View />
       )}
       <SafeAreaView className="flex-1">
         <View className=" h-[90%] w-full bg-[#e0d8d0]">
-          {isValidObject(messageList) && messageList.length > 0 ? (
+          {isValidObject(messageList ?? undefined) &&
+          messageList!.length > 0 ? (
             <ScrollView
               key={key}
               ref={scrollViewRef}
@@ -198,7 +201,7 @@ export function NotificationNoteMessageScreen() {
               }
               className="max-h-[90%] "
             >
-              {messageList.map((message: Message, index: number) => {
+              {messageList!.map((message: Message, index: number) => {
                 if (isValidObject(userDetails) && isValidObject(message)) {
                   if (message.sender !== userDetails.id) {
                     return (
