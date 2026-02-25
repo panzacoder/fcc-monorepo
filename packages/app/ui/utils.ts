@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import { Alert, Platform, Linking } from 'react-native'
 import { logger } from 'app/utils/logger'
@@ -155,7 +155,10 @@ export function getAddressFromObject(address: AddressLike | null | undefined) {
   return finalAddress
 }
 export const getFullDateForCalendar = (time: DateInput, formatType: string) => {
-  return format(new Date(time), formatType)
+  if (!time && time !== 0) return ''
+  const date = new Date(time)
+  if (!isValid(date)) return ''
+  return format(date, formatType)
 }
 export const getMonthsList = () => {
   let monthsList: object[] = [
