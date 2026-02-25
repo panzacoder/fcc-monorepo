@@ -29,6 +29,12 @@ FCC: Cross-platform healthcare app (React Native + Next.js). Caregivers, patient
 - chore/ - Documentation, formatting, tests
 - hotfix/ - Emergency fixes
 
+### PR Process
+
+- **Roadmap updates**: PRs that change phase status must update `docs/modernization-roadmap.md` inline
+- **Issue linking**: PR descriptions must include `Closes #X` for auto-close on merge
+- **Commits**: Squash merge preferred; commit messages should reference issue numbers
+
 ## STRUCTURE
 
 ### Monorepo
