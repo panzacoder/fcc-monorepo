@@ -18,7 +18,10 @@
     "platforms": ["ios", "android"],
     "ios": {
       "bundleIdentifier": "app.familycarecircle.fcc",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "app.familycarecircle.fcc",
