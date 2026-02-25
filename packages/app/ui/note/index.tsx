@@ -2,7 +2,7 @@ import { View, Alert, TouchableOpacity } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
 type Permission = '*' | 'Create' | 'Read' | 'Update' | 'Delete'

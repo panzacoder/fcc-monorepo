@@ -24,7 +24,7 @@ import {
   convertUserTimeToUTC
 } from 'app/ui/utils'
 import { useAppSelector } from 'app/redux/hooks'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'

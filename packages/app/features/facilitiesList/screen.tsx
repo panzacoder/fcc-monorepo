@@ -13,7 +13,7 @@ import type { FacilityListItem } from 'app/data/facilities/types'
 import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useRouter } from 'expo-router'
 import { useAppSelector } from 'app/redux/hooks'
 export function FacilitiesListScreen() {

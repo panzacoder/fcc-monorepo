@@ -22,7 +22,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { Button } from 'app/ui/button'
 import { Location } from 'app/ui/location'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import type { PrivilegeAction } from 'app/data/types'
 import type {
   Facility,

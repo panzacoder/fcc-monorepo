@@ -51,7 +51,7 @@ import { AddEditTransport } from 'app/ui/addEditTransport'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
 type TransportationDisplayData = ComponentProps<typeof Transportation>['data']

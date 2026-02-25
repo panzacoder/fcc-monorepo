@@ -18,7 +18,7 @@ import type { PrivilegeAction } from 'app/data/types'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 export function CaregiversListScreen() {
   const caregiverPrivilegesRef = useRef<PrivilegeAction[]>([])

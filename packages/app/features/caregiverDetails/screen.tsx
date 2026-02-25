@@ -13,7 +13,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useAppSelector } from 'app/redux/hooks'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useCaregiverDetails, useDeleteCaregiver } from 'app/data/caregivers'
 export function CaregiverDetailsScreen() {
   const caregiverPrivilegesRef = useRef<any>({})

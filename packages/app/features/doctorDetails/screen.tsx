@@ -35,7 +35,7 @@ import { useRouter } from 'expo-router'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import * as Clipboard from 'expo-clipboard'
 export function DoctorDetailsScreen() {
   const doctorPrivilegesRef = useRef<PrivilegeAction[]>([])

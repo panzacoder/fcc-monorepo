@@ -49,7 +49,7 @@ import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { getUserPermission } from 'app/utils/getUserPemissions'
+import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useAppSelector } from 'app/redux/hooks'
 
 type MemberRouteParams = {
