@@ -35,6 +35,7 @@ type InAppPurchase = SubscriptionPurchase
 import { logger } from 'app/utils/logger'
 import { useStore } from 'app/store'
 import { useAppSelector } from 'app/redux/hooks'
+import type { LoginAppUser } from 'app/data/auth/types'
 import type {
   CheckOutSessionResponse,
   PaymentSuccessResponse,
@@ -294,7 +295,7 @@ export function PaymentsScreen() {
                 ? data.userDetails.appuserVo
                 : {}
             if (!isEmpty(appuserVo)) {
-              setUserProfile(appuserVo)
+              setUserProfile(appuserVo as LoginAppUser)
             }
             if (!isEmpty(userSubscription)) {
               setSubscription(userSubscription)

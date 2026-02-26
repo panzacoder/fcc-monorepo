@@ -2,6 +2,7 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { isEqual, format } from 'date-fns'
 import { View } from 'react-native'
+import type { LoginAppUser } from 'app/data/auth/types'
 
 type Appoointment = {
   date: string
@@ -56,7 +57,7 @@ function EventEntry({ memberData }: { memberData: MemberData }) {
 
 type TodayCardProps = {
   memberData: MemberData
-  userDetails: Record<string, unknown>
+  userDetails: Record<string, unknown> | LoginAppUser
 }
 export function TodayCard({ memberData }: TodayCardProps) {
   const now = new Date()

@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { getStorage } from './storage'
 import type { StaticData } from 'app/data/static'
+import type { LoginAppUser } from 'app/data/auth/types'
+import type { Address } from 'app/data/types.d'
 
 interface HeaderState {
   header: Record<string, unknown>
@@ -20,7 +22,7 @@ interface PaidAdvertiserState {
 }
 
 interface UserProfileState {
-  header: Record<string, unknown>
+  header: LoginAppUser
 }
 
 interface SubscriptionState {
@@ -32,7 +34,7 @@ interface SubscriptionDetailsState {
 }
 
 interface CurrentMemberAddressState {
-  currentMemberAddress: Record<string, unknown>
+  currentMemberAddress: Partial<Address>
 }
 
 interface MemberNamesState {
@@ -60,12 +62,12 @@ export interface AppState {
 interface AppActions {
   setHeader: (data: Record<string, unknown>) => void
   setStaticData: (data: StaticData) => void
-  setUserProfile: (data: unknown) => void
+  setUserProfile: (data: LoginAppUser) => void
   setSponsor: (data: unknown) => void
   setPaidAd: (data: unknown) => void
   setSubscription: (data: unknown) => void
   setSubscriptionDetails: (data: unknown) => void
-  setMemberAddress: (data: Record<string, unknown>) => void
+  setMemberAddress: (data: Partial<Address>) => void
   setMemberNames: (data: string[]) => void
   setMessageList: (data: Record<string, unknown>[]) => void
   resetStore: () => void
@@ -74,7 +76,7 @@ interface AppActions {
 const initialState: AppState = {
   headerState: { header: {} },
   staticDataState: { staticData: {} as Record<string, never> },
-  userProfileState: { header: {} },
+  userProfileState: { header: {} as LoginAppUser },
   sponsor: { header: {} },
   paidAdvertiser: { header: {} },
   subscriptionState: { subscription: {} },
@@ -113,7 +115,7 @@ export const useStore = create<AppState & AppActions>()(
             (state) => ({
               userProfileState: {
                 ...state.userProfileState,
-                header: data as Record<string, unknown>
+                header: data
               }
             }),
             undefined,

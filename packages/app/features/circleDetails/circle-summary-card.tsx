@@ -10,6 +10,7 @@ import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import type { MemberMenu } from 'app/data/circle'
+import type { LoginAppUser } from 'app/data/auth/types'
 import { Image } from 'app/ui/image'
 import { googleMapOpenUrl } from 'app/ui/utils'
 
@@ -30,7 +31,7 @@ interface MemberRouteData {
 interface CircleSummaryCardProps {
   menuList: MemberMenu[]
   memberData: MemberRouteData
-  userDetails: Record<string, unknown>
+  userDetails: Record<string, unknown> | LoginAppUser
 }
 
 export function CircleSummaryCard({
