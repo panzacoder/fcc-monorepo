@@ -126,6 +126,28 @@ export function MessagesScreen() {
     }
   }, [fetchParticipants, participantsData])
 
+  // Collect participant names from threads and update memberNames store
+  useEffect(() => {
+    if (messagesListFull.length > 0) {
+      const newNames: string[] = []
+      messagesListFull.forEach((thread) => {
+        thread.participantDetailsList?.forEach((participant) => {
+          const name = participant.name || ''
+          if (
+            name &&
+            !memberNamesList.includes(name) &&
+            !newNames.includes(name)
+          ) {
+            newNames.push(name)
+          }
+        })
+      })
+      if (newNames.length > 0) {
+        setMemberNames([...memberNamesList, ...newNames])
+      }
+    }
+  }, [messagesListFull, memberNamesList, setMemberNames])
+
   function createMessageThread(
     subject: string,
     noteData: Record<string, unknown>
@@ -364,16 +386,13 @@ export function MessagesScreen() {
                       className="w-[95%] max-w-[95%] flex-row"
                     >
                       {data.participantDetailsList.map(
-                        (data: ParticipantDetail, index: number) => {
-                          let fullName = data.name ? data.name : ''
-                          if (memberNamesList.includes(fullName) === false) {
-                            memberNamesList.push(fullName)
-                            setMemberNames(memberNamesList)
-                          }
+                        (participant: ParticipantDetail, index: number) => {
                           return (
                             <View key={index} className="ml-2">
                               <PtsNameInitials
-                                fullName={data.name ? data.name : ''}
+                                fullName={
+                                  participant.name ? participant.name : ''
+                                }
                               />
                             </View>
                           )

@@ -86,11 +86,13 @@ export function HomeScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
 
-  let fullName = user.memberName ? user.memberName : ''
-  if (memberNamesList.includes(fullName) === false) {
-    memberNamesList.push(fullName)
-  }
-  setMemberNames(memberNamesList)
+  const fullName = user.memberName ? user.memberName : ''
+
+  useEffect(() => {
+    if (fullName && !memberNamesList.includes(fullName)) {
+      setMemberNames([...memberNamesList, fullName])
+    }
+  }, [fullName, memberNamesList, setMemberNames])
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] =
     useState<TransportRequestItem | null>(null)
