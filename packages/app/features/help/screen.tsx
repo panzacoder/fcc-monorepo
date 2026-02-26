@@ -8,10 +8,10 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function HelpScreen() {
   const router = useRouter()
   let textStyle = 'my-2 w-[95%] text-[16px] text-black'
-  let titleStyle = 'font-400 text-[15px] text-primary font-bold my-2 '
-  let valueStyle = 'font-400 text-[15px]  text-primary font-normal'
-  let titleStyle1 = 'font-400 text-[15px] text-[#ef6603] font-400 ml-2'
-  let valueStyle1 = 'font-400 text-[15px]  text-black font-normal ml-5'
+  let titleStyle = 'font-normal text-[15px] text-primary font-bold my-2 '
+  let valueStyle = 'font-normal text-[15px]  text-primary font-normal'
+  let titleStyle1 = 'font-normal text-[15px] text-[#ef6603] font-normal ml-2'
+  let valueStyle1 = 'font-normal text-[15px]  text-black font-normal ml-5'
   function getTextView(value: string) {
     return (
       <View className="my-1 ml-5 w-[97%]">

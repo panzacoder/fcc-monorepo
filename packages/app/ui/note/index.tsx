@@ -51,7 +51,7 @@ export const Note = ({
     <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#dbc672] bg-[#FCF3CF] py-2">
       <View className="w-full flex-row">
         <View className="max-w-[60%]">
-          <Typography className="font-400 ml-2 text-[#1A1A1A]">
+          <Typography className="font-normal ml-2 text-[#1A1A1A]">
             {noteData.shortDescription ? noteData.shortDescription : ''}
           </Typography>
         </View>
@@ -113,20 +113,20 @@ export const Note = ({
         </View>
       </View>
       <View>
-        <Typography className=" font-400 ml-2 ml-2 text-[#1A1A1A]">
+        <Typography className=" font-normal ml-2 ml-2 text-[#1A1A1A]">
           {noteData.note ? noteData.note : ''}
         </Typography>
       </View>
       <View className="my-2 h-[1px] w-full bg-[#86939e]" />
       <View className="">
         <Typography
-          className={`font-400 ml-2 w-full text-[9px] text-[#1A1A1A]`}
+          className={`font-normal ml-2 w-full text-[9px] text-[#1A1A1A]`}
         >
           {noteData.createdByName
             ? 'Created by ' + noteData.createdByName + ' on ' + creationDate
             : ''}
         </Typography>
-        <Typography className="font-400 ml-2 text-[10px] text-[#1A1A1A]">
+        <Typography className="font-normal ml-2 text-[10px] text-[#1A1A1A]">
           {noteData.occurance && noteData.occurance.occurance
             ? noteData.occurance.occurance
             : ''}

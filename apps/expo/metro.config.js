@@ -26,5 +26,7 @@ config.resolver.disableHierarchicalLookup = true
 
 // Uniwind configuration - cssEntryFile must be relative path from project root
 module.exports = withUniwindConfig(config, {
-  cssEntryFile: '../../packages/app/config/tailwind/global.css'
+  cssEntryFile: '../../packages/app/config/tailwind/global.css',
+  polyfills: { rem: 14 },
+  debug: true
 })

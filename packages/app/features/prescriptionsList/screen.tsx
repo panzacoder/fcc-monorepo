@@ -436,7 +436,7 @@ export function PrescriptionsListScreen() {
               <View className="w-[95%] flex-row">
                 <View>
                   <View className="my-1 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[40%]">
+                    <Typography className="text-primary font-normal ml-5 w-[40%]">
                       {data.type ? data.type : ''}
                     </Typography>
 
@@ -446,7 +446,7 @@ export function PrescriptionsListScreen() {
                   </View>
                   {data.doctorname || data.pharmacy ? (
                     <View className="flex-row">
-                      <Typography className="text-primary font-400 ml-5 w-[40%]">
+                      <Typography className="text-primary font-normal ml-5 w-[40%]">
                         {data.doctorname ? data.doctorname : ''}
                       </Typography>
 

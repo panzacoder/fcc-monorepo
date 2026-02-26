@@ -31,7 +31,7 @@ const MenuButton: FC<{
         className="w-full flex-row self-center bg-white px-2 py-1"
       >
         <Feather name={icon} size={20} className="mr-2" color={'gray'} />
-        <Typography className="font-400">{text}</Typography>
+        <Typography className="font-normal">{text}</Typography>
       </TouchableOpacity>
       <View className="h-[0.5px] w-full bg-gray-400" />
     </View>

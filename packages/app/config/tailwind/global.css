@@ -6,8 +6,15 @@
 @import 'tailwindcss';
 @import 'uniwind';
 
+@source "../../features";
+@source "../../ui";
+
 /* Theme configuration using Tailwind v4 @theme syntax */
 @theme {
+  /* Spacing scale — must be explicit for Uniwind to capture via @property.
+     Tailwind v4 defaults to the * selector which Uniwind's processor skips. */
+  --spacing: 0.25rem;
+
   /* Font sizes with line heights */
   --font-size-xs: 0.75rem;
   --font-size-xs--line-height: 1rem;

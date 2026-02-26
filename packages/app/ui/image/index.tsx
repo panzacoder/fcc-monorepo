@@ -1,17 +1,4 @@
 import { SolitoImage } from 'solito/image'
-import { cssInterop } from 'nativewind'
-import { ComponentProps } from 'react'
+import { withUniwind } from 'uniwind'
 
-const ImageWrapper = (
-  props: ComponentProps<typeof SolitoImage> & { className?: string }
-) => {
-  return <SolitoImage {...props} />
-}
-
-cssInterop(ImageWrapper, {
-  className: {
-    target: 'style'
-  }
-})
-
-export const Image = ImageWrapper
+export const Image = withUniwind(SolitoImage)

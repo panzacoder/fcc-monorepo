@@ -13,7 +13,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "jsxImportSource": "nativewind",
+    "jsxImportSource": "react",
     "paths": {
       "app/*": ["../../packages/app/*"]
     },

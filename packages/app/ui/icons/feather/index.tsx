@@ -1,18 +1,10 @@
 'use client'
 import { Feather as ExpoFeather } from '@expo/vector-icons'
-import { cssInterop } from 'nativewind'
+import { withUniwind } from 'uniwind'
 import { ComponentProps } from 'react'
 import { TouchableOpacity } from 'react-native'
 
-export const Feather = (props: ComponentProps<typeof ExpoFeather>) => {
-  return <ExpoFeather {...props} />
-}
-
-cssInterop(Feather, {
-  className: {
-    target: 'style'
-  }
-})
+export const Feather = withUniwind(ExpoFeather)
 
 export const FeatherButton = ({
   onPress,
@@ -24,9 +16,3 @@ export const FeatherButton = ({
     </TouchableOpacity>
   )
 }
-
-cssInterop(FeatherButton, {
-  className: {
-    target: 'style' // string or boolean
-  }
-})

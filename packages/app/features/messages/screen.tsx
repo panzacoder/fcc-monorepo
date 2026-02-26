@@ -343,7 +343,7 @@ export function MessagesScreen() {
                 <View className="w-[90%] flex-row">
                   <View>
                     <View className="my-2 flex-row">
-                      <Typography className="text-primary font-400 ml-5 mr-5 w-[60%] max-w-[60%] text-[16px]">
+                      <Typography className="text-primary font-normal ml-5 mr-5 w-[60%] max-w-[60%] text-[16px]">
                         {data.subject ? data.subject : ''}
                       </Typography>
                       <View className="">
@@ -353,7 +353,7 @@ export function MessagesScreen() {
                       </View>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
+                      <Typography className="font-normal ml-5 w-full text-black">
                         {data.updatedOn
                           ? formatTimeToUserLocalTime(
                               data.updatedOn,

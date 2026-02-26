@@ -263,7 +263,7 @@ export function IncidentsListScreen() {
                 <View className="w-[90%] flex-row">
                   <View>
                     {/* <View className="my-2 flex-row">
-                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%] text-[16px]">
+                      <Typography className="text-primary font-normal ml-5 mr-5 w-[50%] max-w-[50%] text-[16px]">
                         {data.title ? data.title : ''}
                       </Typography>
                       <View className="">
@@ -273,20 +273,20 @@ export function IncidentsListScreen() {
                       </View>
                     </View> */}
                     <View className="w-full flex-row">
-                      <Typography className="text-primary font-400 ml-5 mr-5 w-[50%] max-w-[50%]">
+                      <Typography className="text-primary font-normal ml-5 mr-5 w-[50%] max-w-[50%]">
                         {data.title ? data.title : ''}
                       </Typography>
-                      <Typography className="font-400 mr-5 w-[40%] max-w-[40%] text-right text-black">
+                      <Typography className="font-normal mr-5 w-[40%] max-w-[40%] text-right text-black">
                         {data.type ? data.type : ''}
                       </Typography>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
+                      <Typography className="font-normal ml-5 w-full text-black">
                         {data.location ? data.location : ''}
                       </Typography>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-full text-black">
+                      <Typography className="font-normal ml-5 w-full text-black">
                         {data.date
                           ? formatTimeToUserLocalTime(
                               data.date,

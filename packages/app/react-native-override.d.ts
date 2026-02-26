@@ -1,4 +1,4 @@
-// Type augmentation for React Native to support NativeWind className prop
+// Type augmentation for React Native to support Uniwind className prop
 import 'react-native'
 import 'react-native-safe-area-context'
 

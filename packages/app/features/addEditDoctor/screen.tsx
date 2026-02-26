@@ -309,7 +309,7 @@ export function AddEditDoctorScreen() {
                       )
                     }}
                   />
-                  <Typography className="font-400 ml-2 self-center">
+                  <Typography className="font-normal ml-2 self-center">
                     {isActive ? 'Active' : 'InActive'}
                   </Typography>
                 </View>

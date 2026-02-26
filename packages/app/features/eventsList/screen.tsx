@@ -399,7 +399,7 @@ export function EventsListScreen() {
                 <View className="w-[90%] flex-row">
                   <View>
                     <View className="my-2 flex-row">
-                      <Typography className="font-400 ml-5 w-[75%] text-black">
+                      <Typography className="font-normal ml-5 w-[75%] text-black">
                         {data.date
                           ? formatTimeToUserLocalTime(
                               data.date,
@@ -415,16 +415,16 @@ export function EventsListScreen() {
                       </View>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-5 w-[90%] text-black">
+                      <Typography className="font-normal ml-5 w-[90%] text-black">
                         {data.location ? data.location : ''}
                       </Typography>
                     </View>
                     <View className="flex-row">
-                      <Typography className="text-primary font-400 ml-5 w-[55%] max-w-[55%] text-[16px]">
+                      <Typography className="text-primary font-normal ml-5 w-[55%] max-w-[55%] text-[16px]">
                         {data.title ? data.title : ''}
                       </Typography>
                       {data.markCompleteCancel ? (
-                        <Typography className="font-400 ml-5 w-[40%] text-[#FF0000]">
+                        <Typography className="font-normal ml-5 w-[40%] text-[#FF0000]">
                           {'Mark Complete/Cancel'}
                         </Typography>
                       ) : (

@@ -213,7 +213,7 @@ export function CaregiversListScreen() {
               <View className="w-[95%] flex-row">
                 <View>
                   <View className="my-2 flex-row">
-                    <Typography className="text-primary font-400 ml-5 w-[45%]">
+                    <Typography className="text-primary font-normal ml-5 w-[45%]">
                       {data.name ? data.name : ''}
                     </Typography>
 
@@ -223,7 +223,7 @@ export function CaregiversListScreen() {
                   </View>
 
                   <View className=" flex-row">
-                    <Typography className="font-400 ml-5 w-[65%] text-black">
+                    <Typography className="font-normal ml-5 w-[65%] text-black">
                       {data.email ? data.email : ''}
                     </Typography>
                     <View className="self-center text-center">

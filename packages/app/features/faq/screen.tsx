@@ -6,8 +6,8 @@ import { useRouter } from 'expo-router'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function FaqScreen() {
   const router = useRouter()
-  let titleStyle = 'font-400 w-[95%] text-[15px] text-[#1A1A1A] font-bold'
-  let valueStyle = 'font-400 ml-1 w-[95%] text-[15px]  text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[95%] text-[15px] text-[#1A1A1A] font-bold'
+  let valueStyle = 'font-normal ml-1 w-[95%] text-[15px]  text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mx-2 my-2 w-[95%] items-center">
@@ -22,7 +22,7 @@ export function FaqScreen() {
         <PtsBackHeader title="FAQ" memberData={{}} />
       </View>
       <ScrollView className="mt-5 w-[95%] self-center rounded-[5px] border-[1px] border-gray-400">
-        <Typography className="font-400 my-2 text-center">
+        <Typography className="font-normal my-2 text-center">
           {'FREQUENTLY ASKED QUESTIONS'}
         </Typography>
         {getDetailsView(

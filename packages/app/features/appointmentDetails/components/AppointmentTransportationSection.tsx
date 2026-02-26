@@ -113,7 +113,7 @@ export function AppointmentTransportationSection({
             }}
             className="w-[50%] flex-row"
           >
-            <Typography className="font-400 text-[14px] font-bold text-black">
+            <Typography className="font-normal text-[14px] font-bold text-black">
               {'Transportation'}
               {transportationList.length > 0
                 ? ' (' + transportationList.length + ') '

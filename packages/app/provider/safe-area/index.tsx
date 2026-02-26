@@ -1,9 +1,19 @@
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  SafeAreaProvider,
+  SafeAreaListener
+} from 'react-native-safe-area-context'
+import { Uniwind } from 'uniwind'
 
-import { cssInterop } from 'nativewind'
-cssInterop(SafeAreaView, {
-  className: { target: 'style' }
-})
-
-export const SafeArea = SafeAreaProvider
+export function SafeArea({ children }: { children: React.ReactNode }) {
+  return (
+    <SafeAreaProvider>
+      <SafeAreaListener
+        onChange={({ insets }) => {
+          Uniwind.updateInsets(insets)
+        }}
+      >
+        {children}
+      </SafeAreaListener>
+    </SafeAreaProvider>
+  )
+}

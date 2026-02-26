@@ -2,21 +2,19 @@ import PtsNameInitials from 'app/ui/PtsNameInitials'
 import { Button } from 'app/ui/button'
 import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
-import { LinearGradient } from 'expo-linear-gradient'
+import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient'
+import { withUniwind } from 'uniwind'
 import { useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { TodayCard } from './today-card'
-import { cssInterop } from 'nativewind'
 import { formatUrl } from 'app/utils/format-url'
+
+const LinearGradient = withUniwind(ExpoLinearGradient)
 import { useRouter } from 'expo-router'
 import type { MemberMenu } from 'app/data/circle'
 import type { LoginAppUser } from 'app/data/auth/types'
 import { Image } from 'app/ui/image'
 import { googleMapOpenUrl } from 'app/ui/utils'
-
-cssInterop(LinearGradient, {
-  className: { target: 'style' }
-})
 
 interface MemberRouteData {
   firstname: string

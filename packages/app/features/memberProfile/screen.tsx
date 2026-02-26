@@ -74,8 +74,8 @@ export function MemberProfileScreen() {
     }
   }, [memberProfileData])
 
-  let titleStyle = 'ml-2 font-400 w-[25%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'ml-2 font-normal w-[25%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -269,7 +269,7 @@ export function MemberProfileScreen() {
                   onPress={() => {
                     Linking.openURL(`tel:${memberDetails.phone}`)
                   }}
-                  className="font-400 text-primary ml-2 w-[70%] text-[15px] font-bold"
+                  className="font-normal text-primary ml-2 w-[70%] text-[15px] font-bold"
                 >
                   {convertPhoneNumberToUsaPhoneNumberFormat(
                     memberDetails.phone ?? ''

@@ -46,9 +46,7 @@ const config: StorybookConfig = {
           'app',
           'expo',
           'moti',
-          'nativewind',
           'react-native',
-          'react-native-css-interop',
           'react-native-gesture-handler',
           'react-native-reanimated',
           'react-native-vector-icons',
@@ -61,8 +59,7 @@ const config: StorybookConfig = {
           [
             '@babel/plugin-transform-react-jsx',
             {
-              runtime: 'automatic',
-              importSource: 'nativewind'
+              runtime: 'automatic'
             }
           ]
         ]

@@ -7,8 +7,8 @@ export const CaregiverProfileInfo = ({
 }: {
   cancelClicked: () => void
 }) => {
-  let titleStyle = 'font-400 w-full text-[15px] text-[#066f72] font-bold'
-  let valueStyle = 'font-400 w-[95%] text-[15px] text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-full text-[15px] text-[#066f72] font-bold'
+  let valueStyle = 'font-normal w-[95%] text-[15px] text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mx-2 mt-2 w-full items-center">

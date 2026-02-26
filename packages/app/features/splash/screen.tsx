@@ -8,16 +8,15 @@ import { useRouter } from 'expo-router'
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { useLogin } from 'app/data/auth'
 import type { LoginResponse } from 'app/data/auth'
-import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
+// Firebase types removed
 import { ApiError } from 'app/data/base'
 import { getCredentials } from 'app/utils/secure-storage'
 import { useStore } from 'app/store'
 import { formatUrl } from 'app/utils/format-url'
 import PtsLoader from 'app/ui/PtsLoader'
-import messaging from '@react-native-firebase/messaging'
+// Firebase removed
 export function SplashScreen() {
-  const notificationDataRef =
-    useRef<FirebaseMessagingTypes.RemoteMessage | null>(null)
+  const notificationDataRef = useRef<Record<string, unknown> | null>(null)
   const {
     setHeader,
     setUserProfile,
@@ -46,24 +45,8 @@ export function SplashScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const getNotificationData = useCallback(async () => {
-    try {
-      await messaging()
-        .getInitialNotification()
-        .then((notification) => {
-          if (notification) {
-            notificationDataRef.current = notification
-          }
-        })
-
-      await messaging().onNotificationOpenedApp((remoteMessage) => {
-        if (remoteMessage) {
-          notificationDataRef.current = remoteMessage
-        }
-      })
-      getUsernamePassword()
-    } catch (e: unknown) {
-      getUsernamePassword()
-    }
+    // Firebase messaging removed - notification deep linking handled by expo-notifications
+    getUsernamePassword()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -217,7 +200,7 @@ export function SplashScreen() {
     )
   }
   return (
-    <View className="native:pt-60 web:pt-40 flex h-full w-full flex-1 px-4 md:justify-center md:pt-0">
+    <View className="relative native:pt-[240px] web:pt-40 flex h-full w-full flex-1 px-4 md:justify-center md:pt-0">
       <PtsLoader loading={isLoading} />
       <Typography
         variant="h2"
@@ -228,7 +211,7 @@ export function SplashScreen() {
         {"\n\nLet's lighten the load."}
       </Typography>
       {isShowButtons ? (
-        <View className="absolute bottom-20 right-4 flex flex-col items-end gap-4 ">
+        <View className="absolute bottom-[80px] right-[16px] flex flex-col items-end gap-4 ">
           <AccentButton title="Log in" onPress={() => router.push('/login')} />
           <AccentButton
             title="Sign up"
