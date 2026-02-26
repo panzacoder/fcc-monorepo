@@ -5,7 +5,9 @@
 - `solito` for cross-platform navigation
 - `moti` for animations
 - `nativewind v4` for universal theming/design
-- Next.js 14
+- `zustand` for state management (with persist middleware)
+- `@tanstack/react-query` for server state
+- Next.js 16
 - Expo SDK 50
 - Expo Router 3
 - Storybook 7 for documentation and testing of components
