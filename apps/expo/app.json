@@ -34,7 +34,6 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app",
       [
         "expo-build-properties",
         {
@@ -49,7 +48,9 @@
         {
           "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-font"
     ]
   }
 }

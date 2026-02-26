@@ -130,8 +130,8 @@ export const Transportation = ({
     deleteResendCancelTransportation(count, transportationData)
   }
 
-  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[30%] text-[15px] text-[#1A1A1A] ml-2'
+  let valueStyle = 'font-normal ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(
     title: string,
     value: string,
@@ -414,7 +414,7 @@ export const Transportation = ({
 
       <View className="mt-2 h-[1px] w-full bg-[#86939e]" />
       <View>
-        <Typography className=" font-400 ml-2 text-[10px] text-[#1A1A1A]">
+        <Typography className=" font-normal ml-2 text-[10px] text-[#1A1A1A]">
           {transportationData.createdByName
             ? 'Created by ' +
               transportationData.createdByName +

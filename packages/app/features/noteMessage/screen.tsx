@@ -11,8 +11,8 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
-import messaging from '@react-native-firebase/messaging'
-import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
+// Firebase removed
+// Firebase types removed
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import PtsNameInitials from 'app/ui/PtsNameInitials'
@@ -240,26 +240,14 @@ export function NoteMessageScreen() {
   ])
 
   const handleFcmMessage = useCallback(async () => {
-    try {
-      Notifications.setNotificationHandler(null)
-      await messaging().setBackgroundMessageHandler(
-        async (message: FirebaseMessagingTypes.RemoteMessage) => {
-          updateMessageList(message)
-        }
-      )
-      await messaging().onMessage(
-        (message: FirebaseMessagingTypes.RemoteMessage) => {
-          updateMessageList(message)
-        }
-      )
-    } catch (e: unknown) {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Firebase messaging removed - using expo-notifications
+    // Background/foreground message handling is done via Notifications.addNotificationReceivedListener
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
   )
   async function updateMessageList(
-    message: FirebaseMessagingTypes.RemoteMessage
+    message: Record<string, unknown>
   ) {
     let messageList: Message[] = messageListFromStore as unknown as Message[]
     let messeageContent = message.data ? message.data : {}

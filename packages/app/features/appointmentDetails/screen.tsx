@@ -242,8 +242,8 @@ export function AppointmentDetailsScreen() {
     }
   }
 
-  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
 
   function getDetailsView(
     title: string,
@@ -424,7 +424,7 @@ export function AppointmentDetailsScreen() {
                     {doctorFacilityName}
                   </Typography>
                   <View className="ml-2 h-[25] w-[2px]  bg-[#86939e]" />
-                  <Typography className="font-400 text-primary ml-2 max-w-[50%] text-[16px]">
+                  <Typography className="font-normal text-primary ml-2 max-w-[50%] text-[16px]">
                     {specialist}
                   </Typography>
                 </View>

@@ -2,8 +2,11 @@ import { Tabs } from 'expo-router/tabs'
 
 import MyTabBar from 'app/ui/tab-bar'
 import { View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context'
+import { withUniwind } from 'uniwind'
 import { TabsHeader } from 'app/ui/tabs-header'
+
+const SafeAreaView = withUniwind(RNSafeAreaView)
 
 export default function Root() {
   return (

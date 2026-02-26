@@ -40,7 +40,7 @@ export function ActivityCard({
       className={`my-1 w-full flex-1 self-center rounded-[15px] border-[1px] border-gray-400 py-2 ${data.type ? ACTIVITY_COLORS[data.type] ?? 'bg-white' : 'bg-white'}`}
     >
       <View className=" flex-row">
-        <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm font-bold text-black">
+        <Typography className="font-normal ml-2 w-[75%] max-w-[75%] text-sm font-bold text-black">
           {data.membername ? data.membername : ''}
         </Typography>
         <View className="">
@@ -50,7 +50,7 @@ export function ActivityCard({
         </View>
       </View>
       <View className=" flex-row">
-        <Typography className="font-400 ml-2 w-[75%] max-w-[75%] text-sm text-black">
+        <Typography className="font-normal ml-2 w-[75%] max-w-[75%] text-sm text-black">
           {data.date
             ? formatTimeToUserLocalTime(data.date, userAddress, memberAddress)
             : ''}
@@ -62,12 +62,12 @@ export function ActivityCard({
         </View>
       </View>
       <View className=" flex-row">
-        <Typography className="font-400 text-primary ml-2 mr-[2px] w-[95%] text-sm font-bold">
+        <Typography className="font-normal text-primary ml-2 mr-[2px] w-[95%] text-sm font-bold">
           {data.address ? data.address : ''}
         </Typography>
       </View>
       <View className=" flex-row">
-        <Typography className="font-400 ml-2 w-full text-sm text-black">
+        <Typography className="font-normal ml-2 w-full text-sm text-black">
           {data.purpose ? data.purpose : ''}
         </Typography>
       </View>

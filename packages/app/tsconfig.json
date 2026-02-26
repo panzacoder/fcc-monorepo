@@ -10,8 +10,9 @@
   "extends": "../../tsconfig",
   "include": [
     "data/types.d.ts",
-    "nativewind-env.d.ts",
+    "../../apps/expo/uniwind-types.d.ts",
     "rnw-overrides.d.ts",
+    "react-native-override.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ]

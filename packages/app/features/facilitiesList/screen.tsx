@@ -171,7 +171,7 @@ export function FacilitiesListScreen() {
                 <View className="w-[95%] flex-row">
                   <View>
                     <View className="my-2 flex-row">
-                      <Typography className="text-primary font-400 ml-5 w-[40%]">
+                      <Typography className="text-primary font-normal ml-5 w-[40%]">
                         {data.name ? data.name : ''}
                       </Typography>
 

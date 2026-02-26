@@ -159,8 +159,8 @@ export function FacilityDetailsScreen() {
       }
     )
   }
-  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -170,7 +170,7 @@ export function FacilityDetailsScreen() {
             <Typography className={valueStyle}>{value}</Typography>
           ) : (
             <Typography
-              className={`font-400 ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
+              className={`font-normal ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
             >
               {value}
             </Typography>
@@ -198,10 +198,10 @@ export function FacilityDetailsScreen() {
           <View className="border-primary mt-[5] w-full flex-1 self-center rounded-[10px] border-[1px] p-2">
             <View className=" w-full flex-row items-center">
               <View className="w-[80%] flex-row">
-                <Typography className="font-400 max-w-[90%] text-[16px] text-black">
+                <Typography className="font-normal max-w-[90%] text-[16px] text-black">
                   {facilityInfo.type ? facilityInfo.type : ''}
                 </Typography>
-                <Typography className="font-400 text-primary ml-2 text-[16px]">
+                <Typography className="font-normal text-primary ml-2 text-[16px]">
                   {facilityInfo.status && facilityInfo.status.status
                     ? facilityInfo.status.status
                     : ''}
@@ -223,7 +223,7 @@ export function FacilityDetailsScreen() {
             </View>
             <View>
               <View className="mt-2 flex-row items-center">
-                <Typography className="font-400 w-[30%] text-[12px] text-[#1A1A1A]">
+                <Typography className="font-normal w-[30%] text-[12px] text-[#1A1A1A]">
                   {'Facility Details'}
                 </Typography>
                 <View className="bg-primary h-[1px] w-[70%] self-center" />
@@ -239,10 +239,10 @@ export function FacilityDetailsScreen() {
               {facilityDetails.website !== null &&
               facilityDetails.website !== '' ? (
                 <View className="mt-2 w-[95%] flex-row">
-                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                  <Typography className="font-normal w-[35%] text-[16px] text-[#1A1A1A] ">
                     {'Facility Portal'}
                   </Typography>
-                  <Typography className="font-400 text-primary w-[70%] text-[16px] underline">
+                  <Typography className="font-normal text-primary w-[70%] text-[16px] underline">
                     {facilityDetails.website}
                   </Typography>
                 </View>
@@ -252,10 +252,10 @@ export function FacilityDetailsScreen() {
               {facilityDetails.websiteuser !== null &&
               facilityDetails.websiteuser !== '' ? (
                 <View className="mt-2 w-[95%] flex-row">
-                  <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A] ">
+                  <Typography className="font-normal w-[35%] text-[16px] text-[#1A1A1A] ">
                     {'Portal Username'}
                   </Typography>
-                  <Typography className="font-400 text-primary w-[60%] text-[16px]">
+                  <Typography className="font-normal text-primary w-[60%] text-[16px]">
                     {facilityDetails.websiteuser}
                   </Typography>
                   <TouchableOpacity
@@ -276,7 +276,7 @@ export function FacilityDetailsScreen() {
                 <View />
               )}
               <View className="mt-2 w-[95%] flex-row">
-                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
+                <Typography className="font-normal w-[35%] text-[16px] text-[#1A1A1A]">
                   {'Status'}
                 </Typography>
                 {facilityDetails.status && facilityDetails.status.status ? (
@@ -290,10 +290,10 @@ export function FacilityDetailsScreen() {
                 )}
               </View>
               <View className="mt-2 w-[95%] flex-row">
-                <Typography className="font-400 w-[35%] text-[16px] text-[#1A1A1A]">
+                <Typography className="font-normal w-[35%] text-[16px] text-[#1A1A1A]">
                   {'Is this Pharmacy ?'}
                 </Typography>
-                <Typography className="font-400 w-[35%] text-[16px] font-bold text-[#1A1A1A]">
+                <Typography className="font-normal w-[35%] text-[16px] font-bold text-[#1A1A1A]">
                   {facilityDetails.ispharmacy ? 'Yes' : 'No'}
                 </Typography>
               </View>
@@ -308,7 +308,7 @@ export function FacilityDetailsScreen() {
                 }}
                 className="w-[60%] min-w-[60%] flex-row"
               >
-                <Typography className="font-400 text-[14px] font-bold text-black">
+                <Typography className="font-normal text-[14px] font-bold text-black">
                   {'Locations'}
                   {locationList.length > 0
                     ? ' (' + locationList.length + ') '
@@ -372,7 +372,7 @@ export function FacilityDetailsScreen() {
                 }}
                 className="w-[55%] min-w-[55%] flex-row"
               >
-                <Typography className="font-400 text-[14px] font-bold text-black">
+                <Typography className="font-normal text-[14px] font-bold text-black">
                   {'Appointments'}
                   {appointmentList.length > 0
                     ? ' (' + appointmentList.length + ') '
@@ -422,7 +422,7 @@ export function FacilityDetailsScreen() {
                         className="border-primary my-[5px] w-full flex-1 self-center rounded-[15px] border-[2px] bg-white py-2"
                       >
                         <View className=" flex-row">
-                          <Typography className="font-400 ml-5 w-[70%] max-w-[70%] text-sm text-black">
+                          <Typography className="font-normal ml-5 w-[70%] max-w-[70%] text-sm text-black">
                             {data.date
                               ? formatTimeToUserLocalTime(
                                   data.date,
@@ -438,11 +438,11 @@ export function FacilityDetailsScreen() {
                           </View>
                         </View>
                         <View className="flex-row">
-                          <Typography className="font-400 ml-5 w-[55%] text-sm text-black">
+                          <Typography className="font-normal ml-5 w-[55%] text-sm text-black">
                             {data.purpose ? data.purpose : ''}
                           </Typography>
                           {data.markCompleteCancel ? (
-                            <Typography className="font-400 ml-5 w-[40%] text-sm text-[#FF0000]">
+                            <Typography className="font-normal ml-5 w-[40%] text-sm text-[#FF0000]">
                               {'Mark Complete/Cancel'}
                             </Typography>
                           ) : (
@@ -450,10 +450,10 @@ export function FacilityDetailsScreen() {
                           )}
                         </View>
                         <View className="flex-row">
-                          <Typography className="text-primary font-400 ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
+                          <Typography className="text-primary font-normal ml-5 mr-5 w-[65%] max-w-[65%] text-[16px] text-sm">
                             {data.appointment ? data.appointment : ''}
                           </Typography>
-                          <Typography className="font-400 ml-[10px] text-sm text-black">
+                          <Typography className="font-normal ml-[10px] text-sm text-black">
                             {data.type.toLowerCase() === 'doctor appointment'
                               ? 'Doctor'
                               : 'Facility'}

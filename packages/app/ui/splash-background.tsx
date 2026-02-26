@@ -1,6 +1,9 @@
 'use client'
 import { ImageBackground, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context'
+import { withUniwind } from 'uniwind'
+
+const SafeAreaView = withUniwind(RNSafeAreaView)
 
 export function SplashBackground({ children }: { children: React.ReactNode }) {
   return (

@@ -548,7 +548,7 @@ export function AppointmentsListScreen() {
                 <View className="w-[97%] flex-row">
                   <View>
                     <View className=" flex-row">
-                      <Typography className="font-400 ml-3 w-[75%] max-w-[75%] text-black">
+                      <Typography className="font-normal ml-3 w-[75%] max-w-[75%] text-black">
                         {data.date
                           ? formatTimeToUserLocalTime(
                               data.date,
@@ -564,11 +564,11 @@ export function AppointmentsListScreen() {
                       </View>
                     </View>
                     <View className="flex-row">
-                      <Typography className="font-400 ml-3 w-[55%] text-black">
+                      <Typography className="font-normal ml-3 w-[55%] text-black">
                         {data.purpose ? data.purpose : ''}
                       </Typography>
                       {data.markCompleteCancel ? (
-                        <Typography className="font-400 ml-3 w-[40%] text-[#FF0000]">
+                        <Typography className="font-normal ml-3 w-[40%] text-[#FF0000]">
                           {'Mark Complete/Cancel'}
                         </Typography>
                       ) : (
@@ -576,10 +576,10 @@ export function AppointmentsListScreen() {
                       )}
                     </View>
                     <View className="flex-row">
-                      <Typography className="text-primary font-400 ml-3 mr-5 w-[65%] max-w-[65%] text-[16px]">
+                      <Typography className="text-primary font-normal ml-3 mr-5 w-[65%] max-w-[65%] text-[16px]">
                         {data.appointment ? data.appointment : ''}
                       </Typography>
-                      <Typography className="font-400 ml-[10px] text-black">
+                      <Typography className="font-normal ml-[10px] text-black">
                         {data.type.toLowerCase() === 'doctor appointment'
                           ? 'Doctor'
                           : 'Facility'}

@@ -18,7 +18,7 @@ import { useAppSelector } from 'app/store'
 import { useStore } from 'app/store'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
-import messaging from '@react-native-firebase/messaging'
+// Firebase removed - using expo-notifications
 import { CardView } from 'app/ui/cardViews'
 import { Feather } from 'app/ui/icons'
 import { useForm } from 'react-hook-form'
@@ -195,7 +195,7 @@ export function HomeScreen() {
   }
   const getFcmToken = async () => {
     try {
-      const fcmToken = await messaging().getToken()
+      const fcmToken = "" // TODO: Use Expo push token
       if (fcmToken) {
         logger.debug('Your Firebase Token is:', fcmToken)
         updateFcmToken(fcmToken)
@@ -219,21 +219,15 @@ export function HomeScreen() {
     )
   }
   const handleFcmMessage = useCallback(async () => {
-    try {
-      await messaging().setBackgroundMessageHandler(async (message) => {
-        schedulePushNotification(message as unknown as Record<string, unknown>)
-      })
-      await messaging().onMessage((message) => {
-        schedulePushNotification(message as unknown as Record<string, unknown>)
-      })
-    } catch (e: unknown) {}
+    // Firebase messaging removed - using expo-notifications
+    // Push notification handling is done via registerForPushNotificationsAsync below
   }, [])
   const getToken = useCallback(async () => {
     try {
-      const authStatus = await messaging().requestPermission()
+      const authStatus = 1 // Using expo-notifications permissions
       const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+        authStatus === 1 ||
+        authStatus === 2
       if (enabled) {
         getFcmToken()
         logger.debug('Authorization status:', authStatus)
@@ -499,7 +493,7 @@ export function HomeScreen() {
           {transportationList.map((data, index) => {
             return (
               <View className="p-2" key={index}>
-                <Typography className="font-400 ml-2">
+                <Typography className="font-normal ml-2">
                   {data.type ? data.type + ':' : ''}
                 </Typography>
                 <Typography className="ml-2 w-full">
@@ -626,7 +620,7 @@ export function HomeScreen() {
         )}
         <View className="flex-row">
           <View>
-            <Typography className="font-400 ml-[30] text-[16px]">
+            <Typography className="font-normal ml-[30] text-[16px]">
               {'Welcome Back,'}
             </Typography>
             <Typography className=" ml-[30] text-[22px] font-bold text-black">
@@ -644,7 +638,7 @@ export function HomeScreen() {
                   <Typography className="mt-[10] text-[20px] font-bold text-black">
                     {'Your Week'}
                   </Typography>
-                  <Typography className="font-400 text-[16px]">
+                  <Typography className="font-normal text-[16px]">
                     {upcomingSentence}
                   </Typography>
                 </View>

@@ -330,8 +330,8 @@ export const AddEditTransport = ({
       setSelectedCountryId(countryId)
     }
   }
-  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A] ml-2'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[30%] text-[15px] text-[#1A1A1A] ml-2'
+  let valueStyle = 'font-normal ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(
     title: string,
     value: string,

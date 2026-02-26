@@ -21,7 +21,6 @@
     "expo-linear-gradient": "~12.7.2",
     "expo-router": "~3.4.8",
     "moti": "^0.28.1",
-    "nativewind": "^4.0.36",
     "react-hook-form": "^7.51.0",
     "react-native-autocomplete-dropdown": "^3.1.4",
     "react-native-calendar-picker": "^8.0.2",
@@ -33,7 +32,7 @@
     "solito": "4.2.2",
     "tailwind-merge": "^2.2.2",
     "tailwind-variants": "^0.2.1",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^4.2.1",
     "toggle-switch-react-native": "^3.3.0",
     "zod": "^3.22.4",
     "zustand": "^5.0.11"
@@ -51,7 +50,6 @@
     "jsdom": "^28.1.0",
     "react": "18.2.0",
     "react-native": "0.73.6",
-    "tailwindcss-animate": "^1.0.7",
     "vitest": "^4.0.18"
   }
 }

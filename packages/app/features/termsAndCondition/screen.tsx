@@ -6,8 +6,8 @@ import { useRouter } from 'expo-router'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 export function TermsAndConditonScreen() {
   const router = useRouter()
-  let titleStyle = 'font-400 w-full text-[15px] text-[#1A1A1A] font-bold'
-  let valueStyle = 'font-400 ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-full text-[15px] text-[#1A1A1A] font-bold'
+  let valueStyle = 'font-normal ml-1 w-[90%] text-[15px]  text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mx-5 my-2 w-[97%] items-center">

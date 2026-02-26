@@ -131,8 +131,8 @@ export function PrescriptionDetailsScreen() {
       note = prescriptionDetails.notes
     }
   }
-  let titleStyle = 'font-400 w-[40%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[55%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[40%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-2 w-[55%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -142,7 +142,7 @@ export function PrescriptionDetailsScreen() {
             <Typography className={valueStyle}>{value}</Typography>
           ) : (
             <Typography
-              className={`font-400 ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
+              className={`font-normal ml-2 rounded-[5px] ${value === 'Active' ? 'bg-[#4DA529]' : 'bg-[#5778ad]'} px-2 py-1 text-[15px] font-bold text-white`}
             >
               {value}
             </Typography>

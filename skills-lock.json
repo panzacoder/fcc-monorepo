@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "migrate-nativewind-to-uniwind": {
+      "source": "uni-stack/uniwind",
+      "sourceType": "github",
+      "computedHash": "046e4da47f8443800f68a61b44e8aeb71ec4ddfb05353318d8810d248b15fb8c"
+    }
+  }
+}

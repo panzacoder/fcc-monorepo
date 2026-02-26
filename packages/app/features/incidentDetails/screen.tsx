@@ -178,8 +178,8 @@ export function IncidentDetailsScreen() {
       incidentAddress = incidentDetails.location
     }
   }
-  let titleStyle = 'font-400 w-[30%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[30%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-2 w-[65%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">
@@ -418,7 +418,7 @@ export function IncidentDetailsScreen() {
             </View>
             <View className="w-full">
               <View className="mt-2 flex-row">
-                <Typography className=" font-400 w-[95%] text-[15px] text-black">
+                <Typography className=" font-normal w-[95%] text-[15px] text-black">
                   {incident}
                 </Typography>
               </View>
@@ -444,7 +444,7 @@ export function IncidentDetailsScreen() {
                 }}
                 className="w-[60%] flex-row"
               >
-                <Typography className="font-400 text-[14px] font-bold text-black">
+                <Typography className="font-normal text-[14px] font-bold text-black">
                   {'Notes'}
                   {notesList.length > 0 ? ' (' + notesList.length + ') ' : ''}
                 </Typography>

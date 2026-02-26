@@ -327,7 +327,7 @@ export function CirclesListScreen() {
           {transportationList.map((data, index) => {
             return (
               <View className="p-2" key={index}>
-                <Typography className="font-400 ml-2">
+                <Typography className="font-normal ml-2">
                   {data.type ? data.type + ':' : ''}
                 </Typography>
                 <Typography className="ml-2 w-full">

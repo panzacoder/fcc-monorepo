@@ -243,8 +243,8 @@ export function AddEditCaregiverScreen() {
     logger.debug('object', JSON.stringify(object))
     createUpdateCaregiver(object)
   }
-  let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'
-  let valueStyle = 'font-400 ml-1 w-[75%] text-[15px] font-bold text-[#1A1A1A]'
+  let titleStyle = 'font-normal w-[20%] text-[15px] text-[#1A1A1A]'
+  let valueStyle = 'font-normal ml-1 w-[75%] text-[15px] font-bold text-[#1A1A1A]'
   function getDetailsView(title: string, value: string) {
     return (
       <View className="mt-2 w-full flex-row items-center">

@@ -421,7 +421,7 @@ export function CreateCircleScreen() {
 
               <View className="ml-1 flex h-[95%] items-start self-center">
                 <View className="items-center gap-2 pb-2 ">
-                  <Typography className="font-400 mt-2 w-[95%]">
+                  <Typography className="font-normal mt-2 w-[95%]">
                     {
                       'Creating a circle with an email address allows the member to be an active participant in the circle. If no email is available, you will represent the member as the authorized caregiver. At any point, you will have the ability to add an email address by updating the member’s profile.'
                     }
@@ -537,13 +537,13 @@ export function CreateCircleScreen() {
                           <Typography className="w-[25%] font-bold">
                             {'Name'}
                           </Typography>
-                          <Typography className="font-400 max-w-[70%]">{`${circleDetails.firstName ? circleDetails.firstName : ''} ${circleDetails.lastName ? circleDetails.lastName : ''}`}</Typography>
+                          <Typography className="font-normal max-w-[70%]">{`${circleDetails.firstName ? circleDetails.firstName : ''} ${circleDetails.lastName ? circleDetails.lastName : ''}`}</Typography>
                         </View>
                         <View className="mt-2 flex-row">
                           <Typography className="w-[25%] font-bold">
                             {'Email'}
                           </Typography>
-                          <Typography className="font-400 max-w-[70%]">{`${circleDetails.email ? circleDetails.email : ''}`}</Typography>
+                          <Typography className="font-normal max-w-[70%]">{`${circleDetails.email ? circleDetails.email : ''}`}</Typography>
                         </View>
                       </View>
                     )}

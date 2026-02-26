@@ -44,7 +44,7 @@ export const Reminder = ({
     <View className="my-2 w-full self-center rounded-[5px] border-[1px] border-[#e09093] bg-[#fbe2e3] py-2">
       <View className="w-full flex-row">
         <View className="w-[70%] self-center">
-          <Typography className="font-400 ml-5 self-center text-[#1A1A1A]">
+          <Typography className="font-normal ml-5 self-center text-[#1A1A1A]">
             {reminderData.content ? reminderData.content : ''}
           </Typography>
         </View>
@@ -88,7 +88,7 @@ export const Reminder = ({
         </View>
       </View>
       <View>
-        <Typography className="font-400 my-2 self-center font-bold text-[#1A1A1A]">
+        <Typography className="font-normal my-2 self-center font-bold text-[#1A1A1A]">
           {reminderDate}
         </Typography>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -103,7 +103,7 @@ export const Reminder = ({
       </View>
       <View className="mt-2 h-[1px] w-full bg-[#86939e]" />
       <View>
-        <Typography className=" font-400 ml-2 text-[10px] text-[#1A1A1A]">
+        <Typography className=" font-normal ml-2 text-[10px] text-[#1A1A1A]">
           {reminderData.createdByName
             ? 'Created by ' + reminderData.createdByName + ' on ' + creationDate
             : ''}

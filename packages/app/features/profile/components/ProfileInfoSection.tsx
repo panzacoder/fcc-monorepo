@@ -11,8 +11,8 @@ import {
 } from 'app/ui/utils'
 import type { ProfileAppUser, ProfileMember } from 'app/data/profile'
 
-const titleStyle = 'ml-2 font-400 w-[25%] text-[15px] text-[#1A1A1A]'
-const valueStyle = 'font-400 ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
+const titleStyle = 'ml-2 font-normal w-[25%] text-[15px] text-[#1A1A1A]'
+const valueStyle = 'font-normal ml-2 w-[70%] text-[15px] font-bold text-[#1A1A1A]'
 
 function DetailRow({ title, value }: { title: string; value: string }) {
   return (
@@ -75,7 +75,7 @@ export function ProfileInfoSection({
               onPress={() => {
                 Linking.openURL(`tel:${appuserDetails.phone}`)
               }}
-              className="font-400 text-primary ml-2 w-[70%] text-[15px] font-bold"
+              className="font-normal text-primary ml-2 w-[70%] text-[15px] font-bold"
             >
               {convertPhoneNumberToUsaPhoneNumberFormat(
                 appuserDetails.phone ?? ''
