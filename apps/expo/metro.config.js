@@ -1,37 +1,30 @@
 // Learn more https://docs.expo.dev/guides/monorepos
-// Learn more https://docs.expo.io/guides/customizing-metro
 /**
  * @type {import('expo/metro-config')}
  */
 const { getDefaultConfig } = require('expo/metro-config')
-const { withNativeWind } = require('nativewind/metro')
-
+const { withUniwindConfig } = require('uniwind/metro')
 const path = require('path')
 
 // Find the project and workspace directories
 const projectRoot = __dirname
-// This can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(projectRoot, '../..')
 
 const config = getDefaultConfig(projectRoot)
-const globalCSS = path.resolve(
-  workspaceRoot,
-  'packages/app/config/tailwind/global.css'
-)
-const tailwindConfigPath = path.resolve(projectRoot, 'tailwind.config.js')
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot]
+
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules')
 ]
+
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true
 
-module.exports = withNativeWind(config, {
-  input: globalCSS,
-  configPath: tailwindConfigPath,
-  projectRoot
+// Uniwind configuration - cssEntryFile must be relative path from project root
+module.exports = withUniwindConfig(config, {
+  cssEntryFile: '../../packages/app/config/tailwind/global.css'
 })
