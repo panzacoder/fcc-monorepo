@@ -118,21 +118,6 @@ export function CreateCircleScreen() {
   const joinCircleMutation = useJoinCircle(header)
   const createCircleMutation = useCreateCircle(header)
 
-  useEffect(() => {
-    if (findEmail && findCircleData !== undefined) {
-      logger.debug('data', JSON.stringify(findCircleData))
-      setIsCircleExists(findCircleData !== null)
-      setCircleDetails(findCircleData !== null ? findCircleData : {})
-      if (findCircleData !== null) {
-        const found = findCircleData as Member
-        reset({
-          firstName: found.firstName ? found.firstName : '',
-          lastName: found.lastName ? found.lastName : ''
-        })
-      }
-    }
-  }, [findCircleData, findEmail, reset])
-
   const isLoading =
     isFindLoading ||
     joinCircleMutation.isPending ||
@@ -152,6 +137,22 @@ export function CreateCircleScreen() {
     },
     resolver: zodResolver(emailSchema)
   })
+
+  useEffect(() => {
+    if (findEmail && findCircleData !== undefined) {
+      logger.debug('data', JSON.stringify(findCircleData))
+      setIsCircleExists(findCircleData !== null)
+      setCircleDetails(findCircleData !== null ? findCircleData : {})
+      if (findCircleData !== null) {
+        const found = findCircleData as Member
+        reset({
+          firstName: found.firstName ? found.firstName : '',
+          lastName: found.lastName ? found.lastName : ''
+        })
+      }
+    }
+  }, [findCircleData, findEmail, reset])
+
   async function setAddressObject(value: unknown, index: number) {
     if (value) {
       const str = value as string

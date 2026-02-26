@@ -183,8 +183,8 @@ export function HomeScreen() {
   }, [weekDetailsData])
 
   useEffect(() => {
-    if (transportData && transportMemberId !== '') {
-      setTransportationList(transportData ? transportData : [])
+    if (Array.isArray(transportData) && transportMemberId !== '') {
+      setTransportationList(transportData)
       setIsShowTransportationRequests(true)
     }
   }, [transportData, transportMemberId])

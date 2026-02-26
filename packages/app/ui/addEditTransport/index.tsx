@@ -108,8 +108,8 @@ export const AddEditTransport = ({
   })
 
   useEffect(() => {
-    if (!memberListQuery.data || !isEmpty(transportData)) return
-    let list: Array<{ id: number; title: string }> = memberListQuery.data.map(
+    if (!Array.isArray(memberListQuery.data) || !isEmpty(transportData)) return
+    const list: Array<{ id: number; title: string }> = memberListQuery.data.map(
       (item: MemberListItem, index: number) => {
         return {
           title: item.name,
