@@ -119,6 +119,7 @@ export const AddEditTransport = ({
     )
     setMemberList(list)
     setMemberListFull((memberListQuery.data as MemberListItem[]) || [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberListQuery.data])
 
   useEffect(() => {
@@ -150,6 +151,7 @@ export const AddEditTransport = ({
 
     setStatesList(statesList)
     setStatesListFull(statesQuery.data.stateList || [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statesQuery.data])
 
   const { control, handleSubmit, reset } = useForm({

@@ -64,6 +64,7 @@ export function CaregiversListScreen() {
       setCaregiversListFull(list)
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caregiversData])
 
   function setFilteredList(filter: string) {

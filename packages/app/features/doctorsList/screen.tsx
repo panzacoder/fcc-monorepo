@@ -44,6 +44,7 @@ export function DoctorsListScreen() {
       getFilteredList(list, currentFilter)
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorsData])
   function setFilteredList(filter: string) {
     setIsShowFilter(false)

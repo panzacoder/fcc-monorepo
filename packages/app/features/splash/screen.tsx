@@ -43,6 +43,7 @@ export function SplashScreen() {
     } catch (e: unknown) {
       setIsShowButtons(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const getNotificationData = useCallback(async () => {
     try {
@@ -63,10 +64,12 @@ export function SplashScreen() {
     } catch (e: unknown) {
       getUsernamePassword()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     getNotificationData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   async function navigateToNotification() {
     if (

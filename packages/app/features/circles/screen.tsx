@@ -151,6 +151,7 @@ export function CirclesListScreen() {
       setMemberNames(memberNamesList)
       setDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberDetailsData])
 
   useEffect(() => {
@@ -162,6 +163,7 @@ export function CirclesListScreen() {
 
   useEffect(() => {
     setMemberAddress({})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function acceptNewRequest(data: { id: number | string }) {

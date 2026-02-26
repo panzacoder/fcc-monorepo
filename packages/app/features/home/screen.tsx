@@ -177,6 +177,7 @@ export function HomeScreen() {
       setUpcomingSentence(sentence)
       setDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekDetailsData])
 
   useEffect(() => {
@@ -236,6 +237,7 @@ export function HomeScreen() {
         logger.debug('Authorization status:', authStatus)
       }
     } catch (e: unknown) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   async function registerForPushNotificationsAsync() {
     let token: string | undefined
@@ -319,7 +321,13 @@ export function HomeScreen() {
     async function redirect(notification: Notifications.Notification) {
       const content = notification.request
         .content as Notifications.NotificationContent & {
-        data: Record<string, any>
+        data: {
+          MessageType?: string
+          notificationData?: {
+            data?: Record<string, string | undefined>
+          }
+          [key: string]: unknown
+        }
       }
       if (
         !isEmpty(content.data.notificationData) &&
@@ -430,6 +438,7 @@ export function HomeScreen() {
       )
       subscription.remove()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function trasportationClicked(memberData: WeekDetailsMember) {

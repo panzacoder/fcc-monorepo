@@ -94,6 +94,7 @@ export function FacilityDetailsScreen() {
       )
       logger.debug('appointmentList', JSON.stringify(appointmentList))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facilityDetailsData])
 
   function handleBackButtonClick() {
@@ -113,6 +114,7 @@ export function FacilityDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function deleteFacility() {

@@ -168,6 +168,7 @@ export function AddEditAppointmentScreen() {
         })
       }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorsQuery.data, facilitiesQuery.data, fetchDoctors, fetchFacilities])
   let typeIndex: number = -1
   if (!isEmpty(appointmentDetails) && !isLoading) {
@@ -381,6 +382,7 @@ export function AddEditAppointmentScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const showAddDcotoFacilityModal = () => {
     return (

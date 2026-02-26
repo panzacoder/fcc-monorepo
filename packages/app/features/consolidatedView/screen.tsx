@@ -32,6 +32,7 @@ export function ConsolidatedViewScreen() {
     if (!isFilterActive && viewData.detailsData) {
       week.processActivityList(viewData.detailsData.memberActivityList)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewData.detailsData, isFilterActive])
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export function ConsolidatedViewScreen() {
       if (!week.isWeekView) week.setCurrentDateForDayView(week.selectedDate)
       setIsShowFilter(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewData.filteredDetailsData, isFilterActive])
 
   const handleCardPress = useCallback(
@@ -71,6 +73,7 @@ export function ConsolidatedViewScreen() {
         )
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [viewData.memberData]
   )
 

@@ -150,6 +150,7 @@ export function IncidentDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let incidentDate = '',
     incident = '',

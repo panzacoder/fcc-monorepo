@@ -122,6 +122,7 @@ export function AddEditEventScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   async function setAddressObject(value: unknown, index: number) {
     if (value) {

@@ -106,6 +106,7 @@ export function AddEditMedicalDeviceScreen() {
       )
       setDoctorListFull(list)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorsQuery.data])
 
   const isLoading =

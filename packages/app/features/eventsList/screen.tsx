@@ -97,6 +97,7 @@ export function EventsListScreen() {
       setIsDataReceived(true)
       setIsFilter(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventsData])
 
   function handleBackButtonClick() {
@@ -125,6 +126,7 @@ export function EventsListScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   function setFilteredList(filter: string) {
     setIsShowFilter(false)

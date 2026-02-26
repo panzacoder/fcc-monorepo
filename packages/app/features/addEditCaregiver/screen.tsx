@@ -163,6 +163,7 @@ export function AddEditCaregiverScreen() {
     } else {
       setIsMemberFound(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData, isSearching, searchEmail])
 
   const isMutating =

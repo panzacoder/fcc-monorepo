@@ -62,6 +62,7 @@ export function SetPasswordForm({
 
   useEffect(() => {
     onLoadingChange(resetPasswordMutation.isPending)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetPasswordMutation.isPending])
 
   const onSubmit = (formData: Schema) => {

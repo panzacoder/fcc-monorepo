@@ -48,6 +48,7 @@ export function FacilitiesListScreen() {
       getFilteredList(list, currentFilter)
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facilitiesData])
   function setFilteredList(filter: string) {
     setIsShowFilter(false)

@@ -147,6 +147,7 @@ export function AppointmentDetailsScreen() {
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hookData.allMemberDetailsData])
 
   useEffect(() => {
@@ -181,6 +182,7 @@ export function AppointmentDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   let doctorFacilityName = '',

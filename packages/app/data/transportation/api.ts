@@ -52,7 +52,7 @@ export async function getTransportationRequests(
   header: AuthHeader,
   params: TransportationRequestsParams
 ) {
-  return fetchData<any>({
+  return fetchData<unknown>({
     header,
     route: GET_TRANSPORTATION_REQUESTS,
     data: {
@@ -65,7 +65,7 @@ export async function getTransportationMemberList(
   header: AuthHeader,
   params: TransportationMemberListParams
 ) {
-  return fetchData<any>({
+  return fetchData<unknown>({
     header,
     route: GET_TRANSPORTATION_MEMBER_LIST,
     data: {

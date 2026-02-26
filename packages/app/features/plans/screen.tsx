@@ -153,6 +153,7 @@ export function PlansScreen() {
       setPlanNames(planNamesList)
       setSelectedPlanId(selectedId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allPlansData])
   async function upgradePlan() {
     setIsShowCardModal(true)

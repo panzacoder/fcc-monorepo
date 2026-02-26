@@ -99,6 +99,7 @@ export function NotificationNoteMessageScreen() {
         setMessageListStore(msgList as unknown as Record<string, unknown>[])
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadData])
 
   const handleFcmMessage = useCallback(async () => {
@@ -111,6 +112,7 @@ export function NotificationNoteMessageScreen() {
         updateMessageList(message)
       })
     } catch (e: unknown) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
@@ -133,6 +135,7 @@ export function NotificationNoteMessageScreen() {
   }
   useEffect(() => {
     handleFcmMessage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function updateMessageThread() {

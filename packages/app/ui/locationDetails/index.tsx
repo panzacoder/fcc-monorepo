@@ -98,6 +98,7 @@ export const LocationDetails = ({
       }
     })
     return countryId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [selectedCountryId, setSelectedCountryId] =
@@ -141,6 +142,7 @@ export const LocationDetails = ({
     reset({
       country: countryIndexRef.current
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -217,6 +219,7 @@ export const LocationDetails = ({
       timeZone: timeZoneIndexRef.current
     })
     setIsDataReceived(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statesQuery.data])
 
   const isLoading = statesQuery.isLoading

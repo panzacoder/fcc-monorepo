@@ -60,6 +60,7 @@ export const ExpandableCalendarView = ({
   const [markedObject, setMarkedObject] = useState({})
   useEffect(() => {
     getMarkedDates()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const onDateChanged = (_date: string, _updateSource: string) => {}
 

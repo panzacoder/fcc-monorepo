@@ -200,6 +200,7 @@ export function NoteMessageScreen() {
       }
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadData])
 
   useEffect(() => {
@@ -230,6 +231,7 @@ export function NoteMessageScreen() {
       processMessageThread(messageThread as MessageThread)
     }
     setIsDataReceived(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     appointmentNoteData,
     eventNoteData,
@@ -251,6 +253,7 @@ export function NoteMessageScreen() {
         }
       )
     } catch (e: unknown) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
@@ -273,6 +276,7 @@ export function NoteMessageScreen() {
   }
   useEffect(() => {
     handleFcmMessage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -293,6 +297,7 @@ export function NoteMessageScreen() {
       logger.debug('setThreadParticipantsList', list)
       setFetchParticipants(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchParticipants, threadParticipantsData])
 
   async function getThreadParticipants() {

@@ -402,6 +402,7 @@ export function PaymentsScreen() {
 
       setUserDataLoaded(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let planItems = [...planDetails.planItems].sort(
     (a, b) => a.displaySequence - b.displaySequence

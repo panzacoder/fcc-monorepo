@@ -165,6 +165,7 @@ export function MedicalDevicesDetailsScreen() {
         )
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medicalDeviceDetailsData])
 
   function handleBackButtonClick() {
@@ -184,6 +185,7 @@ export function MedicalDevicesDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let medicalDeviceDate = '',
     medicalDevice = '',

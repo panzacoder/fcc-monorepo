@@ -80,6 +80,7 @@ export function CircleDetailsScreen() {
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberDetailsData])
 
   useEffect(() => {
@@ -104,6 +105,7 @@ export function CircleDetailsScreen() {
         setMenuList(list)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberMenusData])
 
   const isLoading = isDetailsLoading || isMenusLoading
@@ -122,6 +124,7 @@ export function CircleDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
     <View className=" flex-1">

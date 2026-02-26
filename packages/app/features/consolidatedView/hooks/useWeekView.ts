@@ -178,6 +178,7 @@ export function useWeekView() {
     setIsDataReceived(false)
     setQueryFromDate(newDate)
     setQueryToDate(newDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayCount])
 
   const getNextDate = useCallback(() => {
@@ -192,6 +193,7 @@ export function useWeekView() {
     setIsDataReceived(false)
     setQueryFromDate(newDate)
     setQueryToDate(newDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayCount])
 
   const handleDateChange = useCallback((date: Date) => {

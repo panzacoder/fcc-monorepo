@@ -108,6 +108,7 @@ export function MessagesScreen() {
       )
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadsData])
 
   useEffect(() => {

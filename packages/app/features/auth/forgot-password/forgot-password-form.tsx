@@ -35,6 +35,7 @@ export function ForgotPasswordForm({
 
   useEffect(() => {
     onLoadingChange(forgotPasswordMutation.isPending)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forgotPasswordMutation.isPending])
 
   const onSubmit = (formData: { email: string }) => {

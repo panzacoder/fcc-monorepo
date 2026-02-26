@@ -115,6 +115,7 @@ export function DoctorDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   function getWebsite(url: string) {
     let newUrl = String(url).replace(/(^\w+:|^)\/\//, '')

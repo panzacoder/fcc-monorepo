@@ -145,6 +145,7 @@ export function AppointmentsListScreen() {
       setIsDataReceived(true)
       setIsFilter(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentsData])
 
   useEffect(() => {
@@ -186,6 +187,7 @@ export function AppointmentsListScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function getFilteredList(list: AppointmentListItem[], filter: string) {

@@ -127,6 +127,7 @@ export function EventDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   let eventDate = '',

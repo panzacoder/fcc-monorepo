@@ -131,7 +131,7 @@ export function CreateCircleScreen() {
         })
       }
     }
-  }, [findCircleData, findEmail])
+  }, [findCircleData, findEmail, reset])
 
   const isLoading =
     isFindLoading ||
