@@ -87,6 +87,16 @@ yarn web:sb:build   # Storybook build
 - **Sensitive exploration**: `.claude/future-exploration.md` (gitignored) + `git stash list` for backup
 - Backend team has repo visibility — keep GH issues focused on frontend modernization only
 
+## XCODE 26 BETA WORKAROUNDS
+
+Building with Xcode 26 beta requires manual patches to node_modules (Expo SDK 50 not updated for iOS 26):
+
+1. **expo-localization** (`ios/LocalizationModule.swift:115`): Add `@unknown default: return "unknown"` to calendar switch
+2. **expo-device** (`ios/UIDevice.swift:188`): Replace `TARGET_OS_SIMULATOR != 0` with `#if targetEnvironment(simulator)` check
+3. **expo-dev-menu** (`ios/DevMenuViewController.swift:63`): Replace `TARGET_IPHONE_SIMULATOR > 0` with `#if targetEnvironment(simulator)` check
+
+These patches are lost on `yarn install`. Re-apply before iOS builds or downgrade to Xcode 16 stable.
+
 ## ASSUMPTIONS
 
 - Dev servers assumed running unless stated otherwise
