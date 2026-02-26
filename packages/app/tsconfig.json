@@ -12,6 +12,7 @@
     "data/types.d.ts",
     "nativewind-env.d.ts",
     "rnw-overrides.d.ts",
+    "react-native-override.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ]

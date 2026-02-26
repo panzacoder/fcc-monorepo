@@ -2,7 +2,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/datetimepicker": "8.6.0",
-    "@react-navigation/drawer": "^6.6.15",
+    "@react-navigation/drawer": "^7",
     "@stripe/stripe-react-native": "~0.35.1",
     "app": "workspace:*",
     "expo": "^55.0.0",
@@ -24,7 +24,7 @@
     "expo-secure-store": "~55.0.6",
     "expo-splash-screen": "~55.0.6",
     "expo-status-bar": "~55.0.3",
-    "nativewind": "^4.0.36",
+    "nativewind": "^4.2.2",
     "react": "19.2.0",
     "react-native": "0.83.2",
     "react-native-calendar-picker": "^8.0.2",

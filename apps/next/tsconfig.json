@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,7 +19,9 @@
     "incremental": true,
     "jsxImportSource": "nativewind",
     "paths": {
-      "app/*": ["../../packages/app/*"]
+      "app/*": [
+        "../../packages/app/*"
+      ]
     },
     "plugins": [
       {
@@ -32,7 +38,10 @@
     "**/*.tsx",
     "../../packages/**/*.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "../../packages/app/*.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
