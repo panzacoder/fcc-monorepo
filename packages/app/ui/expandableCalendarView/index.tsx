@@ -9,7 +9,7 @@ import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 
 import testIDs from '../../utils/testIDs'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 export interface CalendarEventItem {
   date: string

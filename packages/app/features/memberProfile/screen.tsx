@@ -31,7 +31,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   getAddressFromObject
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { MemberProfileResponse } from 'app/data/profile'
 const schema = z.object({
   password: z.string().min(1, { message: 'Password is required' })

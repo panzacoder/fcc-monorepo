@@ -17,7 +17,7 @@ import { CircleEmailSection } from './email-section'
 import { CircleAddressSection } from './address-section'
 import { CreateCircleSchema, useCreateCircleForm } from './form-helpers'
 import { Card } from 'app/ui/card'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { logger } from 'app/utils/logger'
 import { ModalScreen } from 'app/ui/modal-screen'
 

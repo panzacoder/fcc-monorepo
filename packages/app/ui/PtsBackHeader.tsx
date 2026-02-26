@@ -3,7 +3,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type PtsBackHeaderProps = {
   title: string

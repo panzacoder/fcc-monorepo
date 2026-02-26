@@ -26,7 +26,7 @@ import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { Typography } from 'app/ui/typography'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { StaticData } from 'app/data/static'
 import type {
   AppointmentData,

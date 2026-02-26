@@ -19,7 +19,7 @@ import { useRouter } from 'expo-router'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { PtsDateTimePicker } from 'app/ui/PtsDateTimePicker'
 import { CheckBox } from 'react-native-elements'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 import { useMemberDoctors } from 'app/data/doctors'
 import type { DoctorListItem } from 'app/data/doctors/types'

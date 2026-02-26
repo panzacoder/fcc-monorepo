@@ -25,7 +25,7 @@ import {
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 const phoneSchema = z.object({
   phone: z.string()
 })

@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 const schema = z.object({
   email: z.string().min(1, { message: 'Email is required' })
 })

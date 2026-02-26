@@ -8,7 +8,7 @@ import {
   getAddressFromObject,
   isEmpty
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { Button } from 'app/ui/button'
 import PtsLoader from 'app/ui/PtsLoader'
 import { AddEditReminder } from 'app/ui/addEditReminder'

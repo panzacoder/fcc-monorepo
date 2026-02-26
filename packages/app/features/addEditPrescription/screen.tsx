@@ -29,7 +29,7 @@ import {
   CalendarViewInput
 } from '../addEditPrescription/calendar-view'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 const schema = z.object({
   typeIndex: z.number().min(0, { message: 'Type is required' }),
   drugName: z.string().min(1, { message: 'Name is required' }),

@@ -9,7 +9,7 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useStore } from 'app/store'
 import {
   useTransportationRequests,

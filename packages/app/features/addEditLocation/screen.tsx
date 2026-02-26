@@ -38,7 +38,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type MemberRouteParams = {
   member: number | string

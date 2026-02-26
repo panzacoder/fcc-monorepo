@@ -30,7 +30,7 @@ import {
 } from 'app/ui/utils'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 const schema = z.object({
   firstName: z.string(),
   website: z.string(),

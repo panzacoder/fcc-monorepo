@@ -22,7 +22,7 @@ import type {
   ParticipantDetail
 } from 'app/data/messages/types'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'

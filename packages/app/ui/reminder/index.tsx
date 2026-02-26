@@ -3,7 +3,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { convertTimeToUserLocalTime, convertUserTimeToUTC } from 'app/ui/utils'
 import { Timer } from 'app/utils/timer'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 interface ReminderDisplayData {
   content?: string

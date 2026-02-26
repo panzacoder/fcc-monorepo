@@ -15,7 +15,7 @@ import {
   formatTimeToUserLocalTime,
   convertPhoneNumberToUsaPhoneNumberFormat
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { Feather } from 'app/ui/icons'
 import type { ComponentProps } from 'react'
 import {

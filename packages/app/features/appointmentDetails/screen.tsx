@@ -14,7 +14,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   isEmpty
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { formatUrl } from 'app/utils/format-url'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'

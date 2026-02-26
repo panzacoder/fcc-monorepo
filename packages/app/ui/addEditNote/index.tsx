@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { Button } from 'app/ui/button'
 import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'

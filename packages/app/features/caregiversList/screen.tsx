@@ -19,7 +19,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 export function CaregiversListScreen() {
   const [isShowFilter, setIsShowFilter] = useState(false)
   const [isDataReceived, setIsDataReceived] = useState(false)

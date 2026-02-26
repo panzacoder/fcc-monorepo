@@ -26,7 +26,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocalSearchParams } from 'expo-router'
 import { useRouter } from 'expo-router'
 import ToggleSwitch from 'toggle-switch-react-native'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 const schema = z.object({
   website: z.string(),
   username: z.string(),

@@ -34,7 +34,7 @@ import RNIap, {
 type InAppPurchase = SubscriptionPurchase
 import { logger } from 'app/utils/logger'
 import { useStore } from 'app/store'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { LoginAppUser } from 'app/data/auth/types'
 import type {
   CheckOutSessionResponse,

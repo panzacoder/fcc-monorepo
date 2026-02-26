@@ -15,7 +15,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useRouter } from 'expo-router'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 export function FacilitiesListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [facilityList, setFacilityList] = useState<FacilityListItem[]>([])

@@ -16,7 +16,7 @@ import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import { Typography } from 'app/ui/typography'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {

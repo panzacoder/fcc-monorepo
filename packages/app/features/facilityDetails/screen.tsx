@@ -9,7 +9,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import * as Clipboard from 'expo-clipboard'
 import {
   useFacilityDetails,

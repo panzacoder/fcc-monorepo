@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { Typography } from 'app/ui/typography'
 import { getNameInitials, getColorSet } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { cn } from './utils'
 export type Props = {
   fullName?: string

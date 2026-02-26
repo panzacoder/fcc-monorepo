@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledCheckbox } from 'app/ui/form-fields/controlled-checkbox'
 import { findCircle } from 'app/data/circle'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 const emailCheckSchema = z.object({
   email: z.string().email()

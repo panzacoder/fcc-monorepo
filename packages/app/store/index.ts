@@ -219,4 +219,10 @@ export const useStore = create<AppState & AppActions>()(
   )
 )
 
+export type RootState = AppState
+
+export function useAppSelector<T>(selector: (state: AppState) => T): T {
+  return useStore(selector)
+}
+
 export type { StaticData }

@@ -23,7 +23,7 @@ import {
   getMonthsList,
   convertUserTimeToUTC
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'

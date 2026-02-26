@@ -1,6 +1,6 @@
 import { ComponentProps, FC, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import PtsNameInitials from '../PtsNameInitials'
 import { Feather } from '../icons'
 import { useLogout } from 'app/data/auth'
