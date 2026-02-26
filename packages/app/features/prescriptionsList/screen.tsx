@@ -21,7 +21,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { Button } from 'app/ui/button'
@@ -136,6 +136,7 @@ export function PrescriptionsListScreen() {
       setIsDataReceived(true)
       setIsFilter(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prescriptionData])
 
   useEffect(() => {

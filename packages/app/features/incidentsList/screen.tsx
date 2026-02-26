@@ -18,7 +18,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { formatTimeToUserLocalTime, getMonthsList } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -112,6 +112,7 @@ export function IncidentsListScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function filterEvents(formData: Schema) {

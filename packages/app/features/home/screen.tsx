@@ -14,7 +14,8 @@ import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { useRouter } from 'expo-router'
 import { convertTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
+import { useStore } from 'app/store'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { formatUrl } from 'app/utils/format-url'
 import messaging from '@react-native-firebase/messaging'
@@ -25,7 +26,6 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { logger } from 'app/utils/logger'
 import { TabsHeader } from 'app/ui/tabs-header'
-import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import Constants from 'expo-constants'
@@ -70,7 +70,7 @@ export function HomeScreen() {
   const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
     []
   )
-  const dispatch = useAppDispatch()
+  const { setMemberNames } = useStore()
   const memberNamesList = useAppSelector((state) =>
     state.memberNames.memberNamesList !== undefined
       ? state.memberNames.memberNamesList
@@ -86,11 +86,13 @@ export function HomeScreen() {
     (state) => state.currentMemberAddress.currentMemberAddress
   )
 
-  let fullName = user.memberName ? user.memberName : ''
-  if (memberNamesList.includes(fullName) === false) {
-    memberNamesList.push(fullName)
-  }
-  dispatch(memberNamesAction.setMemberNames(memberNamesList))
+  const fullName = user.memberName ? user.memberName : ''
+
+  useEffect(() => {
+    if (fullName && !memberNamesList.includes(fullName)) {
+      setMemberNames([...memberNamesList, fullName])
+    }
+  }, [fullName, memberNamesList, setMemberNames])
   const [isWeekDataAvailable, setIsWeekDataAvailable] = useState(false)
   const [transportRequestData, setTransportRequestData] =
     useState<TransportRequestItem | null>(null)
@@ -162,7 +164,7 @@ export function HomeScreen() {
           memberNamesList.push(fullName)
         }
       })
-      dispatch(memberNamesAction.setMemberNames(memberNamesList))
+      setMemberNames(memberNamesList)
       let sentence = ''
       sentence +=
         weekDetailsData.upcomingAppointmentCount &&
@@ -177,11 +179,12 @@ export function HomeScreen() {
       setUpcomingSentence(sentence)
       setDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekDetailsData])
 
   useEffect(() => {
-    if (transportData && transportMemberId !== '') {
-      setTransportationList(transportData ? transportData : [])
+    if (Array.isArray(transportData) && transportMemberId !== '') {
+      setTransportationList(transportData)
       setIsShowTransportationRequests(true)
     }
   }, [transportData, transportMemberId])
@@ -236,6 +239,7 @@ export function HomeScreen() {
         logger.debug('Authorization status:', authStatus)
       }
     } catch (e: unknown) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   async function registerForPushNotificationsAsync() {
     let token: string | undefined
@@ -319,7 +323,13 @@ export function HomeScreen() {
     async function redirect(notification: Notifications.Notification) {
       const content = notification.request
         .content as Notifications.NotificationContent & {
-        data: Record<string, any>
+        data: {
+          MessageType?: string
+          notificationData?: {
+            data?: Record<string, string | undefined>
+          }
+          [key: string]: unknown
+        }
       }
       if (
         !isEmpty(content.data.notificationData) &&
@@ -430,6 +440,7 @@ export function HomeScreen() {
       )
       subscription.remove()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function trasportationClicked(memberData: WeekDetailsMember) {

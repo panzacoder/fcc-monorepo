@@ -9,7 +9,8 @@ import { Feather } from 'app/ui/icons'
 import { Typography } from 'app/ui/typography'
 import { Button } from 'app/ui/button'
 import { convertTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
+import { useStore } from 'app/store'
 import {
   useTransportationRequests,
   useApproveTransport,
@@ -21,13 +22,11 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { SharedContactList } from 'app/ui/sharedContactList'
 import { NewCirclesList } from 'app/ui/newCirclesList'
-import memberNamesAction from 'app/redux/memberNames/memberNamesAction'
 import { PrivacyPolicy } from 'app/ui/privacyPolicy'
 import { useForm } from 'react-hook-form'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import currentMemberAddressAction from 'app/redux/currentMemberAddress/currentMemberAddressAction'
 import {
   useAllMemberDetails,
   useAcceptSharedInfo,
@@ -66,7 +65,7 @@ const schema = z.object({
 export type Schema = z.infer<typeof schema>
 export function CirclesListScreen() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
+  const { setMemberNames, setMemberAddress } = useStore()
   const queryClient = useQueryClient()
   const memberNamesList = useAppSelector(
     (state) => state.memberNames.memberNamesList
@@ -149,20 +148,22 @@ export function CirclesListScreen() {
           memberNamesList.push(fullName)
         }
       })
-      dispatch(memberNamesAction.setMemberNames(memberNamesList))
+      setMemberNames(memberNamesList)
       setDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberDetailsData])
 
   useEffect(() => {
-    if (transportData && transportMemberId !== '') {
-      setTransportationList(transportData ? transportData : [])
+    if (Array.isArray(transportData) && transportMemberId !== '') {
+      setTransportationList(transportData)
       setIsShowTransportationRequests(true)
     }
   }, [transportData, transportMemberId])
 
   useEffect(() => {
-    dispatch(currentMemberAddressAction.setMemberAddress({}))
+    setMemberAddress({})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function acceptNewRequest(data: { id: number | string }) {

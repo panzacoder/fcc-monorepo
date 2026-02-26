@@ -23,7 +23,7 @@ import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { StaticData } from 'app/data/static'
 import type {
   FindCaregiverResult,
@@ -163,6 +163,7 @@ export function AddEditCaregiverScreen() {
     } else {
       setIsMemberFound(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData, isSearching, searchEmail])
 
   const isMutating =

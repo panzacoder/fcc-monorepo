@@ -19,7 +19,7 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type {
   EventDetailResponse,
   CreateEventParams,
@@ -122,6 +122,7 @@ export function AddEditEventScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   async function setAddressObject(value: unknown, index: number) {
     if (value) {

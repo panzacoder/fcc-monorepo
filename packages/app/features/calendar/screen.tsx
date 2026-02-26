@@ -16,7 +16,7 @@ import { getUserPermission } from 'app/utils/getUserPermissions'
 import { ExpandableCalendarView } from 'app/ui/expandableCalendarView'
 import type { CalendarEventItem } from 'app/ui/expandableCalendarView'
 import { format } from 'date-fns'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { AllowedDomainObjects } from 'app/data/dashboard'
 export function CalendarScreen() {
   const calendarPrivilegesRef = useRef<AllowedDomainObjects>({})

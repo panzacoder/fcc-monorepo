@@ -15,7 +15,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 import { useRouter } from 'expo-router'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 export function DoctorsListScreen() {
   const [isDataReceived, setIsDataReceived] = useState(false)
   const [doctorList, setDoctorList] = useState<DoctorListItem[]>([])
@@ -44,6 +44,7 @@ export function DoctorsListScreen() {
       getFilteredList(list, currentFilter)
       setIsDataReceived(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorsData])
   function setFilteredList(filter: string) {
     setIsShowFilter(false)

@@ -3,6 +3,7 @@ const isDev =
     ? __DEV__
     : process.env.NODE_ENV !== 'production'
 
+/* eslint-disable no-console */
 function debug(...args: unknown[]): void {
   if (isDev) {
     console.log('[DEBUG]', ...args)
@@ -24,6 +25,7 @@ function warn(...args: unknown[]): void {
 function error(...args: unknown[]): void {
   console.error('[ERROR]', ...args)
 }
+/* eslint-enable no-console */
 
 export const logger = {
   debug,

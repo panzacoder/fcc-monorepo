@@ -6,7 +6,7 @@ import {
   getNameInitials,
   getColorSet
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 

@@ -23,7 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LocationDetails } from 'app/ui/locationDetails'
 import { PtsComboBox } from 'app/ui/PtsComboBox'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type MemberRouteParams = {
   member?: number | string
@@ -129,6 +129,7 @@ export function AddEditIncidentScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function setAddressObject(value: unknown, index: number) {

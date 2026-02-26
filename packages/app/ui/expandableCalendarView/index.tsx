@@ -9,7 +9,7 @@ import { getFullDateForCalendar, getOnlyUserTimeZone } from '../utils'
 
 import testIDs from '../../utils/testIDs'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 export interface CalendarEventItem {
   date: string
@@ -60,6 +60,7 @@ export const ExpandableCalendarView = ({
   const [markedObject, setMarkedObject] = useState({})
   useEffect(() => {
     getMarkedDates()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const onDateChanged = (_date: string, _updateSource: string) => {}
 

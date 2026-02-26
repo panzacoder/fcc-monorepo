@@ -21,6 +21,8 @@ export interface LoginAppUser {
   email: string
   phone: string
   memberName: string
+  memberId?: number
+  id?: number
   address: Address
   isFreeUser: boolean
   premiumFeatureTrialinfo: {

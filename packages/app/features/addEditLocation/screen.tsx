@@ -38,7 +38,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   removeAllSpecialCharFromString
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type MemberRouteParams = {
   member: number | string
@@ -133,6 +133,7 @@ export function AddEditLocationScreen() {
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statesQuery.data])
 
   function handleBackButtonClick() {
@@ -185,6 +186,7 @@ export function AddEditLocationScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {

@@ -1,2 +1,0 @@
-export const GET_MEMBER_NAMES = 'GET_MEMBER_NAMES'
-export const SET_MEMBER_NAMES = 'SET_MEMBER_NAMES'

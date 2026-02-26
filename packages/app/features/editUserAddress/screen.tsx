@@ -17,7 +17,7 @@ import { useLocalSearchParams } from 'expo-router'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type { Address } from 'app/data/types'
 
 type AddressFormData = {

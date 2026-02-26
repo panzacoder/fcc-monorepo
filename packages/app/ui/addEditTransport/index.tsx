@@ -4,7 +4,7 @@ import { ScrollView } from 'app/ui/scroll-view'
 import { getAddressFromObject, isEmpty } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
 import { SafeAreaView } from 'app/ui/safe-area-view'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { Button } from 'app/ui/button'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
 import { ControlledDropdown } from 'app/ui/form-fields/controlled-dropdown'
@@ -108,8 +108,8 @@ export const AddEditTransport = ({
   })
 
   useEffect(() => {
-    if (!memberListQuery.data || !isEmpty(transportData)) return
-    let list: Array<{ id: number; title: string }> = memberListQuery.data.map(
+    if (!Array.isArray(memberListQuery.data) || !isEmpty(transportData)) return
+    const list: Array<{ id: number; title: string }> = memberListQuery.data.map(
       (item: MemberListItem, index: number) => {
         return {
           title: item.name,
@@ -119,6 +119,7 @@ export const AddEditTransport = ({
     )
     setMemberList(list)
     setMemberListFull((memberListQuery.data as MemberListItem[]) || [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberListQuery.data])
 
   useEffect(() => {
@@ -150,6 +151,7 @@ export const AddEditTransport = ({
 
     setStatesList(statesList)
     setStatesListFull(statesQuery.data.stateList || [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statesQuery.data])
 
   const { control, handleSubmit, reset } = useForm({

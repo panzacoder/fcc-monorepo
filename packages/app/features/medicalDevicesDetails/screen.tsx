@@ -48,7 +48,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 export function MedicalDevicesDetailsScreen() {
   const router = useRouter()
@@ -165,6 +165,7 @@ export function MedicalDevicesDetailsScreen() {
         )
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medicalDeviceDetailsData])
 
   function handleBackButtonClick() {
@@ -184,6 +185,7 @@ export function MedicalDevicesDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let medicalDeviceDate = '',
     medicalDevice = '',

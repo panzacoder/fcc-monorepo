@@ -43,7 +43,7 @@ import { useRouter } from 'expo-router'
 import { logger } from 'app/utils/logger'
 import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type MemberRouteParams = {
   member: number | string
@@ -150,6 +150,7 @@ export function IncidentDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let incidentDate = '',
     incident = '',

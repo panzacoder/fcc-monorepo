@@ -7,7 +7,7 @@ import PtsLoader from 'app/ui/PtsLoader'
 import { useRouter } from 'expo-router'
 import { formatUrl } from 'app/utils/format-url'
 
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 type TransportationRequest = {
   type: string

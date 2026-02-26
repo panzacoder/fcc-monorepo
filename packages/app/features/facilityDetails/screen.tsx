@@ -9,7 +9,7 @@ import { Typography } from 'app/ui/typography'
 import { Feather } from 'app/ui/icons'
 import { ShareDoctorFacility } from 'app/ui/shareDoctorFacility'
 import { formatTimeToUserLocalTime } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import * as Clipboard from 'expo-clipboard'
 import {
   useFacilityDetails,
@@ -94,6 +94,7 @@ export function FacilityDetailsScreen() {
       )
       logger.debug('appointmentList', JSON.stringify(appointmentList))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facilityDetailsData])
 
   function handleBackButtonClick() {
@@ -113,6 +114,7 @@ export function FacilityDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function deleteFacility() {

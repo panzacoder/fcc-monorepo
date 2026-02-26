@@ -3,17 +3,16 @@ import { Alert } from 'react-native'
 import { useRouter } from 'expo-router'
 import { onSessionExpired } from 'app/utils/auth-events'
 import { clearCredentials } from 'app/utils/secure-storage'
-import { useAppDispatch } from 'app/redux/hooks'
-import { resetStore } from 'app/redux/storeAction'
+import { useStore } from 'app/store'
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const dispatch = useAppDispatch()
+  const resetStore = useStore((state) => state.resetStore)
 
   useEffect(() => {
     const unsubscribe = onSessionExpired(async () => {
       await clearCredentials()
-      dispatch(resetStore())
+      resetStore()
       Alert.alert('Session Expired', 'Please log in again.', [
         {
           text: 'Ok',
@@ -26,7 +25,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     })
 
     return unsubscribe
-  }, [router, dispatch])
+  }, [router, resetStore])
 
   return <>{children}</>
 }

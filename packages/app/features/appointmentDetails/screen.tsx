@@ -14,7 +14,7 @@ import {
   convertPhoneNumberToUsaPhoneNumberFormat,
   isEmpty
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { formatUrl } from 'app/utils/format-url'
 import { Location } from 'app/ui/location'
 import { Button } from 'app/ui/button'
@@ -147,6 +147,7 @@ export function AppointmentDetailsScreen() {
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hookData.allMemberDetailsData])
 
   useEffect(() => {
@@ -181,6 +182,7 @@ export function AppointmentDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   let doctorFacilityName = '',

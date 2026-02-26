@@ -21,7 +21,7 @@ import { Location } from 'app/ui/location'
 import { formatUrl } from 'app/utils/format-url'
 import { formatTimeToUserLocalTime, isEmpty } from 'app/ui/utils'
 import { getUserPermission } from 'app/utils/getUserPermissions'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useEventDetailsData } from './hooks/useEventDetailsData'
 import { EventNotesSection } from './components/EventNotesSection'
 import { EventRemindersSection } from './components/EventRemindersSection'
@@ -127,6 +127,7 @@ export function EventDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   let eventDate = '',

@@ -127,6 +127,7 @@ export function SubscriptionSection({
         ]
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileData])
 
   let showUpgradeButton = true

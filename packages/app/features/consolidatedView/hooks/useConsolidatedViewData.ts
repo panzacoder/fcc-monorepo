@@ -6,7 +6,7 @@ import {
   useConsolidatedDetails,
   useFilterConsolidatedDetails
 } from 'app/data/dashboard'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 export function useConsolidatedViewData(
   queryFromDate: string,

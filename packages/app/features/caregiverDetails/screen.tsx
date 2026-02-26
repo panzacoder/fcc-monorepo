@@ -10,7 +10,7 @@ import { Feather } from 'app/ui/icons'
 import { isEmpty } from 'app/ui/utils'
 import { CaregiverProfileInfo } from 'app/ui/caregiverProfileInfo'
 import { formatUrl } from 'app/utils/format-url'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from 'app/ui/button'
 import { getUserPermission } from 'app/utils/getUserPermissions'
@@ -107,6 +107,7 @@ export function CaregiverDetailsScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   let titleStyle = 'font-400 w-[20%] text-[15px] text-[#1A1A1A]'
   let valueStyle = 'font-400 ml-2 w-[75%] text-[15px] font-bold text-[#1A1A1A]'

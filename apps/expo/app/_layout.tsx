@@ -4,14 +4,13 @@ import { Slot } from 'expo-router'
 import { Provider } from 'app/provider'
 import { useEffect } from 'react'
 import { fetchStaticData } from 'app/data/static'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 
 function RootInner() {
   const header = useAppSelector((state) => state.headerState.header)
-  const dispatch = useAppDispatch()
   useEffect(() => {
-    fetchStaticData(header, dispatch)
-  }, [header, dispatch])
+    fetchStaticData(header)
+  }, [header])
   return <Slot />
 }
 

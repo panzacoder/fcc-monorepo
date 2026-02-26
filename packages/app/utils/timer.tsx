@@ -18,6 +18,7 @@ export const Timer = ({ startDate }: TimerProps) => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   function timerInit() {
     const now = new Date()

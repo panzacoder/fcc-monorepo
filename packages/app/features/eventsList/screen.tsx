@@ -23,7 +23,7 @@ import {
   getMonthsList,
   convertUserTimeToUTC
 } from 'app/ui/utils'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { getUserPermission } from 'app/utils/getUserPermissions'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -97,6 +97,7 @@ export function EventsListScreen() {
       setIsDataReceived(true)
       setIsFilter(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventsData])
 
   function handleBackButtonClick() {
@@ -125,6 +126,7 @@ export function EventsListScreen() {
         handleBackButtonClick
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   function setFilteredList(filter: string) {
     setIsShowFilter(false)

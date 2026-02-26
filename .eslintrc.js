@@ -16,9 +16,9 @@ module.exports = {
       {
         paths: [
           {
-            name: 'app/redux/store',
+            name: 'react-redux',
             message:
-              'Use useAppSelector/useAppDispatch hooks from app/redux/hooks instead of importing store directly.'
+              'Redux has been replaced by Zustand. Use useAppSelector from app/redux/hooks or useStore from app/store.'
           }
         ]
       }

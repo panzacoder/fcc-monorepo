@@ -11,12 +11,12 @@ import {
 import { SafeAreaView } from 'app/ui/safe-area-view'
 import PtsLoader from 'app/ui/PtsLoader'
 import messaging from '@react-native-firebase/messaging'
-import messageListAction from 'app/redux/messageList/messageListAction'
+import { useStore } from 'app/store'
 import PtsBackHeader from 'app/ui/PtsBackHeader'
 import * as Notifications from 'expo-notifications'
 import { Typography } from 'app/ui/typography'
 import { formatTimeToUserLocalTime, isValidObject } from 'app/ui/utils'
-import { useAppSelector, useAppDispatch } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useLocalSearchParams } from 'expo-router'
 import { Feather } from 'app/ui/icons'
 import {
@@ -47,7 +47,7 @@ export function NotificationNoteMessageScreen() {
   const [message, setMessage] = useState('')
   const [messageList, setMessageList] = useState<Message[] | null>(null)
   const [threadDetails, setThreadDetails] = useState<MessageThread | null>(null)
-  const dispatch = useAppDispatch()
+  const { setMessageList: setMessageListStore } = useStore()
   const header = useAppSelector((state) => state.headerState.header)
   const userDetails = useAppSelector((state) => state.userProfileState.header)
   const userAddress = useAppSelector(
@@ -96,13 +96,10 @@ export function NotificationNoteMessageScreen() {
             ? messageThread.messageList
             : []
         setMessageList(msgList)
-        dispatch(
-          messageListAction.setMessageList(
-            msgList as unknown as Record<string, unknown>[]
-          )
-        )
+        setMessageListStore(msgList as unknown as Record<string, unknown>[])
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadData])
 
   const handleFcmMessage = useCallback(async () => {
@@ -115,6 +112,7 @@ export function NotificationNoteMessageScreen() {
         updateMessageList(message)
       })
     } catch (e: unknown) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const messageListFromStore = useAppSelector(
     (state) => state.messageList.messageList
@@ -137,6 +135,7 @@ export function NotificationNoteMessageScreen() {
   }
   useEffect(() => {
     handleFcmMessage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function updateMessageThread() {

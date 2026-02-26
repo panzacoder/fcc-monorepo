@@ -6,7 +6,7 @@ import { getAddressFromObject, googleMapOpenUrl } from 'app/ui/utils'
 import { formatUrl } from 'app/utils/format-url'
 import { convertPhoneNumberToUsaPhoneNumberFormat } from 'app/ui/utils'
 import PtsLoader from 'app/ui/PtsLoader'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { Image } from 'app/ui/image'
 import {
   useDeleteDoctorLocation,

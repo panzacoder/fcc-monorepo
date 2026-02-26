@@ -24,7 +24,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'app/ui/button'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import type {
   PlanDetail,
   PlanGroup,
@@ -153,6 +153,7 @@ export function PlansScreen() {
       setPlanNames(planNamesList)
       setSelectedPlanId(selectedId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allPlansData])
   async function upgradePlan() {
     setIsShowCardModal(true)

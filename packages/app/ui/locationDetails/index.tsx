@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { isEmpty } from 'app/ui/utils'
 import { ControlledTextField } from 'app/ui/form-fields/controlled-field'
-import { useAppSelector } from 'app/redux/hooks'
+import { useAppSelector } from 'app/store'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -98,6 +98,7 @@ export const LocationDetails = ({
       }
     })
     return countryId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [selectedCountryId, setSelectedCountryId] =
@@ -141,6 +142,7 @@ export const LocationDetails = ({
     reset({
       country: countryIndexRef.current
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -217,6 +219,7 @@ export const LocationDetails = ({
       timeZone: timeZoneIndexRef.current
     })
     setIsDataReceived(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statesQuery.data])
 
   const isLoading = statesQuery.isLoading
